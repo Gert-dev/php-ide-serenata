@@ -1,4 +1,4 @@
-# php-integraion-base
+# php-integrator-base
 
 This will be completed at a later date.
 
