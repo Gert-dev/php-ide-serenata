@@ -1,0 +1,34 @@
+{
+  "name": "php-integrator-base",
+  "main": "./lib/main",
+  "version": "0.0.1",
+  "description": "Base package for php-integrator that exposes services for querying PHP sources.",
+  "repository":  "https://github.com/Gert-dev/php-integrator-base.git",
+  "license": "MIT",
+
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+
+  "providedServices": {
+    "php-integrator.service": {
+      "versions": {
+        "0.0.1": "getService"
+      }
+    }
+  },
+
+  "dependencies": {
+    "fuzzaldrin": "^2.1.0",
+    "md5": "2.0.0",
+    "jquery": "~2.1.4"
+  },
+
+  "keywords": [
+    "php",
+    "service",
+    "integrator",
+    "integration",
+    "php-integrator"
+  ]
+}

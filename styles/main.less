@@ -1,0 +1,70 @@
+// The ui-variables file is provided by base themes provided by Atom.
+//
+// See https://github.com/atom/atom-dark-ui/blob/master/stylesheets/ui-variables.less
+// for a full listing of what's available.
+@import "ui-variables";
+@import "octicon-utf-codes";
+
+.php-integrator-strike, .php-integrator-strike .word {
+    text-decoration: line-through;
+}
+
+.php-integrator-goto-overlay {
+    width: 100%;
+    margin-left: -50%;
+}
+
+.php-integrator-popover-wrapper {
+    margin: 0em 0em 0em 0em;
+    text-align: left;
+
+    .section {
+        > h4 {
+            margin-top: 1em;
+            font-size: larger;
+            font-weight: bold;
+        }
+
+        > div {
+            padding-left: 1em;
+        }
+    }
+
+}
+
+atom-text-editor, atom-text-editor::shadow {
+    .comment-clickable .region {
+        pointer-events: all;
+        z-index: 9999;
+    }
+
+    .gutter {
+        .line-number {
+            &.override {
+                .icon-right {
+                    opacity: 1.0;
+                    cursor: pointer;
+                    visibility: visible;
+
+                    &:before {
+                        content: @link;
+                        color: @ui-site-color-2;
+                    }
+                }
+            }
+
+            &.implementation {
+                .icon-right {
+                    opacity: 1.0;
+                    cursor: pointer;
+                    visibility: visible;
+
+                    &:before {
+                        content: @link;
+                        color: @ui-site-color-3;
+                    }
+                }
+            }
+        }
+    }
+}
