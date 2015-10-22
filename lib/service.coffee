@@ -59,8 +59,6 @@ class Service
      * Performs a complete index of the current project.
     ###
     performFullIndex: () ->
-        console.log 'Building index'
-
         if @progressBar
             @progressBar.setText("Indexing...")
             @progressBar.show()
@@ -68,8 +66,6 @@ class Service
         proxy.refresh null, () =>
             if @progressBar
                 @progressBar.hide()
-
-            console.log 'Build done'
 
     ###*
      * Deactivates the package.

@@ -10,21 +10,15 @@ class ProgressBar
 
     initialize: () ->
         @span = document.createElement("span")
-        @span.className = "inline-block text-subtle"
-        @span.innerHTML = "Indexing.."
+        @span.className = "text-subtle"
         @span.innerHTML = @text
 
         @progress = document.createElement("progress")
 
         @container = document.createElement("div")
-        @container.className = "inline-block"
-
-        @subcontainer = document.createElement("div")
-        @subcontainer.className = "block"
-        @container.appendChild(@subcontainer)
-
-        @subcontainer.appendChild(@progress)
-        @subcontainer.appendChild(@span)
+        @container.className = "php-integrator-progress-bar"
+        @container.appendChild(@progress)
+        @container.appendChild(@span)
 
     setText: (@text) ->
         if @span
@@ -40,7 +34,7 @@ class ProgressBar
         if not @span
             @initialize()
 
-        @tile = statusBarSevice.addRightTile(item: @container, priority: 19)
+        @tile = statusBarSevice.addLeftTile(item: @container, priority: 999999)
 
     detach: ->
         @tile.destroy()
