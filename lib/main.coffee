@@ -1,8 +1,8 @@
 {Disposable} = require 'atom'
 
-config      = require './config.coffee'
-Service     = require './service.coffee'
-ProgressBar = require "./widgets/progress-bar.coffee"
+config               = require './config.coffee'
+Service              = require './service.coffee'
+StatusBarProgressBar = require "./widgets/status-bar-progress-bar.coffee"
 
 module.exports =
     ###*
@@ -70,7 +70,7 @@ module.exports =
 
         # TODO: Config has to become a class, dependency inject.
 
-        @progressBar = new ProgressBar()
+        @progressBar = new StatusBarProgressBar()
 
         config.init()
 

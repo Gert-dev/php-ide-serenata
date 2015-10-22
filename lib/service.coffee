@@ -31,7 +31,7 @@ class Service
                     for directory in atom.project.getDirectories()
                         if path.indexOf(directory.path) == 0
                             classPath = path.substr(0, directory.path.length+1)
-                            path = path.substr(directory.path.length+1)
+                            path = path.substr(directory.path.length + 1)
                             break
 
                     proxy.refresh(classPath + utility.normalizeSeparators(path))
@@ -58,7 +58,7 @@ class Service
     ###
     performFullIndex: () ->
         if @progressBar
-            @progressBar.setText("Indexing...")
+            @progressBar.setLabel("Indexing...")
             @progressBar.show()
 
         proxy.refresh null, () =>
