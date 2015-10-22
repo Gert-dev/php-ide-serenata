@@ -1,8 +1,8 @@
 {Disposable} = require 'atom'
 
 config               = require './config.coffee'
-Service              = require './service.coffee'
-StatusBarProgressBar = require "./widgets/status-bar-progress-bar.coffee"
+Service              = require './Service.coffee'
+StatusBarProgressBar = require "./Widgets/StatusBarProgressBar.coffee"
 
 module.exports =
     ###*

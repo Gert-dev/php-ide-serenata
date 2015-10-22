@@ -1,4 +1,4 @@
-Popover = require './popover'
+Popover = require './Popover'
 
 module.exports =
 
