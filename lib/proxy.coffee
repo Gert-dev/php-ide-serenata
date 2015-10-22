@@ -1,8 +1,9 @@
+fs            = require 'fs'
+md5           = require 'md5'
 child_process = require "child_process"
-process = require "process"
-config = require "./config.coffee"
-md5 = require 'md5'
-fs = require 'fs'
+
+config  = require "./config.coffee"
+utility = require "./utility.coffee"
 
 # TODO: Proxy should do nothing more than direct interfacing with PHP. It should not perform caching, that should be
 # handled by a CachingProxy class.
@@ -11,9 +12,6 @@ data =
     methods: [],
     autocomplete: [],
     composer: null
-
-escapeSlashes = (text) ->
-    return text.replace(/\\/g, '\\\\')
 
 ###*
  * Executes a command to PHP proxy
@@ -25,7 +23,7 @@ execute = (command, async, callback) ->
     for directory in atom.project.getDirectories()
         if not async
             for c in command
-                c = escapeSlashes(c)
+                c = utility.escapeSeparators(c)
 
             try
                 stdout = child_process.spawnSync(config.config.php, [__dirname + "/../php/parser.php",  directory.path].concat(command)).output[1].toString('ascii')
@@ -45,7 +43,7 @@ execute = (command, async, callback) ->
 
             return res
         else
-            command = escapeSlashes(command)
+            command = utility.escapeSeparators(command)
             child_process.exec(config.config.php + " " + __dirname + "/../php/parser.php " + directory.path + " " + command, callback)
 
 ###*

@@ -1,9 +1,10 @@
-config = require './config.coffee'
-proxy  = require './proxy.coffee'
-parser = require './parser.coffee'
+config  = require './config.coffee'
+proxy   = require './proxy.coffee'
+parser  = require './parser.coffee'
+utility = require './utility.coffee'
 
-Popover  = require './widgets/popover.coffee'
-AttachedPopover  = require './widgets/attached-popover.coffee'
+Popover         = require './widgets/popover.coffee'
+AttachedPopover = require './widgets/attached-popover.coffee'
 
 module.exports =
 
@@ -33,7 +34,7 @@ class Service
                             path = path.substr(directory.path.length+1)
                             break
 
-                    proxy.refresh(classPath + path.replace(/\\/g, '/'))
+                    proxy.refresh(classPath + utility.normalizeSeparators(path))
 
         atom.config.onDidChange 'php-integrator-base.phpCommand', () =>
             proxy.clearCache()
