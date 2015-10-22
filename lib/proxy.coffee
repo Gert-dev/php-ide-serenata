@@ -9,29 +9,23 @@ data =
     autocomplete: [],
     composer: null
 
-currentProcesses = []
-
 ###*
  * Executes a command to PHP proxy
  * @param  {string}  command Command to exectue
  * @param  {boolean} async   Must be async or not
  * @return {array}           Json of the response
 ###
-execute = (command, async) ->
+execute = (command, async, callback) ->
     for directory in atom.project.getDirectories()
         if not async
             for c in command
                 c.replace(/\\/g, '\\\\')
 
             try
-                # avoid multiple processes of the same command
-                if not currentProcesses[command]?
-                    currentProcesses[command] = true
+                stdout = exec.spawnSync(config.config.php, [__dirname + "/../php/parser.php",  directory.path].concat(command)).output[1].toString('ascii')
 
-                    stdout = exec.spawnSync(config.config.php, [__dirname + "/../php/parser.php",  directory.path].concat(command)).output[1].toString('ascii')
+                res = JSON.parse(stdout)
 
-                    delete currentProcesses[command]
-                    res = JSON.parse(stdout)
             catch err
                 console.log err
                 res =
@@ -46,14 +40,7 @@ execute = (command, async) ->
             return res
         else
             command.replace(/\\/g, '\\\\')
-
-            if not currentProcesses[command]?
-                console.log 'Building index'
-                currentProcesses[command] = exec.exec(config.config.php + " " + __dirname + "/../php/parser.php " + directory.path + " " +   command, (error, stdout, stderr) ->
-                    delete currentProcesses[command]
-                    console.log 'Build done'
-                    return []
-                )
+            exec.exec(config.config.php + " " + __dirname + "/../php/parser.php " + directory.path + " " + command, callback)
 
 ###*
  * Reads an index by its name (file in indexes/index.[name].json)
@@ -195,43 +182,8 @@ module.exports =
      * Refresh the full index or only for the given classPath
      * @param  {string} classPath Full path (dir) of the class to refresh
     ###
-    refresh: (classPath) ->
+    refresh: (classPath, callback) ->
         if not classPath?
-            execute("--refresh", true)
+            execute("--refresh", true, callback)
         else
-            execute("--refresh #{classPath}", true)
-
-    ###*
-     * Method called on plugin activation
-    ###
-    init: () ->
-        @refresh()
-        atom.workspace.observeTextEditors (editor) =>
-            editor.onDidSave((event) =>
-              # Only .php file
-              if event.path.substr(event.path.length - 4) == ".php"
-                  @clearCache()
-
-                  # For Windows - Replace \ in class namespace to / because
-                  # composer use / instead of \
-                  path = event.path
-                  for directory in atom.project.getDirectories()
-                      if path.indexOf(directory.path) == 0
-                          classPath = path.substr(0, directory.path.length+1)
-                          path = path.substr(directory.path.length+1)
-                          break
-
-                  @refresh(classPath + path.replace(/\\/g, '/'))
-            )
-
-        atom.config.onDidChange 'php-integrator-base.phpCommand', () =>
-            @clearCache()
-
-        atom.config.onDidChange 'php-integrator-base.composerCommand', () =>
-            @clearCache()
-
-        atom.config.onDidChange 'php-integrator-base.autoloadScripts', () =>
-            @clearCache()
-
-        atom.config.onDidChange 'php-integrator-base.classMapScripts', () =>
-            @clearCache()
+            execute("--refresh #{classPath}", true, callback)

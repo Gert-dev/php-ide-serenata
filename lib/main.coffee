@@ -1,5 +1,8 @@
-config  = require './config.coffee'
-Service = require './service.coffee'
+{Disposable} = require 'atom'
+
+config      = require './config.coffee'
+Service     = require './service.coffee'
+ProgressBar = require "./widgets/progress-bar.coffee"
 
 module.exports =
     ###*
@@ -53,6 +56,11 @@ module.exports =
     service: null
 
     ###*
+     * The progress bar that is displayed during long operations.
+    ###
+    progressBar: null
+
+    ###*
      * Activates the package.
     ###
     activate: ->
@@ -62,9 +70,12 @@ module.exports =
 
         # TODO: Config has to become a class, dependency inject.
 
+        @progressBar = new ProgressBar()
+
         config.init()
 
         @service = new Service()
+        @service.setProgressBar(@progressBar)
         @service.activate()
 
     ###*
@@ -72,6 +83,16 @@ module.exports =
     ###
     deactivate: ->
         @service.deactivate()
+
+    ###*
+     * Sets the status bar service, which is consumed by this package.
+    ###
+    setStatusBarService: (service) ->
+        @progressBar.attach(service)
+
+        # TODO: Test deactivation of status bar package.
+
+        return new Disposable -> @progressBar.detach()
 
     ###*
      * Retrieves the service exposed by this package.

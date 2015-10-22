@@ -9,10 +9,67 @@ module.exports =
 
 class Service
     ###*
+     * The progress bar that is used for long indexing operations.
+    ###
+    progressBar: null
+
+    ###*
      * Activates the package.
     ###
     activate: ->
-        proxy.init()
+        @performFullIndex()
+
+        atom.workspace.observeTextEditors (editor) =>
+            editor.onDidSave((editor) =>
+              # Only .php file
+              if editor.getGrammar().scopeName.match /text.html.php$/
+              #if editor.path.substr(editor.path.length - 4) == ".php"
+                  proxy.clearCache()
+
+                  # For Windows - Replace \ in class namespace to / because
+                  # composer use / instead of \
+                  path = editor.path
+                  for directory in atom.project.getDirectories()
+                      if path.indexOf(directory.path) == 0
+                          classPath = path.substr(0, directory.path.length+1)
+                          path = path.substr(directory.path.length+1)
+                          break
+
+                  proxy.refresh(classPath + path.replace(/\\/g, '/'))
+            )
+
+        atom.config.onDidChange 'php-integrator-base.phpCommand', () =>
+            proxy.clearCache()
+
+        atom.config.onDidChange 'php-integrator-base.composerCommand', () =>
+            proxy.clearCache()
+
+        atom.config.onDidChange 'php-integrator-base.autoloadScripts', () =>
+            proxy.clearCache()
+
+        atom.config.onDidChange 'php-integrator-base.classMapScripts', () =>
+            proxy.clearCache()
+
+    ###*
+     * Sets the progress bar that can be used to display long operations.
+    ###
+    setProgressBar: (@progressBar) ->
+
+    ###*
+     * Performs a complete index of the current project.
+    ###
+    performFullIndex: () ->
+        console.log 'Building index'
+
+        if @progressBar
+            @progressBar.setText("Indexing...")
+            @progressBar.show()
+
+        proxy.refresh null, () =>
+            if @progressBar
+                @progressBar.hide()
+
+            console.log 'Build done'
 
     ###*
      * Deactivates the package.

@@ -18,6 +18,14 @@
     }
   },
 
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "setStatusBarService"
+      }
+    }
+  },
+
   "dependencies": {
     "fuzzaldrin": "^2.1.0",
     "md5": "2.0.0",
