@@ -2,6 +2,9 @@
 
 module.exports =
 
+##*
+# Widget that can be used to display information about a certain context.
+##
 class Popover extends Disposable
     element: null
 
@@ -48,9 +51,9 @@ class Popover extends Disposable
     ###*
      * Shows a popover at the specified location with the specified text and fade in time.
      *
-     * @param {int}    x          The X coordinate to show the popover at (left).
-     * @param {int}    y          The Y coordinate to show the popover at (top).
-     * @param {int}    fadeInTime The amount of time to take to fade in the tooltip.
+     * @param {number} x          The X coordinate to show the popover at (left).
+     * @param {number} y          The Y coordinate to show the popover at (top).
+     * @param {number} fadeInTime The amount of time to take to fade in the tooltip.
     ###
     show: (x, y, fadeInTime = 100) ->
         @$(@element).css('left', x + 'px')

@@ -1,7 +1,8 @@
 {Disposable} = require 'atom'
 
-config               = require './config.coffee'
 Service              = require './Service.coffee'
+AtomConfig           = require './AtomConfig.coffee'
+ConfigTester         = require './ConfigTester.coffee'
 StatusBarProgressBar = require "./Widgets/StatusBarProgressBar.coffee"
 
 module.exports =
@@ -51,6 +52,16 @@ module.exports =
             order       : 5
 
     ###*
+     * The name of the package.
+    ###
+    packageName: 'php-integrator-base'
+
+    ###*
+     * The config.
+    ###
+    config: null
+
+    ###*
      * The exposed service.
     ###
     service: null
@@ -61,20 +72,62 @@ module.exports =
     progressBar: null
 
     ###*
+     * Tests the user's configuration.
+     *
+     * @return {boolean}
+    ###
+    testConfig: () ->
+        configTester = new ConfigTester(@config)
+
+        if not configTester.test()
+            errorTitle = 'Incorrect setup!'
+            errorMessage = 'Either PHP or Composer is not correctly set up and as a result PHP integrator will not ' +
+              'work. Please visit the settings screen to correct this error. If you are not specifying an absolute ' +
+              'path for PHP or Composer, make sure they are in your PATH.'
+
+            atom.notifications.addError(errorTitle, {'detail': errorMessage})
+
+            return false
+
+        return true
+
+    ###*
+     * Registers any commands that are available to the user.
+    ###
+    registerCommands: () ->
+
+        # TODO: Find a way to embed the package name.
+
+        atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
+            return unless @testConfig()
+
+            atom.notifications.addSuccess 'Success', {
+                'detail' : 'Your PHP integrator configuration is working correctly!'
+            }
+
+        # TODO: This doesn't belong here.
+        atom.commands.add 'atom-workspace', "php-integrator-base:namespace": =>
+            namespace = require './namespace.coffee'
+            namespace.createNamespace(atom.workspace.getActivePaneItem())
+
+    ###*
      * Activates the package.
     ###
     activate: ->
-        # See also pull request #197 - Disabled for now because it does not allow the user to reactivate or try again.
-        # return unless config.testConfig()
+        @config = new AtomConfig(@packageName)
 
+        # See also atom-autocomplete-php pull request #197 - Disabled for now because it does not allow the user to
+        # reactivate or try again.
+        # return unless @testConfig()
+        @testConfig()
+
+        @registerCommands()
 
         # TODO: Config has to become a class, dependency inject.
 
         @progressBar = new StatusBarProgressBar()
 
-        config.init()
-
-        @service = new Service()
+        @service = new Service(@config)
         @service.setProgressBar(@progressBar)
         @service.activate()
 

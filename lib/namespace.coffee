@@ -9,7 +9,7 @@ module.exports =
      * @param {TextEditor} editor
     ###
     createNamespace: (editor) ->
-        proxy = require './php-proxy.coffee'
+        proxy = require './proxy.coffee'
 
         composer    = proxy.composer()
         autoloaders = []

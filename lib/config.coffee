@@ -93,7 +93,7 @@ module.exports =
         atom.commands.add 'atom-workspace', 'php-integrator-base:namespace': =>
             namespace.createNamespace(atom.workspace.getActivePaneItem())
 
-        @getConfig()
+        @writeConfig()
 
         # Command to test configuration
         atom.commands.add 'atom-workspace', 'php-integrator-base:configuration': =>

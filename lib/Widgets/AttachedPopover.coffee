@@ -2,21 +2,29 @@ Popover = require './Popover'
 
 module.exports =
 
+##*
+# Popover that is attached to an HTML element.
+#
+# NOTE: The reason we do not use Atom's native tooltip is because it is attached to an element, which caused strange
+# problems such as tickets #107 and #72. This implementation uses the same CSS classes and transitions but handles the
+# displaying manually as we don't want to attach/detach, we only want to temporarily display a popover on mouseover.
+##
 class AttachedPopover extends Popover
-    ###
-        NOTE: The reason we do not use Atom's native tooltip is because it is attached to an element, which caused
-        strange problems such as tickets #107 and #72. This implementation uses the same CSS classes and transitions but
-        handles the displaying manually as we don't want to attach/detach, we only want to temporarily display a popover
-        on mouseover.
+    ###*
+     * Timeout ID, used for setting a timeout before displaying the popover.
     ###
     timeoutId: null
+
+    ###*
+     * The element to attach the popover to.
+    ###
     elementToAttachTo: null
 
     ###*
      * Constructor.
      *
      * @param {HTMLElement} elementToAttachTo The element to show the popover over.
-     * @param {int}         delay             How long the mouse has to hover over the elment before the popover shows
+     * @param {number}      delay             How long the mouse has to hover over the elment before the popover shows
      *                                        up (in miliiseconds).
     ###
     constructor: (@elementToAttachTo, delay = 500) ->
@@ -24,7 +32,6 @@ class AttachedPopover extends Popover
 
     ###*
      * Destructor.
-     *
     ###
     destructor: () ->
         if @timeoutId
@@ -36,7 +43,7 @@ class AttachedPopover extends Popover
     ###*
      * Shows the popover with the specified text.
      *
-     * @param {int} fadeInTime The amount of time to take to fade in the tooltip.
+     * @param {number} fadeInTime The amount of time to take to fade in the tooltip.
     ###
     show: (fadeInTime = 100) ->
         coordinates = @elementToAttachTo.getBoundingClientRect();
@@ -52,8 +59,8 @@ class AttachedPopover extends Popover
      * Shows the popover with the specified text after the specified delay (in miliiseconds). Calling this method
      * multiple times will cancel previous show requests and restart.
      *
-     * @param {int}    delay      The delay before the tooltip shows up (in milliseconds).
-     * @param {int}    fadeInTime The amount of time to take to fade in the tooltip.
+     * @param {number} delay      The delay before the tooltip shows up (in milliseconds).
+     * @param {number} fadeInTime The amount of time to take to fade in the tooltip.
     ###
     showAfter: (delay, fadeInTime = 100) ->
         @timeoutId = setTimeout(() =>

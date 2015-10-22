@@ -1,4 +1,3 @@
-config  = require './config.coffee'
 proxy   = require './proxy.coffee'
 parser  = require './parser.coffee'
 Utility = require './Utility.coffee'
@@ -8,11 +7,26 @@ AttachedPopover = require './Widgets/AttachedPopover.coffee'
 
 module.exports =
 
+##*
+# The service that is exposed to other packages.
+##
 class Service
     ###*
      * The progress bar that is used for long indexing operations.
     ###
     progressBar: null
+
+    ###*
+     * The config.
+    ###
+    config: null
+
+    ###*
+     * Constructor.
+     *
+     * @param {Config} config
+    ###
+    constructor: (@config) ->
 
     ###*
      * Activates the package.
@@ -36,6 +50,7 @@ class Service
 
                     proxy.refresh(classPath + Utility.normalizeSeparators(path))
 
+        # TODO: This should be attaching to the config object, not directly to the atom config.
         atom.config.onDidChange 'php-integrator-base.phpCommand', () =>
             proxy.clearCache()
 
