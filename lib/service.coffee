@@ -20,23 +20,20 @@ class Service
         @performFullIndex()
 
         atom.workspace.observeTextEditors (editor) =>
-            editor.onDidSave((editor) =>
-              # Only .php file
-              if editor.getGrammar().scopeName.match /text.html.php$/
-              #if editor.path.substr(editor.path.length - 4) == ".php"
-                  proxy.clearCache()
+            editor.onDidSave (event) =>
+                if editor.getGrammar().scopeName.match /text.html.php$/
+                    proxy.clearCache()
 
-                  # For Windows - Replace \ in class namespace to / because
-                  # composer use / instead of \
-                  path = editor.path
-                  for directory in atom.project.getDirectories()
-                      if path.indexOf(directory.path) == 0
-                          classPath = path.substr(0, directory.path.length+1)
-                          path = path.substr(directory.path.length+1)
-                          break
+                    # For Windows - Replace \ in class namespace to / because
+                    # composer use / instead of \
+                    path = event.path
+                    for directory in atom.project.getDirectories()
+                        if path.indexOf(directory.path) == 0
+                            classPath = path.substr(0, directory.path.length+1)
+                            path = path.substr(directory.path.length+1)
+                            break
 
-                  proxy.refresh(classPath + path.replace(/\\/g, '/'))
-            )
+                    proxy.refresh(classPath + path.replace(/\\/g, '/'))
 
         atom.config.onDidChange 'php-integrator-base.phpCommand', () =>
             proxy.clearCache()
