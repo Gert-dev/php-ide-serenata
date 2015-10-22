@@ -34,7 +34,7 @@ class ProgressBar
         if not @span
             @initialize()
 
-        @tile = statusBarSevice.addLeftTile(item: @container, priority: 999999)
+        @tile = statusBarSevice.addRightTile(item: @container, priority: 999999)
 
     detach: ->
         @tile.destroy()
