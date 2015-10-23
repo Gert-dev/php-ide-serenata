@@ -98,9 +98,6 @@ module.exports =
      * Registers any commands that are available to the user.
     ###
     registerCommands: () ->
-
-        # TODO: Find a way to embed the package name.
-
         atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
             return unless @testConfig()
 
