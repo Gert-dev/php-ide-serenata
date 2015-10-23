@@ -47,15 +47,17 @@ class Proxy
                 response = JSON.parse(response.output[1].toString('ascii'))
 
             catch err
-                response =
-                    error   : true
-                    message : err
+                response = {
+                    error : {
+                        message : err
+                    }
+                }
 
             if !response
                 return []
 
             if response.error?
-                console.error(response.error.message)
+                console.error(response.error?.message)
 
             return response
 
@@ -108,13 +110,13 @@ class Proxy
         return @performRequest(@getFirstProjectDirectory(), ['--functions'], false)
 
     ###*
-     * Retrieves a list of available members of the class with the specified name.
+     * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
      *
      * @param {string} className
      *
      * @return {Object}
     ###
-    getMembers: (className) ->
+    getClassMembers: (className) ->
         return @performRequest(@getFirstProjectDirectory(), ['--methods', className], false)
 
     ###*
@@ -146,11 +148,11 @@ class Proxy
      * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
      * projects!). This method is asynchronous and will return immediately.
      *
-     * @param {string}   classPath The full file path to the class to refresh.
-     * @param {callback} callback  The callback to invoke when the indexing process is finished.
+     * @param {string}   filename The full file path to the class to refresh.
+     * @param {callback} callback The callback to invoke when the indexing process is finished.
     ###
-    reindex: (fileName, callback) ->
-        if not classPath
-            classPath = ''
+    reindex: (filename, callback) ->
+        if not filename
+            filename = ''
 
-        @performRequest(@getFirstProjectDirectory(), ['--refresh', classPath], true, callback)
+        @performRequest(@getFirstProjectDirectory(), ['--refresh', filename], true, callback)

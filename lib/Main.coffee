@@ -1,5 +1,7 @@
 {Disposable} = require 'atom'
 
+Parser               = require './Parser.coffee'
+Utility              = require './Utility.coffee'
 Service              = require './Service.coffee'
 AtomConfig           = require './AtomConfig.coffee'
 CachingProxy         = require './CachingProxy.coffee'
@@ -107,6 +109,34 @@ module.exports =
             }
 
     ###*
+     * Registers listeners for config changes.
+    ###
+    registerConfigListeners: () ->
+        @config.onDidChange 'php', () =>
+            @service.clearCache()
+
+        @config.onDidChange 'composer', () =>
+            @service.clearCache()
+
+        @config.onDidChange 'autoload', () =>
+            @service.clearCache()
+
+        @config.onDidChange 'classmap', () =>
+            @service.clearCache()
+
+    ###*
+     * Performs a complete index of the current project.
+    ###
+    performFullIndex: () ->
+        if @progressBar
+            @progressBar.setLabel("Indexing...")
+            @progressBar.show()
+
+        @service.reindex null, () =>
+            if @progressBar
+                @progressBar.hide()
+
+    ###*
      * Activates the package.
     ###
     activate: ->
@@ -117,20 +147,41 @@ module.exports =
         # return unless @testConfig()
         @testConfig()
 
-        @registerCommands()
-
-        proxy = new CachingProxy(@config.get('php'))
         @progressBar = new StatusBarProgressBar()
 
-        @service = new Service(@config, proxy)
-        @service.setProgressBar(@progressBar)
-        @service.activate()
+        proxy = new CachingProxy(@config.get('php'))
+
+        parser = new Parser(proxy)
+
+        @service = new Service(proxy, parser)
+
+        @registerCommands()
+        @registerConfigListeners()
+
+        @performFullIndex()
+
+        atom.workspace.observeTextEditors (editor) =>
+            editor.onDidSave (event) =>
+                return unless editor.getGrammar().scopeName.match /text.html.php$/
+
+                @service.clearCache()
+
+                # For Windows - Replace \ in class namespace to / because
+                # composer use / instead of \
+                path = event.path
+
+                for directory in atom.project.getDirectories()
+                    if path.indexOf(directory.path) == 0
+                        classPath = path.substr(0, directory.path.length+1)
+                        path = path.substr(directory.path.length + 1)
+                        break
+
+                @service.reindex(classPath + Utility.normalizeSeparators(path))
 
     ###*
      * Deactivates the package.
     ###
     deactivate: ->
-        @service.deactivate()
 
     ###*
      * Sets the status bar service, which is consumed by this package.

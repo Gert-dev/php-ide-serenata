@@ -9,7 +9,7 @@ class CachingProxy extends Proxy
     ###*
      * The cache.
     ###
-    @cache: {}
+    cache: {}
 
     ###*
      * Clears the cache.
@@ -42,7 +42,7 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    getMembers: (className) ->
+    getClassMembers: (className) ->
         cacheKey = "members-#{className}"
 
         if not @cache[cacheKey]?

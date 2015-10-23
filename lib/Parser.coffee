@@ -1,11 +1,38 @@
-proxy = require "./proxy.coffee"
 
 module.exports =
-    structureStartRegex: /(?:abstract class|class|trait|interface)\s+(\w+)/
-    useStatementRegex: /(?:use)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/
 
-    # Simple cache to avoid duplicate computation for each providers
+##*
+# Parser that handles all kinds of tasks related to parsing PHP code.
+##
+class Parser
+    ###*
+     * Regular expression that will search for a structure (class, interface, trait, ...).
+    ###
+    structureStartRegex : /(?:abstract class|class|trait|interface)\s+(\w+)/
+
+    ###*
+     * Regular expression that will search for a use statement.
+    ###
+    useStatementRegex   : /(?:use)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/
+
+    ###*
+     * Simple cache to avoid duplicate computation.
+     *
+     * @todo Needs refactoring.
+    ###
     cache: []
+
+    ###*
+     * The proxy that can be used to query information about the code.
+    ###
+    proxy: null
+
+    ###*
+     * Constructor.
+     *
+     * @param {Proxy} proxy
+    ###
+    constructor: (@proxy) ->
 
     ###*
      * Retrieves the class the specified term (method or property) is being invoked on.
@@ -133,7 +160,7 @@ module.exports =
             # At this point, this could either be a class name relative to the current namespace or a full class name
             # without a leading slash. For example, Foo\Bar could also be relative (e.g. My\Foo\Bar), in which case its
             # absolute path is determined by the namespace and use statements of the file containing it.
-            methodsRequest = proxy.methods(fullClass)
+            methodsRequest = @proxy.getClassMembers(fullClass)
 
             if not methodsRequest?.filename
                 # The class, e.g. My\Foo\Bar, didn't exist. We can only assume its an absolute path, using a namespace
@@ -597,7 +624,7 @@ module.exports =
 
                     # Can be empty for closures.
                     if funcName and funcName.length > 0
-                        params = proxy.docParams(@getFullClassName(editor), funcName)
+                        params = @proxy.getDocParams(@getFullClassName(editor), funcName)
 
                         if params.params? and params.params[element]?
                             return @getFullClassName(editor, params.params[element])
@@ -652,8 +679,7 @@ module.exports =
         if not calledClass
             return
 
-        proxy = require '../services/php-proxy.coffee'
-        methods = proxy.methods(calledClass)
+        methods = @proxy.getClassMembers(calledClass)
 
         if not methods
             return
@@ -725,7 +751,7 @@ module.exports =
             if className == null
                 break
 
-            methods = proxy.autocomplete(className, element)
+            methods = @proxy.autocomplete(className, element)
 
             # Element not found or no return value
             if not methods.class? or not @isClass(methods.class)
@@ -740,47 +766,6 @@ module.exports =
             return className
 
         return null
-
-    ###*
-     * Gets the full words from the buffer position given.
-     * E.g. Getting a class with its namespace.
-     * @param  {TextEditor}     editor   TextEditor to search.
-     * @param  {BufferPosition} position BufferPosition to start searching from.
-     * @return {string}  Returns a string of the class.
-    ###
-    getFullWordFromBufferPosition: (editor, position) ->
-        foundStart = false
-        foundEnd = false
-        startBufferPosition = []
-        endBufferPosition = []
-        forwardRegex = /-|(?:\()[\w\[\$\(\\]|\s|\)|;|'|,|"|\|/
-        backwardRegex = /\(|\s|\)|;|'|,|"|\|/
-        index = -1
-        previousText = ''
-
-        loop
-            index++
-            startBufferPosition = [position.row, position.column - index - 1]
-            range = [[position.row, position.column], [startBufferPosition[0], startBufferPosition[1]]]
-            currentText = editor.getTextInBufferRange(range)
-            if backwardRegex.test(editor.getTextInBufferRange(range)) || startBufferPosition[1] == -1 || currentText == previousText
-                foundStart = true
-            previousText = editor.getTextInBufferRange(range)
-            break if foundStart
-        index = -1
-        loop
-            index++
-            endBufferPosition = [position.row, position.column + index + 1]
-            range = [[position.row, position.column], [endBufferPosition[0], endBufferPosition[1]]]
-            currentText = editor.getTextInBufferRange(range)
-            if forwardRegex.test(currentText) || endBufferPosition[1] == 500 || currentText == previousText
-                foundEnd = true
-            previousText = editor.getTextInBufferRange(range)
-            break if foundEnd
-
-        startBufferPosition[1] += 1
-        endBufferPosition[1] -= 1
-        return editor.getTextInBufferRange([startBufferPosition, endBufferPosition])
 
     ###*
      * Gets the correct selector when a class or namespace is clicked.
@@ -810,65 +795,3 @@ module.exports =
             return $(selector).parent().children('.namespace, .inherited-class')
 
         return selector
-
-    ###*
-     * Gets the parent class of the current class opened in the editor
-     * @param  {TextEditor} editor Editor with the class in.
-     * @return {string}            The namespace and class of the parent
-    ###
-    getParentClass: (editor) ->
-        text = editor.getText()
-
-        lines = text.split('\n')
-        for line in lines
-            line = line.trim()
-
-            # If we found extends keyword, return the class
-            if line.indexOf('extends ') != -1
-                words = line.split(' ')
-                extendsIndex = words.indexOf('extends')
-                return @getFullClassName(editor, words[extendsIndex + 1])
-
-    ###*
-     * Finds the buffer position of the word given
-     * @param  {TextEditor} editor TextEditor to search
-     * @param  {string}     term   The function name to search for
-     * @return {mixed}             Either null or the buffer position of the function.
-    ###
-    findBufferPositionOfWord: (editor, term, regex, line = null) ->
-        if line != null
-            lineText = editor.lineTextForBufferRow(line)
-            result = @checkLineForWord(lineText, term, regex)
-            if result != null
-                return [line, result]
-        else
-            text = editor.getText()
-            row = 0
-            lines = text.split('\n')
-            for line in lines
-                result = @checkLineForWord(line, term, regex)
-                if result != null
-                    return [row, result]
-                row++
-        return null;
-
-    ###*
-     * Checks the lineText for the term and regex matches
-     * @param  {string}   lineText The line of text to check.
-     * @param  {string}   term     Term to look for.
-     * @param  {regex}    regex    Regex to run on the line to make sure it's valid
-     * @return {null|int}          Returns null if nothing was found or an
-     *                             int of the column the term is on.
-    ###
-    checkLineForWord: (lineText, term, regex) ->
-        if regex.test(lineText)
-            words = lineText.split(' ')
-            propertyIndex = 0
-            for element in words
-                if element.indexOf(term) != -1
-                    break
-                propertyIndex++;
-
-              reducedWords = words.slice(0, propertyIndex).join(' ')
-              return reducedWords.length + 1
-        return null
