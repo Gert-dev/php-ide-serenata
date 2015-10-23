@@ -35,32 +35,36 @@ class Parser
     constructor: (@proxy) ->
 
     ###*
-     * Retrieves the class the specified term (method or property) is being invoked on.
+     * Retrieves the class the specified member (method or property) is being invoked on.
      *
-     * @param  {TextEditor} editor         TextEditor to search for namespace of term.
-     * @param  {string}     term           Term to search for.
-     * @param  {Point}      bufferPosition The cursor location the term is at.
+     * @param  {TextEditor} editor         The text editor to use.
+     * @param  {Point}      bufferPosition The cursor location of the member, this should be at the operator :: or ->
+     *                                      (but anywhere inside the name of the member itself is fine too).
      *
-     * @return {string}
+     * @return {string|null}
      *
      * @example Invoking it on MyMethod::foo()->bar() will ask what class 'bar' is invoked on, which will whatever type
      *          foo returns.
     ###
-    getCalledClass: (editor, term, bufferPosition) ->
-        fullCall = @getStackClasses(editor, bufferPosition)
+    getCalledClass: (editor, bufferPosition) ->
+        fullCall = @retrieveSanitizedCallStackAt(editor, bufferPosition)
 
-        if fullCall?.length == 0 or !term
-            return
+        return null if not fullCall or fullCall.length == 0
 
-        return @parseElements(editor, bufferPosition, fullCall)
+        return @getClassNameFromCallStack(editor, bufferPosition, fullCall)
 
     ###*
-     * Get all variables declared in the current function
-     * @param {TextEdutir} editor         Atom text editor
-     * @param {Range}      bufferPosition Position of the current buffer
+     * Retrieves all variables that are available at the specified buffer position.
+     *
+     * @param {TextEditor} editor
+     * @param {Range}      bufferPosition
+     *
+     * @return {array}
     ###
-    getAllVariablesInFunction: (editor, bufferPosition) ->
-        # return if not @isInFunction(editor, bufferPosition)
+    getAvailableVariables: (editor, bufferPosition) ->
+        # TODO: This needs refactoring and will not properly skip variables that are outside of the current function's
+        # scope.
+
         isInFunction = @isInFunction(editor, bufferPosition)
 
         startPosition = null
@@ -83,28 +87,31 @@ class Parser
         return matches
 
     ###*
-     * Retrieves the full class name. If the class name is a FQCN (Fully Qualified Class Name), it already is a full
-     * name and it is returned as is. Otherwise, the current namespace and use statements are scanned.
+     * Determines the full class name (without leading slash) of the specified class in the specified editor. If no
+     * class name is passed, the full class name of the class defined in the current file is returned instead.
      *
-     * @param {TextEditor}  editor    Text editor instance.
-     * @param {string|null} className Name of the class to retrieve the full name of. If null, the current class will
-     *                                be returned (if any).
+     * @param {TextEditor}  editor    The editor that contains the class (needed to resolve relative class names).
+     * @param {String|null} className The (local) name of the class to resolve.
      *
-     * @return string
+     * @return {string|null}
+     *
+     * @example In a file with namespace A\B, determining C will lead to A\B\C.
     ###
-    getFullClassName: (editor, className = null) ->
+    determineFullClassName: (editor, className = null) ->
         if className == null
             className = ''
 
         if className and className[0] == "\\"
             return className.substr(1) # FQCN, not subject to any further context.
 
+        # TODO: Move these regular expressions to class members.
         usePattern = /(?:use)(?:[^\w\\\\])([\w\\\\]+)(?![\w\\\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/
         namespacePattern = /(?:namespace)(?:[^\w\\\\])([\w\\\\]+)(?![\w\\\\])(?:;)/
         definitionPattern = /(?:abstract class|class|trait|interface)\s+(\w+)/
 
         text = editor.getText()
 
+        # TODO: It is not necessary to split the text, we can use lineTextForBufferRow instead.
         lines = text.split('\n')
         fullClass = className
 
@@ -269,7 +276,6 @@ class Parser
 
         return if firstClassNameParts.join('\\') == secondClassNameParts.join('\\') then true else false
 
-
     ###*
      * Scores the first class name against the second, indicating how much they 'match' each other. This can be used
      * to e.g. find an appropriate location to place a class in an existing list of classes.
@@ -309,18 +315,22 @@ class Parser
         return totalScore
 
     ###*
-     * Checks if the given name is a class or not
-     * @param  {string}  name Name to check
-     * @return {Boolean}
+     * Indicates if the specified name is the name of a structure (class, interface, ...) or not.
+     *
+     * @param {string} name
+     *
+     * @return {boolean}
     ###
-    isClass: (name) ->
+    isClassType: (name) ->
         return name.substr(0,1).toUpperCase() + name.substr(1) == name
 
     ###*
-     * Checks if the current buffer is in a functon or not
-     * @param {TextEditor} editor         Atom text editor
-     * @param {Range}      bufferPosition Position of the current buffer
-     * @return bool
+     * Checks if the specified location is inside a function or method or not.
+     *
+     * @param {TextEditor} editor
+     * @param {Point}      bufferPosition
+     *
+     * @return {boolean}
     ###
     isInFunction: (editor, bufferPosition) ->
         text = editor.getTextInBufferRange([[0, 0], bufferPosition])
@@ -391,17 +401,18 @@ class Parser
         return result
 
     ###*
-     * Retrieves the stack of elements in a stack of calls such as "self::xxx->xxxx".
+     * Does exactly the same as {@see retrieveSanitizedCallStack}, but will automatically retrieve the relevant code
+     * of the call at the specified location in the buffer.
      *
      * @param  {TextEditor} editor
-     * @param  {Point}       position
+     * @param  {Point}      bufferPosition
      *
      * @return {Object}
     ###
-    getStackClasses: (editor, position) ->
-        return unless position?
+    retrieveSanitizedCallStackAt: (editor, bufferPosition) ->
+        return unless bufferPosition?
 
-        line = position.row
+        line = bufferPosition.row
 
         finished = false
         parenthesesOpened = 0
@@ -412,11 +423,11 @@ class Parser
         while line > 0
             lineText = editor.lineTextForBufferRow(line)
 
-            if line != position.row
+            if line != bufferPosition.row
                 i = (lineText.length - 1)
 
             else
-                i = position.column - 1
+                i = bufferPosition.column - 1
 
             while i >= 0
                 if lineText[i] == '('
@@ -473,16 +484,18 @@ class Parser
             --line
 
         # Fetch everything we ran through up until the location we started from.
-        textSlice = editor.getTextInBufferRange([[line, i], position]).trim()
+        textSlice = editor.getTextInBufferRange([[line, i], bufferPosition]).trim()
 
-        return @parseStackClass(textSlice)
+        return @retrieveSanitizedCallStack(textSlice)
 
     ###*
      * Removes content inside parantheses (including nested parantheses).
+     *
      * @param {string} text String to analyze.
-     * @return String
+     *
+     * @return {string}
     ###
-    stripParanthesesContent: (text) ->
+    stripParenthesesContent: (text) ->
         i = 0
         openCount = 0
         closeCount = 0
@@ -512,35 +525,40 @@ class Parser
         return text
 
     ###*
-     * Parse stack class elements
-     * @param {string} text String of the stack class
-     * @return Array
+     * Takes a call stack and turns it into an array of sanitized elements, which are easier to process.
+     *
+     * @example Passing A::b(complex_arguments)->c will retrieve ['A', 'b()', 'c'].
+     *
+     * @param {string} text
+     *
+     * @return {array}
     ###
-    parseStackClass: (text) ->
+    retrieveSanitizedCallStack: (text) ->
         # Remove singe line comments
         regx = /\/\/.*\n/g
         text = text.replace regx, (match) =>
             return ''
 
-        # Remove multi line comments
+        # Remove multi-line comments
         regx = /\/\*[^(\*\/)]*\*\//g
         text = text.replace regx, (match) =>
             return ''
 
         # Remove content inside parantheses (including nested parantheses).
-        text = @stripParanthesesContent(text)
+        text = @stripParenthesesContent(text)
 
         # Get the full text
         return [] if not text
 
         elements = text.split(/(?:\-\>|::)/)
-        # elements = text.split("->")
 
-        # Remove parenthesis and whitespaces
+        # Remove parentheses and whitespace.
         for key, element of elements
             element = element.replace /^\s+|\s+$/g, ""
+
             if element[0] == '{' or element[0] == '(' or element[0] == '['
                 element = element.substring(1)
+
             else if element.indexOf('return ') == 0
                 element = element.substring('return '.length)
 
@@ -549,13 +567,15 @@ class Parser
         return elements
 
     ###*
-     * Get the type of a variable
+     * Retrieves the type of a variable, relative to the context at the specified buffer location.
      *
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition
-     * @param {string}     element        Variable to search
+     * @param {string}     name
     ###
-    getVariableType: (editor, bufferPosition, element) ->
+    getVariableType: (editor, bufferPosition, name) ->
+        element = name
+
         if element.replace(/[\$][a-zA-Z0-9_]+/g, "").trim().length > 0
             return null
 
@@ -581,7 +601,7 @@ class Parser
 
                 if null != matchesNew
                     bestMatchRow = lineNumber
-                    bestMatch = @getFullClassName(editor, matchesNew[1])
+                    bestMatch = @determineFullClassName(editor, matchesNew[1])
 
             if not bestMatch
                 # Check for catch(XXX $xxx)
@@ -589,7 +609,7 @@ class Parser
 
                 if null != matchesCatch
                     bestMatchRow = lineNumber
-                    bestMatch = @getFullClassName(editor, matchesCatch[1])
+                    bestMatch = @determineFullClassName(editor, matchesCatch[1])
 
             if not bestMatch
                 # Check for a variable assignment $x = ...
@@ -597,7 +617,7 @@ class Parser
 
                 if null != matches
                     value = matches[1]
-                    elements = @parseStackClass(value)
+                    elements = @retrieveSanitizedCallStack(value)
                     elements.push("") # Push one more element to get fully the last class
 
                     newPosition =
@@ -607,7 +627,7 @@ class Parser
                     # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
                     # don't recognize the class name is irrelevant.
                     bestMatchRow = lineNumber
-                    bestMatch = @parseElements(editor, newPosition, elements)
+                    bestMatch = @getClassNameFromCallStack(editor, newPosition, elements)
 
             if not bestMatch
                 # Check for function or closure parameter type hints and the docblock.
@@ -618,16 +638,16 @@ class Parser
                     typeHint = matches[2]
 
                     if typeHint.length > 0
-                        return @getFullClassName(editor, typeHint)
+                        return @determineFullClassName(editor, typeHint)
 
                     funcName = matches[1]
 
                     # Can be empty for closures.
                     if funcName and funcName.length > 0
-                        params = @proxy.getDocParams(@getFullClassName(editor), funcName)
+                        params = @proxy.getDocParams(@determineFullClassName(editor), funcName)
 
                         if params.params? and params.params[element]?
-                            return @getFullClassName(editor, params.params[element])
+                            return @determineFullClassName(editor, params.params[element])
 
             chain = editor.scopeDescriptorForBufferPosition([lineNumber, line.length]).getScopeChain()
 
@@ -640,21 +660,21 @@ class Parser
                     matches = regexVar.exec(line)
 
                     if null != matches
-                        return @getFullClassName(editor, matches[1])
+                        return @determineFullClassName(editor, matches[1])
 
                 # Check if there is an PHPStorm-style type inline docblock present /** @var FooType $someVar */.
                 regexVarWithVarName = new RegExp("\\@var[\\s]+([a-zA-Z_\\\\]+)[\\s]+\\#{element}", "g")
                 matches = regexVarWithVarName.exec(line)
 
                 if null != matches
-                    return @getFullClassName(editor, matches[1])
+                    return @determineFullClassName(editor, matches[1])
 
                 # Check if there is an IntelliJ-style type inline docblock present /** @var $someVar FooType */.
                 regexVarWithVarName = new RegExp("\\@var[\\s]+\\#{element}[\\s]+([a-zA-Z_\\\\]+)", "g")
                 matches = regexVarWithVarName.exec(line)
 
                 if null != matches
-                    return @getFullClassName(editor, matches[1])
+                    return @determineFullClassName(editor, matches[1])
 
             # We've reached the function definition, other variables don't apply to this scope.
             if chain.indexOf("function") != -1
@@ -681,42 +701,34 @@ class Parser
 
         methods = @proxy.getClassMembers(calledClass)
 
-        if not methods
-            return
-
-        if methods.error? and methods.error != ''
-            atom.notifications.addError('Failed to get methods for ' + calledClass, {
-                'detail': methods.error.message
-            })
-
-            return
-
-        if methods.names.indexOf(term) == -1
-            return
+        return if not methods or (methods.error? and methods.error != '') or methods.names.indexOf(term) == -1
 
         value = methods.values[term]
 
-        # If there are multiple matches, just select the first method.
+        # If there are multiple matches, just select the first one.
         if value instanceof Array
             for val in value
-                if val.isMethod
-                    value = val
-                    break
+                value = val
+                break
 
         return value
 
     ###*
-     * Parse all elements from the given array to return the last className (if any)
-     * @param  Array elements Elements to parse
-     * @return string|null full class name of the last element
+     * Parses all elements from the given call stack to return the last class name (if any).
+     *
+     * @param {TextEditor} editor
+     * @param {Point}      bufferPosition
+     * @param {array}      callStack
+     *
+     * @return {string|null}
     ###
-    parseElements: (editor, bufferPosition, elements) ->
+    getClassNameFromCallStack: (editor, bufferPosition, callStack) ->
         loop_index = 0
         className  = null
-        if not elements?
+        if not callStack?
             return
 
-        for element in elements
+        for element in callStack
             # $this keyword
             if loop_index == 0
                 if element[0] == '$'
@@ -724,13 +736,13 @@ class Parser
 
                     # NOTE: The type of $this can also be overridden locally by a docblock.
                     if element == '$this' and not className
-                        className = @getFullClassName(editor)
+                        className = @determineFullClassName(editor)
 
                     loop_index++
                     continue
 
                 else if element == 'static' or element == 'self'
-                    className = @getFullClassName(editor)
+                    className = @determineFullClassName(editor)
                     loop_index++
                     continue
 
@@ -740,12 +752,12 @@ class Parser
                     continue
 
                 else
-                    className = @getFullClassName(editor, element)
+                    className = @determineFullClassName(editor, element)
                     loop_index++
                     continue
 
             # Last element
-            if loop_index >= elements.length - 1
+            if loop_index >= callStack.length - 1
                 break
 
             if className == null
@@ -754,7 +766,7 @@ class Parser
             methods = @proxy.autocomplete(className, element)
 
             # Element not found or no return value
-            if not methods.class? or not @isClass(methods.class)
+            if not methods.class? or not @isClassType(methods.class)
                 className = null
                 break
 
@@ -762,7 +774,7 @@ class Parser
             loop_index++
 
         # If no data or a valid end of line, OK
-        if elements.length > 0 and (elements[elements.length-1].length == 0 or elements[elements.length-1].match(/([a-zA-Z0-9]$)/g))
+        if callStack.length > 0 and (callStack[callStack.length-1].length == 0 or callStack[callStack.length-1].match(/([a-zA-Z0-9]$)/g))
             return className
 
         return null
@@ -770,7 +782,7 @@ class Parser
     ###*
      * Gets the correct selector when a class or namespace is clicked.
      *
-     * @param  {jQuery.Event}  event  A jQuery event.
+     * @param {jQuery.Event} event
      *
      * @return {object|null} A selector to be used with jQuery.
     ###

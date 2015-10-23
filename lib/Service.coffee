@@ -141,7 +141,9 @@ class Service
      * @param {TextEditor}  editor    The editor that contains the class (needed to resolve relative class names).
      * @param {String|null} className The (local) name of the class to resolve.
      *
+     * @return {string|null}
+     *
      * @example In a file with namespace A\B, determining C will lead to A\B\C.
     ###
     determineFullClassName: (editor, className = null) ->
-        return @parser.getFullClassName(editor, className)
+        return @parser.determineFullClassName(editor, className)
