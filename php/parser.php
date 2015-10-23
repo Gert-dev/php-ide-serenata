@@ -8,9 +8,11 @@ ErrorHandler::register();
 
 require_once(__DIR__ . '/tmp.php');
 require_once(__DIR__ . '/Config.php');
+
 require_once(__DIR__ . '/services/Tools.php');
 require_once(__DIR__ . '/services/DocParser.php');
 require_once(__DIR__ . '/services/FileParser.php');
+
 require_once(__DIR__ . '/providers/ProviderInterface.php');
 require_once(__DIR__ . '/providers/AutocompleteProvider.php');
 require_once(__DIR__ . '/providers/MethodsProvider.php');
