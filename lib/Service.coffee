@@ -50,17 +50,16 @@ class Service
 
                     proxy.refresh(classPath + Utility.normalizeSeparators(path))
 
-        # TODO: This should be attaching to the config object, not directly to the atom config.
-        atom.config.onDidChange 'php-integrator-base.phpCommand', () =>
+        @config.onDidChange 'php', () =>
             proxy.clearCache()
 
-        atom.config.onDidChange 'php-integrator-base.composerCommand', () =>
+        @config.onDidChange 'composer', () =>
             proxy.clearCache()
 
-        atom.config.onDidChange 'php-integrator-base.autoloadScripts', () =>
+        @config.onDidChange 'autoload', () =>
             proxy.clearCache()
 
-        atom.config.onDidChange 'php-integrator-base.classMapScripts', () =>
+        @config.onDidChange 'classmap', () =>
             proxy.clearCache()
 
     ###*

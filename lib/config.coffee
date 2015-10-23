@@ -1,5 +1,4 @@
 fs = require 'fs'
-namespace = require './namespace.coffee'
 
 module.exports =
     ###*
@@ -89,10 +88,6 @@ module.exports =
      * Register config events and write the first config
     ###
     init: () ->
-        # Command for namespaces
-        atom.commands.add 'atom-workspace', 'php-integrator-base:namespace': =>
-            namespace.createNamespace(atom.workspace.getActivePaneItem())
-
         @writeConfig()
 
         # Command to test configuration

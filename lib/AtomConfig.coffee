@@ -24,29 +24,34 @@ class AtomConfig extends Config
      * @inheritdoc
     ###
     load: () ->
-        @data.php                            = atom.config.get('php-integrator-base.phpCommand')
-        @data.composer                       = atom.config.get('php-integrator-base.composerCommand')
-        @data.autoload                       = atom.config.get('php-integrator-base.autoloadScripts')
-        @data.classmap                       = atom.config.get('php-integrator-base.classMapScripts')
-        @data.insertNewlinesForUseStatements = atom.config.get('php-integrator-base.insertNewlinesForUseStatements')
+        @set('php', atom.config.get('php-integrator-base.phpCommand'))
+        @set('composer', atom.config.get('php-integrator-base.composerCommand'))
+        @set('autoload', atom.config.get('php-integrator-base.autoloadScripts'))
+        @set('classmap', atom.config.get('php-integrator-base.classMapScripts'))
+        @set('insertNewlinesForUseStatements', atom.config.get('php-integrator-base.insertNewlinesForUseStatements'))
 
-        @data.packagePath                    = atom.packages.resolvePackagePath('php-integrator-base')
+        @set('packagePath', atom.packages.resolvePackagePath('php-integrator-base'))
 
     ###*
      * Attaches listeners to listen to Atom configuration changes.
     ###
     attachListeners: () ->
         atom.config.onDidChange 'php-integrator-base.phpCommand', () =>
+            @set('php', atom.config.get('php-integrator-base.phpCommand'))
             @synchronizeToPhpConfig()
 
         atom.config.onDidChange 'php-integrator-base.composerCommand', () =>
+            @set('composer', atom.config.get('php-integrator-base.composerCommand'))
             @synchronizeToPhpConfig()
 
         atom.config.onDidChange 'php-integrator-base.autoloadScripts', () =>
+            @set('autoload', atom.config.get('php-integrator-base.autoloadScripts'))
             @synchronizeToPhpConfig()
 
         atom.config.onDidChange 'php-integrator-base.classMapScripts', () =>
+            @set('classmap', atom.config.get('php-integrator-base.classMapScripts'))
             @synchronizeToPhpConfig()
 
         atom.config.onDidChange 'php-integrator-base.insertNewlinesForUseStatements', () =>
+            @set('insertNewlinesForUseStatements', atom.config.get('php-integrator-base.insertNewlinesForUseStatements'))
             @synchronizeToPhpConfig()

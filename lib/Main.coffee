@@ -105,11 +105,6 @@ module.exports =
                 'detail' : 'Your PHP integrator configuration is working correctly!'
             }
 
-        # TODO: This doesn't belong here.
-        atom.commands.add 'atom-workspace', "php-integrator-base:namespace": =>
-            namespace = require './namespace.coffee'
-            namespace.createNamespace(atom.workspace.getActivePaneItem())
-
     ###*
      * Activates the package.
     ###
@@ -122,8 +117,6 @@ module.exports =
         @testConfig()
 
         @registerCommands()
-
-        # TODO: Config has to become a class, dependency inject.
 
         @progressBar = new StatusBarProgressBar()
 
@@ -143,9 +136,7 @@ module.exports =
     setStatusBarService: (service) ->
         @progressBar.attach(service)
 
-        # TODO: Test deactivation of status bar package.
-
-        return new Disposable -> @progressBar.detach()
+        return new Disposable => @progressBar.detach()
 
     ###*
      * Retrieves the service exposed by this package.
