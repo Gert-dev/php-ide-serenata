@@ -22,11 +22,17 @@ class Service
     config: null
 
     ###*
+     * The proxy to use to contact the PHP side.
+    ###
+    proxy: null
+
+    ###*
      * Constructor.
      *
-     * @param {Config} config
+     * @param {Config}       config
+     * @param {CachingProxy} proxy
     ###
-    constructor: (@config) ->
+    constructor: (@config, @proxy) ->
 
     ###*
      * Activates the package.
@@ -37,7 +43,7 @@ class Service
         atom.workspace.observeTextEditors (editor) =>
             editor.onDidSave (event) =>
                 if editor.getGrammar().scopeName.match /text.html.php$/
-                    proxy.clearCache()
+                    @proxy.clearCache()
 
                     # For Windows - Replace \ in class namespace to / because
                     # composer use / instead of \
@@ -48,19 +54,19 @@ class Service
                             path = path.substr(directory.path.length + 1)
                             break
 
-                    proxy.refresh(classPath + Utility.normalizeSeparators(path))
+                    @proxy.reindex(classPath + Utility.normalizeSeparators(path))
 
         @config.onDidChange 'php', () =>
-            proxy.clearCache()
+            @proxy.clearCache()
 
         @config.onDidChange 'composer', () =>
-            proxy.clearCache()
+            @proxy.clearCache()
 
         @config.onDidChange 'autoload', () =>
-            proxy.clearCache()
+            @proxy.clearCache()
 
         @config.onDidChange 'classmap', () =>
-            proxy.clearCache()
+            @proxy.clearCache()
 
     ###*
      * Sets the progress bar that can be used to display long operations.
@@ -75,7 +81,7 @@ class Service
             @progressBar.setLabel("Indexing...")
             @progressBar.show()
 
-        proxy.refresh null, () =>
+        @proxy.reindex null, () =>
             if @progressBar
                 @progressBar.hide()
 

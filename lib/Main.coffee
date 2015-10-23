@@ -2,6 +2,7 @@
 
 Service              = require './Service.coffee'
 AtomConfig           = require './AtomConfig.coffee'
+CachingProxy         = require './CachingProxy.coffee'
 ConfigTester         = require './ConfigTester.coffee'
 StatusBarProgressBar = require "./Widgets/StatusBarProgressBar.coffee"
 
@@ -118,9 +119,10 @@ module.exports =
 
         @registerCommands()
 
+        proxy = new CachingProxy(@config.get('php'))
         @progressBar = new StatusBarProgressBar()
 
-        @service = new Service(@config)
+        @service = new Service(@config, proxy)
         @service.setProgressBar(@progressBar)
         @service.activate()
 

@@ -26,20 +26,20 @@ class Proxy
      * Performs a request to the PHP side.
      *
      * @param {string}   directory The directory in which to execute the PHP side (e.g. the project folder).
-     * @param {array}    arguments The arguments to pass.
+     * @param {array}    args      The arguments to pass.
      * @param {boolean}  async     Whether the request must be asynchronous or not.
      * @param {callback} callback  The callback to execute when the asynchronous operation finishes.
      *
      * @return {Object} The decoded response JSON, or an object containing error information, or nothing when the
      *                  result is asynchronous. Returns false if there is no directory set.
     ###
-    performRequest: (projectDirectory, arguments, async, callback) ->
+    performRequest: (directory, args, async, callback) ->
         return false unless directory
 
         parameters = [__dirname + "/../php/parser.php", directory]
 
-        for c in arguments
-            parameters.push(Utility.escapeSeparators(c))
+        for a in args
+            parameters.push(Utility.escapeSeparators(a))
 
         if not async
             try
@@ -149,7 +149,7 @@ class Proxy
      * @param {string}   classPath The full file path to the class to refresh.
      * @param {callback} callback  The callback to invoke when the indexing process is finished.
     ###
-    refresh: (fileName, callback) ->
+    reindex: (fileName, callback) ->
         if not classPath
             classPath = ''
 
