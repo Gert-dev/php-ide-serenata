@@ -36,7 +36,7 @@ class Proxy
     performRequest: (directory, args, async, callback) ->
         return false unless directory
 
-        parameters = [__dirname + "/../php/parser.php", directory]
+        parameters = [__dirname + "/../php/Main.php", directory]
 
         for a in args
             parameters.push(Utility.escapeSeparators(a))
