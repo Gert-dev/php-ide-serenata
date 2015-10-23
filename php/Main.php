@@ -1,12 +1,10 @@
 <?php
-
 use PhpIntegrator\ErrorHandler;
 use PhpIntegrator\Config;
 
 require_once(__DIR__ . '/ErrorHandler.php');
 ErrorHandler::register();
 
-require_once(__DIR__ . '/tmp.php');
 require_once(__DIR__ . '/Config.php');
 
 require_once(__DIR__ . '/services/Tools.php');
@@ -52,6 +50,8 @@ if (!isset($commands[$command])) {
 }
 
 // Config
+$config = require_once(__DIR__ . '/generated_config.php');
+
 Config::set('composer', $config['composer']);
 Config::set('php', $config['php']);
 Config::set('projectPath', $project);

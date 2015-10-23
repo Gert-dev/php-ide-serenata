@@ -74,22 +74,30 @@ class Config
      * Synchronizes the active relevant settings to a temporary file that can be used by the PHP side.
     ###
     synchronizeToPhpConfig: () ->
-        files = ""
-        classmaps = ""
+        autoloadScripts = @get('autoload')
 
-        for file in @data.autoload
-            files += "'#{file}',"
+        if autoloadScripts?.length > 0
+            autoloadScripts = "'" + autoloadScripts.join("', '") + "'"
 
-        for classmap in @data.classmap
-            classmaps += "'#{classmap}',"
+        classMapScripts = @get('classmap')
 
-        text = "<?php
-            $config = [
-                'php'      => '#{@data.php}',
-                'composer' => '#{@data.composer}',
-                'autoload' => [#{files}],
-                'classmap' => [(#{classmaps}]
-            ];
-        "
+        if classMapScripts?.length > 0
+            classMapScripts = "'" + classMapScripts.join("', '") + "'"
 
-        fs.writeFileSync(@data.packagePath + '/php/tmp.php', text)
+        phpCommand = @get('php')
+        composerCommand = @get('composer')
+
+        # TODO: Rename config setting names, it is not clear the autoload and classmap are arrays.
+
+        text = """<?php
+
+               // Automatically generated in CoffeeScript. Any changes made will be lost!
+               return [
+                   'php'      => '#{phpCommand}',
+                   'composer' => '#{composerCommand}',
+                   'autoload' => [#{autoloadScripts}],
+                   'classmap' => [#{classMapScripts}]
+               ];\n
+               """
+
+        fs.writeFileSync(@data.packagePath + '/php/generated_config.php', text)
