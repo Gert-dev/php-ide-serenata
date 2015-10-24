@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Base package for php-integrator that exposes services for querying PHP sources.",
   "repository":  "https://github.com/Gert-dev/php-integrator-base.git",
-  "license": "MIT",
+  "license": "GPL-3.0",
 
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
