@@ -288,6 +288,7 @@ class Parser
             lineText = editor.lineTextForBufferRow(line)
 
             if not lineText
+                --line
                 continue
 
             if line != bufferPosition.row
