@@ -24,31 +24,29 @@ class AtomConfig extends Config
      * @inheritdoc
     ###
     load: () ->
-        # TODO: use the package name here.
+        @set('phpCommand', atom.config.get("#{@packageName}.phpCommand"))
+        @set('composerCommand', atom.config.get("#{@packageName}.composerCommand"))
+        @set('autoloadScripts', atom.config.get("#{@packageName}.autoloadScripts"))
+        @set('classMapScripts', atom.config.get("#{@packageName}.classMapScripts"))
 
-        @set('phpCommand', atom.config.get('php-integrator-base.phpCommand'))
-        @set('composerCommand', atom.config.get('php-integrator-base.composerCommand'))
-        @set('autoloadScripts', atom.config.get('php-integrator-base.autoloadScripts'))
-        @set('classMapScripts', atom.config.get('php-integrator-base.classMapScripts'))
-
-        @set('packagePath', atom.packages.resolvePackagePath('php-integrator-base'))
+        @set('packagePath', atom.packages.resolvePackagePath("#{@packageName}"))
 
     ###*
      * Attaches listeners to listen to Atom configuration changes.
     ###
     attachListeners: () ->
-        atom.config.onDidChange 'php-integrator-base.phpCommand', () =>
-            @set('phpCommand', atom.config.get('php-integrator-base.phpCommand'))
+        atom.config.onDidChange "#{@packageName}.phpCommand", () =>
+            @set('phpCommand', atom.config.get("#{@packageName}.phpCommand"))
             @synchronizeToPhpConfig()
 
-        atom.config.onDidChange 'php-integrator-base.composerCommand', () =>
-            @set('composerCommand', atom.config.get('php-integrator-base.composerCommand'))
+        atom.config.onDidChange "#{@packageName}.composerCommand", () =>
+            @set('composerCommand', atom.config.get("#{@packageName}.composerCommand"))
             @synchronizeToPhpConfig()
 
-        atom.config.onDidChange 'php-integrator-base.autoloadScripts', () =>
-            @set('autoloadScripts', atom.config.get('php-integrator-base.autoloadScripts'))
+        atom.config.onDidChange "#{@packageName}.autoloadScripts", () =>
+            @set('autoloadScripts', atom.config.get("#{@packageName}.autoloadScripts"))
             @synchronizeToPhpConfig()
 
-        atom.config.onDidChange 'php-integrator-base.classMapScripts', () =>
-            @set('classMapScripts', atom.config.get('php-integrator-base.classMapScripts'))
+        atom.config.onDidChange "#{@packageName}.classMapScripts", () =>
+            @set('classMapScripts', atom.config.get("#{@packageName}.classMapScripts"))
             @synchronizeToPhpConfig()
