@@ -5,16 +5,6 @@
 @import "ui-variables";
 @import "octicon-utf-codes";
 
-
-
-// TODO: Deprecated methods no longer striked through.
-// TODO: Indexing spinner gets stuck in packages.
-// TODO: Much of this doesn't belong here, move to appropriate package.
-
-.php-integrator-strike, .php-integrator-strike .word {
-    text-decoration: line-through;
-}
-
 .php-integrator-popover {
     max-width: 45%;
 
@@ -53,42 +43,5 @@
 
     > span {
         padding-left: 0.5em;
-    }
-}
-
-atom-text-editor, atom-text-editor::shadow {
-    .comment-clickable .region {
-        pointer-events: all;
-        z-index: 9999;
-    }
-
-    .gutter {
-        .line-number {
-            &.override {
-                .icon-right {
-                    opacity: 1.0;
-                    cursor: pointer;
-                    visibility: visible;
-
-                    &:before {
-                        content: @link;
-                        color: @ui-site-color-2;
-                    }
-                }
-            }
-
-            &.implementation {
-                .icon-right {
-                    opacity: 1.0;
-                    cursor: pointer;
-                    visibility: visible;
-
-                    &:before {
-                        content: @link;
-                        color: @ui-site-color-3;
-                    }
-                }
-            }
-        }
     }
 }
