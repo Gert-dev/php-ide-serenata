@@ -1,4 +1,4 @@
-Config = require './Config.coffee'
+Config = require './Config'
 
 module.exports =
 

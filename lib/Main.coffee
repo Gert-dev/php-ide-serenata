@@ -1,12 +1,12 @@
 {Disposable} = require 'atom'
 
-Parser               = require './Parser.coffee'
-Utility              = require './Utility.coffee'
-Service              = require './Service.coffee'
-AtomConfig           = require './AtomConfig.coffee'
-CachingProxy         = require './CachingProxy.coffee'
-ConfigTester         = require './ConfigTester.coffee'
-StatusBarProgressBar = require "./Widgets/StatusBarProgressBar.coffee"
+Parser               = require './Parser'
+Utility              = require './Utility'
+Service              = require './Service'
+AtomConfig           = require './AtomConfig'
+CachingProxy         = require './CachingProxy'
+ConfigTester         = require './ConfigTester'
+StatusBarProgressBar = require "./Widgets/StatusBarProgressBar"
 
 module.exports =
     ###*

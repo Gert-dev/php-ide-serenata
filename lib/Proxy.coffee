@@ -2,7 +2,7 @@ fs            = require 'fs'
 md5           = require 'md5'
 child_process = require "child_process"
 
-Utility = require "./Utility.coffee"
+Utility = require "./Utility"
 
 module.exports =
 

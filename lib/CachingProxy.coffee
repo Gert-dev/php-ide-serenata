@@ -1,4 +1,4 @@
-Proxy = require './Proxy.coffee'
+Proxy = require './Proxy'
 
 module.exports =
 

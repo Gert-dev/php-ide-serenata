@@ -1,4 +1,4 @@
-AbstractProgressBar = require './AbstractProgressBar.coffee'
+AbstractProgressBar = require './AbstractProgressBar'
 
 module.exports =
 

@@ -1,5 +1,5 @@
-Popover         = require './Widgets/Popover.coffee'
-AttachedPopover = require './Widgets/AttachedPopover.coffee'
+Popover         = require './Widgets/Popover'
+AttachedPopover = require './Widgets/AttachedPopover'
 
 module.exports =
 
