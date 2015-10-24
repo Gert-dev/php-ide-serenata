@@ -80,7 +80,7 @@ class Proxy
     getClassList: () ->
         hash = md5(@getFirstProjectDirectory())
 
-        path = __dirname + "/../../indexes/" + hash + "/index.classes.json"
+        path = __dirname + "/../indexes/" + hash + "/index.classes.json"
 
         try
             fs.accessSync(path, fs.F_OK | fs.R_OK)

@@ -83,7 +83,7 @@ foreach ($config['autoloadScripts'] as $conf) {
 foreach ($config['classMapScripts'] as $conf) {
     $path = sprintf('%s/%s', $project, trim($conf, '/'));
     if (file_exists($path)) {
-        Config::set('classmap_file', $path);
+        Config::set('classMapScript', $path);
         break;
     }
 }

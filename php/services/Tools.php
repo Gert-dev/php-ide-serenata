@@ -10,45 +10,6 @@ use ReflectionFunctionAbstract;
 abstract class Tools
 {
     /**
-     * Contains classmap from composer
-     * @var array
-     */
-    private $classMap = array();
-
-    /**
-     * Returns the classMap from composer.
-     * Fetch it from the command dump-autoload if needed
-     * @param bool $force Force to fetch it from the command
-     * @return array
-     */
-    protected function getClassMap($force = false)
-    {
-        if (empty($this->classMap) || $force) {
-            if (Config::get('classmap_file') && !file_exists(Config::get('classmap_file')) || $force) {
-                // Check if composer is executable or not
-                if (is_executable(Config::get('composer'))) {
-                    exec(sprintf('%s dump-autoload --optimize --quiet --no-interaction --working-dir=%s 2>&1',
-                        escapeshellarg(Config::get('composer')),
-                        escapeshellarg(Config::get('projectPath'))
-                    ));
-                } else {
-                    exec(sprintf('%s %s dump-autoload --optimize --quiet --no-interaction --working-dir=%s 2>&1',
-                        escapeshellarg(Config::get('php')),
-                        escapeshellarg(Config::get('composer')),
-                        escapeshellarg(Config::get('projectPath'))
-                    ));
-                }
-            }
-
-            if (Config::get('classmap_file')) {
-                $this->classMap = require(Config::get('classmap_file'));
-            }
-        }
-
-        return $this->classMap;
-    }
-
-    /**
      * Fetches information about the specified class, trait, interface, ...
      *
      * @param ReflectionClass $class The class to analyze.

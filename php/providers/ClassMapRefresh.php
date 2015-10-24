@@ -5,28 +5,60 @@ namespace PhpIntegrator;
 class ClassMapRefresh extends Tools implements ProviderInterface
 {
     /**
+     * Returns the classMap from composer.
+     * Fetch it from the command dump-autoload if needed
+     * @param bool $force Force to fetch it from the command
+     * @return array
+     */
+    protected function buildClassMap()
+    {
+        $classMapScript = Config::get('classMapScript');
+
+        if (!$classMapScript || !file_exists($classMapScript)) {
+            return [];
+        }
+
+        // Check if composer is executable or not
+        if (is_executable(Config::get('composer'))) {
+            exec(sprintf('%s dump-autoload --optimize --quiet --no-interaction --working-dir=%s 2>&1',
+                escapeshellarg(Config::get('composer')),
+                escapeshellarg(Config::get('projectPath'))
+            ));
+        } else {
+            exec(sprintf('%s %s dump-autoload --optimize --quiet --no-interaction --working-dir=%s 2>&1',
+                escapeshellarg(Config::get('php')),
+                escapeshellarg(Config::get('composer')),
+                escapeshellarg(Config::get('projectPath'))
+            ));
+        }
+
+        return require($classMapScript);
+    }
+
+    /**
      * Execute the command
      * @param  array  $args Arguments gived to the command
      * @return array Response
      */
     public function execute($args = array())
     {
-        $fileExists = false;
+        $indexFileExists = false;
+
+        $fileToReindex = array_shift($args);
 
         // If we specified a file
-        if (count($args) > 0 && $file = $args[0]) {
+        if ($fileToReindex) {
             if (file_exists(Config::get('indexClasses'))) {
                 $index = json_decode(file_get_contents(Config::get('indexClasses')), true);
 
                 // Invalid json (#24)
                 if (false !== $index) {
-                    $fileExists = true;
+                    $indexFileExists = true;
 
                     $found = false;
-                    $fileParser = new FileParser($file);
+                    $fileParser = new FileParser($fileToReindex);
                     $class = $fileParser->getFullClassName(null, $found);
 
-                    // if (false !== $class = array_search($file, $classMap)) {
                     if ($found) {
                         if (isset($index['mapping'][$class])) {
                             unset($index['mapping'][$class]);
@@ -47,9 +79,9 @@ class ClassMapRefresh extends Tools implements ProviderInterface
         }
 
         // Otherwise, full index
-        if (!$fileExists) {
+        if (!$indexFileExists) {
             // Autoload classes
-            foreach ($this->getClassMap(true) as $class => $filePath) {
+            foreach ($this->buildClassMap() as $class => $filePath) {
                 if ($value = $this->buildIndexClass($class)) {
                     $index['mapping'][$class] = $value;
                     $index['autocomplete'][] = $class;
@@ -78,7 +110,7 @@ class ClassMapRefresh extends Tools implements ProviderInterface
     {
         $ret = exec(sprintf('%s %s %s --class %s',
             escapeshellarg(Config::get('php')),
-            escapeshellarg(__DIR__ . '/../parser.php'),
+            escapeshellarg(__DIR__ . '/../Main.php'),
             escapeshellarg(Config::get('projectPath')),
             escapeshellarg($class)
         ));
