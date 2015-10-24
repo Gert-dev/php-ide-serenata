@@ -116,7 +116,7 @@ class Proxy
      *
      * @return {Object}
     ###
-    getClassMembers: (className) ->
+    getClassInfo: (className) ->
         return @performRequest(@getFirstProjectDirectory(), ['--methods', className], false)
 
     ###*

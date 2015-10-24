@@ -42,7 +42,7 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    getClassMembers: (className) ->
+    getClassInfo: (className) ->
         cacheKey = "members-#{className}"
 
         if not @cache[cacheKey]?

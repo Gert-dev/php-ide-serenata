@@ -54,6 +54,32 @@ class Parser
         return @getClassNameFromCallStack(editor, bufferPosition, fullCall)
 
     ###*
+     * Retrieves contextual information about the class member at the specified location in the editor.
+     *
+     * @param {TextEditor} editor         The text editor to use.
+     * @param {Point}      bufferPosition The cursor location of the member.
+     * @param {string}     name           The name of the member to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassMember: (editor, bufferPosition, name) ->
+        calledClass = @getCalledClass(editor, bufferPosition)
+
+        return null unless calledClass
+
+        response = @proxy.getClassInfo(calledClass)
+
+        return if not response or (response.error? and response.error != '') or response.names.indexOf(name) == -1
+
+        members = response.values[name]
+
+        # If there are multiple matches, just select the first one.
+        if members instanceof Array and members.length > 0
+            return members[0]
+
+        return members
+
+    ###*
      * Retrieves all variables that are available at the specified buffer position.
      *
      * @param {TextEditor} editor
@@ -167,9 +193,9 @@ class Parser
             # At this point, this could either be a class name relative to the current namespace or a full class name
             # without a leading slash. For example, Foo\Bar could also be relative (e.g. My\Foo\Bar), in which case its
             # absolute path is determined by the namespace and use statements of the file containing it.
-            methodsRequest = @proxy.getClassMembers(fullClass)
+            info = @proxy.getClassInfo(fullClass)
 
-            if not methodsRequest?.filename
+            if not info?.filename
                 # The class, e.g. My\Foo\Bar, didn't exist. We can only assume its an absolute path, using a namespace
                 # set up in composer.json, without a leading slash.
                 fullClass = className
@@ -683,35 +709,6 @@ class Parser
             --lineNumber
 
         return bestMatch
-
-    ###*
-     * Retrieves contextual information about the class member at the specified location in the editor.
-     *
-     * @param {TextEditor} editor         TextEditor to search for namespace of term.
-     * @param {string}     term           Term to search for.
-     * @param {Point}      bufferPosition The cursor location the term is at.
-     * @param {Object}     calledClass    Information about the called class (optional).
-    ###
-    getMemberContext: (editor, term, bufferPosition, calledClass) ->
-        if not calledClass
-            calledClass = @getCalledClass(editor, term, bufferPosition)
-
-        if not calledClass
-            return
-
-        methods = @proxy.getClassMembers(calledClass)
-
-        return if not methods or (methods.error? and methods.error != '') or methods.names.indexOf(term) == -1
-
-        value = methods.values[term]
-
-        # If there are multiple matches, just select the first one.
-        if value instanceof Array
-            for val in value
-                value = val
-                break
-
-        return value
 
     ###*
      * Parses all elements from the given call stack to return the last class name (if any).

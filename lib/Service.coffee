@@ -38,16 +38,6 @@ class Service
         return new AttachedPopover(arguments...)
 
     ###*
-     * Gets the correct selector for the class or namespace that is part of the specified event.
-     *
-     * @param  {jQuery.Event}  event  A jQuery event.
-     *
-     * @return {object|null} A selector to be used with jQuery.
-    ###
-    getClassSelectorFromEvent: (event) ->
-        return @parser.getClassSelectorFromEvent(event)
-
-    ###*
      * Clears the autocompletion cache. Most fetching operations such as fetching constants, autocompletion, fetching
      * members, etc. are cached when they are first retrieved. This clears the cache, forcing them to be retrieved
      # again. Clearing the cache is automatically performed, so this method is usually unnecessary.
@@ -96,8 +86,8 @@ class Service
      *
      * @return {Object}
     ###
-    getClassMembers: (className) ->
-        return @proxy.getClassMembers(className)
+    getClassInfo: (className) ->
+        return @proxy.getClassInfo(className)
 
     ###*
      * Retrieves the members of the type that is returned by the member with the specified name in the specified class.
@@ -135,6 +125,16 @@ class Service
         @proxy.reindex(filename, callback)
 
     ###*
+     * Gets the correct selector for the class or namespace that is part of the specified event.
+     *
+     * @param  {jQuery.Event}  event  A jQuery event.
+     *
+     * @return {object|null} A selector to be used with jQuery.
+    ###
+    getClassSelectorFromEvent: (event) ->
+        return @parser.getClassSelectorFromEvent(event)
+
+    ###*
      * Determines the full class name (without leading slash) of the specified class in the specified editor. If no
      * class name is passed, the full class name of the class defined in the current file is returned instead.
      *
@@ -147,3 +147,15 @@ class Service
     ###
     determineFullClassName: (editor, className = null) ->
         return @parser.determineFullClassName(editor, className)
+
+    ###*
+     * Retrieves contextual information about the class member at the specified location in the editor.
+     *
+     * @param {TextEditor} editor         The text editor to use.
+     * @param {Point}      bufferPosition The cursor location of the member.
+     * @param {string}     name           The name of the member to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassMember: (editor, bufferPosition, name) ->
+        return @parser.getClassMember(editor, bufferPosition, name)
