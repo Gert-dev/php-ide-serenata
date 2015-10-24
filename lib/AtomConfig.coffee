@@ -9,7 +9,7 @@ class AtomConfig extends Config
     ###*
      * The name of the package to use when searching for settings.
     ###
-    packageName: {}
+    packageName: null
 
     ###*
      * @inheritdoc
@@ -24,11 +24,12 @@ class AtomConfig extends Config
      * @inheritdoc
     ###
     load: () ->
+        # TODO: use the package name here.
+
         @set('phpCommand', atom.config.get('php-integrator-base.phpCommand'))
         @set('composerCommand', atom.config.get('php-integrator-base.composerCommand'))
         @set('autoloadScripts', atom.config.get('php-integrator-base.autoloadScripts'))
         @set('classMapScripts', atom.config.get('php-integrator-base.classMapScripts'))
-        @set('insertNewlinesForUseStatements', atom.config.get('php-integrator-base.insertNewlinesForUseStatements'))
 
         @set('packagePath', atom.packages.resolvePackagePath('php-integrator-base'))
 
@@ -50,8 +51,4 @@ class AtomConfig extends Config
 
         atom.config.onDidChange 'php-integrator-base.classMapScripts', () =>
             @set('classMapScripts', atom.config.get('php-integrator-base.classMapScripts'))
-            @synchronizeToPhpConfig()
-
-        atom.config.onDidChange 'php-integrator-base.insertNewlinesForUseStatements', () =>
-            @set('insertNewlinesForUseStatements', atom.config.get('php-integrator-base.insertNewlinesForUseStatements'))
             @synchronizeToPhpConfig()

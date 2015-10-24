@@ -32,6 +32,7 @@ class ClassProvider extends Tools implements ProviderInterface
         }
 
         return array(
+            'class' => $this->getClassArguments($reflection),
             'methods' => array(
                 'constructor' => array(
                     'has'  => !is_null($ctor),

@@ -98,7 +98,7 @@ class Proxy
      *
      * @return {Object}
     ###
-    getConstants: () ->
+    getGlobalConstants: () ->
         return @performRequest(@getFirstProjectDirectory(), ['--constants'], false)
 
     ###*

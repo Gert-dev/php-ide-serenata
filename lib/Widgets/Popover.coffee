@@ -15,8 +15,7 @@ class Popover extends Disposable
         @$ = require 'jquery'
 
         @element = document.createElement('div')
-        @element.id = 'php-integrator-popover'
-        @element.className = 'tooltip bottom fade'
+        @element.className = 'tooltip bottom fade php-integrator-popover'
         @element.innerHTML = "<div class='tooltip-arrow'></div><div class='tooltip-inner'></div>"
 
         document.body.appendChild(@element)
@@ -45,7 +44,7 @@ class Popover extends Disposable
     ###
     setText: (text) ->
         @$('.tooltip-inner', @element).html(
-            '<div class="php-integrator-popover-wrapper">' + text.replace(/\n/g, '<br/>') + '</div>'
+            '<div class="php-integrator-popover-wrapper">' + text.replace(/\n\n/g, '<br/><br/>') + '</div>'
         )
 
     ###*

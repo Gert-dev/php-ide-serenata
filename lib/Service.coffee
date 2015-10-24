@@ -46,16 +46,6 @@ class Service
         @proxy.clearCache()
 
     ###*
-     * Retrieves a list of members the specified class has.
-     *
-     * @param {String} className The absolute and full path to the class, e.g. MyRoot\Foo\Bar.
-     *
-     * @return {Object}
-    ###
-    getConstants: () ->
-        return @proxy.getConstants()
-
-    ###*
      * Retrieves a list of available classes.
      *
      * @return {Object}
@@ -68,8 +58,8 @@ class Service
      *
      * @return {Object}
     ###
-    getConstants: () ->
-        return @proxy.getConstants()
+    getGlobalConstants: () ->
+        return @proxy.getGlobalConstants()
 
     ###*
      * Retrieves a list of available global functions.
@@ -149,6 +139,30 @@ class Service
         return @parser.determineFullClassName(editor, className)
 
     ###*
+     * Retrieves all variables that are available at the specified buffer position.
+     *
+     * @param {TextEditor} editor
+     * @param {Range}      bufferPosition
+     *
+     * @return {array}
+    ###
+    getAvailableVariables: (editor, bufferPosition) ->
+        return @parser.getAvailableVariables(editor, bufferPosition)
+
+    ###*
+     * Retrieves the type of a variable, relative to the context at the specified buffer location. Class names will
+     * be returned in their full form (full class name, but not necessarily with a leading slash).
+     *
+     * @param {TextEditor} editor
+     * @param {Range}      bufferPosition
+     * @param {string}     name
+     *
+     * @return {string|null}
+    ###
+    getVariableType: (editor, bufferPosition, name) ->
+        return @parser.getVariableType(editor, bufferPosition, name)
+
+    ###*
      * Retrieves contextual information about the class member at the specified location in the editor. This is
      * essentially the same as {@see getClassMember}, but will automatically determine the class based on the code at
      * the specified location.
@@ -160,7 +174,7 @@ class Service
      * @return {Object|null}
     ###
     getClassMemberAt: (editor, bufferPosition, name) ->
-        className = @parser.getCalledClass(editor, bufferPosition)
+        className = @getCalledClass(editor, bufferPosition)
 
         return @getClassMember(className, name)
 
@@ -174,3 +188,22 @@ class Service
     ###
     getClassMember: (className, name) ->
         return @parser.getClassMember(className, name)
+
+    ###*
+     * Retrieves the class the specified member (method or property) is being invoked on.
+     *
+     * @param  {TextEditor} editor         The text editor to use.
+     * @param  {Point}      bufferPosition The cursor location of the member, this should be at the operator :: or ->
+     *                                      (but anywhere inside the name of the member itself is fine too).
+     *
+     * @return {string|null}
+     *
+     * @example Invoking it on MyMethod::foo()->bar() will ask what class 'bar' is invoked on, which will whatever type
+     *          foo returns.
+    ###
+    getCalledClass: (editor, bufferPosition) ->
+        callStack = @parser.retrieveSanitizedCallStackAt(editor, bufferPosition)
+
+        return null if not callStack or callStack.length == 0
+
+        return @parser.getClassNameFromCallStack(editor, bufferPosition, callStack)

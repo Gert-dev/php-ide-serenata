@@ -45,15 +45,6 @@ module.exports =
             default     : ['vendor/composer/autoload_classmap.php', 'autoload/ezp_kernel.php']
             order       : 4
 
-        insertNewlinesForUseStatements:
-            title       : 'Insert newlines for use statements'
-            description : 'When enabled, the plugin will add additional newlines before or after an automatically added
-                           use statement when it can\'t add them nicely to an existing group. This results in more
-                           cleanly separated use statements but will create additional vertical whitespace.'
-            type        : 'boolean'
-            default     : false
-            order       : 5
-
     ###*
      * The name of the package.
     ###

@@ -20,7 +20,7 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    getConstants: () ->
+    getGlobalConstants: () ->
         cacheKey = 'constants'
 
         if not @cache[cacheKey]?

@@ -5,28 +5,45 @@
 @import "ui-variables";
 @import "octicon-utf-codes";
 
+
+
+// TODO: Deprecated methods no longer striked through.
+// TODO: Indexing spinner gets stuck in packages.
+// TODO: Much of this doesn't belong here, move to appropriate package.
+
 .php-integrator-strike, .php-integrator-strike .word {
     text-decoration: line-through;
 }
 
-.php-integrator-goto-overlay {
-    width: 100%;
-    margin-left: -50%;
-}
+.php-integrator-popover {
+    max-width: 45%;
 
-.php-integrator-popover-wrapper {
-    margin: 0em 0em 0em 0em;
-    text-align: left;
+    .php-integrator-popover-wrapper {
+        margin: 0em 0em 0em 0em;
+        text-align: left;
 
-    .section {
-        > h4 {
-            margin-top: 1em;
-            font-size: larger;
-            font-weight: bold;
+        div {
+            white-space: normal;
         }
 
-        > div {
-            padding-left: 1em;
+        .section {
+            > h4 {
+                margin-top: 1em;
+                font-size: larger;
+                font-weight: bold;
+            }
+
+            > div {
+                padding-left: 1em;
+            }
+
+            td {
+                vertical-align: top;
+            }
+
+            td:not(:last-child) {
+                padding-right: 1em;
+            }
         }
     }
 }
