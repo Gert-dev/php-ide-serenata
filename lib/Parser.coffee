@@ -207,6 +207,8 @@ class Parser
      *
      * @return {int}       The amount of lines added (including newlines), so you can reliably and easily offset your
      *                     rows. This could be zero if a use statement was already present.
+     *
+     * @todo Belongs in the php-integrator-autocomplete-plus package, along with its helpers.
     ###
     addUseClass: (editor, className, allowAdditionalNewlines) ->
         if className.split('\\').length == 1 or className.indexOf('\\') == 0
@@ -443,6 +445,9 @@ class Parser
 
         while line > 0
             lineText = editor.lineTextForBufferRow(line)
+
+            if not lineText
+                continue
 
             if line != bufferPosition.row
                 i = (lineText.length - 1)
