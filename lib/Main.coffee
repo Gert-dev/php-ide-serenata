@@ -60,9 +60,9 @@ module.exports =
     packageName: 'php-integrator-base'
 
     ###*
-     * The config.
+     * The configuration object.
     ###
-    config: null
+    configuration: null
 
     ###*
      * The exposed service.
@@ -80,7 +80,7 @@ module.exports =
      * @return {boolean}
     ###
     testConfig: () ->
-        configTester = new ConfigTester(@config)
+        configTester = new ConfigTester(@configuration)
 
         if not configTester.test()
             errorTitle = 'Incorrect setup!'
@@ -109,16 +109,16 @@ module.exports =
      * Registers listeners for config changes.
     ###
     registerConfigListeners: () ->
-        @config.onDidChange 'php', () =>
+        @configuration.onDidChange 'php', () =>
             @service.clearCache()
 
-        @config.onDidChange 'composer', () =>
+        @configuration.onDidChange 'composer', () =>
             @service.clearCache()
 
-        @config.onDidChange 'autoload', () =>
+        @configuration.onDidChange 'autoload', () =>
             @service.clearCache()
 
-        @config.onDidChange 'classmap', () =>
+        @configuration.onDidChange 'classmap', () =>
             @service.clearCache()
 
     ###*
@@ -137,7 +137,7 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
-        @config = new AtomConfig(@packageName)
+        @configuration = new AtomConfig(@packageName)
 
         # See also atom-autocomplete-php pull request #197 - Disabled for now because it does not allow the user to
         # reactivate or try again.
@@ -146,7 +146,7 @@ module.exports =
 
         @progressBar = new StatusBarProgressBar()
 
-        proxy = new CachingProxy(@config.get('phpCommand'))
+        proxy = new CachingProxy(@configuration.get('phpCommand'))
 
         parser = new Parser(proxy)
 
