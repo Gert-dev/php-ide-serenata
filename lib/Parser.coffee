@@ -298,7 +298,12 @@ class Parser
                 i = bufferPosition.column - 1
 
             while i >= 0
-                if lineText[i] == '('
+                scopeDescriptor = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
+
+                if scopeDescriptor.indexOf('.comment') > 0
+                    # Do nothing, we just keep parsing. (Comments can occur inside call stacks.)
+
+                else if lineText[i] == '('
                     ++parenthesesOpened
 
                     # Ticket #164 - We're walking backwards, if we find an opening paranthesis that hasn't been closed
@@ -335,14 +340,12 @@ class Parser
                         finished = true
                         break
 
-                    else
-                        scopeDescriptor = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
-
-                        # Language constructs, such as echo and print, don't require parantheses.
-                        if scopeDescriptor.indexOf('.function.construct') > 0 or scopeDescriptor.indexOf('.comment') > 0
-                            ++i
-                            finished = true
-                            break
+                    # Language constructs, such as echo and print, don't require parantheses, but we still need to stop
+                    # when we find them.
+                    else if scopeDescriptor.indexOf('.function.construct') > 0
+                        ++i
+                        finished = true
+                        break
 
                 --i
 
