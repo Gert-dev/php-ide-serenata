@@ -16,13 +16,13 @@ class AutocompleteProvider extends Tools implements ProviderInterface
         $class = $args[0];
         $name  = $args[1];
 
-        if (strpos($class, '\\') === 0) {
+        if (mb_strpos($class, '\\') === 0) {
             $class = substr($class, 1);
         }
 
         $isMethod = false;
 
-        if (strpos($name, '()') !== false) {
+        if (mb_strpos($name, '()') !== false) {
             $isMethod = true;
             $name = str_replace('()', '', $name);
         }
@@ -43,7 +43,7 @@ class AutocompleteProvider extends Tools implements ProviderInterface
                 }
             }
 
-            $returnValue = $memberInfo['args']['return'];
+            $returnValue = $memberInfo['args']['return']['type'];
 
             if ($returnValue == '$this' || $returnValue == 'static') {
                 $relevantClass = $class;

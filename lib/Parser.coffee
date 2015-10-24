@@ -568,14 +568,15 @@ class Parser
      * @return {string|null}
     ###
     getClassNameFromCallStack: (editor, bufferPosition, callStack) ->
-        loop_index = 0
-        className  = null
-        if not callStack?
-            return
+        i = 0
+        className = null
 
+        if not callStack
+            callStack = []
+
+        # TODO: Can probably use a for i,element of callStack here.
         for element in callStack
-            # $this keyword
-            if loop_index == 0
+            if i == 0
                 if element[0] == '$'
                     className = @getVariableType(editor, bufferPosition, element)
 
@@ -583,40 +584,38 @@ class Parser
                     if element == '$this' and not className
                         className = @determineFullClassName(editor)
 
-                    loop_index++
+                    i++
                     continue
 
                 else if element == 'static' or element == 'self'
                     className = @determineFullClassName(editor)
-                    loop_index++
+                    i++
                     continue
 
                 else if element == 'parent'
                     className = @getParentClass(editor)
-                    loop_index++
+                    i++
                     continue
 
                 else
                     className = @determineFullClassName(editor, element)
-                    loop_index++
+                    i++
                     continue
 
             # Last element
-            if loop_index >= callStack.length - 1
+            if i >= callStack.length - 1
                 break
 
             if className == null
                 break
 
-            methods = @proxy.autocomplete(className, element)
+            classInfo = @proxy.autocomplete(className, element)
 
-            # Element not found or no return value
-            if not methods.class? or not @isClassType(methods.class)
-                className = null
-                break
+            if not classInfo.wasFound or not @isClassType(classInfo.class)
+                return null
 
-            className = methods.class
-            loop_index++
+            className = classInfo.class
+            ++i
 
         # If no data or a valid end of line, OK
         if callStack.length > 0 and (callStack[callStack.length-1].length == 0 or callStack[callStack.length-1].match(/([a-zA-Z0-9]$)/g))
