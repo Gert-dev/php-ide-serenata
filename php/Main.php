@@ -91,6 +91,7 @@ foreach ($config['classMapScripts'] as $conf) {
 $new = new $commands[$command]();
 
 $args = array_slice($argv, 3);
+
 foreach ($args as &$arg) {
     $arg = str_replace('\\\\', '\\', $arg);
 }

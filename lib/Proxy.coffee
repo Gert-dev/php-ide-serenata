@@ -78,8 +78,6 @@ class Proxy
      * @return {Object}
     ###
     getClassList: () ->
-        # TODO: The dependency on md5 can be dropped if we just sanitize the path.
-
         hash = md5(@getFirstProjectDirectory())
 
         path = __dirname + "/../../indexes/" + hash + "/index.classes.json"
