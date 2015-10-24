@@ -231,8 +231,9 @@ abstract class Tools
         $declaringClass = $reflectionMember->getDeclaringClass();
 
         return array(
-            'name'     => $declaringClass->name,
-            'filename' => $declaringClass->getFilename()
+            'name'      => $declaringClass->name,
+            'filename'  => $declaringClass->getFilename(),
+            'startLine' => $declaringClass->getStartLine()
         );
     }
 
@@ -261,8 +262,9 @@ abstract class Tools
         }
 
         return array(
-            'name'     => $declaringStructure->name,
-            'filename' => $declaringStructure->getFilename()
+            'name'      => $declaringStructure->name,
+            'filename'  => $declaringStructure->getFilename(),
+            'startLine' => $declaringStructure->getStartLine()
         );
     }
 
@@ -382,8 +384,9 @@ abstract class Tools
     protected function getClassMetadata($className)
     {
         $data = array(
-            'wasFound'    => false,
             'class'       => $className,
+            'wasFound'    => false,
+            'startLine'   => null,
             'shortName'   => null,
             'filename'    => null,
             'isTrait'     => null,
@@ -404,6 +407,7 @@ abstract class Tools
 
         $data = array_merge($data, array(
             'wasFound'     => true,
+            'startLine'    => $reflection->getStartLine(),
             'shortName'    => $reflection->getShortName(),
             'filename'     => $reflection->getFileName(),
             'isTrait'      => $reflection->isTrait(),
