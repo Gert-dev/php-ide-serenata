@@ -8,6 +8,8 @@ module.exports =
      * @return {string}
     ###
     escapeSeparators: (text) ->
+        return '' if not text
+
         return text.replace(/\\/g, '\\\\')
 
     ###*
@@ -18,4 +20,6 @@ module.exports =
      * @return {string}
     ###
     normalizeSeparators: (text) ->
+        return '' if not text
+        
         return text.replace(/\\/g, '/')
