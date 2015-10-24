@@ -78,9 +78,11 @@ class Proxy
      * @return {Object}
     ###
     getClassList: () ->
-        crypt = md5(@getFirstProjectDirectory())
+        # TODO: The dependency on md5 can be dropped if we just sanitize the path.
 
-        path = __dirname + "/../../indexes/" + crypt + "/index.classes.json"
+        hash = md5(@getFirstProjectDirectory())
+
+        path = __dirname + "/../../indexes/" + hash + "/index.classes.json"
 
         try
             fs.accessSync(path, fs.F_OK | fs.R_OK)

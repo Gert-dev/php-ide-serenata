@@ -1,6 +1,7 @@
 <?php
-use PhpIntegrator\ErrorHandler;
+
 use PhpIntegrator\Config;
+use PhpIntegrator\ErrorHandler;
 
 require_once(__DIR__ . '/ErrorHandler.php');
 ErrorHandler::register();
@@ -21,13 +22,13 @@ require_once(__DIR__ . '/providers/ClassMapRefresh.php');
 require_once(__DIR__ . '/providers/DocParamProvider.php');
 
 $commands = array(
-    '--class'            => 'PhpIntegrator\ClassProvider',
-    '--methods'          => 'PhpIntegrator\MethodsProvider',
-    '--functions'        => 'PhpIntegrator\FunctionsProvider',
-    '--constants'        => 'PhpIntegrator\ConstantsProvider',
-    '--refresh'          => 'PhpIntegrator\ClassMapRefresh',
-    '--autocomplete'     => 'PhpIntegrator\AutocompleteProvider',
-    '--doc-params'       => 'PhpIntegrator\DocParamProvider'
+    '--class'        => 'PhpIntegrator\ClassProvider',
+    '--methods'      => 'PhpIntegrator\MethodsProvider',
+    '--functions'    => 'PhpIntegrator\FunctionsProvider',
+    '--constants'    => 'PhpIntegrator\ConstantsProvider',
+    '--refresh'      => 'PhpIntegrator\ClassMapRefresh',
+    '--autocomplete' => 'PhpIntegrator\AutocompleteProvider',
+    '--doc-params'   => 'PhpIntegrator\DocParamProvider'
 );
 
 /**
@@ -35,11 +36,13 @@ $commands = array(
 * @param string $message
 */
 function show_error($message) {
-    die(json_encode(array('error' => array('message' => $message))));
+    die(json_encode([
+        'error' => ['message' => $message]
+    ]));
 }
 
 if (count($argv) < 3) {
-    die('Usage : php parser.php <dirname> <command> <args>');
+    die('Usage: php Main.php <directory> <command> <arguments>');
 }
 
 $project = $argv[1];
@@ -52,13 +55,15 @@ if (!isset($commands[$command])) {
 // Config
 $config = require_once(__DIR__ . '/generated_config.php');
 
-Config::set('composer', $config['composer']);
-Config::set('php', $config['php']);
 Config::set('projectPath', $project);
+Config::set('php', $config['phpCommand']);
+Config::set('composer', $config['composerCommand']);
 
 // To see if it fix #19
 chdir(Config::get('projectPath'));
+
 $indexDir =  __DIR__ . '/../indexes/' . md5($project);
+
 if (!is_dir($indexDir)) {
     if (false === mkdir($indexDir, 0777, true)) {
         show_error('Unable to create directory ' . $indexDir);
@@ -67,7 +72,7 @@ if (!is_dir($indexDir)) {
 
 Config::set('indexClasses', $indexDir . '/index.classes.json');
 
-foreach ($config['autoload'] as $conf) {
+foreach ($config['autoloadScripts'] as $conf) {
     $path = sprintf('%s/%s', $project, trim($conf, '/'));
     if (file_exists($path)) {
         require_once($path);
@@ -75,7 +80,7 @@ foreach ($config['autoload'] as $conf) {
     }
 }
 
-foreach ($config['classmap'] as $conf) {
+foreach ($config['classMapScripts'] as $conf) {
     $path = sprintf('%s/%s', $project, trim($conf, '/'));
     if (file_exists($path)) {
         Config::set('classmap_file', $path);

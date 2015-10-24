@@ -10,10 +10,10 @@ class Config
      * Raw configuration object.
     ###
     data:
-        php                            : null
-        composer                       : null
-        autoload                       : []
-        classmap                       : []
+        phpCommand                     : null
+        composerCommand                : null
+        autoloadScripts                : []
+        classMapScripts                : []
         insertNewlinesForUseStatements : false
 
         packagePath                    : null
@@ -74,29 +74,27 @@ class Config
      * Synchronizes the active relevant settings to a temporary file that can be used by the PHP side.
     ###
     synchronizeToPhpConfig: () ->
-        autoloadScripts = @get('autoload')
+        autoloadScripts = @get('autoloadScripts')
 
         if autoloadScripts?.length > 0
             autoloadScripts = "'" + autoloadScripts.join("', '") + "'"
 
-        classMapScripts = @get('classmap')
+        classMapScripts = @get('classMapScripts')
 
         if classMapScripts?.length > 0
             classMapScripts = "'" + classMapScripts.join("', '") + "'"
 
-        phpCommand = @get('php')
-        composerCommand = @get('composer')
-
-        # TODO: Rename config setting names, it is not clear the autoload and classmap are arrays.
+        phpCommand = @get('phpCommand')
+        composerCommand = @get('composerCommand')
 
         text = """<?php
 
                // Automatically generated in CoffeeScript. Any changes made will be lost!
                return [
-                   'php'      => '#{phpCommand}',
-                   'composer' => '#{composerCommand}',
-                   'autoload' => [#{autoloadScripts}],
-                   'classmap' => [#{classMapScripts}]
+                   'phpCommand'      => '#{phpCommand}',
+                   'composerCommand' => '#{composerCommand}',
+                   'autoloadScripts' => [#{autoloadScripts}],
+                   'classMapScripts' => [#{classMapScripts}]
                ];\n
                """
 

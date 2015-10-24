@@ -146,7 +146,7 @@ module.exports =
 
         @progressBar = new StatusBarProgressBar()
 
-        proxy = new CachingProxy(@config.get('php'))
+        proxy = new CachingProxy(@config.get('phpCommand'))
 
         parser = new Parser(proxy)
 
@@ -163,8 +163,7 @@ module.exports =
 
                 @service.clearCache()
 
-                # For Windows - Replace \ in class namespace to / because
-                # composer use / instead of \
+                # For Windows - Replace \ in class namespace to / because composer use / instead of \.
                 path = event.path
 
                 for directory in atom.project.getDirectories()
