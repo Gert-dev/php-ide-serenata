@@ -28,15 +28,12 @@ class DocParser
      */
     public function get($className, $type, $name, $filters)
     {
-        $isConstructor = false;
-
         switch($type) {
             case 'function':
                 $reflection = new \ReflectionFunction($name);
                 break;
 
             case 'method':
-                $isConstructor = ($name === '__construct');
                 $reflection = new \ReflectionMethod($className, $name);
                 break;
 
@@ -49,157 +46,255 @@ class DocParser
         }
 
         $comment = $reflection->getDocComment();
-        return $this->parse($comment, $filters, $isConstructor);
+        return $this->parse($comment, $filters, $name);
     }
 
     /**
      * Parse the comment string to get its elements
      *
-     * @param string|false|null $comment       The docblock to parse. If null, the return array will be filled up with the
-     *                                         correct keys, but they will be empty.
-     * @param array             $filters       Elements to search (see constants).
-     * @param bool              $isConstructor Whether or not the method the docblock is for is a constructor.
+     * @param string|false|null $docblock The docblock to parse. If null, the return array will be filled up with the
+     *                                    correct keys, but they will be empty.
+     * @param array             $filters  Elements to search (see constants).
+     * @param string            $itemName The name of the item (method, class, ...) the docblock is for.
      *
      * @return array
      */
-    public function parse($comment, array $filters, $isConstructor)
+    public function parse($docblock, array $filters, $itemName)
     {
-        $comment = is_string($comment) ? $comment : null;
-
-        if ($comment) {
-            $strippedComment = str_replace(array('*', '/'), '', $comment);
-            $escapedComment = $this->replaceNewlines($strippedComment, ' ');
+        if (empty($filters)) {
+            return array();
         }
 
+        $tags = array();
         $result = array();
+        $matches = array();
 
-        foreach($filters as $filter) {
-            switch ($filter) {
-                case self::VAR_TYPE:
-                    $result['var'] = null;
+        $docblock = is_string($docblock) ? $docblock : null;
 
-                    if ($comment) {
-                        $var = $this->parseVar($escapedComment);
-                        $result['var'] = $var ?: null;
-                    }
+        if ($docblock) {
+            preg_match_all('/\*\s+(@[a-z-]+)([^@]*)\n/', $docblock, $matches, PREG_SET_ORDER);
 
-                    break;
+            foreach ($matches as $match) {
+                if (!isset($tags[$match[1]])) {
+                    $tags[$match[1]] = array();
+                }
 
-                case self::RETURN_VALUE:
-                    $result['return'] = null;
+                $tagValue = $match[2];
+                $tagValue = $this->normalizeNewlines($tagValue);
 
-                    if ($comment) {
-                        $return = $this->parseVar($escapedComment, self::RETURN_VALUE);
+                // Remove the delimiters of the docblock itself at the start of each line, if any.
+                $tagValue = preg_replace('/\n\s+\*\s*/', ' ', $tagValue);
 
-                        if ($return) {
-                            $result['return'] = $return;
-                        } else {
-                            // According to http://www.phpdoc.org/docs/latest/guides/docblocks.html, a method that does
-                            // have a docblock, but no explicit return type returns void. Constructors, however, must
-                            // return self. If there is no docblock at all, we can't assume either of these types.
-                            $result['return'] = $isConstructor ? 'self' : 'void';
-                        }
-                    }
+                // Collapse multiple spaces, just like HTML does.
+                $tagValue = preg_replace('/\s\s+/', ' ', $tagValue);
 
-                    break;
-
-                case self::PARAM_TYPE:
-                    $result['params'] = array();
-
-                    if ($comment) {
-                        $res = $escapedComment;
-
-                        while (null !== $ret = $this->parseParams($res)) {
-                            $result['params'][$ret['name']] = $ret['type'];
-                            $res = $ret['string'];
-                        }
-                    }
-
-                    break;
-
-                case self::THROWS:
-                    $result['throws'] = array();
-
-                    if ($comment) {
-                        $res = $escapedComment;
-
-                        while (null !== $ret = $this->parseThrows($res)) {
-                            $res = $ret['string'];
-                            $result['throws'][$ret['type']] = $ret['description'];
-                        }
-                    }
-
-                    break;
-
-                case self::DESCRIPTION:
-                    $result['descriptions'] = array(
-                        'short' => '',
-                        'long'  => ''
-                    );
-
-                    if ($comment) {
-                        list($summary, $description) = $this->parseDescription($comment);
-
-                        $result['descriptions']['short'] = $summary;
-                        $result['descriptions']['long']  = $description;
-                    }
-
-                    break;
-
-                case self::DEPRECATED:
-                    $result['deprecated'] = false;
-
-                    if ($comment) {
-                        $result['deprecated'] = (false !== strpos($escapedComment, self::DEPRECATED));
-                    }
-
-                    break;
+                $tags[$match[1]][] = trim($tagValue);
             }
+        }
+
+        $filterMethodMap = array(
+            static::RETURN_VALUE => 'filterReturn',
+            static::PARAM_TYPE   => 'filterParams',
+            static::VAR_TYPE     => 'filterVar',
+            static::DEPRECATED   => 'filterDeprecated',
+            static::THROWS       => 'filterThrows',
+            static::DESCRIPTION  => 'filterDescription'
+        );
+
+        foreach ($filters as $filter) {
+            if (!isset($filterMethodMap[$filter])) {
+                throw new \UnexpectedValueException('Unknown filter passed!');
+            }
+
+            $result = array_merge(
+                $result,
+                $this->{$filterMethodMap[$filter]}($docblock, $methodName, $tags)
+            );
         }
 
         return $result;
     }
 
     /**
-     * Retrieves the specified string with its line separators replaced with the specifed separator.
+     * Returns an array of three values, the first value will go up until the first space, the second value will go up
+     * until the second space, and the third value will contain the rest of the string. Convenience method for tags that
+     * consist of three parameters.
      *
-     * @param  string $string
-     * @param  string $replacement
+     * @param string $value
      *
-     * @return string
+     * @return string[]
      */
-    private function replaceNewlines($string, $replacement)
+    protected function filterThreeParameterTag($value)
     {
-        return str_replace(array('\n', '\r\n', PHP_EOL), $replacement, $string);
+        $parts = explode(' ', $value);
+
+        $firstPart = trim(array_shift($parts));
+        $secondPart = trim(array_shift($parts));
+
+        if (!empty($parts)) {
+            $thirdPart = trim(implode(' ', $parts));
+        } else {
+            $thirdPart = null;
+        }
+
+        return array($firstPart ?: null, $secondPart ?: null, $thirdPart);
     }
 
     /**
-     * Normalizes all types of newlines to the "\n" separator.
+     * Returns an array of two values, the first value will go up until the first space and the second value will
+     * contain the rest of the string. Convenience method for tags that consist of two parameters.
      *
-     * @param  string $string
+     * @param string $value
      *
-     * @return string
+     * @return string[]
      */
-    private function normalizeNewlines($string)
+    protected function filterTwoParameterTag($value)
     {
-        return $this->replaceNewlines($string, "\n");
+        list($firstPart, $secondPart, $thirdPart) = $this->filterThreeParameterTag($value);
+
+        return array($firstPart, trim($secondPart . ' ' . $thirdPart));
     }
 
     /**
-     * Search for the long and short description on a method or attribute
+     * Filters out information about the return value of the function or method.
      *
-     * @param string $comment Comment
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
      *
-     * @return array ('short' => short description, 'long' => long description)
+     * @return array
      */
-    private function parseDescription($comment)
+    protected function filterReturn($docblock, $methodName, array $tags)
+    {
+        if (isset($tags[static::RETURN_VALUE])) {
+            list($type, $description) = $this->filterTwoParameterTag($tags[static::RETURN_VALUE][0]);
+        } else {
+            // According to http://www.phpdoc.org/docs/latest/guides/docblocks.html, a method that does
+            // have a docblock, but no explicit return type returns void. Constructors, however, must
+            // return self. If there is no docblock at all, we can't assume either of these types.
+            $type = ($methodName === '__construct') ? 'self' : 'void';
+            $description = null;
+        }
+
+        return array(
+            'return' => array(
+                'type'        => $type,
+                'description' => $description
+            )
+        );
+    }
+
+    /**
+     * Filters out information about the parameters of the function or method.
+     *
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterParams($docblock, $methodName, array $tags)
+    {
+        $params = array();
+
+        if (isset($tags[static::PARAM_TYPE])) {
+            foreach ($tags[static::PARAM_TYPE] as $tag) {
+                list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
+
+                $params[$variableName] = array(
+                    'type'        => $type,
+                    'description' => $description
+                );
+            }
+        }
+
+        return array(
+            'params' => $params
+        );
+    }
+
+    /**
+     * Filters out information about the variable.
+     *
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterVar($docblock, $methodName, array $tags)
+    {
+        if (isset($tags[static::VAR_TYPE])) {
+            list($type, $description) = $this->filterTwoParameterTag($tags[static::VAR_TYPE][0]);
+        } else {
+            $type = null;
+        }
+
+        return array(
+            'var' => array(
+                'type'        => $type,
+                'description' => $description
+            )
+        );
+    }
+
+    /**
+     * Filters out deprecation information.
+     *
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterDeprecated($docblock, $methodName, array $tags)
+    {
+        return array(
+            'deprecated' => isset($tags[static::DEPRECATED])
+        );
+    }
+
+    /**
+     * Filters out information about what exceptions the method can throw.
+     *
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterThrows($docblock, $methodName, array $tags)
+    {
+        $throws = array();
+
+        if (isset($tags[static::THROWS])) {
+            foreach ($tags[static::THROWS] as $tag) {
+                list($type, $description) = $this->filterTwoParameterTag($tag);
+
+                $throws[$type] = $description;
+            }
+        }
+
+        return array(
+            'throws' => $throws
+        );
+    }
+
+    /**
+     * Filters out information about the description.
+     *
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterDescription($docblock, $methodName, array $tags)
     {
         $summary = '';
         $description = '';
 
-        $collapsedComment = $this->normalizeNewlines($comment);
-
-        $lines = explode("\n", $collapsedComment);
+        $lines = explode("\n", $docblock);
 
         $isReadingSummary = true;
 
@@ -224,109 +319,35 @@ class DocParser
         }
 
         return array(
-            trim($summary),
-            trim($description)
+            'descriptions' => array(
+                'short' => trim($summary),
+                'long'  => trim($description)
+            )
         );
     }
 
     /**
-     * Search for a $type in the comment and its value
-     * @param string $string comment string
-     * @param string $type   annotation type searched
+     * Retrieves the specified string with its line separators replaced with the specifed separator.
+     *
+     * @param  string $string
+     * @param  string $replacement
+     *
      * @return string
      */
-    private function parseVar($string, $type = self::VAR_TYPE)
+    protected function replaceNewlines($string, $replacement)
     {
-        if (false === $pos = strpos($string, $type)) {
-            return null;
-        }
-
-        $varSubstring = substr(
-            $string,
-            $pos + strlen($type),
-            strlen($string)-1
-        );
-        $varSubstring = trim($varSubstring);
-
-        if (empty($varSubstring)) {
-            return null;
-        }
-
-        $elements = explode(' ', $varSubstring);
-        return $elements[0];
+        return str_replace(array("\n", "\r\n", PHP_EOL), $replacement, $string);
     }
 
     /**
-     * Search all @param annotations in the given string
-     * @param string $string String comment to search
+     * Normalizes all types of newlines to the "\n" separator.
+     *
+     * @param  string $string
+     *
      * @return string
      */
-    private function parseParams($string)
+    protected function normalizeNewlines($string)
     {
-        if (false === $pos = strpos($string, self::PARAM_TYPE)) {
-            return null;
-        }
-
-        $paramSubstring = substr(
-            $string,
-            $pos + strlen(self::PARAM_TYPE),
-            strlen($string)-1
-        );
-        $paramSubstring = trim($paramSubstring);
-
-        if (empty($paramSubstring)) {
-            return null;
-        }
-
-        $elements = explode(' ', $paramSubstring);
-        if (count($elements) < 2) {
-            return null;
-        }
-
-        return array(
-            'name' => $elements[1],
-            'type' => $elements[0],
-            'string' => $paramSubstring
-        );
-    }
-
-    /**
-     * Search all @throws annotations in the given string
-     * @param string $string String comment to search
-     * @return string
-     */
-    private function parseThrows($string)
-    {
-        if (false === $pos = strpos($string, self::THROWS)) {
-            return null;
-        }
-
-        $throwsSubstring = substr(
-            $string,
-            $pos + strlen(self::THROWS),
-            strlen($string)-1
-        );
-        $throwsSubstring = trim($throwsSubstring);
-
-        if (empty($throwsSubstring)) {
-            return null;
-        }
-
-        // Make sure we don't use the rest of the docblock as description of the exception type.
-        // NOTE: The next tag detection can probably be improved at a later stage.
-        $substringToExplode = $throwsSubstring;
-        $nextTag = strpos($throwsSubstring, '@');
-
-        if ($nextTag !== false) {
-            $substringToExplode = substr($throwsSubstring, 0, $nextTag);
-        }
-
-        $elements = explode(' ', $substringToExplode);
-
-        return array(
-            'type' => trim(array_shift($elements)),
-            'description' => !empty($elements) ? trim(implode(' ', $elements)) : null,
-            'string' => $throwsSubstring
-        );
+        return $this->replaceNewlines($string, "\n");
     }
 }
