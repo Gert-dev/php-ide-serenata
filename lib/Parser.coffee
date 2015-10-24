@@ -54,20 +54,15 @@ class Parser
         return @getClassNameFromCallStack(editor, bufferPosition, fullCall)
 
     ###*
-     * Retrieves contextual information about the class member at the specified location in the editor.
+     * Retrieves information about the member of the specified class.
      *
-     * @param {TextEditor} editor         The text editor to use.
-     * @param {Point}      bufferPosition The cursor location of the member.
-     * @param {string}     name           The name of the member to retrieve information about.
+     * @param {string} className The full name of the class to examine.
+     * @param {string} name      The name of the member to retrieve information about.
      *
      * @return {Object|null}
     ###
-    getClassMember: (editor, bufferPosition, name) ->
-        calledClass = @getCalledClass(editor, bufferPosition)
-
-        return null unless calledClass
-
-        response = @proxy.getClassInfo(calledClass)
+    getClassMember: (className, name) ->
+        response = @proxy.getClassInfo(className)
 
         return if not response or (response.error? and response.error != '') or response.names.indexOf(name) == -1
 

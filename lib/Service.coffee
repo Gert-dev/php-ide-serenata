@@ -149,7 +149,9 @@ class Service
         return @parser.determineFullClassName(editor, className)
 
     ###*
-     * Retrieves contextual information about the class member at the specified location in the editor.
+     * Retrieves contextual information about the class member at the specified location in the editor. This is
+     * essentially the same as {@see getClassMember}, but will automatically determine the class based on the code at
+     * the specified location.
      *
      * @param {TextEditor} editor         The text editor to use.
      * @param {Point}      bufferPosition The cursor location of the member.
@@ -157,5 +159,18 @@ class Service
      *
      * @return {Object|null}
     ###
-    getClassMember: (editor, bufferPosition, name) ->
-        return @parser.getClassMember(editor, bufferPosition, name)
+    getClassMemberAt: (editor, bufferPosition, name) ->
+        className = @parser.getCalledClass(editor, bufferPosition)
+
+        return @getClassMember(className, name)
+
+    ###*
+     * Retrieves information about the member of the specified class.
+     *
+     * @param {string} className The full name of the class to examine.
+     * @param {string} name      The name of the member to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassMember: (className, name) ->
+        return @parser.getClassMember(className, name)
