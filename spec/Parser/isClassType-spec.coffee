@@ -3,7 +3,7 @@ Parser = require '../../lib/Parser'
 describe "isClassType", ->
     parser = new Parser(null)
 
-    it "Does not think built-in simple PHP types are classes.", ->
+    it "does not think built-in simple PHP types are classes.", ->
         expect(parser.isClassType("Foo")).toBeTruthy()
         expect(parser.isClassType("DateTime")).toBeTruthy()
         expect(parser.isClassType("SomewhatComplexClass")).toBeTruthy()

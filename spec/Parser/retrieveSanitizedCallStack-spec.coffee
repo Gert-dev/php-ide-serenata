@@ -3,7 +3,7 @@ Parser = require '../../lib/Parser'
 describe "retrieveSanitizedCallStack", ->
     parser = new Parser(null)
 
-    it "Correctly sanitizes comments at the start of the call stack.", ->
+    it "correctly sanitizes comments at the start of the call stack.", ->
         source =
             """
             /*test
@@ -20,7 +20,7 @@ describe "retrieveSanitizedCallStack", ->
 
         expect(parser.retrieveSanitizedCallStack(source)).toEqual(expectedResult)
 
-    it "Correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
+    it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =
             """
             $this

@@ -301,7 +301,7 @@ class Parser
             while i >= 0
                 scopeDescriptor = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
-                if scopeDescriptor.indexOf('.comment') > 0
+                if scopeDescriptor.indexOf('.comment') != -1
                     # Do nothing, we just keep parsing. (Comments can occur inside call stacks.)
 
                 else if lineText[i] == '('
@@ -344,7 +344,7 @@ class Parser
 
                     # Language constructs, such as echo and print, as well as keywords, such as return, don't require
                     # parantheses, but we still need to stop when we find them.
-                    else if scopeDescriptor.indexOf('.function.construct') > 0 or scopeDescriptor.indexOf('.keyword.control') > 0
+                    else if scopeDescriptor.indexOf('.function.construct') != -1 or scopeDescriptor.indexOf('.keyword.control') != -1
                         ++i
                         finished = true
                         break
@@ -352,10 +352,10 @@ class Parser
                     # For variables, we knof we can stop at the dollar sign, but for static class names, we won't know
                     # when to stop. Static class names can only ever appear at the start of an expression, so stop when
                     # we find one.
-                    else if scopeDescriptor.indexOf('.support.class') > 0
+                    else if scopeDescriptor.indexOf('.support.class') >= 0
                         beganStaticClassName = true
 
-                    else if beganStaticClassName and scopeDescriptor.indexOf('.support.class') < 0
+                    else if beganStaticClassName and scopeDescriptor.indexOf('.support.class') == -1
                         ++i
                         finished = true
                         break
