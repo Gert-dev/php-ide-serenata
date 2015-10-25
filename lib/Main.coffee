@@ -146,7 +146,14 @@ module.exports =
         @registerCommands()
         @registerConfigListeners()
 
-        @performFullIndex()
+        # In rare cases, the package is loaded faster than the project gets a chance to load. At that point, no project
+        # directory is returned. The onDidChangePaths listener below will also catch that case.
+        if atom.project.getDirectories().length > 0
+            @performFullIndex()
+
+        atom.project.onDidChangePaths (projectPaths) =>
+            @service.clearCache()
+            @performFullIndex()
 
         atom.workspace.observeTextEditors (editor) =>
             editor.onDidSave (event) =>
