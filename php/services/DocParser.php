@@ -128,11 +128,11 @@ class DocParser
     {
         $parts = explode(' ', $value);
 
-        $firstPart = trim(array_shift($parts));
-        $secondPart = trim(array_shift($parts));
+        $firstPart = $this->sanitizeText(array_shift($parts));
+        $secondPart = $this->sanitizeText(array_shift($parts));
 
         if (!empty($parts)) {
-            $thirdPart = trim(implode(' ', $parts));
+            $thirdPart = $this->sanitizeText(implode(' ', $parts));
         } else {
             $thirdPart = null;
         }
@@ -320,17 +320,29 @@ class DocParser
 
         return array(
             'descriptions' => array(
-                'short' => trim($summary),
-                'long'  => trim($description)
+                'short' => $this->sanitizeText($summary),
+                'long'  => $this->sanitizeText($description)
             )
         );
     }
 
     /**
+     * Sanitizes text, trimming it and encoding HTML entities.
+     *
+     * @param string $text
+     *
+     * @return string
+     */
+    protected function sanitizeText($text)
+    {
+        return trim(htmlentities($text));
+    }
+
+    /**
      * Retrieves the specified string with its line separators replaced with the specifed separator.
      *
-     * @param  string $string
-     * @param  string $replacement
+     * @param string $string
+     * @param string $replacement
      *
      * @return string
      */
@@ -342,7 +354,7 @@ class DocParser
     /**
      * Normalizes all types of newlines to the "\n" separator.
      *
-     * @param  string $string
+     * @param string $string
      *
      * @return string
      */
