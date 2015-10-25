@@ -46,15 +46,33 @@ describe "retrieveSanitizedCallStackAt", ->
         editor.setText(source)
 
         expectedResult = [
-            'Foo',
-            'someProperty'
+            'Bar',
+            'testProperty'
         ]
 
-        # NOTE: Suggestions welcome: the grammar seems to need time to parse the file, but it's not a promise so we
-        # can't wait for it to finish parsing. This is an ugly hack that works around that problem.
-        setTimeout(() ->
-            expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 17})).toEqual(expectedResult)
-        , 50)
+        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 17})).toEqual(expectedResult)
+
+    it "correctly stops at static class names containing a namespace.", ->
+        source =
+            """
+            <?php
+
+            if (true) {
+                // More code here.
+            }
+
+            Namespace\\Bar::staticmethod()
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            'Namespace\\Bar',
+            'staticmethod()'
+        ]
+
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 29})).toEqual(expectedResult)
 
     it "correctly stops at control keywords.", ->
         source =
@@ -121,10 +139,7 @@ describe "retrieveSanitizedCallStackAt", ->
             'someProperty'
         ]
 
-        # NOTE: See the same hack above.
-        setTimeout(() ->
-            expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 19})).toEqual(expectedResult)
-        , 50)
+        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 19})).toEqual(expectedResult)
 
     it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =

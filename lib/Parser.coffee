@@ -283,7 +283,9 @@ class Parser
         parenthesesClosed = 0
         squiggleBracketsOpened = 0
         squiggleBracketsClosed = 0
-        startOfCallStackType = null
+
+        startedKeyword = false
+        startedStaticClassName = false
 
         while line > 0
             lineText = editor.lineTextForBufferRow(line)
@@ -333,35 +335,44 @@ class Parser
                 else if parenthesesOpened == parenthesesClosed and squiggleBracketsOpened == squiggleBracketsClosed
                     # Variable name.
                     if lineText[i] == '$'
+                        console.log('here4')
                         finished = true
                         break
 
                     # Reached an operator that can never be part of the current statement.
                     else if lineText[i] == ';' or lineText[i] == '='
                         ++i
+                        console.log('here3')
                         finished = true
                         break
 
+                    # NOTE: This should no longer be necessary as it was intended to catch stack classes that started
+                    # with static class names and keywords such as 'self', which is now covered by the statements below.
                     # Language constructs, such as echo and print, as well as keywords, such as return, don't require
                     # parantheses, but we still need to stop when we find them.
-                    else if scopeDescriptor.indexOf('.function.construct') != -1 or
-                            scopeDescriptor.indexOf('.keyword.control') != -1
-                        ++i
-                        finished = true
-                        break
+                    #else if scopeDescriptor.indexOf('.function.construct') != -1 or
+                    #        scopeDescriptor.indexOf('.keyword.control') != -1
+                    #    ++i
+                    #    finished = true
+                    #    break
 
                     # For static class names and things like the self and parent keywords, we won't know when to stop.
                     # These always appear the start of the call stack, so we know we can stop if we find them.
                     else if scopeDescriptor.indexOf('.support.class') >= 0
-                        startOfCallStackType = '.support.class'
+                        startedStaticClassName = true
 
                     else if scopeDescriptor.indexOf('.storage.type') >= 0
-                        startOfCallStackType = '.storage.type'
+                        startedKeyword = true
 
-                    else if startOfCallStackType and scopeDescriptor.indexOf(startOfCallStackType) == -1
-                        ++i
-                        finished = true
-                        break
+                if startedStaticClassName and scopeDescriptor.indexOf('.support.class') == -1 and scopeDescriptor.indexOf('.support.other.namespace') == -1
+                    ++i
+                    finished = true
+                    break
+
+                else if startedKeyword and scopeDescriptor.indexOf('.storage.type') == -1
+                    ++i
+                    finished = true
+                    break
 
                 --i
 
