@@ -283,6 +283,7 @@ class Parser
         parenthesesClosed = 0
         squiggleBracketsOpened = 0
         squiggleBracketsClosed = 0
+        beganStaticClassName = false
 
         while line > 0
             lineText = editor.lineTextForBufferRow(line)
@@ -330,11 +331,12 @@ class Parser
 
                 # These will not be the same if, for example, we've entered a closure.
                 else if parenthesesOpened == parenthesesClosed and squiggleBracketsOpened == squiggleBracketsClosed
-                    # Variable definition.
+                    # Variable name.
                     if lineText[i] == '$'
                         finished = true
                         break
 
+                    # Reached an operator that can never be part of the current statement.
                     else if lineText[i] == ';' or lineText[i] == '='
                         ++i
                         finished = true
@@ -343,6 +345,17 @@ class Parser
                     # Language constructs, such as echo and print, don't require parantheses, but we still need to stop
                     # when we find them.
                     else if scopeDescriptor.indexOf('.function.construct') > 0
+                        ++i
+                        finished = true
+                        break
+
+                    # For variables, we knof we can stop at the dollar sign, but for static class names, we won't know
+                    # when to stop. Static class names can only ever appear at the start of an expression, so stop when
+                    # we find one.
+                    else if scopeDescriptor.indexOf('.support.class') > 0
+                        beganStaticClassName = true
+
+                    else if beganStaticClassName and scopeDescriptor.indexOf('.support.class') < 0
                         ++i
                         finished = true
                         break
