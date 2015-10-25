@@ -13,7 +13,12 @@ class Parser
     ###*
      * Regular expression that will search for a use statement.
     ###
-    useStatementRegex   : /(?:use)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/
+    useStatementRegex : /(?:use)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/
+
+    ###*
+     * Regular expression that will search for a namespace declaration.
+    ###
+    namespaceDeclarationRegex : /(?:namespace)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:;)/
 
     ###*
      * Simple cache to avoid duplicate computation.
@@ -106,11 +111,6 @@ class Parser
         if className and className[0] == "\\"
             return className.substr(1) # FQCN, not subject to any further context.
 
-        # TODO: Move these regular expressions to class members.
-        usePattern = /(?:use)(?:[^\w\\\\])([\w\\\\]+)(?![\w\\\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/
-        namespacePattern = /(?:namespace)(?:[^\w\\\\])([\w\\\\]+)(?![\w\\\\])(?:;)/
-        definitionPattern = /(?:abstract class|class|trait|interface)\s+(\w+)/
-
         text = editor.getText()
 
         # TODO: It is not necessary to split the text, we can use lineTextForBufferRow instead.
@@ -120,13 +120,13 @@ class Parser
         found = false
 
         for line,i in lines
-            matches = line.match(namespacePattern)
+            matches = line.match(@namespaceDeclarationRegex)
 
             if matches
                 fullClass = matches[1] + '\\' + className
 
             else if className
-                matches = line.match(usePattern)
+                matches = line.match(@useStatementRegex)
 
                 if matches
                     classNameParts = className.split('\\')
@@ -151,7 +151,7 @@ class Parser
 
                         break
 
-            matches = line.match(definitionPattern)
+            matches = line.match(@structureStartRegex)
 
             if matches
                 if not className
