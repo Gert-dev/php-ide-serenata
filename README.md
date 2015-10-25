@@ -39,6 +39,6 @@ These limitations may affect other packages using the provided service:
   * `static` and `self` behave mostly like `$this` in **non-static** contexts, i.e. they can also access non-static members.
 
 ## Do you accept donations?
-I do accept donations and am very grateful for any donation you may give, but they were not my primary intention when releasing this application as open source. As such, a link to the (PayPal) donation screen is located [here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ), at the bottom of the readme, hidden from initial sight and not even in the form of a fancy button ;-).
+I do accept donations and am very grateful for any donation you may give, but they were not my primary intention when releasing this project as open source. As such, a link to the (PayPal) donation screen is located [here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ), at the bottom of the readme, hidden from initial sight and not even in the form of a fancy button ;-).
 
 ![GPLv3 Logo](http://gplv3.fsf.org/gplv3-127x51.png)
