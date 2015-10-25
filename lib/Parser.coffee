@@ -583,22 +583,30 @@ class Parser
                     if element == '$this' and not className
                         className = @determineFullClassName(editor)
 
-                    i++
+                    ++i
                     continue
 
                 else if element == 'static' or element == 'self'
                     className = @determineFullClassName(editor)
-                    i++
+                    ++i
                     continue
 
                 else if element == 'parent'
-                    className = @getParentClass(editor)
-                    i++
+                    currentClassName = @determineFullClassName(editor)
+                    currentClassInfo = @proxy.getClassInfo(currentClassName)
+
+                    if currentClassInfo.parents.length > 0
+                        className = currentClassInfo.parents[0]
+
+                    else
+                        className = null
+
+                    ++i
                     continue
 
                 else
                     className = @determineFullClassName(editor, element)
-                    i++
+                    ++i
                     continue
 
             # Last element
