@@ -44,7 +44,6 @@ describe "retrieveSanitizedCallStackAt", ->
             """
 
         editor.setText(source)
-        # editor.setGrammar(atom.grammars.selectGrammar('.source.php'))
 
         expectedResult = [
             'Foo',
@@ -102,6 +101,31 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 22})).toEqual(expectedResult)
 
+    it "correctly stops at keywords such as self and parent.", ->
+        source =
+            """
+            <?php
+
+            if(true) {
+
+            }
+
+            self::someProperty
+            """
+
+
+        editor.setText(source)
+
+        expectedResult = [
+            'self',
+            'someProperty'
+        ]
+
+        # NOTE: See the same hack above.
+        setTimeout(() ->
+            expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 19})).toEqual(expectedResult)
+        , 50)
+
     it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =
             """
@@ -109,7 +133,7 @@ describe "retrieveSanitizedCallStackAt", ->
                 ->testChaining(5, ['Somewhat more complex parameters', /* inline comment */ null])
                 //------------
                 /*
-                    another comment$this;[]{}**** /*
+                    another comment$this;[]{}**** /*int echo return
                 */
                 ->testChaining(2, [
                 //------------
@@ -122,6 +146,7 @@ describe "retrieveSanitizedCallStackAt", ->
                     3,
                     [],
                     function (FooClass $foo) {
+                        echo 'test';
                         //    --------
                         return $foo;
                     }
@@ -147,4 +172,4 @@ describe "retrieveSanitizedCallStackAt", ->
             'testChai'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, [32, 10])).toEqual(expectedResult)
+        expect(parser.retrieveSanitizedCallStackAt(editor, [33, 10])).toEqual(expectedResult)

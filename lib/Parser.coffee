@@ -283,7 +283,7 @@ class Parser
         parenthesesClosed = 0
         squiggleBracketsOpened = 0
         squiggleBracketsClosed = 0
-        beganStaticClassName = false
+        startOfCallStackType = null
 
         while line > 0
             lineText = editor.lineTextForBufferRow(line)
@@ -344,18 +344,21 @@ class Parser
 
                     # Language constructs, such as echo and print, as well as keywords, such as return, don't require
                     # parantheses, but we still need to stop when we find them.
-                    else if scopeDescriptor.indexOf('.function.construct') != -1 or scopeDescriptor.indexOf('.keyword.control') != -1
+                    else if scopeDescriptor.indexOf('.function.construct') != -1 or
+                            scopeDescriptor.indexOf('.keyword.control') != -1
                         ++i
                         finished = true
                         break
 
-                    # For variables, we knof we can stop at the dollar sign, but for static class names, we won't know
-                    # when to stop. Static class names can only ever appear at the start of an expression, so stop when
-                    # we find one.
+                    # For static class names and things like the self and parent keywords, we won't know when to stop.
+                    # These always appear the start of the call stack, so we know we can stop if we find them.
                     else if scopeDescriptor.indexOf('.support.class') >= 0
-                        beganStaticClassName = true
+                        startOfCallStackType = '.support.class'
 
-                    else if beganStaticClassName and scopeDescriptor.indexOf('.support.class') == -1
+                    else if scopeDescriptor.indexOf('.storage.type') >= 0
+                        startOfCallStackType = '.storage.type'
+
+                    else if startOfCallStackType and scopeDescriptor.indexOf(startOfCallStackType) == -1
                         ++i
                         finished = true
                         break
