@@ -342,9 +342,9 @@ class Parser
                         finished = true
                         break
 
-                    # Language constructs, such as echo and print, don't require parantheses, but we still need to stop
-                    # when we find them.
-                    else if scopeDescriptor.indexOf('.function.construct') > 0
+                    # Language constructs, such as echo and print, as well as keywords, such as return, don't require
+                    # parantheses, but we still need to stop when we find them.
+                    else if scopeDescriptor.indexOf('.function.construct') > 0 or scopeDescriptor.indexOf('.keyword.control') > 0
                         ++i
                         finished = true
                         break
