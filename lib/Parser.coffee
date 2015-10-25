@@ -411,7 +411,7 @@ class Parser
             return ''
 
         # Remove multi-line comments
-        regx = /\/\*[^(\*\/)]*\*\//g
+        regx = /\/\*(.|\n)*?\*\//g
         text = text.replace regx, (match) =>
             return ''
 
@@ -574,7 +574,6 @@ class Parser
         if not callStack
             callStack = []
 
-        # TODO: Can probably use a for i,element of callStack here.
         for element in callStack
             if i == 0
                 if element[0] == '$'
@@ -618,10 +617,10 @@ class Parser
             ++i
 
         # If no data or a valid end of line, OK
-        if callStack.length > 0 and (callStack[callStack.length-1].length == 0 or callStack[callStack.length-1].match(/([a-zA-Z0-9]$)/g))
-            return className
+        #if callStack.length > 0 and (callStack[callStack.length-1].length == 0 or callStack[callStack.length-1].match(/([a-zA-Z0-9]$)/g))
+        #    return className
 
-        return null
+        return className
 
     ###*
      * Gets the correct selector when a class or namespace is clicked.
