@@ -13,6 +13,7 @@ improvements as well as separation of the various components into separate packa
 
 ## What do I need to do to make it work?
 Currently the following is required in order to get the package up and running:
+  * You must use PHP 5.4 or above.
   * You must use [Composer](https://getcomposer.org/) for dependency management.
   * You must follow the PSR standards (for the names of classes, methods, namespacing, etc.).
   * You must write proper docblocks for your methods. There currently is no standard around this, but we try to follow the draft PSR-5 standard (which, in turn, is mostly inspired by phpDocumentor's implementation). Minimum requirements for proper autocompletion:
