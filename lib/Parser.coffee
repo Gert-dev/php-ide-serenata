@@ -335,14 +335,12 @@ class Parser
                 else if parenthesesOpened == parenthesesClosed and squiggleBracketsOpened == squiggleBracketsClosed
                     # Variable name.
                     if lineText[i] == '$'
-                        console.log('here4')
                         finished = true
                         break
 
                     # Reached an operator that can never be part of the current statement.
                     else if lineText[i] == ';' or lineText[i] == '='
                         ++i
-                        console.log('here3')
                         finished = true
                         break
 
