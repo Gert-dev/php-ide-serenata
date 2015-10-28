@@ -8,16 +8,11 @@ namespace PhpIntegrator;
 class ConstantsProvider extends Tools implements ProviderInterface
 {
     /**
-     * Execute the command
-     * @param  array  $args Arguments gived to the command
-     * @return array Response
+     * {@inheritDoc}
      */
     public function execute($args = array())
     {
-        $constants = array(
-            'names'  => array(),
-            'values' => array()
-        );
+        $constants = [];
 
         foreach (get_defined_constants(true) as $namespace => $constantList) {
             // We don't want constants from our own code showing up, but we don't select the internal namespace
@@ -28,13 +23,10 @@ class ConstantsProvider extends Tools implements ProviderInterface
 
             // NOTE: Be very careful if you want to pass back the value, there are also escaped paths, newlines
             // (PHP_EOL), etc. in there.
-            foreach ($constantList as $constantName => $value) {
-                $constants['names'][] = $constantName;
-                $constants['values'][$constantName] = array(
-                    array(
-                        // NOTE: No additional information is available at the moment, but keep the format consistent.
-                    )
-                );
+            foreach ($constantList as $name => $value) {
+                $constants[$name] = [
+                    'name' => $name
+                ];
             }
         }
 

@@ -36,9 +36,7 @@ class ClassMapRefresh extends Tools implements ProviderInterface
     }
 
     /**
-     * Execute the command
-     * @param  array  $args Arguments gived to the command
-     * @return array Response
+     * {@inheritDoc}
      */
     public function execute($args = array())
     {

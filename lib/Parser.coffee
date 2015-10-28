@@ -48,17 +48,22 @@ class Parser
      * @return {Object|null}
     ###
     getClassMember: (className, name) ->
-        response = @proxy.getClassInfo(className)
+        classInfo = @proxy.getClassInfo(className)
 
-        return if not response or (response.error? and response.error != '') or response.names.indexOf(name) == -1
+        return if not classInfo or (classInfo.error? and classInfo.error != '')
 
-        members = response.values[name]
+        member = null
 
-        # If there are multiple matches, just select the first one.
-        if members instanceof Array and members.length > 0
-            return members[0]
+        if name of classInfo.methods
+            member = classInfo.methods[name]
 
-        return members
+        else if name of classInfo.properties
+            member = classInfo.properties[name]
+
+        else if name of classInfo.constants
+            member = classInfo.constants[name]
+
+        return member
 
     ###*
      * Retrieves all variables that are available at the specified buffer position.

@@ -5,36 +5,28 @@ namespace PhpIntegrator;
 class FunctionsProvider extends Tools implements ProviderInterface
 {
     /**
-     * Execute the command
-     * @param  array  $args Arguments gived to the command
-     * @return array Response
+     * {@inheritDoc}
      */
-    public function execute($args = array())
+    public function execute($args = [])
     {
-        $functions = array(
-            'names'  => array(),
-            'values' => array()
-        );
+        $functions = [];
 
-        $functions = get_defined_functions();
+        $definedFunctions = get_defined_functions();
 
-        foreach ($functions['internal'] as $functionName) {
+        foreach ($definedFunctions['internal'] as $functionName) {
             try {
                 $function = new \ReflectionFunction($functionName);
             } catch (\Exception $e) {
                 continue;
             }
 
-            $functions['names'][] = $function->getName();
-
             $args = $this->getMethodArguments($function);
 
-            $functions['values'][$function->getName()] = array(
-                array(
-                    'isMethod' => true,
-                    'args'     => $args
-                )
-            );
+            $functions[$function->getName()] = [
+                'name'     => $function->getName(),
+                'isMethod' => true,
+                'args'     => $args
+            ];
         }
 
         return $functions;

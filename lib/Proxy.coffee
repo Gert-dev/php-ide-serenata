@@ -117,7 +117,7 @@ class Proxy
      * @return {Object}
     ###
     getClassInfo: (className) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--methods', className], false)
+        return @performRequest(@getFirstProjectDirectory(), ['--class-info', className], false)
 
     ###*
      * Retrieves the members of the type that is returned by the member with the specified name in the specified class.

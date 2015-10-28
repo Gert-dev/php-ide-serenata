@@ -5,13 +5,9 @@ namespace PhpIntegrator;
 class AutocompleteProvider extends Tools implements ProviderInterface
 {
     /**
-     * Execute the command.
-     *
-     * @param  array $args Arguments gived to the command.
-     *
-     * @return array Response
+     * {@inheritDoc}
      */
-    public function execute($args = array())
+    public function execute($args = [])
     {
         $class = $args[0];
         $name  = $args[1];
@@ -27,22 +23,17 @@ class AutocompleteProvider extends Tools implements ProviderInterface
             $name = str_replace('()', '', $name);
         }
 
+        $memberInfo = null;
         $relevantClass = null;
-        $data = $this->getClassMetadata($class);
+        $classInfo = $this->getClassInfo($class);
 
-        if (isset($data['values'][$name])) {
-            $memberInfo = $data['values'][$name];
+        if ($isMethod && isset($classInfo['methods'][$name])) {
+            $memberInfo = $classInfo['methods'][$name];
+        } elseif (!$isMethod && isset($classInfo['properties'][$name])) {
+            $memberInfo = $classInfo['properties'][$name];
+        }
 
-            if (!isset($data['values'][$name]['isMethod'])) {
-                foreach ($data['values'][$name] as $value) {
-                    if ($value['isMethod'] && $isMethod) {
-                        $memberInfo = $value;
-                    } elseif (!$value['isMethod'] && !$isMethod) {
-                        $memberInfo = $value;
-                    }
-                }
-            }
-
+        if ($memberInfo) {
             $returnValue = $memberInfo['args']['return']['type'];
 
             if ($returnValue == '$this' || $returnValue == 'static') {
@@ -86,7 +77,7 @@ class AutocompleteProvider extends Tools implements ProviderInterface
         }
 
         // Minor optimization to avoid fetching the same data twice.
-        return ($relevantClass === $class) ? $data : $this->getClassMetadata($relevantClass);
+        return ($relevantClass === $class) ? $classInfo : $this->getClassInfo($relevantClass);
     }
 
     /**
@@ -106,7 +97,7 @@ class AutocompleteProvider extends Tools implements ProviderInterface
         if ($returnValueStatement) {
             $types = explode(DocParser::TYPE_SPLITTER, $returnValueStatement);
 
-            $classTypes = array();
+            $classTypes = [];
 
             foreach ($types as $type) {
                 if ($this->isClassType($type)) {

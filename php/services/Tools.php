@@ -161,7 +161,7 @@ abstract class Tools
             }
         }
 
-        return array(
+        return [
             'parameters'    => $parameters,
             'optionals'     => $optionals,
             'docParameters' => $docParseResult['params'],
@@ -169,7 +169,7 @@ abstract class Tools
             'return'        => $docParseResult['return'],
             'descriptions'  => $docParseResult['descriptions'],
             'deprecated'    => $function->isDeprecated() || $docParseResult['deprecated']
-        );
+        ];
     }
 
      /**
@@ -375,15 +375,15 @@ abstract class Tools
     }
 
     /**
-     * Returns methods and properties of the given className
+     * Returns information about the specified class.
      *
      * @param string $className Full namespace of the parsed class.
      *
      * @return array
      */
-    protected function getClassMetadata($className)
+    protected function getClassInfo($className)
     {
-        $data = array(
+        $data = [
             'class'       => $className,
             'wasFound'    => false,
             'startLine'   => null,
@@ -393,11 +393,12 @@ abstract class Tools
             'isClass'     => null,
             'isAbstract'  => null,
             'isInterface' => null,
-            'parents'     => array(),
-            'names'       => array(),
-            'values'      => array(),
-            'args'        => array()
-        );
+            'parents'     => [],
+            'properties'  => [],
+            'methods'     => [],
+            'constants'   => [],
+            'args'        => []
+        ];
 
         try {
             $reflection = new ReflectionClass($className);
@@ -420,9 +421,8 @@ abstract class Tools
 
         // Retrieve information about methods.
         foreach ($reflection->getMethods() as $method) {
-            $data['names'][] = $method->getName();
-
-            $data['values'][$method->getName()] = array(
+            $data['methods'][$method->getName()] = [
+                'name'               => $method->getName(),
                 'isMethod'           => true,
                 'isProperty'         => false,
                 'isPublic'           => $method->isPublic(),
@@ -437,74 +437,57 @@ abstract class Tools
                 'declaringClass'     => $this->getDeclaringClass($method),
                 'declaringStructure' => $this->getDeclaringStructure($method),
                 'startLine'          => $method->getStartLine()
-            );
+            ];
         }
 
         // Retrieves information about properties/attributes.
-        foreach ($reflection->getProperties() as $attribute) {
-            if (!in_array($attribute->getName(), $data['names'])) {
-                $data['names'][] = $attribute->getName();
-                $data['values'][$attribute->getName()] = null;
-            }
-
-            $attributesValues = array(
+        foreach ($reflection->getProperties() as $property) {
+            $data['properties'][$property->getName()] = [
+                'name'               => $property->getName(),
                 'isMethod'           => false,
                 'isProperty'         => true,
-                'isPublic'           => $attribute->isPublic(),
-                'isProtected'        => $attribute->isProtected(),
-                'isPrivate'          => $attribute->isPrivate(),
-                'isStatic'           => $attribute->isStatic(),
+                'isPublic'           => $property->isPublic(),
+                'isProtected'        => $property->isProtected(),
+                'isPrivate'          => $property->isPrivate(),
+                'isStatic'           => $property->isStatic(),
 
-                'override'           => $this->getOverrideInfo($attribute),
+                'override'           => $this->getOverrideInfo($property),
 
-                'args'               => $this->getPropertyArguments($attribute),
-                'declaringClass'     => $this->getDeclaringClass($attribute),
-                'declaringStructure' => $this->getDeclaringStructure($attribute)
-            );
-
-            if (is_array($data['values'][$attribute->getName()])) {
-                $attributesValues = array(
-                    $attributesValues,
-                    $data['values'][$attribute->getName()]
-                );
-            }
-
-            $data['values'][$attribute->getName()] = $attributesValues;
+                'args'               => $this->getPropertyArguments($property),
+                'declaringClass'     => $this->getDeclaringClass($property),
+                'declaringStructure' => $this->getDeclaringStructure($property)
+            ];
         }
 
         // Retrieve information about constants.
         $constants  = $reflection->getConstants();
 
         foreach ($constants as $constant => $value) {
-            if (!in_array($constant, $data['names'])) {
-                $data['names'][] = $constant;
-                $data['values'][$constant] = null;
-            }
-
             // TODO: There is no direct way to know where the constant originated from (the current class, a base class,
             // an interface of a base class, a trait, ...). This could be done by looping up the chain of base classes
             // to the last class that also has the same property and then checking if any of that class' traits or
             // interfaces define the constant.
-            $data['values'][$constant][] = array(
+            $data['constants'][$constant][] = [
+                'name'           => $constant,
                 'isMethod'       => false,
                 'isProperty'     => false,
                 'isPublic'       => true,
                 'isProtected'    => false,
                 'isPrivate'      => false,
                 'isStatic'       => true,
-                'declaringClass' => array(
+                'declaringClass' => [
                     'name'     => $reflection->name,
                     'filename' => $reflection->getFileName()
-                ),
+                ],
 
                 // TODO: It is not possible to directly fetch the docblock of the constant through reflection, manual
                 // file parsing is required.
-                'args'           => array(
+                'args'           => [
                     'return'       => null,
                     'descriptions' => array(),
                     'deprecated'   => false
-                )
-            );
+                ]
+            ];
         }
 
         return $data;

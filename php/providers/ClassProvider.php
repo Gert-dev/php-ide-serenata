@@ -5,41 +5,34 @@ namespace PhpIntegrator;
 class ClassProvider extends Tools implements ProviderInterface
 {
     /**
-     * Execute the command
-     * @param  array  $args Arguments gived to the command
-     * @return array Response
+     * {@inheritDoc}
      */
-    public function execute($args = array())
+    public function execute($args = [])
     {
-        $class = $args[0];
-        $internal = isset($args[1]) ? $args[1] : false;
+        $class      = $args[0];
+        $isInternal = isset($args[1]) ? $args[1] : false;
 
         try {
             $reflection = new \ReflectionClass($class);
         } catch (\Exception $e) {
-            return array('error' => $e->getMessage());
+            return ['error' => $e->getMessage()];
         }
 
-        if ($internal && !$reflection->isInternal()) {
-            return array();
+        if ($isInternal && !$reflection->isInternal()) {
+            return [];
         }
 
-        $ctor = $reflection->getConstructor();
+        $constructor = $reflection->getConstructor();
 
-        $args = array();
-        if (!is_null($ctor)) {
-            $args = $this->getMethodArguments($ctor);
-        }
-
-        return array(
+        return [
             'class' => $this->getClassArguments($reflection),
-            'methods' => array(
-                'constructor' => array(
-                    'has'  => !is_null($ctor),
-                'args' => $args
-                )
-            )
-        );
+            'methods' => [
+                'constructor' => [
+                    'has'  => !!$constructor,
+                    'args' => $constructor ? $this->getMethodArguments($constructor) : []
+                ]
+            ]
+        ];
     }
 }
 
