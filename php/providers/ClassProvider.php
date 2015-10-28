@@ -25,6 +25,7 @@ class ClassProvider extends Tools implements ProviderInterface
         $constructor = $reflection->getConstructor();
 
         return [
+            'name'  => $reflection->getName(),
             'class' => $this->getClassArguments($reflection),
             'methods' => [
                 'constructor' => [

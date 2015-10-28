@@ -58,42 +58,37 @@ class ClassMapRefresh extends Tools implements ProviderInterface
                     $class = $fileParser->getFullClassName(null, $found);
 
                     if ($found) {
-                        if (isset($index['mapping'][$class])) {
-                            unset($index['mapping'][$class]);
-                        }
-
-                        if (false !== $key = array_search($class, $index['autocomplete'])) {
-                            unset($index['autocomplete'][$key]);
-                            $index['autocomplete'] = array_values($index['autocomplete']);
+                        if (isset($index[$class])) {
+                            unset($index[$class]);
                         }
 
                         if ($value = $this->buildIndexClass($class)) {
-                            $index['mapping'][$class] = array('methods' => $value);
-                            $index['autocomplete'][] = $class;
+                            $index[$class] = $value;
+                            /*$index[$class] = [
+                                'methods' => $value
+                            ];*/
                         }
                     }
                 }
             }
         }
 
-        // Otherwise, full index
+        // Perform a full index if necessary.
         if (!$indexFileExists) {
-            // Autoload classes
+            // Autoloaded classes.
             foreach ($this->buildClassMap() as $class => $filePath) {
                 if ($value = $this->buildIndexClass($class)) {
-                    $index['mapping'][$class] = $value;
-                    $index['autocomplete'][] = $class;
+                    $index[$class] = $value;
                 }
             }
 
             // Internal classes
-            foreach (get_declared_classes() as $class) {
-                $provider = new ClassProvider();
+            $provider = new ClassProvider();
 
-                if ($value = $provider->execute(array($class, true))) {
+            foreach (get_declared_classes() as $class) {
+                if ($value = $provider->execute([$class, true])) {
                     if (!empty($value)) {
-                        $index['mapping'][$class] = $value;
-                        $index['autocomplete'][] = $class;
+                        $index[$class] = $value;
                     }
                 }
             }
@@ -101,7 +96,7 @@ class ClassMapRefresh extends Tools implements ProviderInterface
 
         file_put_contents(Config::get('indexClasses'), json_encode($index));
 
-        return array();
+        return [];
     }
 
     protected function buildIndexClass($class)
