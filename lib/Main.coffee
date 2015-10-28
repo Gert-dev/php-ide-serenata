@@ -116,6 +116,9 @@ module.exports =
      * Performs a complete index of the current project.
     ###
     performFullIndex: () ->
+        timerName = @packageName + " - Indexing project"
+        console.time(timerName);
+
         if @progressBar
             @progressBar.setLabel("Indexing...")
             @progressBar.show()
@@ -123,6 +126,8 @@ module.exports =
         @service.reindex null, () =>
             if @progressBar
                 @progressBar.hide()
+
+            console.timeEnd(timerName);
 
     ###*
      * Activates the package.
