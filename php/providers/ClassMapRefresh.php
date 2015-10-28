@@ -87,9 +87,7 @@ class ClassMapRefresh extends Tools implements ProviderInterface
 
             foreach (get_declared_classes() as $class) {
                 if ($value = $provider->execute([$class, true])) {
-                    if (!empty($value)) {
-                        $index[$class] = $value;
-                    }
+                    $index[$class] = $value;
                 }
             }
         }
