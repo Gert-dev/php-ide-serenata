@@ -78,7 +78,9 @@ class ReindexProvider extends Tools implements ProviderInterface
 
         file_put_contents(Config::get('indexClasses'), json_encode($index));
 
-        return $index;
+        return [
+            'success' => true
+        ];
     }
 
     /**
