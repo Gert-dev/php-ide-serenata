@@ -2,12 +2,11 @@
 
 namespace PhpIntegrator;
 
-class ClassMapRefresh extends Tools implements ProviderInterface
+class ReindexProvider extends Tools implements ProviderInterface
 {
     /**
-     * Returns the classMap from composer.
-     * Fetch it from the command dump-autoload if needed
-     * @param bool $force Force to fetch it from the command
+     * Attempts to rebuild the entire Composer class map and return it.
+     *
      * @return array
      */
     protected function buildClassMap()
@@ -40,49 +39,10 @@ class ClassMapRefresh extends Tools implements ProviderInterface
      */
     public function execute($args = array())
     {
-        $indexFileExists = false;
-
         $fileToReindex = array_shift($args);
 
-        // If we specified a file
-        if ($fileToReindex) {
-            if (file_exists(Config::get('indexClasses'))) {
-                $index = json_decode(file_get_contents(Config::get('indexClasses')), true);
-
-                // Invalid json (#24)
-                if (false !== $index) {
-                    $indexFileExists = true;
-
-                    $found = false;
-                    $fileParser = new FileParser($fileToReindex);
-                    $class = $fileParser->getFullClassName(null, $found);
-
-                    if ($found) {
-                        if (isset($index[$class])) {
-                            unset($index[$class]);
-                        }
-
-                        if ($value = $this->buildIndexClass($class)) {
-                            $index[$class] = $value;
-                            /*$index[$class] = [
-                                'methods' => $value
-                            ];*/
-                        }
-                    }
-                }
-            }
-        }
-
-        // Perform a full index if necessary.
-        if (!$indexFileExists) {
-            // Autoloaded classes.
-            foreach ($this->buildClassMap() as $class => $filePath) {
-                if ($value = $this->buildIndexClass($class)) {
-                    $index[$class] = $value;
-                }
-            }
-
-            // Internal classes
+        if (!$fileToReindex) {
+            $index = [];
             $provider = new ClassProvider();
 
             foreach (get_declared_classes() as $class) {
@@ -90,14 +50,44 @@ class ClassMapRefresh extends Tools implements ProviderInterface
                     $index[$class] = $value;
                 }
             }
+
+            foreach ($this->buildClassMap() as $class => $filePath) {
+                if ($value = $this->execClassInfoFetch($class)) {
+                    $index[$class] = $value;
+                }
+            }
+        } elseif (file_exists(Config::get('indexClasses'))) {
+            $index = json_decode(file_get_contents(Config::get('indexClasses')), true);
+
+            if ($index !== false) {
+                $found = false;
+                $fileParser = new FileParser($fileToReindex);
+                $class = $fileParser->getFullClassName(null, $found);
+
+                if ($found) {
+                    if (isset($index[$class])) {
+                        unset($index[$class]);
+                    }
+
+                    if ($value = $this->execClassInfoFetch($class)) {
+                        $index[$class] = $value;
+                    }
+                }
+            }
         }
 
         file_put_contents(Config::get('indexClasses'), json_encode($index));
 
-        return [];
+        return $index;
     }
 
-    protected function buildIndexClass($class)
+    /**
+     * Fetches class information through a separate PHP process to ensure that errors inside the file being scanned do
+     * not propagate to the current process.
+     *
+     * @param string $class The name of the class to fetch information about.
+     */
+    protected function execClassInfoFetch($class)
     {
         $ret = exec(sprintf('%s %s %s --class %s',
             escapeshellarg(Config::get('php')),

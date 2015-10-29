@@ -1,5 +1,4 @@
 fs            = require 'fs'
-md5           = require 'md5'
 child_process = require "child_process"
 
 Utility = require "./Utility"
@@ -78,20 +77,7 @@ class Proxy
      * @return {Object}
     ###
     getClassList: () ->
-        hash = md5(@getFirstProjectDirectory())
-
-        path = __dirname + "/../indexes/" + hash + "/index.classes.json"
-
-        try
-            fs.accessSync(path, fs.F_OK | fs.R_OK)
-
-        catch err
-            return []
-
-        options =
-            encoding: 'UTF-8'
-
-        return JSON.parse(fs.readFileSync(path, options))
+        return @performRequest(@getFirstProjectDirectory(), ['--class-list'], false)
 
     ###*
      * Retrieves a list of available global constants.
@@ -155,4 +141,4 @@ class Proxy
         if not filename
             filename = ''
 
-        @performRequest(@getFirstProjectDirectory(), ['--refresh', filename], true, callback)
+        @performRequest(@getFirstProjectDirectory(), ['--reindex', filename], true, callback)

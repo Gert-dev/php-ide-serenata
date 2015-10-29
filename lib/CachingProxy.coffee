@@ -20,6 +20,17 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    getClassList: () ->
+        cacheKey = 'class-list'
+
+        if not @cache[cacheKey]?
+            @cache[cacheKey] = super()
+
+        return @cache[cacheKey]
+
+    ###*
+     * @inherited
+    ###
     getGlobalConstants: () ->
         cacheKey = 'constants'
 
@@ -71,3 +82,14 @@ class CachingProxy extends Proxy
             @cache[cacheKey] = super(className, functionName)
 
         return @cache[cacheKey]
+
+    ###*
+     * @inherited
+    ###
+    reindex: (filename, callback) ->
+        super(filename, (output) =>
+            @clearCache()
+
+            if callback
+                callback(output)
+        )
