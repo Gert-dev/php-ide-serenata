@@ -9,29 +9,33 @@ class Config
     ###*
      * Raw configuration object.
     ###
-    data:
-        phpCommand                     : null
-        composerCommand                : null
-        autoloadScripts                : []
-        classMapScripts                : []
-        insertNewlinesForUseStatements : false
-
-        packagePath                    : null
-
-        # See also https://secure.php.net/urlhowto.php .
-        php_documentation_base_url     : {
-            functions: 'https://secure.php.net/function.'
-        }
+    data: null
 
     ###*
      * Array of change listeners.
     ###
-    listeners: {}
+    listeners: null
 
     ###*
      * Constructor.
     ###
     constructor: () ->
+        @listeners = {}
+
+        @data =
+            phpCommand                     : null
+            composerCommand                : null
+            autoloadScripts                : []
+            classMapScripts                : []
+            insertNewlinesForUseStatements : false
+
+            packagePath                    : null
+
+            # See also https://secure.php.net/urlhowto.php .
+            php_documentation_base_url     : {
+                functions: 'https://secure.php.net/function.'
+            }
+
         @load()
 
     ###*
@@ -66,7 +70,7 @@ class Config
     set: (name, value) ->
         @data[name] = value
 
-        if name in @listeners
+        if name of @listeners
             for listener in @listeners[name]
                 listener(value, name)
 
