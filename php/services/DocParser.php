@@ -108,7 +108,7 @@ class DocParser
 
             $result = array_merge(
                 $result,
-                $this->{$filterMethodMap[$filter]}($docblock, $methodName, $tags)
+                $this->{$filterMethodMap[$filter]}($docblock, $itemName, $tags)
             );
         }
 
