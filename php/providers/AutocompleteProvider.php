@@ -7,7 +7,7 @@ class AutocompleteProvider extends Tools implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function execute($args = [])
+    public function execute(array $args = [])
     {
         $class = $args[0];
         $name  = $args[1];

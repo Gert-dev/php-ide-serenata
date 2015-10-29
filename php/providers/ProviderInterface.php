@@ -5,9 +5,11 @@ namespace PhpIntegrator;
 interface ProviderInterface
 {
     /**
-     * Execute the command
-     * @param  array  $args Arguments gived to the command
-     * @return array Response
+     * Executes the command.
+     *
+     * @param array $args
+     *
+     * @return array
      */
-    public function execute($args = array());
+    public function execute(array $args = []);
 }

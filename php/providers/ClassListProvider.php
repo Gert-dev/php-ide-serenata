@@ -7,7 +7,7 @@ class ClassListProvider extends Tools implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function execute($args = array())
+    public function execute(array $args = [])
     {
         $index = json_decode(file_get_contents(Config::get('indexClasses')), true);
 

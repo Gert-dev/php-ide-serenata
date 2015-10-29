@@ -10,7 +10,7 @@ class ConstantsProvider extends Tools implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function execute($args = array())
+    public function execute(array $args = [])
     {
         $constants = [];
 

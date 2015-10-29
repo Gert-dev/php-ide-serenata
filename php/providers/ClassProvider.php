@@ -7,7 +7,7 @@ class ClassProvider extends Tools implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function execute($args = [])
+    public function execute(array $args = [])
     {
         $class      = $args[0];
         $isInternal = isset($args[1]) ? $args[1] : false;

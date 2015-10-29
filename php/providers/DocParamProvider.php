@@ -7,7 +7,7 @@ class DocParamProvider extends Tools implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function execute($args = array())
+    public function execute(array $args = [])
     {
         $class = $args[0];
         $name  = $args[1];

@@ -7,7 +7,7 @@ class FunctionsProvider extends Tools implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function execute($args = [])
+    public function execute(array $args = [])
     {
         $functions = [];
 
