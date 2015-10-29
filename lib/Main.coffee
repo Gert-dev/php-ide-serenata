@@ -100,16 +100,16 @@ module.exports =
      * Registers listeners for config changes.
     ###
     registerConfigListeners: () ->
-        @configuration.onDidChange 'php', () =>
+        @configuration.onDidChange 'phpCommand', () =>
             @service.clearCache()
 
-        @configuration.onDidChange 'composer', () =>
+        @configuration.onDidChange 'composerCommand', () =>
             @service.clearCache()
 
-        @configuration.onDidChange 'autoload', () =>
+        @configuration.onDidChange 'autoloadScripts', () =>
             @service.clearCache()
 
-        @configuration.onDidChange 'classmap', () =>
+        @configuration.onDidChange 'classMapScripts', () =>
             @service.clearCache()
 
     ###*
