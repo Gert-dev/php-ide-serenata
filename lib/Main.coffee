@@ -157,14 +157,11 @@ module.exports =
             @performFullIndex()
 
         atom.project.onDidChangePaths (projectPaths) =>
-            @service.clearCache()
             @performFullIndex()
 
         atom.workspace.observeTextEditors (editor) =>
             editor.onDidSave (event) =>
                 return unless editor.getGrammar().scopeName.match /text.html.php$/
-
-                @service.clearCache()
 
                 # For Windows - Replace \ in class namespace to / because composer use / instead of \.
                 path = event.path
