@@ -101,16 +101,16 @@ module.exports =
     ###
     registerConfigListeners: () ->
         @configuration.onDidChange 'phpCommand', () =>
-            @service.clearCache()
+            @performFullIndex()
 
         @configuration.onDidChange 'composerCommand', () =>
-            @service.clearCache()
+            @performFullIndex()
 
         @configuration.onDidChange 'autoloadScripts', () =>
-            @service.clearCache()
+            @performFullIndex()
 
         @configuration.onDidChange 'classMapScripts', () =>
-            @service.clearCache()
+            @performFullIndex()
 
     ###*
      * Performs a complete index of the current project.
