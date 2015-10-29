@@ -17,7 +17,6 @@ class ReindexProvider extends Tools implements ProviderInterface
             return [];
         }
 
-        // Check if composer is executable or not
         if (is_executable(Config::get('composer'))) {
             exec(sprintf('%s dump-autoload --optimize --quiet --no-interaction --working-dir=%s 2>&1',
                 escapeshellarg(Config::get('composer')),
