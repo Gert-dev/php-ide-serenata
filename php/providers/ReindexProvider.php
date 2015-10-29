@@ -42,10 +42,10 @@ class ReindexProvider extends Tools implements ProviderInterface
 
         if (!$fileToReindex) {
             $index = [];
-            $provider = new ClassProvider();
+            $provider = new ClassInfoProvider();
 
             foreach (get_declared_classes() as $class) {
-                if ($value = $provider->execute([$class, true])) {
+                if ($value = $provider->execute([$class])) {
                     $index[$class] = $value;
                 }
             }
@@ -90,21 +90,19 @@ class ReindexProvider extends Tools implements ProviderInterface
      */
     protected function execClassInfoFetch($class)
     {
-        $ret = exec(sprintf('%s %s %s --class %s',
+        $response = exec(sprintf('%s %s %s --class-info %s',
             escapeshellarg(Config::get('php')),
             escapeshellarg(__DIR__ . '/../Main.php'),
             escapeshellarg(Config::get('projectPath')),
             escapeshellarg($class)
         ));
 
-        if (false === $value = json_decode($ret, true)) {
+        $response = json_decode($response, true);
+
+        if ($response === false || !$response['wasFound']) {
             return null;
         }
 
-        if (isset($value['error'])) {
-            return null;
-        }
-
-        return $value;
+        return $response;
     }
 }

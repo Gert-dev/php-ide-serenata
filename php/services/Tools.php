@@ -386,6 +386,7 @@ abstract class Tools
         $data = [
             'class'       => $className,
             'wasFound'    => false,
+            'name'        => null,
             'startLine'   => null,
             'shortName'   => null,
             'filename'    => null,
@@ -406,9 +407,10 @@ abstract class Tools
             return $data;
         }
 
-        $data = array_merge($data, array(
+        $data = array_merge($data, [
             'wasFound'     => true,
             'startLine'    => $reflection->getStartLine(),
+            'name'         => $reflection->getName(),
             'shortName'    => $reflection->getShortName(),
             'filename'     => $reflection->getFileName(),
             'isTrait'      => $reflection->isTrait(),
@@ -417,7 +419,7 @@ abstract class Tools
             'isInterface'  => $reflection->isInterface(),
             'parents'      => $this->getParentClasses($reflection),
             'args'         => $this->getClassArguments($reflection)
-        ));
+        ]);
 
         // Retrieve information about methods.
         foreach ($reflection->getMethods() as $method) {
