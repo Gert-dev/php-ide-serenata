@@ -5,6 +5,11 @@ namespace PhpIntegrator;
 class ReindexProvider extends Tools implements ProviderInterface
 {
     /**
+     * @var ClassInfoProvider
+     */
+    protected $classInfoProvider = null;
+
+    /**
      * Attempts to rebuild the entire Composer class map and return it.
      *
      * @return array
@@ -42,16 +47,15 @@ class ReindexProvider extends Tools implements ProviderInterface
 
         if (!$fileToReindex) {
             $index = [];
-            $provider = new ClassInfoProvider();
 
             foreach (get_declared_classes() as $class) {
-                if ($value = $provider->execute([$class])) {
+                if ($value = $this->fetchClassInfo($class, false)) {
                     $index[$class] = $value;
                 }
             }
 
             foreach ($this->buildClassMap() as $class => $filePath) {
-                if ($value = $this->execClassInfoFetch($class)) {
+                if ($value = $this->fetchClassInfo($class, true)) {
                     $index[$class] = $value;
                 }
             }
@@ -68,7 +72,7 @@ class ReindexProvider extends Tools implements ProviderInterface
                         unset($index[$class]);
                     }
 
-                    if ($value = $this->execClassInfoFetch($class)) {
+                    if ($value = $this->fetchClassInfo($class, true)) {
                         $index[$class] = $value;
                     }
                 }
@@ -88,21 +92,51 @@ class ReindexProvider extends Tools implements ProviderInterface
      *
      * @param string $class The name of the class to fetch information about.
      */
-    protected function execClassInfoFetch($class)
+    protected function fetchClassInfo($class, $useSeparateProcess)
     {
-        $response = exec(sprintf('%s %s %s --class-info %s',
-            escapeshellarg(Config::get('php')),
-            escapeshellarg(__DIR__ . '/../Main.php'),
-            escapeshellarg(Config::get('projectPath')),
-            escapeshellarg($class)
-        ));
+        $data = null;
 
-        $response = json_decode($response, true);
+        if ($useSeparateProcess) {
+            $response = exec(sprintf('%s %s %s --class-info %s',
+                escapeshellarg(Config::get('php')),
+                escapeshellarg(__DIR__ . '/../Main.php'),
+                escapeshellarg(Config::get('projectPath')),
+                escapeshellarg($class)
+            ));
 
-        if ($response === false || !$response['wasFound']) {
-            return null;
+            $response = json_decode($response, true);
+
+            if ($response && $response['wasFound']) {
+                $data = $response;
+            }
+        } else {
+            $data = $this->getClassInfoProvider()->execute([$class]);
         }
 
-        return $response;
+        if ($data) {
+            $constructor = isset($data['methods']['__construct']) ? $data['methods']['__construct'] : null;
+
+            unset($data['constants'], $data['methods'], $data['properties']);
+
+            if ($constructor) {
+                $data['methods'] = [
+                    '__construct' => $constructor
+                ];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return ClassInfoProvider
+     */
+    protected function getClassInfoProvider()
+    {
+        if (!$this->classInfoProvider) {
+            $this->classInfoProvider = new ClassInfoProvider();
+        }
+
+        return $this->classInfoProvider;
     }
 }
