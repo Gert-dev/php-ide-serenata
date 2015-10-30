@@ -113,6 +113,9 @@ class Parser
         if className == null
             className = ''
 
+        else if not className
+            return null # Nothing we can do here.
+
         if className and className[0] == "\\"
             return className.substr(1) # FQCN, not subject to any further context.
 
