@@ -228,6 +228,7 @@ class DocParser
             list($type, $description) = $this->filterTwoParameterTag($tags[static::VAR_TYPE][0]);
         } else {
             $type = null;
+            $description = null;
         }
 
         return array(
