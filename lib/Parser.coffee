@@ -116,15 +116,15 @@ class Parser
         if className and className[0] == "\\"
             return className.substr(1) # FQCN, not subject to any further context.
 
-        text = editor.getText()
-
-        # TODO: It is not necessary to split the text, we can use lineTextForBufferRow instead.
-        lines = text.split('\n')
+        found = false
         fullClass = className
 
-        found = false
+        for i in [0 .. editor.getLineCount() - 1]
+            line = editor.lineTextForBufferRow(i)
 
-        for line,i in lines
+            if not line
+                continue
+
             matches = line.match(@namespaceDeclarationRegex)
 
             if matches
