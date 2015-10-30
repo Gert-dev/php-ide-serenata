@@ -87,10 +87,10 @@ class ReindexProvider extends Tools implements ProviderInterface
     }
 
     /**
-     * Fetches class information through a separate PHP process to ensure that errors inside the file being scanned do
-     * not propagate to the current process.
+     * Fetches class information, optionally through a separate process.
      *
-     * @param string $class The name of the class to fetch information about.
+     * @param string $class              The name of the class to fetch information about.
+     * @param bool   $useSeparateProcess Whether to spawn a separate PHP process or not (to contain fatal errors).
      */
     protected function fetchClassInfo($class, $useSeparateProcess)
     {
