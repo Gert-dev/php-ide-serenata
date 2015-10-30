@@ -74,9 +74,6 @@ class Parser
      * @return {array}
     ###
     getAvailableVariables: (editor, bufferPosition) ->
-        # TODO: This needs refactoring and will not properly skip variables that are outside of the current function's
-        # scope.
-
         isInFunction = @isInFunction(editor, bufferPosition)
 
         startPosition = null
