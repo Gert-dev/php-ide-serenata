@@ -128,6 +128,11 @@ class Parser
             if not line
                 continue
 
+            scopeDescriptor = editor.scopeDescriptorForBufferPosition([i, line.length]).getScopeChain()
+
+            if scopeDescriptor.indexOf('.comment') != -1
+                continue
+
             matches = line.match(@namespaceDeclarationRegex)
 
             if matches
