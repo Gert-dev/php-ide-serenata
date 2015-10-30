@@ -3,6 +3,18 @@ Parser = require '../../lib/Parser'
 describe "retrieveSanitizedCallStack", ->
     parser = new Parser(null)
 
+    it "correctly stops with no text.", ->
+        source =
+            """
+
+            """
+
+        expectedResult = [
+
+        ]
+
+        expect(parser.retrieveSanitizedCallStack(source)).toEqual(expectedResult)
+
     it "correctly sanitizes comments at the start of the call stack.", ->
         source =
             """
@@ -15,6 +27,19 @@ describe "retrieveSanitizedCallStack", ->
 
         expectedResult = [
             'Foo',
+            'myFunc'
+        ]
+
+        expect(parser.retrieveSanitizedCallStack(source)).toEqual(expectedResult)
+
+    it "correctly sanitizes call stacks that start with a new instance.", ->
+        source =
+            """
+            (new Foo())->myFunc
+            """
+
+        expectedResult = [
+            'new Foo()',
             'myFunc'
         ]
 

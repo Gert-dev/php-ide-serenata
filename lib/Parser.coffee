@@ -321,7 +321,7 @@ class Parser
                     ++squiggleBracketsClosed
 
                 # These will not be the same if, for example, we've entered a closure.
-                else if parenthesesOpened == parenthesesClosed and squiggleBracketsOpened == squiggleBracketsClosed
+                else if squiggleBracketsOpened == squiggleBracketsClosed and parenthesesOpened == parenthesesClosed
                     # Variable name.
                     if lineText[i] == '$'
                         finished = true
@@ -420,34 +420,30 @@ class Parser
     ###
     retrieveSanitizedCallStack: (text) ->
         # Remove singe line comments
-        regx = /\/\/.*\n/g
-        text = text.replace regx, (match) =>
+        regex = /\/\/.*\n/g
+        text = text.replace regex, (match) =>
             return ''
 
         # Remove multi-line comments
-        regx = /\/\*(.|\n)*?\*\//g
-        text = text.replace regx, (match) =>
+        regex = /\/\*(.|\n)*?\*\//g
+        text = text.replace regex, (match) =>
             return ''
+
+        # The start of the call stack may be wrapped in parentheses, e.g. ""(new Foo())->test", unwrap them. Note that
+        # "($this)->" is invalid (at least in PHP 5.6).
+        regex = /^\(new\s+.+?\)/g
+        text = text.replace regex, (match) =>
+            return match.substr(1, match.length - 2)
 
         # Remove content inside parantheses (including nested parantheses).
         text = @stripParenthesesContent(text)
 
-        # Get the full text
         return [] if not text
 
         elements = text.split(/(?:\-\>|::)/)
 
-        # Remove parentheses and whitespace.
         for key, element of elements
-            element = element.replace /^\s+|\s+$/g, ""
-
-            if element[0] == '{' or element[0] == '(' or element[0] == '['
-                element = element.substring(1)
-
-            else if element.indexOf('return ') == 0
-                element = element.substring('return '.length)
-
-            elements[key] = element
+            elements[key] = element.trim()
 
         return elements
 
@@ -619,6 +615,12 @@ class Parser
                     continue
 
                 else
+                    # This could either be just a (static) class name, or a new instance of a class.
+                    matches = element.match(/^new\s+(.+)(?:\(\))?/)
+
+                    if matches
+                        element = matches[1]
+
                     className = @determineFullClassName(editor, element)
                     ++i
                     continue

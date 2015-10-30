@@ -71,7 +71,6 @@ describe "retrieveSanitizedCallStackAt", ->
             'staticmethod()'
         ]
 
-
         expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 29})).toEqual(expectedResult)
 
     it "correctly stops at control keywords.", ->
@@ -140,6 +139,27 @@ describe "retrieveSanitizedCallStackAt", ->
         ]
 
         expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 19})).toEqual(expectedResult)
+
+    it "correctly stops when the first element is an instantiation wrapped in parentheses.", ->
+        source =
+            """
+            <?php
+
+            if (true) {
+                // More code here.
+            }
+
+            (new Foo\\Bar())->doFoo()
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            'new Foo\Bar()',
+            'doFoo()'
+        ]
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 26})).toEqual(expectedResult)
 
     it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =
