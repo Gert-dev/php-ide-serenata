@@ -74,7 +74,7 @@ class Parser
             [bufferPosition.row, bufferPosition.column - 1]
         ])
 
-        matches = text.match(/(\$[a-zA-Z_]+)/g)
+        matches = text.match(/(\$[a-zA-Z0-9_]+)/g)
 
         if not matches
             matches = []
