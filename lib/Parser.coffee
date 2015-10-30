@@ -21,13 +21,6 @@ class Parser
     namespaceDeclarationRegex : /(?:namespace)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:;)/
 
     ###*
-     * Simple cache to avoid duplicate computation.
-     *
-     * @todo Needs refactoring.
-    ###
-    cache: []
-
-    ###*
      * The proxy that can be used to query information about the code.
     ###
     proxy: null
@@ -74,24 +67,20 @@ class Parser
      * @return {array}
     ###
     getAvailableVariables: (editor, bufferPosition) ->
-        isInFunction = @isInFunction(editor, bufferPosition)
+        startPosition = @getOuterFunctionStart(editor, bufferPosition)
 
-        startPosition = null
+        text = editor.getTextInBufferRange([
+            if startPosition then startPosition else [0, 0],
+            [bufferPosition.row, bufferPosition.column - 1]
+        ])
 
-        if isInFunction
-            startPosition = @cache['functionPosition']
+        matches = text.match(/(\$[a-zA-Z_]+)/g)
 
-        else
-            startPosition = [0, 0]
+        if not matches
+            matches = []
 
-        text = editor.getTextInBufferRange([startPosition, [bufferPosition.row, bufferPosition.column-1]])
-        regex = /(\$[a-zA-Z_]+)/g
-
-        matches = text.match(regex)
-        return [] if not matches?
-
-        if isInFunction
-            matches.push "$this"
+        if startPosition
+            matches.push("$this")
 
         return matches
 
@@ -199,30 +188,22 @@ class Parser
         return name.substr(0,1).toUpperCase() + name.substr(1) == name
 
     ###*
-     * Checks if the specified location is inside a function or method or not.
+     * Checks if the specified location is inside a function or method or not and returns the point it starts at, if
+     # any.
      *
      * @param {TextEditor} editor
      * @param {Point}      bufferPosition
      *
-     * @return {boolean}
+     * @return {Point|null}
     ###
-    isInFunction: (editor, bufferPosition) ->
+    getOuterFunctionStart: (editor, bufferPosition) ->
         text = editor.getTextInBufferRange([[0, 0], bufferPosition])
-
-        # If last request was the same
-        if @cache[text]?
-          return @cache[text]
-
-        # Reinitialize current cache
-        @cache = []
 
         row = bufferPosition.row
         rows = text.split('\n')
 
         openedBlocks = 0
         closedBlocks = 0
-
-        result = false
 
         # for each row
         while row != -1
@@ -264,15 +245,13 @@ class Parser
             if chain.indexOf("function") != -1
                 # If more openedblocks than closedblocks, we are in a function. Otherwise, could be a closure, continue looking.
                 if openedBlocks > closedBlocks
-                    result = true
-                    @cache["functionPosition"] = [row, 0]
+                    return [row, 0]
 
                     break
 
             row--
 
-        @cache[text] = result
-        return result
+        return null
 
     ###*
      * Does exactly the same as {@see retrieveSanitizedCallStack}, but will automatically retrieve the relevant code
