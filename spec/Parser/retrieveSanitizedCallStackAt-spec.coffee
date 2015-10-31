@@ -186,6 +186,8 @@ describe "retrieveSanitizedCallStackAt", ->
     it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =
             """
+            <?php
+
             $this
                 ->testChaining(5, ['Somewhat more complex parameters', /* inline comment */ null])
                 //------------
