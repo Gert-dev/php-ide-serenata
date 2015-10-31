@@ -323,7 +323,7 @@ class Parser
                     # Subscopes can only exist when e.g. a closure is embedded as an argument to a function call, in
                     # which case they will be inside parentheses. If we find a subscope outside parentheses, it means
                     # we've moved beyond the call stack to e.g. the end of an if statement.
-                    if scopeDescriptor.indexOf('.scope.end') >= 0 and parenthesesOpened == parenthesesClosed
+                    if scopeDescriptor.indexOf('.scope.end') != -1 and parenthesesOpened == parenthesesClosed
                         ++i
                         finished = true
                         break
@@ -353,10 +353,10 @@ class Parser
 
                     # For static class names and things like the self and parent keywords, we won't know when to stop.
                     # These always appear the start of the call stack, so we know we can stop if we find them.
-                    else if scopeDescriptor.indexOf('.support.class') >= 0
+                    else if scopeDescriptor.indexOf('.support.class') != -1
                         startedStaticClassName = true
 
-                    else if scopeDescriptor.indexOf('.storage.type') >= 0
+                    else if scopeDescriptor.indexOf('.storage.type') != -1
                         startedKeyword = true
 
                 if startedStaticClassName and scopeDescriptor.indexOf('.support.class') == -1 and scopeDescriptor.indexOf('.support.other.namespace') == -1
