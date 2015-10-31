@@ -229,4 +229,4 @@ describe "retrieveSanitizedCallStackAt", ->
             'testChai'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, [33, 10])).toEqual(expectedResult)
+        expect(parser.retrieveSanitizedCallStackAt(editor, {row: editor.getLineCount() - 1, column: 14})).toEqual(expectedResult)
