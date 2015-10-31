@@ -140,6 +140,28 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 19})).toEqual(expectedResult)
 
+    it "correctly stops when when the bracket syntax is used for dynamic access to members.", ->
+        source =
+            """
+            <?php
+
+            if (true) {
+                // More code here.
+            }
+
+            $this->{$foo}()->test()
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            '$this',
+            '{$foo}()',
+            'test()'
+        ]
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 23})).toEqual(expectedResult)
+
     it "correctly stops when the first element is an instantiation wrapped in parentheses.", ->
         source =
             """
@@ -155,7 +177,7 @@ describe "retrieveSanitizedCallStackAt", ->
         editor.setText(source)
 
         expectedResult = [
-            'new Foo\Bar()',
+            'new Foo\\Bar()',
             'doFoo()'
         ]
 

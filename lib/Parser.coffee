@@ -320,8 +320,16 @@ class Parser
                 else if lineText[i] == '}'
                     ++squiggleBracketsClosed
 
+                    # Subscopes can only exist when e.g. a closure is embedded as an argument to a function call, in
+                    # which case they will be inside parentheses. If we find a subscope outside parentheses, it means
+                    # we've moved beyond the call stack to e.g. the end of an if statement.
+                    if scopeDescriptor.indexOf('.scope.end') >= 0 and parenthesesClosed == parenthesesClosed
+                        ++i
+                        finished = true
+                        break
+
                 # These will not be the same if, for example, we've entered a closure.
-                else if squiggleBracketsOpened == squiggleBracketsClosed and parenthesesOpened == parenthesesClosed
+                else if parenthesesOpened == parenthesesClosed and squiggleBracketsOpened == squiggleBracketsClosed
                     # Variable name.
                     if lineText[i] == '$'
                         finished = true
@@ -616,7 +624,7 @@ class Parser
 
                 else
                     # This could either be just a (static) class name, or a new instance of a class.
-                    matches = element.match(/^new\s+(.+)(?:\(\))?/)
+                    matches = element.match(/^new\s+([^\(]+)(?:\(\))?/)
 
                     if matches
                         element = matches[1]
