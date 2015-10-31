@@ -3,7 +3,7 @@ Parser = require '../../lib/Parser'
 describe "stripParenthesesContent", ->
     parser = new Parser(null)
 
-    it "correctly stips parentheses.", ->
+    it "correctly strips parentheses.", ->
         source =
             """
             $this
