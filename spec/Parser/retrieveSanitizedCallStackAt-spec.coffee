@@ -50,7 +50,11 @@ describe "retrieveSanitizedCallStackAt", ->
             'testProperty'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 17})).toEqual(expectedResult)
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 17
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
     it "correctly stops at static class names containing a namespace.", ->
         source =
@@ -71,7 +75,11 @@ describe "retrieveSanitizedCallStackAt", ->
             'staticmethod()'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 29})).toEqual(expectedResult)
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 29
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
     it "correctly stops at control keywords.", ->
         source =
@@ -93,7 +101,11 @@ describe "retrieveSanitizedCallStackAt", ->
             'someProperty'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 24})).toEqual(expectedResult)
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 24
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
 
     it "correctly stops at built-in constructs.", ->
@@ -116,7 +128,11 @@ describe "retrieveSanitizedCallStackAt", ->
             'someProperty'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 22})).toEqual(expectedResult)
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 22
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
     it "correctly stops at keywords such as self and parent.", ->
         source =
@@ -138,7 +154,11 @@ describe "retrieveSanitizedCallStackAt", ->
             'someProperty'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 19})).toEqual(expectedResult)
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 19
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
     it "correctly stops when when the bracket syntax is used for dynamic access to members.", ->
         source =
@@ -160,7 +180,11 @@ describe "retrieveSanitizedCallStackAt", ->
             'test()'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 23})).toEqual(expectedResult)
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 23
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
     it "correctly stops when the first element is an instantiation wrapped in parentheses.", ->
         source =
@@ -181,7 +205,11 @@ describe "retrieveSanitizedCallStackAt", ->
             'doFoo()'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 6, column: 26})).toEqual(expectedResult)
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 26
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
     it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =
@@ -231,4 +259,8 @@ describe "retrieveSanitizedCallStackAt", ->
             'testChai'
         ]
 
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: editor.getLineCount() - 1, column: 14})).toEqual(expectedResult)
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 14
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
