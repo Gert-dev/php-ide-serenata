@@ -1,15 +1,13 @@
 {
   "name": "php-integrator-base",
   "main": "./lib/Main",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Base package for php-integrator that exposes services for querying PHP sources.",
-  "repository":  "https://github.com/Gert-dev/php-integrator-base.git",
+  "repository": "https://github.com/Gert-dev/php-integrator-base.git",
   "license": "GPL-3.0",
-
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-
   "providedServices": {
     "php-integrator.service": {
       "versions": {
@@ -17,7 +15,6 @@
       }
     }
   },
-
   "consumedServices": {
     "status-bar": {
       "versions": {
@@ -25,12 +22,10 @@
       }
     }
   },
-
   "dependencies": {
     "fuzzaldrin": "^2.1.0",
     "jquery": "~2.1.4"
   },
-
   "keywords": [
     "php",
     "service",
