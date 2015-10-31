@@ -323,7 +323,7 @@ class Parser
                     # Subscopes can only exist when e.g. a closure is embedded as an argument to a function call, in
                     # which case they will be inside parentheses. If we find a subscope outside parentheses, it means
                     # we've moved beyond the call stack to e.g. the end of an if statement.
-                    if scopeDescriptor.indexOf('.scope.end') >= 0 and parenthesesClosed == parenthesesClosed
+                    if scopeDescriptor.indexOf('.scope.end') >= 0 and parenthesesOpened == parenthesesClosed
                         ++i
                         finished = true
                         break
