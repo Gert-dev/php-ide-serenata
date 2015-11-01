@@ -265,7 +265,9 @@ class Service
         return null
 
     ###*
-     * Retrieves the class the specified member (method or property) is being invoked on.
+     * Retrieves the class the specified member (method or property) is being invoked on. Note that this does not
+     * guarantee that the returned class actually exists. You can use {@see getClassInfo} on the returned class name
+     * to check for this.
      *
      * @param  {TextEditor} editor         The text editor to use.
      * @param  {Point}      bufferPosition The cursor location of the member, this should be at the operator :: or ->
