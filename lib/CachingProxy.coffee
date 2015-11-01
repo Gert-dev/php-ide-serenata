@@ -9,7 +9,7 @@ class CachingProxy extends Proxy
     ###*
      * The cache.
     ###
-    cache: {}
+    cache: null
 
     ###*
      * Clears the cache.
@@ -18,78 +18,73 @@ class CachingProxy extends Proxy
         @cache = {}
 
     ###*
-     * @inherited
+     * Internal convenience method that wraps a call to a parent method.
+     *
+     * @param {string}  cacheKey
+     * @param {string}  parentMethodName
+     * @param {array}   parameters
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
     ###
-    getClassList: () ->
-        cacheKey = 'class-list'
+    wrapCachedRequestToParent: (cacheKey, parentMethodName, parameters, async) ->
+        if not async
+            if not @cache[cacheKey]?
+                @cache[cacheKey] = CachingProxy.__super__[parentMethodName].apply(this, parameters)
 
-        if not @cache[cacheKey]?
-            @cache[cacheKey] = super()
+            return @cache[cacheKey]
 
-        return @cache[cacheKey]
+        else if @cache[cacheKey]?
+            return new Promise (resolve, reject) =>
+                resolve(@cache[cacheKey])
+
+        else
+            return (CachingProxy.__super__[parentMethodName].apply(this, parameters)).then (output) =>
+                @cache[cacheKey] = output
+
+                return output
 
     ###*
      * @inherited
     ###
-    getGlobalConstants: () ->
-        cacheKey = 'constants'
-
-        if not @cache[cacheKey]?
-            @cache[cacheKey] = super()
-
-        return @cache[cacheKey]
+    getClassList: (async = false) ->
+        return @wrapCachedRequestToParent("getClassList", 'getClassList', arguments, async)
 
     ###*
      * @inherited
     ###
-    getGlobalFunctions: () ->
-        cacheKey = 'functions'
-
-        if not @cache[cacheKey]?
-            @cache[cacheKey] = super()
-
-        return @cache[cacheKey]
+    getGlobalConstants: (async = false) ->
+        return @wrapCachedRequestToParent("getGlobalConstants", 'getGlobalConstants', arguments, async)
 
     ###*
      * @inherited
     ###
-    getClassInfo: (className) ->
-        cacheKey = "members-#{className}"
-
-        if not @cache[cacheKey]?
-            @cache[cacheKey] = super(className)
-
-        return @cache[cacheKey]
+    getGlobalFunctions: (async = false) ->
+        return @wrapCachedRequestToParent("getGlobalFunctions", 'getGlobalFunctions', arguments, async)
 
     ###*
      * @inherited
     ###
-    autocomplete: (className, name) ->
-        cacheKey = "autocompletion-#{className}-#{name}"
-
-        if not @cache[cacheKey]?
-            @cache[cacheKey] = super(className, name)
-
-        return @cache[cacheKey]
+    getClassInfo: (className, async = false) ->
+        return @wrapCachedRequestToParent("getClassInfo-#{className}", 'getClassInfo', arguments, async)
 
     ###*
      * @inherited
     ###
-    getDocParams: (className, functionName) ->
-        cacheKey = "doc-params-#{className}-#{functionName}"
-
-        if not @cache[cacheKey]?
-            @cache[cacheKey] = super(className, functionName)
-
-        return @cache[cacheKey]
+    autocomplete: (className, name, async = false) ->
+        return @wrapCachedRequestToParent("autocomplete-#{className}-#{name}", 'autocomplete', arguments, async)
 
     ###*
      * @inherited
     ###
-    reindex: (filename, callback) ->
-        super(filename, (output) =>
+    getDocParams: (className, functionName, async = false) ->
+        return @wrapCachedRequestToParent("getDocParams-#{className}-#{functionName}", 'getDocParams', arguments, async)
+
+    ###*
+     * @inherited
+    ###
+    reindex: (filename) ->
+        return super(filename).then (output) =>
             @clearCache()
 
-            if callback
-                callback(output)
-        )
+            return output

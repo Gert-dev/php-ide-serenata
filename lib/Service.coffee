@@ -48,36 +48,43 @@ class Service
     ###*
      * Retrieves a list of available classes.
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    getClassList: () ->
-        return @proxy.getClassList()
+    getClassList: (async = false) ->
+        return @proxy.getClassList(async)
 
     ###*
      * Retrieves a list of available global constants.
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    getGlobalConstants: () ->
-        return @proxy.getGlobalConstants()
+    getGlobalConstants: (async = false) ->
+        return @proxy.getGlobalConstants(async)
 
     ###*
      * Retrieves a list of available global functions.
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    getGlobalFunctions: () ->
-        return @proxy.getGlobalFunctions()
+    getGlobalFunctions: (async = false) ->
+        return @proxy.getGlobalFunctions(async)
 
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
      *
-     * @param {string} className
+     * @param {string}  className
+     * @param {boolean} async
      *
-     * @return {Object}
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    getClassInfo: (className) ->
-        return @proxy.getClassInfo(className)
+    getClassInfo: (className, async = false) ->
+        return @proxy.getClassInfo(className, async)
 
     ###*
      * Retrieves the members of the type that is returned by the member with the specified name in the specified class.
@@ -85,34 +92,37 @@ class Service
      * the given name in the given class, and then calling {@see getMembers} for that type, hence autocompleting the
      * 'name' in 'className'.
      *
-     * @param {string} className
-     * @param {string} name
+     * @param {string}  className
+     * @param {string}  name
+     * @param {boolean} async
      *
-     * @return {Object}
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    autocomplete: (className, name) ->
-        return @proxy.autocomplete(className, name)
+    autocomplete: (className, name, async = false) ->
+        return @proxy.autocomplete(className, name, async)
 
     ###*
      * Returns information about parameters described in the docblock for the given method in the given class.
      *
-     * @param {string} className
-     * @param {string} name
+     * @param {string}  className
+     * @param {string}  name
+     * @param {boolean} async
      *
-     * @return {Object}
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    getDocParams: (className, name) ->
-        return @proxy.getDocParams(className, name)
+    getDocParams: (className, name, async = false) ->
+        return @proxy.getDocParams(className, name, async)
 
     ###*
      * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
      * projects!). This method is asynchronous and will return immediately.
      *
-     * @param {string}   filename The full path to the file to refresh.
-     * @param {callback} callback The callback to invoke when the indexing process is finished.
+     * @param {string} filename The full path to the file to refresh.
+     *
+     * @return {Promise}
     ###
-    reindex: (filename, callback) ->
-        @proxy.reindex(filename, callback)
+    reindex: (filename) ->
+        @proxy.reindex(filename)
 
     ###*
      * Gets the correct selector for the class or namespace that is part of the specified event.

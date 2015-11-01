@@ -116,14 +116,14 @@ module.exports =
      * Performs a complete index of the current project.
     ###
     performFullIndex: () ->
-        timerName = @packageName + " - Indexing project"
+        timerName = @packageName + " - Project indexing"
         console.time(timerName);
 
         if @progressBar
             @progressBar.setLabel("Indexing...")
             @progressBar.show()
 
-        @service.reindex null, () =>
+        @service.reindex(null).then () =>
             if @progressBar
                 @progressBar.hide()
 

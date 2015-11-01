@@ -26,13 +26,11 @@ class Proxy
      *
      * @param {string}   directory The directory in which to execute the PHP side (e.g. the project folder).
      * @param {array}    args      The arguments to pass.
-     * @param {boolean}  async     Whether the request must be asynchronous or not.
-     * @param {callback} callback  The callback to execute when the asynchronous operation finishes.
+     * @param {boolean}  async     Whether to execute the method asynchronously or not.
      *
-     * @return {Object} The decoded response JSON, or an object containing error information, or nothing when the
-     *                  result is asynchronous. Returns false if there is no directory set.
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    performRequest: (directory, args, async, callback) ->
+    performRequest: (directory, args, async) ->
         return false unless directory
 
         parameters = [__dirname + "/../php/Main.php", directory]
@@ -43,6 +41,10 @@ class Proxy
         if not async
             try
                 response = child_process.spawnSync(@php, parameters)
+
+                if response.error
+                    throw response.error
+
                 response = JSON.parse(response.output[1].toString('ascii'))
 
             catch err
@@ -53,7 +55,7 @@ class Proxy
                 }
 
             if !response
-                return []
+                return {}
 
             if response.error?
                 console.error(response.error?.message)
@@ -61,7 +63,22 @@ class Proxy
             return response
 
         else
-            child_process.exec(@php + ' ' + parameters.join(' '), callback)
+            return new Promise (resolve, reject) =>
+                child_process.exec(@php + ' ' + parameters.join(' '), (error, stdout, stderr) =>
+                    try
+                        response = JSON.parse(stdout)
+
+                    catch error
+                        reject({message: error})
+
+                    if response?.error
+                        message = response.error?.message
+
+                        console.error(message)
+                        reject({mesage: message})
+
+                    resolve(response)
+                )
 
     ###*
      * Returns the first available project directory.
@@ -74,36 +91,44 @@ class Proxy
     ###*
      * Retrieves a list of available classes.
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
     ###
-    getClassList: () ->
-        return @performRequest(@getFirstProjectDirectory(), ['--class-list'], false)
+    getClassList: (async = false) ->
+        return @performRequest(@getFirstProjectDirectory(), ['--class-list'], async)
 
     ###*
      * Retrieves a list of available global constants.
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
     ###
-    getGlobalConstants: () ->
-        return @performRequest(@getFirstProjectDirectory(), ['--constants'], false)
+    getGlobalConstants: (async = false) ->
+        return @performRequest(@getFirstProjectDirectory(), ['--constants'], async)
 
     ###*
      * Retrieves a list of available global functions.
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
     ###
-    getGlobalFunctions: () ->
-        return @performRequest(@getFirstProjectDirectory(), ['--functions'], false)
+    getGlobalFunctions: (async = false) ->
+        return @performRequest(@getFirstProjectDirectory(), ['--functions'], async)
 
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
      *
      * @param {string} className
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
     ###
-    getClassInfo: (className) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--class-info', className], false)
+    getClassInfo: (className, async = false) ->
+        return @performRequest(@getFirstProjectDirectory(), ['--class-info', className], async)
 
     ###*
      * Retrieves the members of the type that is returned by the member with the specified name in the specified class.
@@ -114,10 +139,12 @@ class Proxy
      * @param {string} className
      * @param {string} name
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
     ###
-    autocomplete: (className, name) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--autocomplete', className, name], false)
+    autocomplete: (className, name, async = false) ->
+        return @performRequest(@getFirstProjectDirectory(), ['--autocomplete', className, name], async)
 
     ###*
      * Returns information about parameters described in the docblock for the given method in the given class.
@@ -125,20 +152,23 @@ class Proxy
      * @param {string} className
      * @param {string} name
      *
-     * @return {Object}
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
     ###
-    getDocParams: (className, name) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--doc-params', className, name], false)
+    getDocParams: (className, name, async = false) ->
+        return @performRequest(@getFirstProjectDirectory(), ['--doc-params', className, name], async)
 
     ###*
      * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
      * projects!). This method is asynchronous and will return immediately.
      *
-     * @param {string}   filename The full file path to the class to refresh.
-     * @param {callback} callback The callback to invoke when the indexing process is finished.
+     * @param {string}  filename The full file path to the class to refresh.
+     *
+     * @return {Promise}
     ###
-    reindex: (filename, callback) ->
+    reindex: (filename) ->
         if not filename
             filename = ''
 
-        @performRequest(@getFirstProjectDirectory(), ['--reindex', filename], true, callback)
+        return @performRequest(@getFirstProjectDirectory(), ['--reindex', filename], true)
