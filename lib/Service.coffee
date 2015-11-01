@@ -181,11 +181,11 @@ class Service
         # Methods and properties can share the same name, which one is being used depends on the context, so we have
         # to disambiguate in this case.
         if members.method and members.property
-            if @parser.isFunctionCall(editor, bufferPosition)
-                return members.method
+            if @parser.isUsingProperty(editor, bufferPosition)
+                return members.property
 
             else
-                return members.property
+                return members.method
 
         return members.method if members.method
         return members.property if members.property
