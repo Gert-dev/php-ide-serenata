@@ -178,34 +178,37 @@ class Service
 
         members = @getClassMember(className, name)
 
-        # TODO: This should never return an array, in the passed context (buffer position), it must either be a method
-        # or a property, check for this and take the right value from the array.
-        if members.length > 0
-            return members.pop()
+        # Methods and properties can share the same name, which one is being used depends on the context, so we have
+        # to disambiguate in this case.
+        if members.method and members.property
+            if @parser.isFunctionCall(editor, bufferPosition)
+                return members.method
+
+            else
+                return members.property
+
+        return members.method if members.method
+        return members.property if members.property
+        return members.constant if members.constant
 
         return null
 
     ###*
-     * Retrieves information about members of the specified class. Note that this always returns an array, as there may
-     * be multiple members (e.g. methods and properties) sharing the same name.
+     * Retrieves information about members of the specified class. Note that this always returns an object, as there may
+     * be multiple members (e.g. methods and properties) sharing the same name. The object's properties are 'method',
+     * 'property' and 'constant'.
      *
      * @param {string} className The full name of the class to examine.
      * @param {string} name      The name of the member to retrieve information about.
      *
-     * @return {array}
+     * @return {Object}
     ###
     getClassMember: (className, name) ->
-        members = []
-
-        method   = @getClassMethod(className, name)
-        property = @getClassProperty(className, name)
-        constant = @getClassConstant(className, name)
-
-        if method   then members.push(method)
-        if property then members.push(property)
-        if constant then members.push(constant)
-
-        return members
+        return {
+            method   : @getClassMethod(className, name)
+            property : @getClassProperty(className, name)
+            constant : @getClassConstant(className, name)
+        }
 
     ###*
      * Retrieves information about the specified method of the specified class.

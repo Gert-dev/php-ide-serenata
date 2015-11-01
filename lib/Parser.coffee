@@ -162,6 +162,20 @@ class Parser
         return name.substr(0,1).toUpperCase() + name.substr(1) == name
 
     ###*
+     * Indicates if the specifiec location is a function call or not. If it is not, it is most likely a property call.
+     * This is useful to distinguish between properties and methods with the same name.
+     *
+     * @param {TextEditor} editor
+     * @param {Point}      bufferPosition
+     *
+     * @return {boolean}
+    ###
+    isFunctionCall: (editor, bufferPosition) ->
+        scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition).getScopeChain()
+
+        return (scopeDescriptor.indexOf('.function-call') != -1)
+
+    ###*
      * Checks if the specified location is inside a function or method or not and returns the point it starts at, if
      # any.
      *
