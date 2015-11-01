@@ -33,32 +33,6 @@ class Parser
     constructor: (@proxy) ->
 
     ###*
-     * Retrieves information about the member of the specified class.
-     *
-     * @param {string} className The full name of the class to examine.
-     * @param {string} name      The name of the member to retrieve information about.
-     *
-     * @return {Object|null}
-    ###
-    getClassMember: (className, name) ->
-        classInfo = @proxy.getClassInfo(className)
-
-        return if not classInfo or (classInfo.error? and classInfo.error != '')
-
-        member = null
-
-        if name of classInfo.methods
-            member = classInfo.methods[name]
-
-        else if name of classInfo.properties
-            member = classInfo.properties[name]
-
-        else if name of classInfo.constants
-            member = classInfo.constants[name]
-
-        return member
-
-    ###*
      * Retrieves all variables that are available at the specified buffer position.
      *
      * @param {TextEditor} editor

@@ -176,18 +176,90 @@ class Service
     getClassMemberAt: (editor, bufferPosition, name) ->
         className = @getCalledClass(editor, bufferPosition)
 
-        return @getClassMember(className, name)
+        members = @getClassMember(className, name)
+
+        # TODO: This should never return an array, in the passed context (buffer position), it must either be a method
+        # or a property, check for this and take the right value from the array.
+        if members.length > 0
+            return members.pop()
+
+        return null
 
     ###*
-     * Retrieves information about the member of the specified class.
+     * Retrieves information about members of the specified class. Note that this always returns an array, as there may
+     * be multiple members (e.g. methods and properties) sharing the same name.
      *
      * @param {string} className The full name of the class to examine.
      * @param {string} name      The name of the member to retrieve information about.
      *
-     * @return {Object|null}
+     * @return {array}
     ###
     getClassMember: (className, name) ->
-        return @parser.getClassMember(className, name)
+        members = []
+
+        method   = @getClassMethod(className, name)
+        property = @getClassProperty(className, name)
+        constant = @getClassConstant(className, name)
+
+        if method   then members.push(method)
+        if property then members.push(property)
+        if constant then members.push(constant)
+
+        return members
+
+    ###*
+     * Retrieves information about the specified method of the specified class.
+     *
+     * @param {string} className The full name of the class to examine.
+     * @param {string} name      The name of the method to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassMethod: (className, name) ->
+        classInfo = @proxy.getClassInfo(className)
+
+        return if not classInfo or (classInfo.error? and classInfo.error != '')
+
+        if name of classInfo.methods
+            return classInfo.methods[name]
+
+        return null
+
+    ###*
+     * Retrieves information about the specified property of the specified class.
+     *
+     * @param {string} className The full name of the class to examine.
+     * @param {string} name      The name of the property to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassProperty: (className, name) ->
+        classInfo = @proxy.getClassInfo(className)
+
+        return if not classInfo or (classInfo.error? and classInfo.error != '')
+
+        if name of classInfo.properties
+            return classInfo.properties[name]
+
+        return null
+
+    ###*
+     * Retrieves information about the specified constant of the specified class.
+     *
+     * @param {string} className The full name of the class to examine.
+     * @param {string} name      The name of the constant to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassConstant: (className, name) ->
+        classInfo = @proxy.getClassInfo(className)
+
+        return if not classInfo or (classInfo.error? and classInfo.error != '')
+
+        if name of classInfo.constants
+            return classInfo.constants[name]
+
+        return null
 
     ###*
      * Retrieves the class the specified member (method or property) is being invoked on.
