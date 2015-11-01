@@ -64,11 +64,16 @@ class Proxy
 
         else
             return new Promise (resolve, reject) =>
-                child_process.exec(@php + ' ' + parameters.join(' '), (error, stdout, stderr) =>
+                # We are already above the default of 200 kB for methods such as getGlobalFunctions.
+                options =
+                    maxBuffer: 4000 * 1024
+
+                child_process.exec(@php + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
                     try
                         response = JSON.parse(stdout)
 
                     catch error
+                        console.error(error)
                         reject({message: error})
 
                     if response?.error
