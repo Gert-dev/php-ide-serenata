@@ -12,6 +12,14 @@ class CachingProxy extends Proxy
     cache: null
 
     ###*
+     * @inherited
+    ###
+    constructor: (@php) ->
+        super(@php)
+
+        @cache = {}
+
+    ###*
      * Clears the cache.
     ###
     clearCache: () ->
