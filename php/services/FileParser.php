@@ -4,9 +4,9 @@ namespace PhpIntegrator;
 
 class FileParser
 {
-    const USE_PATTERN = '/(?:use)(?:[^\w\\\\])([\w\\\\]+)(?![\w\\\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/';
-    const NAMESPACE_PATTERN = '/(?:namespace)(?:[^\w\\\\])([\w\\\\]+)(?![\w\\\\])(?:;)/';
-    const DEFINITION_PATTERN = '/(?:abstract class|class|trait|interface)\s+(\w+)/';
+    const USE_PATTERN = '/^\s*``(?:use)(?:[^\w\\\\])([\w\\\\]+)(?![\w\\\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/';
+    const NAMESPACE_PATTERN = '/^\s*(?:namespace)(?:[^\w\\\\])([\w\\\\]+)(?![\w\\\\])(?:;)/';
+    const DEFINITION_PATTERN = '/^\s*(?:abstract class|class|trait|interface)\s+(\w+)/';
 
     /**
      * @var string Handler to the file
