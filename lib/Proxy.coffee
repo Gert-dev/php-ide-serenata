@@ -66,7 +66,7 @@ class Proxy
             return new Promise (resolve, reject) =>
                 # We are already above the default of 200 kB for methods such as getGlobalFunctions.
                 options =
-                    maxBuffer: 4000 * 1024
+                    maxBuffer: 50000 * 1024
 
                 child_process.exec(@php + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
                     try
