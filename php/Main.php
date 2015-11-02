@@ -21,7 +21,7 @@ require_once(__DIR__ . '/providers/FunctionsProvider.php');
 require_once(__DIR__ . '/providers/ReindexProvider.php');
 require_once(__DIR__ . '/providers/DocParamProvider.php');
 
-$commands = array(
+$commands = [
     '--class-list'   => 'PhpIntegrator\ClassListProvider',
     '--class-info'   => 'PhpIntegrator\ClassInfoProvider',
     '--functions'    => 'PhpIntegrator\FunctionsProvider',
@@ -29,7 +29,7 @@ $commands = array(
     '--reindex'      => 'PhpIntegrator\ReindexProvider',
     '--autocomplete' => 'PhpIntegrator\AutocompleteProvider',
     '--doc-params'   => 'PhpIntegrator\DocParamProvider'
-);
+];
 
 /**
 * Print an error

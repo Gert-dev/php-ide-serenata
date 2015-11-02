@@ -8,15 +8,18 @@ namespace PhpIntegrator;
 class Config
 {
     /**
-     * Configuration container
+     * Configuration container.
+     *
      * @var array
      */
-    private static $config = array();
+    private static $config = [];
 
     /**
-     * Returns a key
-     * @param  string $key     Key of the value required
-     * @param  mixed  $default Default value if not found
+     * Returns a key.
+     *
+     * @param  string $key     Key of the value required.
+     * @param  mixed  $default Default value if not found.
+     *
      * @return mixed
      */
     public static function get($key, $default = null)
@@ -25,9 +28,10 @@ class Config
     }
 
     /**
-     * Sets a new value in the configuration
-     * @param string $key   Identifier
-     * @param mixed  $value Configuration value
+     * Sets a new value in the configuration.
+     *
+     * @param string $key   Identifier.
+     * @param mixed  $value Configuration value.
      */
     public static function set($key, $value)
     {

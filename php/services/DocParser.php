@@ -62,12 +62,12 @@ class DocParser
     public function parse($docblock, array $filters, $itemName)
     {
         if (empty($filters)) {
-            return array();
+            return [];
         }
 
-        $tags = array();
-        $result = array();
-        $matches = array();
+        $tags = [];
+        $result = [];
+        $matches = [];
 
         $docblock = is_string($docblock) ? $docblock : null;
 
@@ -76,7 +76,7 @@ class DocParser
 
             foreach ($matches as $match) {
                 if (!isset($tags[$match[1]])) {
-                    $tags[$match[1]] = array();
+                    $tags[$match[1]] = [];
                 }
 
                 $tagValue = $match[2];
@@ -92,14 +92,14 @@ class DocParser
             }
         }
 
-        $filterMethodMap = array(
+        $filterMethodMap = [
             static::RETURN_VALUE => 'filterReturn',
             static::PARAM_TYPE   => 'filterParams',
             static::VAR_TYPE     => 'filterVar',
             static::DEPRECATED   => 'filterDeprecated',
             static::THROWS       => 'filterThrows',
             static::DESCRIPTION  => 'filterDescription'
-        );
+        ];
 
         foreach ($filters as $filter) {
             if (!isset($filterMethodMap[$filter])) {
@@ -137,7 +137,7 @@ class DocParser
             $thirdPart = null;
         }
 
-        return array($firstPart ?: null, $secondPart ?: null, $thirdPart);
+        return [$firstPart ?: null, $secondPart ?: null, $thirdPart];
     }
 
     /**
@@ -152,7 +152,7 @@ class DocParser
     {
         list($firstPart, $secondPart, $thirdPart) = $this->filterThreeParameterTag($value);
 
-        return array($firstPart, trim($secondPart . ' ' . $thirdPart));
+        return [$firstPart, trim($secondPart . ' ' . $thirdPart)];
     }
 
     /**
@@ -176,12 +176,12 @@ class DocParser
             $description = null;
         }
 
-        return array(
-            'return' => array(
+        return [
+            'return' => [
                 'type'        => $type,
                 'description' => $description
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -195,22 +195,22 @@ class DocParser
      */
     protected function filterParams($docblock, $methodName, array $tags)
     {
-        $params = array();
+        $params = [];
 
         if (isset($tags[static::PARAM_TYPE])) {
             foreach ($tags[static::PARAM_TYPE] as $tag) {
                 list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
 
-                $params[$variableName] = array(
+                $params[$variableName] = [
                     'type'        => $type,
                     'description' => $description
-                );
+                ];
             }
         }
 
-        return array(
+        return [
             'params' => $params
-        );
+        ];
     }
 
     /**
@@ -231,12 +231,12 @@ class DocParser
             $description = null;
         }
 
-        return array(
-            'var' => array(
+        return [
+            'var' => [
                 'type'        => $type,
                 'description' => $description
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -250,9 +250,9 @@ class DocParser
      */
     protected function filterDeprecated($docblock, $methodName, array $tags)
     {
-        return array(
+        return [
             'deprecated' => isset($tags[static::DEPRECATED])
-        );
+        ];
     }
 
     /**
@@ -266,7 +266,7 @@ class DocParser
      */
     protected function filterThrows($docblock, $methodName, array $tags)
     {
-        $throws = array();
+        $throws = [];
 
         if (isset($tags[static::THROWS])) {
             foreach ($tags[static::THROWS] as $tag) {
@@ -276,9 +276,9 @@ class DocParser
             }
         }
 
-        return array(
+        return [
             'throws' => $throws
-        );
+        ];
     }
 
     /**
@@ -319,12 +319,12 @@ class DocParser
             }
         }
 
-        return array(
-            'descriptions' => array(
+        return [
+            'descriptions' => [
                 'short' => $this->sanitizeText($summary),
                 'long'  => $this->sanitizeText($description)
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -349,7 +349,7 @@ class DocParser
      */
     protected function replaceNewlines($string, $replacement)
     {
-        return str_replace(array("\n", "\r\n", PHP_EOL), $replacement, $string);
+        return str_replace(["\n", "\r\n", PHP_EOL], $replacement, $string);
     }
 
     /**

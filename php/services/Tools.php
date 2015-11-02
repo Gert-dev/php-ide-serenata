@@ -21,15 +21,15 @@ abstract class Tools
        $parser = new DocParser();
        $docComment = $class->getDocComment() ?: '';
 
-       $docParseResult = $parser->parse($docComment, array(
+       $docParseResult = $parser->parse($docComment, [
            DocParser::DEPRECATED,
            DocParser::DESCRIPTION
-       ), $class->getShortName());
+       ], $class->getShortName());
 
-       return array(
+       return [
           'descriptions' => $docParseResult['descriptions'],
           'deprecated'   => $docParseResult['deprecated']
-      );
+      ];
    }
 
     /**
@@ -44,8 +44,8 @@ abstract class Tools
     {
         $args = $function->getParameters();
 
-        $optionals = array();
-        $parameters = array();
+        $optionals = [];
+        $parameters = [];
 
         foreach ($args as $argument) {
             $value = '$' . $argument->getName();
@@ -76,13 +76,13 @@ abstract class Tools
         $parser = new DocParser();
         $docComment = $function->getDocComment();
 
-        $docParseResult = $parser->parse($docComment, array(
+        $docParseResult = $parser->parse($docComment, [
             DocParser::THROWS,
             DocParser::PARAM_TYPE,
             DocParser::DEPRECATED,
             DocParser::DESCRIPTION,
             DocParser::RETURN_VALUE
-        ), $function->name);
+        ], $function->name);
 
         $docblockInheritsLongDescription = false;
 
@@ -90,7 +90,7 @@ abstract class Tools
         // nothing but these tags. Note that, according to draft PSR-5 and phpDocumentor's implementation, this is
         // incorrect. However, some large frameworks (such as Symfony) use this and it thus makes life easier for many
         // developers, hence this workaround.
-        if (in_array($docParseResult['descriptions']['short'], array('{@inheritdoc}', '{@inheritDoc}'))) {
+        if (in_array($docParseResult['descriptions']['short'], ['{@inheritdoc}', '{@inheritDoc}'])) {
             $docComment = false; // Pretend there is no docblock.
         }
 
@@ -184,11 +184,11 @@ abstract class Tools
         $parser = new DocParser();
         $docComment = $property->getDocComment() ?: '';
 
-        $docParseResult = $parser->parse($docComment, array(
+        $docParseResult = $parser->parse($docComment, [
             DocParser::VAR_TYPE,
             DocParser::DEPRECATED,
             DocParser::DESCRIPTION
-        ), $property->name);
+        ], $property->name);
 
         if (!$docComment) {
             $classIterator = new ReflectionClass($property->class);
@@ -210,11 +210,11 @@ abstract class Tools
             }
         }
 
-        return array(
+        return [
            'return'       => $docParseResult['var'],
            'descriptions' => $docParseResult['descriptions'],
            'deprecated'   => $docParseResult['deprecated']
-       );
+       ];
     }
 
     /**
@@ -230,11 +230,11 @@ abstract class Tools
         // inherited (and not overridden).
         $declaringClass = $reflectionMember->getDeclaringClass();
 
-        return array(
+        return [
             'name'      => $declaringClass->name,
             'filename'  => $declaringClass->getFilename(),
             'startLine' => $declaringClass->getStartLine()
-        );
+        ];
     }
 
     /**
@@ -261,11 +261,11 @@ abstract class Tools
             }
         }
 
-        return array(
+        return [
             'name'      => $declaringStructure->name,
             'filename'  => $declaringStructure->getFilename(),
             'startLine' => $declaringStructure->getStartLine()
-        );
+        ];
     }
 
     /**
@@ -317,11 +317,11 @@ abstract class Tools
             $startLine = $overriddenMember->getStartLine();
         }
 
-        return array(
+        return [
             'declaringClass'     => $this->getDeclaringClass($overriddenMember),
             'declaringStructure' => $this->getDeclaringStructure($overriddenMember),
             'startLine'          => $startLine
-        );
+        ];
     }
 
     /**
@@ -347,11 +347,11 @@ abstract class Tools
             return null;
         }
 
-        return array(
+        return [
             'declaringClass'     => $this->getDeclaringClass($implementedMember),
             'declaringStructure' => $this->getDeclaringStructure($implementedMember),
             'startLine'          => $implementedMember->getStartLine()
-        );
+        ];
     }
 
     /**
@@ -486,7 +486,7 @@ abstract class Tools
                 // file parsing is required.
                 'args'           => [
                     'return'       => null,
-                    'descriptions' => array(),
+                    'descriptions' => [],
                     'deprecated'   => false
                 ]
             ];

@@ -51,8 +51,8 @@ class FileParser
         }
 
         $line = '';
+        $matches = [];
         $found = false;
-        $matches = array();
         $fullClass = $className;
 
         while (!feof($this->file)) {

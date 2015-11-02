@@ -39,18 +39,12 @@ class ErrorHandler
      */
     public static function onException(\Exception $exception)
     {
-        die(
-            json_encode(
-                array('error' =>
-                    array(
-                        'message' => $exception->getMessage(),
-                        'code' => $exception->getCode(),
-                        'file' => $exception->getFile(),
-                        'line' => $exception->getLine(),
-                    )
-                )
-            )
-        );
+        die(json_encode(['error' => [
+            'message' => $exception->getMessage(),
+            'code' => $exception->getCode(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+        ]]));
     }
 
     /**
@@ -61,8 +55,9 @@ class ErrorHandler
         self::$reserve = null;
 
         $error = error_get_last();
+
         if ($error !== null) {
-            die(json_encode(array('error' => $error)));
+            die(json_encode(['error' => $error]));
         }
     }
 }
