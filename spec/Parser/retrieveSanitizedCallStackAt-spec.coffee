@@ -211,6 +211,50 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
+    it "correctly stops when the first element is an instantiation wrapped in parentheses and it is inside an array.", ->
+        source =
+            """
+            <?php
+
+            $array = [
+                (new Foo\\Bar())->doFoo()
+            ];
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            'new Foo\\Bar()',
+            'doFoo()'
+        ]
+
+        bufferPosition =
+            row: editor.getLineCount() - 2
+            column: 29
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
+    it "correctly stops when the first element is an instantiation wrapped in parentheses and it is inside a function call.", ->
+        source =
+            """
+            <?php
+
+            foo(firstArg($test), (new Foo\\Bar())->doFoo(), 'test');
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            'new Foo\\Bar()',
+            'doFoo()'
+        ]
+
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 45
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
     it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =
             """

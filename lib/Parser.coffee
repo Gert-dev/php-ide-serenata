@@ -260,6 +260,8 @@ class Parser
         finished = false
         parenthesesOpened = 0
         parenthesesClosed = 0
+        squareBracketsOpened = 0
+        squareBracketsClosed = 0
         squiggleBracketsOpened = 0
         squiggleBracketsClosed = 0
 
@@ -298,6 +300,18 @@ class Parser
                 else if lineText[i] == ')'
                     ++parenthesesClosed
 
+                else if lineText[i] == '['
+                    ++squareBracketsOpened
+
+                    # Same as above.
+                    if squareBracketsOpened > squareBracketsClosed
+                        ++i
+                        finished = true
+                        break
+
+                else if lineText[i] == ']'
+                    ++squareBracketsClosed
+
                 else if lineText[i] == '{'
                     ++squiggleBracketsOpened
 
@@ -310,36 +324,29 @@ class Parser
                 else if lineText[i] == '}'
                     ++squiggleBracketsClosed
 
-                    # Subscopes can only exist when e.g. a closure is embedded as an argument to a function call, in
-                    # which case they will be inside parentheses. If we find a subscope outside parentheses, it means
-                    # we've moved beyond the call stack to e.g. the end of an if statement.
-                    if scopeDescriptor.indexOf('.scope.end') != -1 and parenthesesOpened == parenthesesClosed
-                        ++i
-                        finished = true
-                        break
+                    if parenthesesOpened == parenthesesClosed
+                        # Subscopes can only exist when e.g. a closure is embedded as an argument to a function call,
+                        # in which case they will be inside parentheses. If we find a subscope outside parentheses, it
+                        # means we've moved beyond the call stack to e.g. the end of an if statement.
+                        if scopeDescriptor.indexOf('.scope.end') != -1
+                            ++i
+                            finished = true
+                            break
 
                 # These will not be the same if, for example, we've entered a closure.
-                else if parenthesesOpened == parenthesesClosed and squiggleBracketsOpened == squiggleBracketsClosed
+                else if parenthesesOpened == parenthesesClosed and
+                        squareBracketsOpened == squareBracketsClosed and
+                        squiggleBracketsOpened == squiggleBracketsClosed
                     # Variable name.
                     if lineText[i] == '$'
                         finished = true
                         break
 
                     # Reached an operator that can never be part of the current statement.
-                    else if lineText[i] == ';' or lineText[i] == '='
+                    else if lineText[i] == ';' or lineText[i] == '=' or lineText[i] == ',' or lineText[i] == '['
                         ++i
                         finished = true
                         break
-
-                    # NOTE: This should no longer be necessary as it was intended to catch stack classes that started
-                    # with static class names and keywords such as 'self', which is now covered by the statements below.
-                    # Language constructs, such as echo and print, as well as keywords, such as return, don't require
-                    # parantheses, but we still need to stop when we find them.
-                    #else if scopeDescriptor.indexOf('.function.construct') != -1 or
-                    #        scopeDescriptor.indexOf('.keyword.control') != -1
-                    #    ++i
-                    #    finished = true
-                    #    break
 
                     # For static class names and things like the self and parent keywords, we won't know when to stop.
                     # These always appear the start of the call stack, so we know we can stop if we find them.
