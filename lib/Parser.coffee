@@ -152,16 +152,6 @@ class Parser
         return fullClass
 
     ###*
-     * Indicates if the specified name is the name of a structure (class, interface, ...) or not.
-     *
-     * @param {string} name
-     *
-     * @return {boolean}
-    ###
-    isClassType: (name) ->
-        return name.substr(0,1).toUpperCase() + name.substr(1) == name
-
-    ###*
      * Indicates if the specifiec location is a property usage or not. If it is not, it is most likely a method call.
      * This is useful to distinguish between properties and methods with the same name.
      *
@@ -589,7 +579,9 @@ class Parser
         if not callStack
             callStack = []
 
-        for element in callStack
+        return null if not callStack or callStack.length == 0
+
+        for element,i in callStack
             if i == 0
                 if element[0] == '$'
                     className = @getVariableType(editor, bufferPosition, element)
@@ -598,13 +590,8 @@ class Parser
                     if element == '$this' and not className
                         className = @determineFullClassName(editor)
 
-                    ++i
-                    continue
-
                 else if element == 'static' or element == 'self'
                     className = @determineFullClassName(editor)
-                    ++i
-                    continue
 
                 else if element == 'parent'
                     currentClassName = @determineFullClassName(editor)
@@ -616,9 +603,6 @@ class Parser
                     else
                         className = null
 
-                    ++i
-                    continue
-
                 else
                     # This could either be just a (static) class name, or a new instance of a class.
                     matches = element.match(/^new\s+([^\(]+)(?:\(\))?/)
@@ -627,27 +611,16 @@ class Parser
                         element = matches[1]
 
                     className = @determineFullClassName(editor, element)
-                    ++i
-                    continue
 
-            # Last element
-            if i >= callStack.length - 1
+            else if i >= callStack.length - 1
                 break
+
+            else
+                classInfo = @proxy.autocomplete(className, element)
+                className = classInfo.name
 
             if className == null
                 break
-
-            classInfo = @proxy.autocomplete(className, element)
-
-            if not classInfo.wasFound or not @isClassType(classInfo.class)
-                return null
-
-            className = classInfo.class
-            ++i
-
-        # If no data or a valid end of line, OK
-        #if callStack.length > 0 and (callStack[callStack.length-1].length == 0 or callStack[callStack.length-1].match(/([a-zA-Z0-9]$)/g))
-        #    return className
 
         return className
 
