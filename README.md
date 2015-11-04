@@ -14,7 +14,7 @@ improvements as well as separation of the various components into separate packa
 ## What do I need to do to make it work?
 Currently the following is required in order to get the package up and running:
   * You must use PHP 5.4 or above.
-  * You must use [Composer](https://getcomposer.org/) for dependency management.
+  * You must provide a file that handles autoloading. The (only) officially supported way of doing this is through [Composer](https://getcomposer.org/), but this *should* also work with other autoloaders (see also the wiki).
   * You must follow the PSR standards (for the names of classes, methods, namespacing, etc.).
   * You must write proper docblocks for your methods. There currently is no standard around this, but we try to follow the draft PSR-5 standard (which, in turn, is mostly inspired by phpDocumentor's implementation). Minimum requirements for proper autocompletion:
     * `@return` statements for functions and methods.
@@ -25,7 +25,7 @@ Currently the following is required in order to get the package up and running:
     * ... IntellJ-style variable annotations `/** @var MyType $var */` as well as `/** @var $var MyType */`.
     * ... shortcut variable annotations (must appear right above the respective variable) `/** @var MyType */`.
 
-Some features may or may not work outside these restrictions. For example, Composer is primarily used for its classmap and autoloading, so it may be possible to get everything working with another autoloading script and class map file. Reflection is used to fetch information about classes.
+Some features may or may not work outside these restrictions. For example, Composer is primarily used for its classmap and autoloading, so it may be possible to get everything working with another autoloading script and class map file. The wiki has more information about this. Reflection is used to fetch information about classes.
 
 Don't forget to open the settings page after installing to set up the package!
 
