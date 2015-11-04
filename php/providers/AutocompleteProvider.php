@@ -56,6 +56,12 @@ class AutocompleteProvider extends Tools implements ProviderInterface
                         $useStatementFound = false;
                         $completedClassName = $parser->getFullClassName($soleClassName, $useStatementFound);
 
+                        $relevantClass = $completedClassName;
+
+                        /*
+                        // NOTE: See also determineFullClassName in Parser.coffee for why this is currently disabled;
+                        // I don't think it is correct.
+
                         if ($useStatementFound) {
                             $relevantClass = $completedClassName;
                         } else {
@@ -71,6 +77,7 @@ class AutocompleteProvider extends Tools implements ProviderInterface
                                 // using a namespace set up in composer.json, without a leading slash.
                             }
                         }
+                        */
                     }
                 }
             }
