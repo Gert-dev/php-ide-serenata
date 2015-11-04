@@ -469,7 +469,7 @@ abstract class Tools
             // an interface of a base class, a trait, ...). This could be done by looping up the chain of base classes
             // to the last class that also has the same property and then checking if any of that class' traits or
             // interfaces define the constant.
-            $data['constants'][$constant][] = [
+            $data['constants'][$constant] = [
                 'name'           => $constant,
                 'isMethod'       => false,
                 'isProperty'     => false,
