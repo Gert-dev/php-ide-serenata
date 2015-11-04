@@ -198,15 +198,15 @@ class Parser
             lineLength = line.length
             lastChain = null
 
-            # Scan the entire line, fetching the scope for each character position as one line can contain both a scope start
-            # and end such as "} elseif (true) {". Here the scope descriptor will differ for different character positions on
-            # the line.
+            # Scan the entire line, fetching the scope for each character position as one line can contain both a scope
+            # start and end such as "} elseif (true) {". Here the scope descriptor will differ for different character
+            # positions on the line.
             while character <= line.length
                 # Get chain of all scopes
                 chain = editor.scopeDescriptorForBufferPosition([row, character]).getScopeChain()
 
-                # NOTE: Atom quirk: both line.length and line.length - 1 return the same scope descriptor, BUT you can't skip
-                # scanning line.length as sometimes line.length - 1 does not return a scope descriptor at all.
+                # NOTE: Atom quirk: both line.length and line.length - 1 return the same scope descriptor, BUT you can't
+                # skip scanning line.length as sometimes line.length - 1 does not return a scope descriptor at all.
                 if not (character == line.length and chain == lastChain)
                     # }
                     if chain.indexOf("scope.end") != -1
@@ -223,7 +223,8 @@ class Parser
 
             # function
             if chain.indexOf("function") != -1
-                # If more openedblocks than closedblocks, we are in a function. Otherwise, could be a closure, continue looking.
+                # If more openedblocks than closedblocks, we are in a function. Otherwise, could be a closure, continue
+                # looking.
                 if openedBlocks > closedBlocks
                     return [row, 0]
 
