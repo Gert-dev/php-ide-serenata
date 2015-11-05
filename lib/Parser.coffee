@@ -589,38 +589,42 @@ class Parser
 
         return null if not callStack or callStack.length == 0
 
+        firstClassName = null
+        firstElement = callStack.shift()
+
+        if firstElement[0] == '$'
+            className = @getVariableType(editor, bufferPosition, firstElement)
+
+            # NOTE: The type of $this can also be overridden locally by a docblock.
+            if firstElement == '$this' and not className
+                className = @determineFullClassName(editor)
+
+        else if firstElement == 'static' or firstElement == 'self'
+            className = @determineFullClassName(editor)
+
+        else if firstElement == 'parent'
+            currentClassName = @determineFullClassName(editor)
+            currentClassInfo = @proxy.getClassInfo(currentClassName)
+
+            if currentClassInfo.parents.length > 0
+                className = currentClassInfo.parents[0]
+
+            else
+                className = null
+
+        else
+            # This could either be just a (static) class name, or a new instance of a class.
+            matches = firstElement.match(/^new\s+([^\(]+)(?:\(\))?/)
+
+            if matches
+                firstElement = matches[1]
+
+            className = @determineFullClassName(editor, firstElement)
+
+        # We now know what class we need to start from, now it's just a matter of fetching the return types of members
+        # in the call stack.
         for element,i in callStack
-            if i == 0
-                if element[0] == '$'
-                    className = @getVariableType(editor, bufferPosition, element)
-
-                    # NOTE: The type of $this can also be overridden locally by a docblock.
-                    if element == '$this' and not className
-                        className = @determineFullClassName(editor)
-
-                else if element == 'static' or element == 'self'
-                    className = @determineFullClassName(editor)
-
-                else if element == 'parent'
-                    currentClassName = @determineFullClassName(editor)
-                    currentClassInfo = @proxy.getClassInfo(currentClassName)
-
-                    if currentClassInfo.parents.length > 0
-                        className = currentClassInfo.parents[0]
-
-                    else
-                        className = null
-
-                else
-                    # This could either be just a (static) class name, or a new instance of a class.
-                    matches = element.match(/^new\s+([^\(]+)(?:\(\))?/)
-
-                    if matches
-                        element = matches[1]
-
-                    className = @determineFullClassName(editor, element)
-
-            else if i >= callStack.length - 1
+            if i >= callStack.length - 1
                 break
 
             else
