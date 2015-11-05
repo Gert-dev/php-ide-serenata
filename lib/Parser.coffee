@@ -585,7 +585,6 @@ class Parser
 
         return null if not callStack or callStack.length == 0
 
-        firstClassName = null
         firstElement = callStack.shift()
 
         if firstElement[0] == '$'
@@ -613,6 +612,8 @@ class Parser
                 firstElement = matches[1]
 
             className = @determineFullClassName(editor, firstElement)
+
+        return null if not className
 
         # We now know what class we need to start from, now it's just a matter of fetching the return types of members
         # in the call stack.
