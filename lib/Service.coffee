@@ -275,13 +275,15 @@ class Service
         return null
 
     ###*
-     * Retrieves the class the specified member (method or property) is being invoked on. Note that this does not
+     * Retrieves the class that is being used (called) at the specified location in the buffer. Note that this does not
      * guarantee that the returned class actually exists. You can use {@see getClassInfo} on the returned class name
-     * to check for this.
+     * to check for this instead.
      *
      * @param {TextEditor} editor            The text editor to use.
-     * @param {Point}      bufferPosition    The cursor location of the member, this should be at the operator :: or ->
-     *                                       (but anywhere inside the name of the member itself is fine too).
+     * @param {Point}      bufferPosition    The cursor location of the item, such as the class member. Note that this
+     *                                       should always be at the end of the actual member (i.e. just after it).
+     *                                       If you want to ignore the element at the buffer position itself, see
+     *                                       'ignoreLastElement'.
      * @param {boolean}    ignoreLastElement Whether to remove the last element or not, this is useful when the user
      *                                       is still writing code, e.g. "$this->foo()->b" would normally return the
      *                                       type (class) of 'b', as it is the last element, but as the user is still
