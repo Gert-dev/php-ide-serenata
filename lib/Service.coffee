@@ -184,7 +184,7 @@ class Service
      * @return {Object|null}
     ###
     getClassMemberAt: (editor, bufferPosition, name) ->
-        className = @getCalledClass(editor, bufferPosition, true)
+        className = @getCalledClassAt(editor, bufferPosition, true)
 
         members = @getClassMember(className, name)
 
@@ -292,7 +292,7 @@ class Service
      * @example Invoking it on MyMethod::foo()->bar() will ask what class 'bar' is invoked on, which will whatever type
      *          foo returns.
     ###
-    getCalledClass: (editor, bufferPosition, ignoreLastElement) ->
+    getCalledClassAt: (editor, bufferPosition, ignoreLastElement) ->
         callStack = @parser.retrieveSanitizedCallStackAt(editor, bufferPosition)
 
         if ignoreLastElement
