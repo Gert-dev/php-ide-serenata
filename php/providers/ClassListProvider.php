@@ -11,11 +11,11 @@ class ClassListProvider extends Tools implements ProviderInterface
     {
         $index = json_decode(file_get_contents(Config::get('indexClasses')), true);
 
-        if ($index === false) {
-            // The class map hasn't been generated yet, don't error out as it can take a while for it to be generated.
-            return [];
-        }
-
-        return $index;
+        return [
+            'success' => true,
+            // If it evaluates to false, the class map hasn't been generated yet, don't error out as it can take a while
+            // for it to be generated.
+            'result' => $index ?: []
+        ];
     }
 }

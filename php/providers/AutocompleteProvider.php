@@ -24,7 +24,7 @@ class AutocompleteProvider extends Tools implements ProviderInterface
         }
 
         $memberInfo = null;
-        $relevantClass = null;
+        $relevantClass = $class;
         $classInfo = $this->getClassInfo($class);
 
         if ($isMethod && isset($classInfo['methods'][$name])) {
@@ -84,7 +84,12 @@ class AutocompleteProvider extends Tools implements ProviderInterface
         }
 
         // Minor optimization to avoid fetching the same data twice.
-        return ($relevantClass === $class) ? $classInfo : $this->getClassInfo($relevantClass);
+        $result = ($relevantClass === $class) ? $classInfo : $this->getClassInfo($relevantClass);
+
+        return [
+            'success' => ($result && $result['wasFound']),
+            'result'  => $result
+        ];
     }
 
     /**

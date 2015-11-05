@@ -29,7 +29,10 @@ class FunctionsProvider extends Tools implements ProviderInterface
             ];
         }
 
-        return $functions;
+        return [
+            'success' => true,
+            'result'  => $functions
+        ];
     }
 }
 

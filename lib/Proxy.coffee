@@ -48,19 +48,12 @@ class Proxy
                 response = JSON.parse(response.output[1].toString('ascii'))
 
             catch err
-                response = {
-                    error : {
-                        message : err
-                    }
-                }
+                return null
 
-            if !response
-                return {}
+            if !response or response.error?
+                return null
 
-            if response.error?
-                console.error(response.error?.message)
-
-            return response
+            return response?.result
 
         else
             return new Promise (resolve, reject) =>
@@ -69,20 +62,29 @@ class Proxy
                     maxBuffer: 50000 * 1024
 
                 child_process.exec(@php + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
+                    if not stdout or stdout.length == 0
+                        reject({message: "No output received from the PHP side!"})
+                        return
+
                     try
                         response = JSON.parse(stdout)
 
                     catch error
-                        console.error(error)
+                        #console.error(error)
                         reject({message: error})
+                        return
 
                     if response?.error
+                        #console.error(message)
                         message = response.error?.message
+                        reject({message: message})
+                        return
 
-                        console.error(message)
-                        reject({mesage: message})
+                    if not response.success
+                        reject({message: 'An unsuccessful status code was returned by the PHP side!'})
+                        return
 
-                    resolve(response)
+                    resolve(response.result)
                 )
 
     ###*

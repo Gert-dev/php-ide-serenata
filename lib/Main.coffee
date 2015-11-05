@@ -1,12 +1,14 @@
 {Disposable} = require 'atom'
 
-Parser               = require './Parser'
-Utility              = require './Utility'
-Service              = require './Service'
-AtomConfig           = require './AtomConfig'
-CachingProxy         = require './CachingProxy'
-ConfigTester         = require './ConfigTester'
-StatusBarProgressBar = require "./Widgets/StatusBarProgressBar"
+$ = require 'jquery'
+
+Parser           = require './Parser'
+Utility          = require './Utility'
+Service          = require './Service'
+AtomConfig       = require './AtomConfig'
+CachingProxy     = require './CachingProxy'
+ConfigTester     = require './ConfigTester'
+StatusBarManager = require "./Widgets/StatusBarManager"
 
 module.exports =
     ###*
@@ -61,9 +63,9 @@ module.exports =
     service: null
 
     ###*
-     * The progress bar that is displayed during long operations.
+     * The status bar manager.
     ###
-    progressBar: null
+    statusBarManager: null
 
     ###*
      * Tests the user's configuration.
@@ -113,21 +115,51 @@ module.exports =
             @performFullIndex()
 
     ###*
-     * Performs a complete index of the current project.
+     * Indexes a file aynschronously.
+     *
+     * @param {string|null} fileName The file to index, or null to index the entire project.
     ###
-    performFullIndex: () ->
+    performIndex: (fileName = null) ->
         timerName = @packageName + " - Project indexing"
-        console.time(timerName);
 
-        if @progressBar
-            @progressBar.setLabel("Indexing...")
-            @progressBar.show()
+        if not fileName
+            console.time(timerName);
 
-        @service.reindex(null).then () =>
-            if @progressBar
-                @progressBar.hide()
+        if @statusBarManager and fileName is null
+            @statusBarManager.showMessage("Indexing...")
 
-            console.timeEnd(timerName);
+        successHandler = () =>
+            if @statusBarManager
+                @statusBarManager.setLabel("Indexing completed!")
+                @statusBarManager.hide()
+
+            if not fileName
+                console.timeEnd(timerName);
+
+        failureHandler = () =>
+            if @statusBarManager
+                @statusBarManager.showMessage("Indexing failed!", "highlight-error")
+
+        @service.reindex(fileName).then(successHandler, failureHandler)
+
+    ###*
+     * Attaches items to the status bar.
+     *
+     * @param {mixed} statusBarService
+    ###
+    attachStatusBarItems: (statusBarService) ->
+        if not @statusBarManager
+            @statusBarManager = new StatusBarManager()
+            @statusBarManager.initialize(statusBarService)
+            @statusBarManager.setLabel("Indexing...")
+
+    ###*
+     * Detaches existing items from the status bar.
+    ###
+    detachStatusBarItems: () ->
+        if @statusBarManager
+            @statusBarManager.destroy()
+            @statusBarManager = null
 
     ###*
      * Activates the package.
@@ -139,8 +171,6 @@ module.exports =
         # reactivate or try again.
         # return unless @testConfig()
         @testConfig()
-
-        @progressBar = new StatusBarProgressBar()
 
         proxy = new CachingProxy(@configuration.get('phpCommand'))
 
@@ -154,10 +184,10 @@ module.exports =
         # In rare cases, the package is loaded faster than the project gets a chance to load. At that point, no project
         # directory is returned. The onDidChangePaths listener below will also catch that case.
         if atom.project.getDirectories().length > 0
-            @performFullIndex()
+            @performIndex()
 
         atom.project.onDidChangePaths (projectPaths) =>
-            @performFullIndex()
+            @performIndex()
 
         atom.workspace.observeTextEditors (editor) =>
             editor.onDidSave (event) =>
@@ -172,7 +202,7 @@ module.exports =
                         path = path.substr(directory.path.length + 1)
                         break
 
-                @service.reindex(classPath + Utility.normalizeSeparators(path))
+                @performIndex(classPath + Utility.normalizeSeparators(path))
 
     ###*
      * Deactivates the package.
@@ -183,9 +213,9 @@ module.exports =
      * Sets the status bar service, which is consumed by this package.
     ###
     setStatusBarService: (service) ->
-        @progressBar.attach(service)
+        @attachStatusBarItems(service)
 
-        return new Disposable => @progressBar.detach()
+        return new Disposable => @detachStatusBarItems()
 
     ###*
      * Retrieves the service exposed by this package.

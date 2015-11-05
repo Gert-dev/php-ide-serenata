@@ -1,6 +1,8 @@
 ## 0.2.0
 * The PHP FileParser will no longer trip over class docblocks containing the pattern `class MyClass`.
 * Fix several issues with autocompletion of `(new Foo())->` in corner cases such as inside arrays and function calls.
+* When the initial PHP process that indexes the entire project fails or is killed, it will not be picked up and displayed as an error.
+* There was no convenient visual indicator of when indexing failed, a label is now shown in the status bar if that is indeed the case.
 * New service methods:
   * `getClassMethod` - Retrieves information about a specific class method.
   * `getClassProperty` - Retrieves information about a specific class property.

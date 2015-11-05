@@ -11,6 +11,9 @@ class ClassInfoProvider extends Tools implements ProviderInterface
     {
         $class = $args[0];
 
-        return $this->getClassInfo($class);
+        return [
+            'success' => true,
+            'result'  => $this->getClassInfo($class)
+        ];
     }
 }

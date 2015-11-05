@@ -43,6 +43,7 @@ class ReindexProvider extends Tools implements ProviderInterface
      */
     public function execute(array $args = [])
     {
+        $isSuccessful = true;
         $fileToReindex = array_shift($args);
 
         if (!$fileToReindex) {
@@ -72,8 +73,12 @@ class ReindexProvider extends Tools implements ProviderInterface
                         unset($index[$class]);
                     }
 
-                    if ($value = $this->fetchClassInfo($class, true)) {
+                    $value = $this->fetchClassInfo($class, true);
+
+                    if ($value) {
                         $index[$class] = $value;
+                    } else {
+                        $isSuccessful = false;
                     }
                 }
             }
@@ -82,7 +87,8 @@ class ReindexProvider extends Tools implements ProviderInterface
         file_put_contents(Config::get('indexClasses'), json_encode($index));
 
         return [
-            'success' => true
+            'success' => $isSuccessful,
+            'result'  => null
         ];
     }
 
@@ -106,11 +112,12 @@ class ReindexProvider extends Tools implements ProviderInterface
 
             $response = json_decode($response, true);
 
-            if ($response && $response['wasFound']) {
-                $data = $response;
+            if ($response && $response['result']['wasFound']) {
+                $data = $response['result'];
             }
         } else {
             $data = $this->getClassInfoProvider()->execute([$class]);
+            $data = $data['result'];
         }
 
         if ($data) {

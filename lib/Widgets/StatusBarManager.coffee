@@ -3,13 +3,13 @@ $ = require 'jquery'
 module.exports =
 
 ##*
-# Abstract base class for progress bars.
+# Manages the items in the status bar.
 ##
-class AbstractProgressBar
+class StatusBarManager
     ###*
      * The label to show.
     ###
-    label: []
+    label: null
 
     ###*
      * The label HTML element.
@@ -17,24 +17,44 @@ class AbstractProgressBar
     labelElement: null
 
     ###*
+     * The progress bar HTML element.
+    ###
+    progressBar: null
+
+    ###*
      * The root HTML element of the progress bar.
     ###
     element: null
 
     ###*
-     * Initializes the progress bar, setting up its DOM structure.
+     * The tile that is located in the status bar.
     ###
-    initialize: () ->
+    tile: null
+
+    ###*
+     * Initializes the progress bar, setting up its DOM structure.
+     *
+     * @param {mixed} statusBarService
+    ###
+    initialize: (statusBarService) ->
         @labelElement = document.createElement("span")
-        @labelElement.className = "text-subtle"
+        @labelElement.className = ""
         @labelElement.innerHTML = @label
 
-        @progress = document.createElement("progress")
+        @progressBar = document.createElement("progress")
 
         @element = document.createElement("div")
         @element.className = "php-integrator-progress-bar"
-        @element.appendChild(@progress)
+        @element.appendChild(@progressBar)
         @element.appendChild(@labelElement)
+
+        @tile = statusBarService.addRightTile(item: @element, priority: 999999)
+
+    ###*
+     * Cleans up and removes all elements.
+    ###
+    destroy: () ->
+        @tile.destroy()
 
     ###*
      * Sets the text to show in the label.
@@ -56,6 +76,24 @@ class AbstractProgressBar
     ###
     hide: ->
         $(@element).hide()
+
+    ###*
+     * Shows only the label.
+    ###
+    showLabelOnly: ->
+        $(@element).show()
+        $(@progressBar).hide()
+
+    ###*
+     * Shows the specified message in the status area.
+     *
+     * @param {string} label
+     * @param {string} className
+    ###
+    showMessage: (label, className = '') ->
+        @setLabel(label)
+        @labelElement.className = className
+        @showLabelOnly()
 
     ###*
      * Attaches to the specified element or using the specified object.
