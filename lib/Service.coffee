@@ -184,7 +184,7 @@ class Service
      * @return {Object|null}
     ###
     getClassMemberAt: (editor, bufferPosition, name) ->
-        className = @getCalledClass(editor, bufferPosition)
+        className = @getCalledClass(editor, bufferPosition, true)
 
         members = @getClassMember(className, name)
 
@@ -279,17 +279,24 @@ class Service
      * guarantee that the returned class actually exists. You can use {@see getClassInfo} on the returned class name
      * to check for this.
      *
-     * @param  {TextEditor} editor         The text editor to use.
-     * @param  {Point}      bufferPosition The cursor location of the member, this should be at the operator :: or ->
-     *                                      (but anywhere inside the name of the member itself is fine too).
+     * @param {TextEditor} editor            The text editor to use.
+     * @param {Point}      bufferPosition    The cursor location of the member, this should be at the operator :: or ->
+     *                                       (but anywhere inside the name of the member itself is fine too).
+     * @param {boolean}    ignoreLastElement Whether to remove the last element or not, this is useful when the user
+     *                                       is still writing code, e.g. "$this->foo()->b" would normally return the
+     *                                       type (class) of 'b', as it is the last element, but as the user is still
+     *                                       writing code, you may instead be interested in the type of 'foo()' instead.
      *
      * @return {string|null}
      *
      * @example Invoking it on MyMethod::foo()->bar() will ask what class 'bar' is invoked on, which will whatever type
      *          foo returns.
     ###
-    getCalledClass: (editor, bufferPosition) ->
+    getCalledClass: (editor, bufferPosition, ignoreLastElement) ->
         callStack = @parser.retrieveSanitizedCallStackAt(editor, bufferPosition)
+
+        if ignoreLastElement
+            callStack.pop();
 
         return null if not callStack or callStack.length == 0
 

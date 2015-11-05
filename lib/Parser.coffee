@@ -505,7 +505,6 @@ class Parser
                 if null != matches
                     value = matches[1]
                     elements = @retrieveSanitizedCallStack(value)
-                    elements.push("") # Push one more element to get fully the last class
 
                     newPosition =
                         row : lineNumber
@@ -584,9 +583,6 @@ class Parser
         i = 0
         className = null
 
-        if not callStack
-            callStack = []
-
         return null if not callStack or callStack.length == 0
 
         firstClassName = null
@@ -609,9 +605,6 @@ class Parser
             if currentClassInfo.parents.length > 0
                 className = currentClassInfo.parents[0]
 
-            else
-                className = null
-
         else
             # This could either be just a (static) class name, or a new instance of a class.
             matches = firstElement.match(/^new\s+([^\(]+)(?:\(\))?/)
@@ -624,12 +617,8 @@ class Parser
         # We now know what class we need to start from, now it's just a matter of fetching the return types of members
         # in the call stack.
         for element,i in callStack
-            if i >= callStack.length - 1
-                break
-
-            else
-                classInfo = @proxy.autocomplete(className, element)
-                className = classInfo.name
+            classInfo = @proxy.autocomplete(className, element)
+            className = classInfo.name
 
             if className == null
                 break
