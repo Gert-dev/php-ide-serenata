@@ -616,7 +616,7 @@ class Parser
 
         # We now know what class we need to start from, now it's just a matter of fetching the return types of members
         # in the call stack.
-        for element,i in callStack
+        for element in callStack
             classInfo = @proxy.autocomplete(className, element)
             className = classInfo.name
 
