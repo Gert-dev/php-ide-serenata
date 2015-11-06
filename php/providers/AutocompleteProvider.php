@@ -24,7 +24,7 @@ class AutocompleteProvider extends Tools implements ProviderInterface
         }
 
         $memberInfo = null;
-        $relevantClass = $class;
+        $relevantClass = null;
         $classInfo = $this->getClassInfo($class);
 
         if ($isMethod && isset($classInfo['methods'][$name])) {
