@@ -1,5 +1,6 @@
 ## 0.2.0
 * The PHP FileParser will no longer trip over class docblocks containing the pattern `class MyClass`.
+* Classes from this package are now no longer included in the class list and will no longer be indexed.
 * Fix several issues with autocompletion of `(new Foo())->` in corner cases such as inside arrays and function calls.
 * Fixed an issue where the package would attempt to index the project on shutdown (which was harmless, but a bug nonetheless).
 * When the initial PHP process that indexes the entire project fails or is killed, it will now be picked up and displayed as an error.

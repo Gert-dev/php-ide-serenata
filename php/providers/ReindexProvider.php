@@ -50,6 +50,10 @@ class ReindexProvider extends Tools implements ProviderInterface
             $index = [];
 
             foreach (get_declared_classes() as $class) {
+                if (mb_strpos($class, 'PhpIntegrator') === 0) {
+                    continue; // Don't include our own classes.
+                }
+
                 if ($value = $this->fetchClassInfo($class, false)) {
                     $index[$class] = $value;
                 }
