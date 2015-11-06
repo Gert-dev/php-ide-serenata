@@ -1,3 +1,4 @@
+{Range} = require 'atom'
 
 module.exports =
 
@@ -43,10 +44,10 @@ class Parser
     getAvailableVariables: (editor, bufferPosition) ->
         startPosition = @getOuterFunctionStart(editor, bufferPosition)
 
-        range = [
+        range = new Range(
             if startPosition then startPosition else [0, 0],
             [bufferPosition.row, bufferPosition.column - 1]
-        ]
+        )
 
         matches = []
 
@@ -56,10 +57,16 @@ class Parser
             if matchInfo.matchText == '$this'
                 thisFound = true
 
-            matches.push(matchInfo.matchText)
+            matches.push({
+                name : matchInfo.matchText
+                type : @getVariableType(editor, range.end, matchInfo.matchText)
+            })
 
         if startPosition and not thisFound
-            matches.push("$this")
+            matches.push({
+                name : '$this'
+                type : @getVariableType(editor, range.end, '$this')
+            })
 
         return matches
 
@@ -572,6 +579,9 @@ class Parser
                 break
 
             --lineNumber
+
+        if not bestMatch and name == '$this'
+            bestMatch = @determineFullClassName(editor)
 
         return bestMatch
 
