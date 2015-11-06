@@ -1,11 +1,16 @@
 ## 0.2.0
+### Features and enhancements
+* There was no convenient visual indicator of when indexing failed, a label is now shown in the status bar if that is indeed the case.
+* It is now possible to specify a list of additional scripts to load, which allows you to add things such as bootstrap scripts or scripts with global helper functions, which will then be made available to other packages (such as autocompletion).
+* When the initial PHP process that indexes the entire project fails or is killed, it will now be picked up and displayed as an error.
+
+### Bugs fixed
 * The PHP FileParser will no longer trip over class docblocks containing the pattern `class MyClass`.
 * Classes from this package are now no longer included in the class list and will no longer be indexed.
 * Fix several issues with autocompletion of `(new Foo())->` in corner cases such as inside arrays and function calls.
-* When the initial PHP process that indexes the entire project fails or is killed, it will now be picked up and displayed as an error.
-* There was no convenient visual indicator of when indexing failed, a label is now shown in the status bar if that is indeed the case.
 * Fixed an issue where the package would attempt to index the project on shutdown. This could result in a message being displayed at shutdown about the Atom window not being responsive.
-* It is now possible to specify a list of additional scripts to load, which allows you to add things such as bootstrap scripts or scripts with global helper functions, which will then be made available to other packages (such as autocompletion).
+
+### Changes for developers
 * New service methods:
   * `getClassMethod` - Retrieves information about a specific class method.
   * `getClassProperty` - Retrieves information about a specific class property.
