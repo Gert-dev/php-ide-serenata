@@ -43,17 +43,22 @@ class Parser
     getAvailableVariables: (editor, bufferPosition) ->
         startPosition = @getOuterFunctionStart(editor, bufferPosition)
 
-        text = editor.getTextInBufferRange([
+        range = [
             if startPosition then startPosition else [0, 0],
             [bufferPosition.row, bufferPosition.column - 1]
-        ])
+        ]
 
-        matches = text.match(/(\$[a-zA-Z0-9_]+)/g)
+        matches = []
 
-        if not matches
-            matches = []
+        thisFound = false
 
-        if startPosition
+        editor.getBuffer().scanInRange /(\$[a-zA-Z0-9_]+)/g, range, (matchInfo) =>
+            if matchInfo.matchText == '$this'
+                thisFound = true
+
+            matches.push(matchInfo.matchText)
+
+        if startPosition and not thisFound
             matches.push("$this")
 
         return matches
