@@ -9,29 +9,31 @@ class FunctionsProvider extends Tools implements ProviderInterface
      */
     public function execute(array $args = [])
     {
-        $functions = [];
+        $result = [];
 
         $definedFunctions = get_defined_functions();
 
-        foreach ($definedFunctions['internal'] as $functionName) {
-            try {
-                $function = new \ReflectionFunction($functionName);
-            } catch (\Exception $e) {
-                continue;
+        foreach ($definedFunctions as $group => $functions) {
+            foreach ($functions as $functionName) {
+                try {
+                    $function = new \ReflectionFunction($functionName);
+                } catch (\Exception $e) {
+                    continue;
+                }
+
+                $args = $this->getMethodArguments($function);
+
+                $result[$function->getName()] = [
+                    'name'     => $function->getName(),
+                    'isMethod' => true,
+                    'args'     => $args
+                ];
             }
-
-            $args = $this->getMethodArguments($function);
-
-            $functions[$function->getName()] = [
-                'name'     => $function->getName(),
-                'isMethod' => true,
-                'args'     => $args
-            ];
         }
 
         return [
             'success' => true,
-            'result'  => $functions
+            'result'  => $result
         ];
     }
 }

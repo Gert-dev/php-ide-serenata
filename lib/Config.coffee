@@ -27,6 +27,7 @@ class Config
             composerCommand                : null
             autoloadScripts                : []
             classMapScripts                : []
+            additionalScripts              : []
             insertNewlinesForUseStatements : false
 
             packagePath                    : null
@@ -88,6 +89,11 @@ class Config
         if classMapScripts?.length > 0
             classMapScripts = "'" + classMapScripts.join("', '") + "'"
 
+        additionalScripts = @get('additionalScripts')
+
+        if additionalScripts?.length > 0
+            additionalScripts = "'" + additionalScripts.join("', '") + "'"
+
         phpCommand = @get('phpCommand')
         composerCommand = @get('composerCommand')
 
@@ -95,10 +101,11 @@ class Config
 
                // Automatically generated in CoffeeScript. Any changes made will be lost!
                return [
-                   'phpCommand'      => '#{phpCommand}',
-                   'composerCommand' => '#{composerCommand}',
-                   'autoloadScripts' => [#{autoloadScripts}],
-                   'classMapScripts' => [#{classMapScripts}]
+                   'phpCommand'        => '#{phpCommand}',
+                   'composerCommand'   => '#{composerCommand}',
+                   'autoloadScripts'   => [#{autoloadScripts}],
+                   'classMapScripts'   => [#{classMapScripts}],
+                   'additionalScripts' => [#{additionalScripts}]
                ];\n
                """
 

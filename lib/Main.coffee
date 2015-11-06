@@ -47,6 +47,16 @@ module.exports =
             default     : ['vendor/composer/autoload_classmap.php', 'autoload/ezp_kernel.php']
             order       : 4
 
+        additionalScripts:
+            title       : 'Additional scripts to load'
+            description : 'Additional scripts to load on the PHP side before performing any action. You can add things
+                           such as bootstrap scripts or helper scripts that contain global functions and constants here.
+                           They will then be automatically picked up (and can, for example, be made available during
+                           autocompletion)'
+            type        : 'array'
+            default     : ['src/bootstrap.php', 'some/script.php']
+            order       : 5
+
     ###*
      * The name of the package.
     ###
@@ -112,6 +122,9 @@ module.exports =
             @performFullIndex()
 
         @configuration.onDidChange 'classMapScripts', () =>
+            @performFullIndex()
+
+        @configuration.onDidChange 'additionalScripts', () =>
             @performFullIndex()
 
     ###*

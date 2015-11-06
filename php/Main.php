@@ -31,15 +31,12 @@ $commands = [
     '--doc-params'   => 'PhpIntegrator\DocParamProvider'
 ];
 
-/**
-* Print an error
-* @param string $message
-*/
-function show_error($message) {
+// NOTE: This is explicitly not a global function so it doesn't end up in the items returned by FunctionProvider.
+$showErrorCallable = function ($message) {
     die(json_encode([
         'error' => ['message' => $message]
     ]));
-}
+};
 
 if (count($argv) < 3) {
     die('Usage: php Main.php <directory> <command> <arguments>');
@@ -49,7 +46,7 @@ $project = $argv[1];
 $command = $argv[2];
 
 if (!isset($commands[$command])) {
-    show_error(sprintf('Command %s not found', $command));
+    $showErrorCallable(sprintf('Command %s not found', $command));
 }
 
 // Config
@@ -66,25 +63,35 @@ $indexDir =  __DIR__ . '/../indexes/' . md5($project);
 
 if (!is_dir($indexDir)) {
     if (false === mkdir($indexDir, 0777, true)) {
-        show_error('Unable to create directory ' . $indexDir);
+        $showErrorCallable('Unable to create directory ' . $indexDir);
     }
 }
 
 Config::set('indexClasses', $indexDir . '/index.classes.json');
 
-foreach ($config['autoloadScripts'] as $conf) {
-    $path = sprintf('%s/%s', $project, trim($conf, '/'));
+foreach ($config['autoloadScripts'] as $script) {
+    $path = sprintf('%s/%s', $project, trim($script, '/'));
+
     if (file_exists($path)) {
         require_once($path);
         break;
     }
 }
 
-foreach ($config['classMapScripts'] as $conf) {
-    $path = sprintf('%s/%s', $project, trim($conf, '/'));
+foreach ($config['classMapScripts'] as $script) {
+    $path = sprintf('%s/%s', $project, trim($script, '/'));
+
     if (file_exists($path)) {
         Config::set('classMapScript', $path);
         break;
+    }
+}
+
+foreach ($config['additionalScripts'] as $script) {
+    $path = sprintf('%s/%s', $project, trim($script, '/'));
+
+    if (file_exists($path)) {
+        require_once($path);
     }
 }
 
