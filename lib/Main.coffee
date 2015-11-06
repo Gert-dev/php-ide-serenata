@@ -187,7 +187,10 @@ module.exports =
             @performIndex()
 
         atom.project.onDidChangePaths (projectPaths) =>
-            @performIndex()
+            # NOTE: This listener is also invoked at shutdown with an empty array as argument, this makes sure we don't
+            # try to reindex then.
+            if projectPaths.length > 0
+                @performIndex()
 
         atom.workspace.observeTextEditors (editor) =>
             editor.onDidSave (event) =>
