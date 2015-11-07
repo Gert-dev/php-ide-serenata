@@ -9,7 +9,12 @@ class ClassListProvider extends Tools implements ProviderInterface
      */
     public function execute(array $args = [])
     {
-        $index = json_decode(file_get_contents(Config::get('indexClasses')), true);
+        $index = null;
+        $indexFile = Config::get('indexClasses');
+
+        if (file_exists($indexFile)) {
+            $index = json_decode(file_get_contents($indexFile), true);
+        }
 
         return [
             'success' => true,
