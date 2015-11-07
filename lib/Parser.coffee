@@ -646,9 +646,9 @@ class Parser
         # in the call stack.
         for element in callStack
             classInfo = @proxy.autocomplete(className, element)
-            className = classInfo.name
+            className = classInfo?.name
 
-            if className == null
+            if not className
                 break
 
         return className
