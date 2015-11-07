@@ -387,6 +387,7 @@ abstract class Tools
             'name'               => $function->getName(),
             'isMethod'           => true,
             'isProperty'         => false,
+            'isBuiltin'          => ($function->getFileName() === false),
 
             'args'               => $this->getFunctionArguments($function),
             'startLine'          => $function->getStartLine(),
