@@ -471,6 +471,10 @@ abstract class Tools
                 'name'     => $class ? $class->name : null,
                 'filename' => $class ? $class->getFileName() : null
             ],
+            'declaringStructure' => [
+                'name'     => $class ? $class->name : null,
+                'filename' => $class ? $class->getFileName() : null
+            ],
 
             // TODO: It is not possible to directly fetch the docblock of the constant through reflection, manual
             // file parsing is required.
