@@ -113,19 +113,19 @@ module.exports =
     ###
     registerConfigListeners: () ->
         @configuration.onDidChange 'phpCommand', () =>
-            @performFullIndex()
+            @performIndex()
 
         @configuration.onDidChange 'composerCommand', () =>
-            @performFullIndex()
+            @performIndex()
 
         @configuration.onDidChange 'autoloadScripts', () =>
-            @performFullIndex()
+            @performIndex()
 
         @configuration.onDidChange 'classMapScripts', () =>
-            @performFullIndex()
+            @performIndex()
 
         @configuration.onDidChange 'additionalScripts', () =>
-            @performFullIndex()
+            @performIndex()
 
     ###*
      * Indexes a file aynschronously.
