@@ -224,7 +224,7 @@ abstract class Tools
      *
      * @return array
      */
-    protected function getDeclaringClass($reflectionMember)
+    protected function getDeclaringClassForMember($reflectionMember)
     {
         // This will point to the class that contains the member, which will resolve to the parent class if it's
         // inherited (and not overridden).
@@ -244,7 +244,7 @@ abstract class Tools
      *
      * @return array
      */
-    protected function getDeclaringStructure($reflectionMember)
+    protected function getDeclaringStructureForMember($reflectionMember)
     {
         // This will point to the class that contains the member, which will resolve to the parent class if it's
         // inherited (and not overridden).
@@ -318,8 +318,8 @@ abstract class Tools
         }
 
         return [
-            'declaringClass'     => $this->getDeclaringClass($overriddenMember),
-            'declaringStructure' => $this->getDeclaringStructure($overriddenMember),
+            'declaringClass'     => $this->getDeclaringClassForMember($overriddenMember),
+            'declaringStructure' => $this->getDeclaringStructureForMember($overriddenMember),
             'startLine'          => $startLine
         ];
     }
@@ -348,8 +348,8 @@ abstract class Tools
         }
 
         return [
-            'declaringClass'     => $this->getDeclaringClass($implementedMember),
-            'declaringStructure' => $this->getDeclaringStructure($implementedMember),
+            'declaringClass'     => $this->getDeclaringClassForMember($implementedMember),
+            'declaringStructure' => $this->getDeclaringStructureForMember($implementedMember),
             'startLine'          => $implementedMember->getStartLine()
         ];
     }
@@ -414,8 +414,8 @@ abstract class Tools
             'isPrivate'          => $method->isPrivate(),
             'isStatic'           => $method->isStatic(),
 
-            'declaringClass'     => $this->getDeclaringClass($method),
-            'declaringStructure' => $this->getDeclaringStructure($method)
+            'declaringClass'     => $this->getDeclaringClassForMember($method),
+            'declaringStructure' => $this->getDeclaringStructureForMember($method)
         ]);
     }
 
@@ -440,8 +440,8 @@ abstract class Tools
             'override'           => $this->getOverrideInfo($property),
 
             'args'               => $this->getPropertyArguments($property),
-            'declaringClass'     => $this->getDeclaringClass($property),
-            'declaringStructure' => $this->getDeclaringStructure($property)
+            'declaringClass'     => $this->getDeclaringClassForMember($property),
+            'declaringStructure' => $this->getDeclaringStructureForMember($property)
         ];
     }
 
