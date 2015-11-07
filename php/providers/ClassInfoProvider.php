@@ -11,6 +11,10 @@ class ClassInfoProvider extends Tools implements ProviderInterface
     {
         $class = $args[0];
 
+        if (mb_strpos($class, '\\') === 0) {
+            $class = substr($class, 1);
+        }
+
         return [
             'success' => true,
             'result'  => $this->getClassInfo($class)
