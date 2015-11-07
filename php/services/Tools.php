@@ -375,6 +375,97 @@ abstract class Tools
     }
 
     /**
+     * Retrieves a data structure containing information about the specified method (or function).
+     *
+     * @param ReflectionFunctionAbstract $method
+     *
+     * @return array
+     */
+    protected function getMethodInfo(ReflectionFunctionAbstract $method)
+    {
+        return [
+            'name'               => $method->getName(),
+            'isMethod'           => true,
+            'isProperty'         => false,
+            'isPublic'           => $method->isPublic(),
+            'isProtected'        => $method->isProtected(),
+            'isPrivate'          => $method->isPrivate(),
+            'isStatic'           => $method->isStatic(),
+
+            'override'           => $this->getOverrideInfo($method),
+            'implementation'     => $this->getImplementationInfo($method),
+
+            'args'               => $this->getMethodArguments($method),
+            'declaringClass'     => $this->getDeclaringClass($method),
+            'declaringStructure' => $this->getDeclaringStructure($method),
+            'startLine'          => $method->getStartLine()
+        ];
+    }
+
+    /**
+     * Retrieves a data structure containing information about the specified property.
+     *
+     * @param ReflectionProperty $property
+     *
+     * @return array
+     */
+    protected function getPropertyInfo(ReflectionProperty $property)
+    {
+        return [
+            'name'               => $property->getName(),
+            'isMethod'           => false,
+            'isProperty'         => true,
+            'isPublic'           => $property->isPublic(),
+            'isProtected'        => $property->isProtected(),
+            'isPrivate'          => $property->isPrivate(),
+            'isStatic'           => $property->isStatic(),
+
+            'override'           => $this->getOverrideInfo($property),
+
+            'args'               => $this->getPropertyArguments($property),
+            'declaringClass'     => $this->getDeclaringClass($property),
+            'declaringStructure' => $this->getDeclaringStructure($property)
+        ];
+    }
+
+    /**
+     * Retrieves a data structure containing information about the specified constant.
+     *
+     * @param string               $name
+     * @param ReflectionClass|null $class
+     *
+     * @return array
+     */
+    protected function getConstantInfo($name, ReflectionClass $class = null)
+    {
+        // TODO: There is no direct way to know where the constant originated from (the current class, a base class,
+        // an interface of a base class, a trait, ...). This could be done by looping up the chain of base classes
+        // to the last class that also has the same property and then checking if any of that class' traits or
+        // interfaces define the constant.
+        return [
+            'name'           => $name,
+            'isMethod'       => false,
+            'isProperty'     => false,
+            'isPublic'       => true,
+            'isProtected'    => false,
+            'isPrivate'      => false,
+            'isStatic'       => true,
+            'declaringClass' => [
+                'name'     => $class ? $class->name : null,
+                'filename' => $class ? $class->getFileName() : null
+            ],
+
+            // TODO: It is not possible to directly fetch the docblock of the constant through reflection, manual
+            // file parsing is required.
+            'args'           => [
+                'return'       => null,
+                'descriptions' => [],
+                'deprecated'   => false
+            ]
+        ];
+    }
+
+    /**
      * Returns information about the specified class.
      *
      * @param string $className Full namespace of the parsed class.
@@ -421,75 +512,16 @@ abstract class Tools
             'args'         => $this->getClassArguments($reflection)
         ]);
 
-        // Retrieve information about methods.
         foreach ($reflection->getMethods() as $method) {
-            $data['methods'][$method->getName()] = [
-                'name'               => $method->getName(),
-                'isMethod'           => true,
-                'isProperty'         => false,
-                'isPublic'           => $method->isPublic(),
-                'isProtected'        => $method->isProtected(),
-                'isPrivate'          => $method->isPrivate(),
-                'isStatic'           => $method->isStatic(),
-
-                'override'           => $this->getOverrideInfo($method),
-                'implementation'     => $this->getImplementationInfo($method),
-
-                'args'               => $this->getMethodArguments($method),
-                'declaringClass'     => $this->getDeclaringClass($method),
-                'declaringStructure' => $this->getDeclaringStructure($method),
-                'startLine'          => $method->getStartLine()
-            ];
+            $data['methods'][$method->getName()] = $this->getMethodInfo($method);
         }
 
-        // Retrieves information about properties/attributes.
         foreach ($reflection->getProperties() as $property) {
-            $data['properties'][$property->getName()] = [
-                'name'               => $property->getName(),
-                'isMethod'           => false,
-                'isProperty'         => true,
-                'isPublic'           => $property->isPublic(),
-                'isProtected'        => $property->isProtected(),
-                'isPrivate'          => $property->isPrivate(),
-                'isStatic'           => $property->isStatic(),
-
-                'override'           => $this->getOverrideInfo($property),
-
-                'args'               => $this->getPropertyArguments($property),
-                'declaringClass'     => $this->getDeclaringClass($property),
-                'declaringStructure' => $this->getDeclaringStructure($property)
-            ];
+            $data['properties'][$property->getName()] = $this->getPropertyInfo($property);
         }
 
-        // Retrieve information about constants.
-        $constants  = $reflection->getConstants();
-
-        foreach ($constants as $constant => $value) {
-            // TODO: There is no direct way to know where the constant originated from (the current class, a base class,
-            // an interface of a base class, a trait, ...). This could be done by looping up the chain of base classes
-            // to the last class that also has the same property and then checking if any of that class' traits or
-            // interfaces define the constant.
-            $data['constants'][$constant] = [
-                'name'           => $constant,
-                'isMethod'       => false,
-                'isProperty'     => false,
-                'isPublic'       => true,
-                'isProtected'    => false,
-                'isPrivate'      => false,
-                'isStatic'       => true,
-                'declaringClass' => [
-                    'name'     => $reflection->name,
-                    'filename' => $reflection->getFileName()
-                ],
-
-                // TODO: It is not possible to directly fetch the docblock of the constant through reflection, manual
-                // file parsing is required.
-                'args'           => [
-                    'return'       => null,
-                    'descriptions' => [],
-                    'deprecated'   => false
-                ]
-            ];
+        foreach ($reflection->getConstants() as $constant => $value) {
+            $data['constants'][$constant] = $this->getConstantInfo($constant, $reflection);
         }
 
         return $data;
