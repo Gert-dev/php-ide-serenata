@@ -2,6 +2,7 @@
 
 namespace PhpIntegrator;
 
+use Reflector;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -224,7 +225,7 @@ abstract class Tools
      *
      * @return array
      */
-    protected function getDeclaringClassForMember($reflectionMember)
+    protected function getDeclaringClassForMember(Reflector $reflectionMember)
     {
         // This will point to the class that contains the member, which will resolve to the parent class if it's
         // inherited (and not overridden).
@@ -244,7 +245,7 @@ abstract class Tools
      *
      * @return array
      */
-    protected function getDeclaringStructureForMember($reflectionMember)
+    protected function getDeclaringStructureForMember(Reflector $reflectionMember)
     {
         // This will point to the class that contains the member, which will resolve to the parent class if it's
         // inherited (and not overridden).
@@ -275,7 +276,7 @@ abstract class Tools
      *
      * @return array|null
      */
-    protected function getOverrideInfo($reflectionMember)
+    protected function getOverrideInfo(Reflector $reflectionMember)
     {
         $overriddenMember = null;
         $memberName = $reflectionMember->getName();
@@ -548,5 +549,3 @@ abstract class Tools
         return $data;
     }
 }
-
-?>
