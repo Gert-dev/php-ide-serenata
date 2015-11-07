@@ -18,6 +18,7 @@ foo()-> // Autocompletion for DateTime.
 ```
 
 ### Bugs fixed
+* Fixed the 'className.split is not a function' error popping up sometimes.
 * Return values such as `\DateTime` (with a leading slash) were not always being found.
 * The PHP FileParser will no longer trip over class docblocks containing the pattern `class MyClass`.
 * Classes from this package are now no longer included in the class list and will no longer be indexed.
