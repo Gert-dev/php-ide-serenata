@@ -40,7 +40,7 @@ abstract class Tools
      *
      * @return array
      */
-    protected function getMethodArguments(ReflectionFunctionAbstract $function)
+    protected function getFunctionArguments(ReflectionFunctionAbstract $function)
     {
         $args = $function->getParameters();
 
@@ -113,7 +113,7 @@ abstract class Tools
                         $traitMethod = $trait->getMethod($function->getName());
 
                         if ($traitMethod->isAbstract() && $traitMethod->getDocComment()) {
-                            return $this->getMethodArguments($traitMethod);
+                            return $this->getFunctionArguments($traitMethod);
                         }
                     }
                 }
@@ -129,7 +129,7 @@ abstract class Tools
                         $interfaceMethod = $interface->getMethod($function->getName());
 
                         if ($interfaceMethod->getDocComment()) {
-                            return $this->getMethodArguments($interfaceMethod);
+                            return $this->getFunctionArguments($interfaceMethod);
                         }
                     }
                 }
@@ -141,7 +141,7 @@ abstract class Tools
                     $baseClassMethod = $classIterator->getMethod($function->getName());
 
                     if ($baseClassMethod->getDocComment()) {
-                        $baseClassMethodArgs = $this->getMethodArguments($baseClassMethod);
+                        $baseClassMethodArgs = $this->getFunctionArguments($baseClassMethod);
 
                         if (!$docComment) {
                             return $baseClassMethodArgs; // Fall back to parent docblock.
@@ -375,31 +375,47 @@ abstract class Tools
     }
 
     /**
-     * Retrieves a data structure containing information about the specified method (or function).
+     * Retrieves a data structure containing information about the specified function (or method).
      *
-     * @param ReflectionFunctionAbstract $method
+     * @param ReflectionFunctionAbstract $function
      *
      * @return array
      */
-    protected function getMethodInfo(ReflectionFunctionAbstract $method)
+    protected function getFunctionInfo(ReflectionFunctionAbstract $function)
     {
         return [
-            'name'               => $method->getName(),
+            'name'               => $function->getName(),
             'isMethod'           => true,
             'isProperty'         => false,
+
+            'args'               => $this->getFunctionArguments($function),
+            'startLine'          => $function->getStartLine(),
+            'filename'           => $function->getFileName()
+        ];
+    }
+
+    /**
+     * Retrieves a data structure containing information about the specified method, expanding upon
+     * {@see getFunctionInfo} to provide additional information.
+     *
+     * @param ReflectionMethod $method
+     *
+     * @return array
+     */
+    protected function getMethodInfo(ReflectionMethod $method)
+    {
+        return array_merge($this->getFunctionInfo($method), [
+            'override'           => $this->getOverrideInfo($method),
+            'implementation'     => $this->getImplementationInfo($method),
+
             'isPublic'           => $method->isPublic(),
             'isProtected'        => $method->isProtected(),
             'isPrivate'          => $method->isPrivate(),
             'isStatic'           => $method->isStatic(),
 
-            'override'           => $this->getOverrideInfo($method),
-            'implementation'     => $this->getImplementationInfo($method),
-
-            'args'               => $this->getMethodArguments($method),
             'declaringClass'     => $this->getDeclaringClass($method),
-            'declaringStructure' => $this->getDeclaringStructure($method),
-            'startLine'          => $method->getStartLine()
-        ];
+            'declaringStructure' => $this->getDeclaringStructure($method)
+        ]);
     }
 
     /**

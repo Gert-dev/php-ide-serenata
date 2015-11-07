@@ -21,13 +21,13 @@ class FunctionsProvider extends Tools implements ProviderInterface
                     continue;
                 }
 
-                $args = $this->getMethodArguments($function);
+                $result[$function->getName()] = $this->getFunctionInfo($function);
 
-                $result[$function->getName()] = [
-                    'name'     => $function->getName(),
-                    'isMethod' => true,
-                    'args'     => $args
-                ];
+                if ($group === 'internal') {
+                    // PHP's built-in functions don't have docblocks, so per exception, this doesn't mean they return
+                    // void.
+                    $result[$function->getName()]['args']['return']['type'] = '';
+                }
             }
         }
 
