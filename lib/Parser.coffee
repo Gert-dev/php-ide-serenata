@@ -542,10 +542,10 @@ class Parser
 
                     # Can be empty for closures.
                     if funcName and funcName.length > 0
-                        params = @proxy.getDocParams(@determineFullClassName(editor), funcName)
+                        response = @proxy.getDocParams(@determineFullClassName(editor), funcName)
 
-                        if params.params? and params.params[element]?
-                            return @determineFullClassName(editor, params.params[element].type)
+                        if response.params? and response.params[element]?
+                            return @determineFullClassName(editor, response.params[element].type)
 
             chain = editor.scopeDescriptorForBufferPosition([lineNumber, line.length]).getScopeChain()
 
