@@ -620,13 +620,25 @@ class Parser
                 className = currentClassInfo.parents[0]
 
         else
-            # This could either be just a (static) class name, or a new instance of a class.
-            matches = firstElement.match(/^new\s+([^\(]+)(?:\(\))?/)
+            # Check if this is perhaps a PHP global function.
+            matches = firstElement.match(/^(.*?)\(\)$/)
 
             if matches
-                firstElement = matches[1]
+                functionName = matches[1]
+                functions = @proxy.getGlobalFunctions()
 
-            className = @determineFullClassName(editor, firstElement)
+                if functionName of functions
+                    className = functions[functionName].args.return.type
+
+            if not className
+                # Check if this is a new instance of a class.
+                matches = firstElement.match(/^new\s+([^\(]+)(?:\(\))?/)
+
+                if matches
+                    firstElement = matches[1]
+
+                # This is probably a static class name.
+                className = @determineFullClassName(editor, firstElement)
 
         return null if not className
 
