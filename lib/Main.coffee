@@ -52,9 +52,9 @@ module.exports =
             description : 'Additional scripts to load on the PHP side before performing any action. You can add things
                            such as bootstrap scripts or helper scripts that contain global functions and constants here.
                            They will then be automatically picked up (and can, for example, be made available during
-                           autocompletion)'
+                           autocompletion). You can use all patterns supported by the PHP glob function.'
             type        : 'array'
-            default     : ['src/bootstrap.php', 'some/script.php']
+            default     : ['src/bootstrap.php', 'src/functions/*.php']
             order       : 5
 
     ###*

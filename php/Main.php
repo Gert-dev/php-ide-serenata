@@ -90,8 +90,8 @@ foreach ($config['classMapScripts'] as $script) {
 foreach ($config['additionalScripts'] as $script) {
     $path = sprintf('%s/%s', $project, trim($script, '/'));
 
-    if (file_exists($path)) {
-        require_once($path);
+    foreach (glob($path) as $filename) {
+        require_once($filename);
     }
 }
 
