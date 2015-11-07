@@ -37,6 +37,7 @@ foo()-> // Autocompletion for DateTime.
   * `getCalledClass` is now called `getCalledClassAt` to better indicate that it needs a buffer position.
   * `getClassMemberAt` will now return the correct member if a structure has a property and a method with the same name.
   * `getAvailableVariables` now returns an array with variables, containing the name and type of the variable (if found).
+  * Class constants will now contain information about their declaring class and declaring structure, just like other members.
   * Several methods such as `getClassInfo` now take an additional parameter to make them execute asynchronously (a promise will be returned instead of the actual results).
 
 ## 0.1.0
