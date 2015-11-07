@@ -219,7 +219,68 @@ abstract class Tools
     }
 
     /**
-     * Retrieves the class that contains the specified reflection member.
+     * Retrieves information about the class that contains the specified constant.
+     *
+     * @param string          $name
+     * @param ReflectionClass $class
+     *
+     * @return array
+     */
+    protected function getDeclaringClassForConstant($name, ReflectionClass $class)
+    {
+        $parent = $class;
+        $declaringClass = $class;
+
+        while ($parent = $parent->getParentClass()) {
+            if (!$parent->hasConstant($name)) {
+                break;
+            }
+
+            $declaringClass = $parent;
+        }
+
+        return [
+            'name'     => $declaringClass->name,
+            'filename' => $declaringClass->getFileName()
+        ];
+    }
+
+    /**
+     * Retrieves information about the structure (class, trait, interface, ...) that contains the specified constant.
+     *
+     * @param string          $name
+     * @param ReflectionClass $class
+     *
+     * @return array
+     */
+    protected function getDeclaringStructureForConstant($name, ReflectionClass $class)
+    {
+        $parent = $class;
+        $declaringClass = $class;
+
+        while ($parent = $parent->getParentClass()) {
+            if (!$parent->hasConstant($name)) {
+                break;
+            }
+
+            $declaringClass = $parent;
+        }
+
+        foreach ($declaringClass->getInterfaces() as $interface) {
+            if ($interface->hasConstant($name)) {
+                $declaringClass = $interface;
+                break;
+            }
+        }
+
+        return [
+            'name'     => $declaringClass->name,
+            'filename' => $declaringClass->getFileName()
+        ];
+    }
+
+    /**
+     * Retrieves information about the class that contains the specified reflection member.
      *
      * @param ReflectionFunctionAbstract|ReflectionProperty $reflectionMember
      *
@@ -239,7 +300,8 @@ abstract class Tools
     }
 
     /**
-     * Retrieves the structure (class, trait, interface, ...) that contains the specified reflection member.
+     * Retrieves information about the structure (class, trait, interface, ...) that contains the specified reflection
+     * member.
      *
      * @param ReflectionFunctionAbstract|ReflectionProperty $reflectionMember
      *
@@ -456,25 +518,22 @@ abstract class Tools
      */
     protected function getConstantInfo($name, ReflectionClass $class = null)
     {
-        // TODO: There is no direct way to know where the constant originated from (the current class, a base class,
-        // an interface of a base class, a trait, ...). This could be done by looping up the chain of base classes
-        // to the last class that also has the same property and then checking if any of that class' traits or
-        // interfaces define the constant.
         return [
-            'name'           => $name,
-            'isMethod'       => false,
-            'isProperty'     => false,
-            'isPublic'       => true,
-            'isProtected'    => false,
-            'isPrivate'      => false,
-            'isStatic'       => true,
-            'declaringClass' => [
-                'name'     => $class ? $class->name : null,
-                'filename' => $class ? $class->getFileName() : null
+            'name'               => $name,
+            'isMethod'           => false,
+            'isProperty'         => false,
+            'isPublic'           => true,
+            'isProtected'        => false,
+            'isPrivate'          => false,
+            'isStatic'           => true,
+
+            'declaringClass'     => $class ? $this->getDeclaringClassForConstant($name, $class) : [
+                'name'     => null,
+                'filename' => null
             ],
-            'declaringStructure' => [
-                'name'     => $class ? $class->name : null,
-                'filename' => $class ? $class->getFileName() : null
+            'declaringStructure' => $class ? $this->getDeclaringStructureForConstant($name, $class) : [
+                'name'     => null,
+                'filename' => null
             ],
 
             // TODO: It is not possible to directly fetch the docblock of the constant through reflection, manual
