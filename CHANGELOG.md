@@ -23,6 +23,7 @@ foo()-> // Autocompletion for DateTime.
 * The PHP FileParser will no longer trip over class docblocks containing the pattern `class MyClass`.
 * Classes from this package are now no longer included in the class list and will no longer be indexed.
 * Fix several issues with autocompletion of `(new Foo())->` in corner cases such as inside arrays and function calls.
+* Global class names in combination with the 'new' operator such as `new \My\Class` were not properly having their type deduced (and e.g. getting no autocompletion as a result).
 * Fixed an issue where the package would attempt to index the project on shutdown. This could result in a message being displayed at shutdown about the Atom window not being responsive.
 
 ### Changes for developers

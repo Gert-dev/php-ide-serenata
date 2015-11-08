@@ -486,7 +486,7 @@ class Parser
 
         # Regex variable definition
         regexElement = new RegExp("\\#{element}[\\s]*=[\\s]*([^;]+);", "g")
-        regexNewInstance = new RegExp("\\#{element}[\\s]*=[\\s]*new[\\s]*\\\\?([A-Z][a-zA-Z_\\\\]*)+(?:(.+)?);", "g")
+        regexNewInstance = new RegExp("\\#{element}[\\s]*=[\\s]*new[\\s]*(\\\\?[A-Z][a-zA-Z_\\\\]*)+(?:(.+)?);", "g")
         regexCatch = new RegExp("catch[\\s]*\\([\\s]*([A-Za-z0-9_\\\\]+)[\\s]+\\#{element}[\\s]*\\)", "g")
 
         lineNumber = bufferPosition.row - 1
