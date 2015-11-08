@@ -525,7 +525,12 @@ class Parser
                     # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
                     # don't recognize the class name is irrelevant.
                     bestMatchRow = lineNumber
-                    bestMatch = @getClassNameFromCallStack(editor, newPosition, elements)
+
+                    try
+                        bestMatch = @getResultingTypeFromCallStack(editor, newPosition, elements)
+
+                    catch error
+                        bestMatch = null
 
             if not bestMatch
                 # Check for function or closure parameter type hints and the docblock.
@@ -586,15 +591,18 @@ class Parser
         return bestMatch
 
     ###*
-     * Parses all elements from the given call stack to return the last class name (if any).
+     * Parses all elements from the given call stack to return the last type (if any). Returns null if the type of the
+     * member could not be deduced (i.e. because it does not exist).
      *
      * @param {TextEditor} editor
      * @param {Point}      bufferPosition
      * @param {array}      callStack
      *
+     * @throws an error if one of the elements in the call stack does not exist.
+     *
      * @return {string|null}
     ###
-    getClassNameFromCallStack: (editor, bufferPosition, callStack) ->
+    getResultingTypeFromCallStack: (editor, bufferPosition, callStack) ->
         i = 0
         className = null
 
@@ -646,10 +654,7 @@ class Parser
         # in the call stack.
         for element in callStack
             classInfo = @proxy.autocomplete(className, element)
-            className = classInfo?.name
-
-            if not className
-                break
+            className = classInfo.name
 
         return className
 

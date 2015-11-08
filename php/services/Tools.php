@@ -539,9 +539,15 @@ abstract class Tools
             // TODO: It is not possible to directly fetch the docblock of the constant through reflection, manual
             // file parsing is required.
             'args'           => [
-                'return'       => null,
-                'descriptions' => [],
-                'deprecated'   => false
+                'deprecated'   => false,
+                'return'       => [
+                    'type'        => null,
+                    'description' => null
+                ],
+                'descriptions' => [
+                    'short'       => null,
+                    'long'        => null,
+                ]
             ]
         ];
     }

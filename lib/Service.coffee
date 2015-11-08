@@ -184,7 +184,7 @@ class Service
      * @return {Object|null}
     ###
     getClassMemberAt: (editor, bufferPosition, name) ->
-        className = @getCalledClassAt(editor, bufferPosition, true)
+        className = @getResultingTypeAt(editor, bufferPosition, true)
 
         members = @getClassMember(className, name)
 
@@ -289,12 +289,15 @@ class Service
      *                                       type (class) of 'b', as it is the last element, but as the user is still
      *                                       writing code, you may instead be interested in the type of 'foo()' instead.
      *
+     * @throws an error if one of the elements in the call stack does not exist, which can happen if the user is writing
+     *         invalid code.
+     *
      * @return {string|null}
      *
      * @example Invoking it on MyMethod::foo()->bar() will ask what class 'bar' is invoked on, which will whatever type
      *          foo returns.
     ###
-    getCalledClassAt: (editor, bufferPosition, ignoreLastElement) ->
+    getResultingTypeAt: (editor, bufferPosition, ignoreLastElement) ->
         callStack = @parser.retrieveSanitizedCallStackAt(editor, bufferPosition)
 
         if ignoreLastElement
@@ -302,4 +305,4 @@ class Service
 
         return null if not callStack or callStack.length == 0
 
-        return @parser.getClassNameFromCallStack(editor, bufferPosition, callStack)
+        return @parser.getResultingTypeFromCallStack(editor, bufferPosition, callStack)

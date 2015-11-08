@@ -47,11 +47,14 @@ class Proxy
 
                 response = JSON.parse(response.output[1].toString('ascii'))
 
-            catch err
-                return null
+                if not response or response.error?
+                    throw response.error
 
-            if !response or response.error?
-                return null
+                if not response.success
+                    throw "An unsuccessful status code was returned by the PHP side!"
+
+            catch error
+                throw (if error.message then error.message else error)
 
             return response?.result
 

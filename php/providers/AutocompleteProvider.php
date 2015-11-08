@@ -24,17 +24,24 @@ class AutocompleteProvider extends Tools implements ProviderInterface
         }
 
         $memberInfo = null;
-        $relevantClass = null;
         $classInfo = $this->getClassInfo($class);
 
         if ($isMethod && isset($classInfo['methods'][$name])) {
             $memberInfo = $classInfo['methods'][$name];
-        } elseif (!$isMethod && isset($classInfo['properties'][$name])) {
-            $memberInfo = $classInfo['properties'][$name];
+        } elseif (!$isMethod) {
+            if (isset($classInfo['properties'][$name])) {
+                $memberInfo = $classInfo['properties'][$name];
+            } elseif (isset($classInfo['constants'][$name])) {
+                $memberInfo = $classInfo['constants'][$name];
+            }
         }
+
+        $result = null;
 
         if ($memberInfo) {
             $returnValue = $memberInfo['args']['return']['type'];
+
+            $relevantClass = $returnValue;
 
             if ($returnValue == '$this' || $returnValue == 'static') {
                 $relevantClass = $class;
@@ -81,13 +88,13 @@ class AutocompleteProvider extends Tools implements ProviderInterface
                     }
                 }
             }
+
+            // Minor optimization to avoid fetching the same data twice.
+            $result = ($relevantClass === $class) ? $classInfo : $this->getClassInfo($relevantClass);
         }
 
-        // Minor optimization to avoid fetching the same data twice.
-        $result = ($relevantClass === $class) ? $classInfo : $this->getClassInfo($relevantClass);
-
         return [
-            'success' => ($result && $result['wasFound']),
+            'success' => !!$memberInfo,
             'result'  => $result
         ];
     }
