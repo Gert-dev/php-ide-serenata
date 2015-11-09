@@ -226,8 +226,9 @@ class Parser
 
                 lastChain = chain
 
-            # If openedScopes == closedScopes at this point, we're probably in a closure or nested function.
-            if chain.indexOf("function") != -1 and openedScopes > closedScopes
+            # If openedScopes == closedScopes at this point, we're probably in a closure or nested function. The == 0
+            # checks are to catch the case where the cursor is inside the signature, to ensure it stops.
+            if chain.indexOf("function") != -1 and (openedScopes > closedScopes or (openedScopes == 0 and closedScopes == 0))
                 return [row, 0]
 
         return null
