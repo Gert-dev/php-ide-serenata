@@ -62,14 +62,15 @@ class StatusBarManager
      * @param {string} label
     ###
     setLabel: (@label) ->
-        if @labelElement
-            @labelElement.innerHTML = @label
+        @labelElement.innerHTML = @label
+        @labelElement.className = ''
 
     ###*
      * Shows the element.
     ###
     show: ->
         $(@element).show()
+        $(@progressBar).show()
 
     ###*
      * Hides the element.

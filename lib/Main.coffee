@@ -139,7 +139,8 @@ module.exports =
             console.time(timerName);
 
         if @statusBarManager and fileName is null
-            @statusBarManager.showMessage("Indexing...")
+            @statusBarManager.setLabel("Indexing...")
+            @statusBarManager.show()
 
         successHandler = () =>
             if @statusBarManager
@@ -165,6 +166,7 @@ module.exports =
             @statusBarManager = new StatusBarManager()
             @statusBarManager.initialize(statusBarService)
             @statusBarManager.setLabel("Indexing...")
+            # @statusBarManager.hide()
 
     ###*
      * Detaches existing items from the status bar.
