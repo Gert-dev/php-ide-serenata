@@ -196,60 +196,39 @@ class Parser
      * @return {Point|null}
     ###
     getOuterFunctionStart: (editor, bufferPosition) ->
-        text = editor.getTextInBufferRange([[0, 0], bufferPosition])
+        openedScopes = 0
+        closedScopes = 0
 
-        row = bufferPosition.row
-        rows = text.split('\n')
+        for row in [bufferPosition.row .. 0]
+            line = editor.lineTextForBufferRow(row)
 
-        openedBlocks = 0
-        closedBlocks = 0
+            continue if not line
 
-        # for each row
-        while row != -1
-            line = rows[row]
-
-            # issue #61
-            if not line
-                row--
-                continue
-
-            character = 0
-            lineLength = line.length
             lastChain = null
 
             # Scan the entire line, fetching the scope for each character position as one line can contain both a scope
             # start and end such as "} elseif (true) {". Here the scope descriptor will differ for different character
             # positions on the line.
-            while character <= line.length
-                # Get chain of all scopes
+            for character in [0 .. line.length]
                 chain = editor.scopeDescriptorForBufferPosition([row, character]).getScopeChain()
+
+                continue if chain.indexOf('comment') != -1
 
                 # NOTE: Atom quirk: both line.length and line.length - 1 return the same scope descriptor, BUT you can't
                 # skip scanning line.length as sometimes line.length - 1 does not return a scope descriptor at all.
                 if not (character == line.length and chain == lastChain)
                     # }
                     if chain.indexOf("scope.end") != -1
-                        closedBlocks++
+                        ++closedScopes
                     # {
                     else if chain.indexOf("scope.begin") != -1
-                        openedBlocks++
+                        ++openedScopes
 
                 lastChain = chain
-                character++
 
-            # Get chain of all scopes
-            chain = editor.scopeDescriptorForBufferPosition([row, line.length]).getScopeChain()
-
-            # function
-            if chain.indexOf("function") != -1
-                # If more openedblocks than closedblocks, we are in a function. Otherwise, could be a closure, continue
-                # looking.
-                if openedBlocks > closedBlocks
-                    return [row, 0]
-
-                    break
-
-            row--
+            # If openedScopes == closedScopes at this point, we're probably in a closure or nested function.
+            if chain.indexOf("function") != -1 and openedScopes > closedScopes
+                return [row, 0]
 
         return null
 
