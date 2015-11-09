@@ -14,8 +14,8 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    constructor: (@php) ->
-        super(@php)
+    constructor: (@config) ->
+        super(@config)
 
         @cache = {}
 

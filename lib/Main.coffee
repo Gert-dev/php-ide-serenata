@@ -187,7 +187,7 @@ module.exports =
         # return unless @testConfig()
         @testConfig()
 
-        proxy = new CachingProxy(@configuration.get('phpCommand'))
+        proxy = new CachingProxy(@configuration)
 
         parser = new Parser(proxy)
 

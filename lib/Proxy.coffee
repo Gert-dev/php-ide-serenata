@@ -10,16 +10,16 @@ module.exports =
 ##
 class Proxy
     ###*
-     * The command to execute when a PHP process needs to be spawned.
+     * The config to use.
     ###
-    php: null
+    config: null
 
     ###*
      * Cosntructor.
      *
-     * @param {string} php The command to execute when a PHP process needs to be spawned.
+     * @param {Config} config
     ###
-    constructor: (@php) ->
+    constructor: (@config) ->
 
     ###*
      * Performs a request to the PHP side.
@@ -40,7 +40,7 @@ class Proxy
 
         if not async
             try
-                response = child_process.spawnSync(@php, parameters)
+                response = child_process.spawnSync(@config.get('phpCommand'), parameters)
 
                 if response.error
                     throw response.error
@@ -64,7 +64,7 @@ class Proxy
                 options =
                     maxBuffer: 50000 * 1024
 
-                child_process.exec(@php + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
+                child_process.exec(@config.get('phpCommand') + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
                     if not stdout or stdout.length == 0
                         reject({message: "No output received from the PHP side!"})
                         return
