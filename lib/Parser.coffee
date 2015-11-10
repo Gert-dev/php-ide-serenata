@@ -48,13 +48,6 @@ class Parser
         scopeList = @getFunctionScopeListAt(editor, bufferPosition)
 
         for range in scopeList
-            ###
-            range = new Range(
-                if startPosition then startPosition else [0, 0],
-                [bufferPosition.row, bufferPosition.column - 1]
-            )
-            ###
-
             editor.getBuffer().backwardsScanInRange /(\$[a-zA-Z0-9_]+)/g, range, (matchInfo) =>
                 if matchInfo.matchText == '$this'
                     thisFound = true
