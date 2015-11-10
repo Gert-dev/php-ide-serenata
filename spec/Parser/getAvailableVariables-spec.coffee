@@ -56,13 +56,14 @@ describe "getAvailableVariables", ->
         editor.setText(source)
 
         bufferPosition =
-            row: editor.getLineCount() - 2
+            row: editor.getLineCount() - 1
             column: 0
 
         expectedResult = [
             '$var1'
             '$var2'
             '$var3'
+            '$this'
         ]
 
         variables = parser.getAvailableVariables(editor, bufferPosition)
