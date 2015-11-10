@@ -1,4 +1,4 @@
-{Range} = require 'atom'
+{Point, Range} = require 'atom'
 
 module.exports =
 
@@ -42,27 +42,30 @@ class Parser
      * @return {Object}
     ###
     getAvailableVariables: (editor, bufferPosition) ->
-        startPosition = @getOuterFunctionStart(editor, bufferPosition)
-
-        range = new Range(
-            if startPosition then startPosition else [0, 0],
-            [bufferPosition.row, bufferPosition.column - 1]
-        )
-
         matches = {}
-
         thisFound = false
 
-        editor.getBuffer().backwardsScanInRange /(\$[a-zA-Z0-9_]+)/g, range, (matchInfo) =>
-            if matchInfo.matchText == '$this'
-                thisFound = true
+        scopeList = @getFunctionScopeListAt(editor, bufferPosition)
 
-            if matchInfo.matchText not of matches
-                matches[matchInfo.matchText] =
-                    name : matchInfo.matchText
-                    type : @getVariableType(editor, range.end, matchInfo.matchText)
+        for range in scopeList
+            ###
+            range = new Range(
+                if startPosition then startPosition else [0, 0],
+                [bufferPosition.row, bufferPosition.column - 1]
+            )
+            ###
 
-        if startPosition and not thisFound
+            editor.getBuffer().backwardsScanInRange /(\$[a-zA-Z0-9_]+)/g, range, (matchInfo) =>
+                if matchInfo.matchText == '$this'
+                    thisFound = true
+
+                if matchInfo.matchText not of matches
+                    matches[matchInfo.matchText] =
+                        name : matchInfo.matchText
+                        type : @getVariableType(editor, range.end, matchInfo.matchText)
+
+
+        if scopeList.length > 0 and not thisFound
             matches['$this'] =
                 name : '$this'
                 type : @getVariableType(editor, range.end, '$this')
@@ -186,17 +189,20 @@ class Parser
         return (scopeDescriptor.indexOf('.property') != -1)
 
     ###*
-     * Checks if the specified location is inside a function or method or not and returns the point it starts at, if
-     # any.
+     * Retrieves an array of ranges that contain code that apply to the function the specified buffer position is in.
+     * In other words, all these ranges are "inside this function's scope".
      *
      * @param {TextEditor} editor
      * @param {Point}      bufferPosition
      *
-     * @return {Point|null}
+     * @return {array}
     ###
-    getOuterFunctionStart: (editor, bufferPosition) ->
-        openedScopes = 0
-        closedScopes = 0
+    getFunctionScopeListAt: (editor, bufferPosition) ->
+        ranges = []
+        scopeEndStack = []
+        lastScopeEnd = null
+        isInFunctionChain = true
+        currentRangeEnd = bufferPosition
 
         for row in [bufferPosition.row .. 0]
             line = editor.lineTextForBufferRow(row)
@@ -205,32 +211,47 @@ class Parser
 
             lastChain = null
 
-            # Scan the entire line, fetching the scope for each character position as one line can contain both a scope
-            # start and end such as "} elseif (true) {". Here the scope descriptor will differ for different character
-            # positions on the line.
-            for character in [0 .. line.length]
-                chain = editor.scopeDescriptorForBufferPosition([row, character]).getScopeChain()
+            for i in [line.length - 1 .. 0]
+                chain = editor.scopeDescriptorForBufferPosition([row, i]).getScopeChain()
 
-                continue if chain.indexOf('comment') != -1
+                if chain.indexOf('comment') != -1
+                    continue
 
-                # NOTE: Atom quirk: both line.length and line.length - 1 return the same scope descriptor, BUT you can't
-                # skip scanning line.length as sometimes line.length - 1 does not return a scope descriptor at all.
-                if not (character == line.length and chain == lastChain)
-                    # }
-                    if chain.indexOf("scope.end") != -1
-                        ++closedScopes
-                    # {
-                    else if chain.indexOf("scope.begin") != -1
-                        ++openedScopes
+                else if line[i] == '}'
+                    scopeEndStack.push(new Point(row, i))
 
-                lastChain = chain
+                else if line[i] == '{'
+                    if scopeEndStack.length > 0
+                        lastScopeEnd = scopeEndStack.pop()
 
-            # If openedScopes == closedScopes at this point, we're probably in a closure or nested function. The == 0
-            # checks are to catch the case where the cursor is inside the signature, to ensure it stops.
-            if chain.indexOf("function") != -1 and (openedScopes > closedScopes or (openedScopes == 0 and closedScopes == 0))
-                return [row, 0]
+                    else
+                        lastScopeEnd = null
 
-        return null
+                else if chain.indexOf('.storage.type.function') != -1
+                    if not isInFunctionChain
+                        # isInFunctionChain ensures that we don't match multiple times on the same function keyword.
+                        isInFunctionChain = true
+
+                        if lastScopeEnd?
+                            # There was a last scope end, we're iterating over a callable or inline function. The scope of
+                            # this function is not part of the current scope.
+                            ranges.push(new Range(lastScopeEnd, currentRangeEnd))
+
+                            lastScopeEnd = null
+                            currentRangeEnd = new Point(row, i)
+
+                        else
+                            currentPoint = new Point(row, i)
+
+                            ranges.push(new Range(currentPoint, currentRangeEnd))
+
+                            return ranges
+
+                else
+                    isInFunctionChain = false
+
+        # Getting here means we never found a start for the current scope, which means we're not in a function.
+        return []
 
     ###*
      * Does exactly the same as {@see retrieveSanitizedCallStack}, but will automatically retrieve the relevant code

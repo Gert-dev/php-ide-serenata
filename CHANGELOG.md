@@ -1,8 +1,9 @@
 ## 0.2.0
 ### Features and enhancements
 * There was no convenient visual indicator of when indexing failed, a label is now shown in the status bar if that is indeed the case.
-* It is now possible to specify a list of additional scripts to load, which allows you to add things such as bootstrap scripts or scripts with global helper functions, which will then be made available to other packages (such as autocompletion).
 * When the initial PHP process that indexes the entire project fails or is killed, it will now be picked up and displayed as an error.
+* The list of variables returned will now try to skip scopes that don't apply. For example, you will now only see variables that are relevant to your closure when inside one.
+* It is now possible to specify a list of additional scripts to load, which allows you to add things such as bootstrap scripts or scripts with global helper functions, which will then be made available to other packages (such as autocompletion).
 * The return type of your global functions will now be correctly analyzed, the following will now work:
 
 ```php
