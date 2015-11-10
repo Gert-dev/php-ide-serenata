@@ -35,8 +35,8 @@ foo()-> // Autocompletion for DateTime.
   * Previously, `getCalledClass` always ignored the last element in a call stack, causing `$this->foo->b` to return the type of `foo` instead of `b`. Because this behavior is unexpected and undocumented, this no longer happens. To maintain this 'feature', a new parameter `ignoreLastElement` has been added that can be set to true to restore this behavior (i.e. it will return the type of `foo`). Setting it to false will return the type of `b` instead.
   * `getGlobalFunctions` will now also return user-defined global functions (i.e. non-internal global functions).
   * `getGlobalConstants` will now also return information about if a constant is built-in or not (as opposed to user defined).
+  * `getAvailableVariables` now returns an object with variable names mapped to information such as their type (if found).
   * `getClassMemberAt` will now return the correct member if a structure has a property and a method with the same name.
-  * `getAvailableVariables` now returns an array with variables, containing the name and type of the variable (if found).
   * `getCalledClass` is now called `getResultingTypeAt` to better indicate what it does and that it needs a buffer position.
   * Class constants will now contain information about their declaring class and declaring structure, just like other members.
   * Several methods such as `getClassInfo` now take an additional parameter to make them execute asynchronously (a promise will be returned instead of the actual results).

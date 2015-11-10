@@ -39,7 +39,7 @@ class Parser
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition
      *
-     * @return {array}
+     * @return {Object}
     ###
     getAvailableVariables: (editor, bufferPosition) ->
         startPosition = @getOuterFunctionStart(editor, bufferPosition)
@@ -49,24 +49,23 @@ class Parser
             [bufferPosition.row, bufferPosition.column - 1]
         )
 
-        matches = []
+        matches = {}
 
         thisFound = false
 
-        editor.getBuffer().scanInRange /(\$[a-zA-Z0-9_]+)/g, range, (matchInfo) =>
+        editor.getBuffer().backwardsScanInRange /(\$[a-zA-Z0-9_]+)/g, range, (matchInfo) =>
             if matchInfo.matchText == '$this'
                 thisFound = true
 
-            matches.push({
-                name : matchInfo.matchText
-                type : @getVariableType(editor, range.end, matchInfo.matchText)
-            })
+            if matchInfo.matchText not of matches
+                matches[matchInfo.matchText] =
+                    name : matchInfo.matchText
+                    type : @getVariableType(editor, range.end, matchInfo.matchText)
 
         if startPosition and not thisFound
-            matches.push({
+            matches['$this'] =
                 name : '$this'
                 type : @getVariableType(editor, range.end, '$this')
-            })
 
         return matches
 

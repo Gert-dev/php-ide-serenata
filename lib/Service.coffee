@@ -154,7 +154,7 @@ class Service
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition
      *
-     * @return {array}
+     * @return {Object}
     ###
     getAvailableVariables: (editor, bufferPosition) ->
         return @parser.getAvailableVariables(editor, bufferPosition)
