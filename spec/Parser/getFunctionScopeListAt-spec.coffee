@@ -24,14 +24,21 @@ describe "getFunctionScopeListAt", ->
         runs ->
             editor.setGrammar(grammar)
 
-    it "correctly returns an empty array when not in a function.", ->
+    it "correctly operates when not in a function (global scope).", ->
         source =
             """
             <?php
 
-            function test()
+            function foo($param)
             {
+                $nestedVar = null;
+            }
 
+            function test($param1, $param2)
+            {
+                $closure = function ($closureParam) use ($something) {
+                    $test = 3;
+                };
             }
 
             //
@@ -44,7 +51,9 @@ describe "getFunctionScopeListAt", ->
             column: 0
 
         expectedResult = [
-
+            new Range(new Point(0, 0), new Point(2, 0)),
+            new Range(new Point(5, 0), new Point(7, 0)),
+            new Range(new Point(12, 0), bufferPosition)
         ]
 
         expect(parser.getFunctionScopeListAt(editor, bufferPosition)).toEqual(expectedResult)
@@ -67,7 +76,7 @@ describe "getFunctionScopeListAt", ->
             column: 0
 
         expectedResult = [
-            new Range(new Point(2, 7), bufferPosition)
+            new Range(new Point(2, 8), bufferPosition)
         ]
 
         expect(parser.getFunctionScopeListAt(editor, bufferPosition)).toEqual(expectedResult)
@@ -94,8 +103,8 @@ describe "getFunctionScopeListAt", ->
             column: 0
 
         expectedResult = [
+            new Range(new Point(2, 8), new Point(4, 15)),
             new Range(new Point(6, 4), bufferPosition)
-            new Range(new Point(2, 7), new Point(4, 22)),
         ]
 
         expect(parser.getFunctionScopeListAt(editor, bufferPosition)).toEqual(expectedResult)

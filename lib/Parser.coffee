@@ -58,7 +58,10 @@ class Parser
                         type : @getVariableType(editor, range.end, matchInfo.matchText)
 
 
-        if scopeList.length > 0 and not thisFound
+        # If the row and column equal 0, 0, the scope is at the start of the file, hence we're not in a function.
+        # NOTE: Commented out as this can never be fool proof anyway, when not in a function we can still be in a file
+        # that has a '$this' variable if it is included via a class.
+        if not thisFound #and scopeList.length > 0 and not (scopeList[0].start.row == 0 and scopeList[0].start.column == 0)
             matches['$this'] =
                 name : '$this'
                 type : @getVariableType(editor, range.end, '$this')
@@ -183,7 +186,8 @@ class Parser
 
     ###*
      * Retrieves an array of ranges that contain code that apply to the function the specified buffer position is in.
-     * In other words, all these ranges are "inside this function's scope".
+     * In other words, all these ranges are "inside this function's scope". If not currently inside a function, the
+     * global scope is analyzed instead.
      *
      * @param {TextEditor} editor
      * @param {Point}      bufferPosition
@@ -191,60 +195,89 @@ class Parser
      * @return {array}
     ###
     getFunctionScopeListAt: (editor, bufferPosition) ->
-        ranges = []
-        scopeEndStack = []
-        lastScopeEnd = null
-        isInFunctionChain = true
-        currentRangeEnd = bufferPosition
+        openedScopes = 0
+        closedScopes = 0
 
+        currentScopeFunctionStart = null
+
+        # First walk back until we find the actual start of the current scope.
         for row in [bufferPosition.row .. 0]
             line = editor.lineTextForBufferRow(row)
 
             continue if not line
 
-            lastChain = null
-
+            # Scan the entire line, fetching the scope for each character position as one line can contain both a scope
+            # start and end such as "} elseif (true) {". Here the scope descriptor will differ for different character
+            # positions on the line.
             for i in [line.length - 1 .. 0]
+                chain = editor.scopeDescriptorForBufferPosition([row, i]).getScopeChain()
+
+                continue if chain.indexOf('comment') != -1
+
+                # }
+                if line[i] == '}'
+                    ++closedScopes
+                # {
+                if line[i] == '{'
+                    ++openedScopes
+
+                # If openedScopes == closedScopes at this point, we're probably in a closure or nested function.
+                if chain.indexOf(".storage.type.function") != -1 and openedScopes > closedScopes
+                    currentScopeFunctionStart = new Point(row, i + 1)
+                    break
+
+            break if currentScopeFunctionStart?
+
+
+        if not currentScopeFunctionStart?
+            currentScopeFunctionStart = new Point(0, 0)
+
+        # Now start scanning the range to find the actual scopes.
+        ranges = []
+        isInFunction = false
+        parenthesesOpened = 0
+        lastStart = currentScopeFunctionStart
+
+        for row in [currentScopeFunctionStart.row .. bufferPosition.row]
+            line = editor.lineTextForBufferRow(row)
+
+            continue if not line
+
+            startIndex = 0
+            lastIndex = line.length - 1
+
+            if row == currentScopeFunctionStart.row
+                startIndex = currentScopeFunctionStart.column
+
+            if row == bufferPosition.row
+                lastIndex = bufferPosition.column
+
+            for i in [startIndex .. lastIndex]
                 chain = editor.scopeDescriptorForBufferPosition([row, i]).getScopeChain()
 
                 if chain.indexOf('comment') != -1
                     continue
 
-                else if line[i] == '}'
-                    scopeEndStack.push(new Point(row, i))
+                else if not isInFunction and chain.indexOf('.storage.type.function') != -1
+                    ranges.push(new Range(lastStart, new Point(row, i)))
+
+                    isInFunction = true
 
                 else if line[i] == '{'
-                    if scopeEndStack.length > 0
-                        lastScopeEnd = scopeEndStack.pop()
+                    if isInFunction
+                        ++parenthesesOpened
 
-                    else
-                        lastScopeEnd = null
+                else if line[i] == '}'
+                    if isInFunction
+                        --parenthesesOpened
 
-                else if chain.indexOf('.storage.type.function') != -1
-                    if not isInFunctionChain
-                        # isInFunctionChain ensures that we don't match multiple times on the same function keyword.
-                        isInFunctionChain = true
+                        if parenthesesOpened == 0
+                            lastStart = new Point(row, i)
+                            isInFunction = false
 
-                        if lastScopeEnd?
-                            # There was a last scope end, we're iterating over a callable or inline function. The scope of
-                            # this function is not part of the current scope.
-                            ranges.push(new Range(lastScopeEnd, currentRangeEnd))
+        ranges.push(new Range(lastStart, bufferPosition))
 
-                            lastScopeEnd = null
-                            currentRangeEnd = new Point(row, i)
-
-                        else
-                            currentPoint = new Point(row, i)
-
-                            ranges.push(new Range(currentPoint, currentRangeEnd))
-
-                            return ranges
-
-                else
-                    isInFunctionChain = false
-
-        # Getting here means we never found a start for the current scope, which means we're not in a function.
-        return []
+        return ranges
 
     ###*
      * Does exactly the same as {@see retrieveSanitizedCallStack}, but will automatically retrieve the relevant code
