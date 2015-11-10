@@ -122,7 +122,7 @@ class Parser
                     isAliasedImport = if matches[2] then true else false
 
                     if className == matches[1]
-                        fullClass = className # Already a complete name
+                        fullClass = className # Already a complete name.
 
                         break
 
