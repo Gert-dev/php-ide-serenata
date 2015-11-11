@@ -521,10 +521,13 @@ class Parser
         regexNewInstance = new RegExp("\\#{element}[\\s]*=[\\s]*new[\\s]*(\\\\?[A-Z][a-zA-Z_\\\\]*)+(?:(.+)?);", "g")
         regexCatch = new RegExp("catch[\\s]*\\([\\s]*([A-Za-z0-9_\\\\]+)[\\s]+\\#{element}[\\s]*\\)", "g")
 
-        lineNumber = bufferPosition.row - 1
+        lineNumber = bufferPosition.row
 
         while lineNumber > 0
             line = editor.lineTextForBufferRow(lineNumber)
+
+            if lineNumber == bufferPosition.row
+                line = line.substr(0, bufferPosition.column)
 
             if not bestMatch
                 # Check for $x = new XXXXX()
