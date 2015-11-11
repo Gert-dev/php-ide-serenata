@@ -521,7 +521,7 @@ class Parser
 
         # Regex variable definition
         regexElement = new RegExp("\\#{element}[\\s]*=[\\s]*([^;]+);", "g")
-        regexNewInstance = new RegExp("\\#{element}[\\s]*=[\\s]*new[\\s]*(\\\\?[A-Z][a-zA-Z_\\\\]*)+(?:(.+)?);", "g")
+        regexNewInstance = new RegExp("\\#{element}[\\s]*=[\\s]*new[\\s]*(\\\\?[A-Z][a-zA-Z0-9_\\\\]*)+(?:(.+)?);", "g")
         regexCatch = new RegExp("catch[\\s]*\\([\\s]*([A-Za-z0-9_\\\\]+)[\\s]+\\#{element}[\\s]*\\)", "g")
 
         lineNumber = bufferPosition.row
@@ -600,21 +600,21 @@ class Parser
                 # Check if the line before contains a /** @var FooType */, which overrides the type of the variable
                 # immediately below it. This will not evaluate to /** @var FooType $someVar */ (see below for that).
                 if bestMatchRow and lineNumber == (bestMatchRow - 1)
-                    regexVar = /\@var[\s]+([a-zA-Z_\\]+)(?![\w]+\$)/g
+                    regexVar = /\@var[\s]+([a-zA-Z0-9_\\]+)(?![\w]+\$)/g
                     matches = regexVar.exec(line)
 
                     if null != matches
                         return @determineFullClassName(editor, matches[1])
 
                 # Check if there is an PHPStorm-style type inline docblock present /** @var FooType $someVar */.
-                regexVarWithVarName = new RegExp("\\@var[\\s]+([a-zA-Z_\\\\]+)[\\s]+\\#{element}", "g")
+                regexVarWithVarName = new RegExp("\\@var[\\s]+([a-zA-Z0-9_\\\\]+)[\\s]+\\#{element}", "g")
                 matches = regexVarWithVarName.exec(line)
 
                 if null != matches
                     return @determineFullClassName(editor, matches[1])
 
                 # Check if there is an IntelliJ-style type inline docblock present /** @var $someVar FooType */.
-                regexVarWithVarName = new RegExp("\\@var[\\s]+\\#{element}[\\s]+([a-zA-Z_\\\\]+)", "g")
+                regexVarWithVarName = new RegExp("\\@var[\\s]+\\#{element}[\\s]+([a-zA-Z0-9_\\\\]+)", "g")
                 matches = regexVarWithVarName.exec(line)
 
                 if null != matches
