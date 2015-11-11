@@ -524,7 +524,7 @@ class Parser
         # Regex variable definition
         regexElement = ///#{elementForRegex}\s*=\s*([^;]+);///g
         regexCatch = ///catch\s*\(\s*([A-Za-z0-9_\\]+)\s+#{elementForRegex}\s*\)///g
-        regexNewInstance = ///#{elementForRegex}\s*=\s*new\s*(\\?[A-Z][a-zA-Z0-9_\\]*)+(?:(.+)?);///g
+        regexNewInstance = ///#{elementForRegex}\s*=\s*new\s*(\\?[A-Z][a-zA-Z0-9_\\]*)+.*;///g
 
         lineNumber = bufferPosition.row
 
