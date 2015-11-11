@@ -25,7 +25,7 @@ class Parser
      * A string that can be inserted into regular expressions that will match a class name, including its namespace,
      * if present.
     ###
-    classRegexPart = '(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*)+'
+    classRegexPart = '\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*'
 
     ###*
      * The proxy that can be used to query information about the code.
