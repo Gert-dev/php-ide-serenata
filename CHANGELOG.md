@@ -22,6 +22,7 @@ foo()-> // Autocompletion for DateTime.
 * Fixed the 'className.split is not a function' error popping up sometimes.
 * Fixed type hints from function parameters not being correctly deduced in some cases.
 * Return values such as `\DateTime` (with a leading slash) were not always being found.
+* Numbers and underscores were not permitted in class names in several locations (they are now).
 * The PHP FileParser will no longer trip over class docblocks containing the pattern `class MyClass`.
 * Classes from this package are now no longer included in the class list and will no longer be indexed.
 * Fix several issues with autocompletion of `(new Foo())->` in corner cases such as inside arrays and function calls.
