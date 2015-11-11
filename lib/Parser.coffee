@@ -548,14 +548,14 @@ class Parser
                         return @determineFullClassName(editor, matches[1])
 
                 # Check if there is an PHPStorm-style type inline docblock present /** @var FooType $someVar */.
-                regexVarWithVarName = new RegExp("\\@var[\\s]+([a-zA-Z0-9_\\\\]+)[\\s]+\\#{element}", "g")
+                regexVarWithVarName = ///@var\s+([a-zA-Z0-9_\\]+)\s+#{elementForRegex}///g
                 matches = regexVarWithVarName.exec(line)
 
                 if null != matches
                     return @determineFullClassName(editor, matches[1])
 
                 # Check if there is an IntelliJ-style type inline docblock present /** @var $someVar FooType */.
-                regexVarWithVarName = new RegExp("\\@var[\\s]+\\#{element}[\\s]+([a-zA-Z0-9_\\\\]+)", "g")
+                regexVarWithVarName = ///@var\s+#{elementForRegex}\s+([a-zA-Z0-9_\\]+)///g
                 matches = regexVarWithVarName.exec(line)
 
                 if null != matches
