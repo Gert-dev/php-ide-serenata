@@ -624,10 +624,14 @@ class Parser
 
                     # Can be empty for closures.
                     if funcName and funcName.length > 0
-                        response = @proxy.getDocParams(@determineFullClassName(editor), funcName)
+                        try
+                            response = @proxy.getDocParams(@determineFullClassName(editor), funcName)
 
-                        if response.params? and response.params[element]?
-                            return @determineFullClassName(editor, response.params[element].type)
+                            if response.params? and response.params[element]?
+                                return @determineFullClassName(editor, response.params[element].type)
+
+                        catch error
+                            # This data isn't useful, continue searching.
 
                     break;
 
