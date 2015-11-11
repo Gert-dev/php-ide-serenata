@@ -571,14 +571,14 @@ class Parser
                 # Check for function or closure parameter type hints and the docblock.
                 tmpElement = '\\' + element
 
-                regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\(.*?([a-zA-Z0-9_\\]+)\s+#{tmpElement}.*?\)///g
+                regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:([a-zA-Z0-9_\\]+)\s+)?#{tmpElement}[^{]*?\)///g
 
                 matches = regexFunction.exec(line)
 
                 if null != matches
                     typeHint = matches[2]
 
-                    if typeHint.length > 0
+                    if typeHint?.length > 0
                         return @determineFullClassName(editor, typeHint)
 
                     funcName = matches[1]
