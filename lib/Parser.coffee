@@ -569,7 +569,10 @@ class Parser
 
             if not bestMatch
                 # Check for function or closure parameter type hints and the docblock.
-                regexFunction = new RegExp("function(?:[\\s]+([a-zA-Z]+))?[\\s]*[\\(](?:(?![a-zA-Z\\_\\\\]*[\\s]*\\#{element}).)*[,\\s]?([a-zA-Z\\_\\\\]*)[\\s]*\\#{element}[a-zA-Z0-9\\s\\$\\\\,=\\\"\\\'\(\)]*[\\s]*[\\)]", "g")
+                tmpElement = '\\' + element
+
+                regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\(.*?([a-zA-Z0-9_\\]+)\s+#{tmpElement}.*?\)///g
+
                 matches = regexFunction.exec(line)
 
                 if null != matches
