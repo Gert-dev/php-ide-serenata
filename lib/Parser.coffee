@@ -519,10 +519,12 @@ class Parser
         bestMatch = null
         bestMatchRow = null
 
+        elementForRegex = '\\' + element
+
         # Regex variable definition
-        regexElement = new RegExp("\\#{element}[\\s]*=[\\s]*([^;]+);", "g")
-        regexNewInstance = new RegExp("\\#{element}[\\s]*=[\\s]*new[\\s]*(\\\\?[A-Z][a-zA-Z0-9_\\\\]*)+(?:(.+)?);", "g")
-        regexCatch = new RegExp("catch[\\s]*\\([\\s]*([A-Za-z0-9_\\\\]+)[\\s]+\\#{element}[\\s]*\\)", "g")
+        regexElement = ///#{elementForRegex}\s*=\s*([^;]+);///g
+        regexCatch = ///catch\s*\(\s*([A-Za-z0-9_\\]+)\s+#{elementForRegex}\s*\)///g
+        regexNewInstance = ///#{elementForRegex}\s*=\s*new\s*(\\?[A-Z][a-zA-Z0-9_\\]*)+(?:(.+)?);///g
 
         lineNumber = bufferPosition.row
 
@@ -603,9 +605,7 @@ class Parser
 
                 if not bestMatch
                     # Check for function or closure parameter type hints and the docblock.
-                    tmpElement = '\\' + element
-
-                    regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:([a-zA-Z0-9_\\]+)\s+)?#{tmpElement}[^{]*?\)///g
+                    regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:([a-zA-Z0-9_\\]+)\s+)?#{elementForRegex}[^{]*?\)///g
 
                     matches = regexFunction.exec(line)
 
