@@ -534,7 +534,7 @@ class Parser
 
         lineNumber = bufferPosition.row
 
-        while lineNumber > 0
+        while lineNumber >= 0
             line = editor.lineTextForBufferRow(lineNumber)
 
             if lineNumber == bufferPosition.row
@@ -570,68 +570,69 @@ class Parser
                 --lineNumber
                 continue
 
-            else
-                if not bestMatch
-                    # Check for $x = new XXXXX()
-                    matchesNew = regexNewInstance.exec(line)
+            if not bestMatch
+                # Check for $x = new XXXXX()
+                matchesNew = regexNewInstance.exec(line)
 
-                    if null != matchesNew
-                        bestMatchRow = lineNumber
-                        bestMatch = @determineFullClassName(editor, matchesNew[1])
+                if null != matchesNew
+                    bestMatchRow = lineNumber
+                    bestMatch = @determineFullClassName(editor, matchesNew[1])
 
-                if not bestMatch
-                    # Check for catch(XXX $xxx)
-                    matchesCatch = regexCatch.exec(line)
+            if not bestMatch
+                # Check for catch(XXX $xxx)
+                matchesCatch = regexCatch.exec(line)
 
-                    if null != matchesCatch
-                        bestMatchRow = lineNumber
-                        bestMatch = @determineFullClassName(editor, matchesCatch[1])
+                if null != matchesCatch
+                    bestMatchRow = lineNumber
+                    bestMatch = @determineFullClassName(editor, matchesCatch[1])
 
-                if not bestMatch
-                    # Check for a variable assignment $x = ...
-                    matches = regexElement.exec(line)
+            if not bestMatch
+                # Check for a variable assignment $x = ...
+                matches = regexElement.exec(line)
 
-                    if null != matches
-                        value = matches[1]
-                        elements = @retrieveSanitizedCallStack(value)
+                if null != matches
+                    value = matches[1]
+                    elements = @retrieveSanitizedCallStack(value)
 
-                        newPosition =
-                            row : lineNumber
-                            column: bufferPosition.column
+                    newPosition =
+                        row : lineNumber
+                        column: bufferPosition.column
 
-                        # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
-                        # don't recognize the class name is irrelevant.
-                        bestMatchRow = lineNumber
+                    # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
+                    # don't recognize the class name is irrelevant.
+                    bestMatchRow = lineNumber
 
-                        try
-                            bestMatch = @getResultingTypeFromCallStack(editor, newPosition, elements)
+                    try
+                        bestMatch = @getResultingTypeFromCallStack(editor, newPosition, elements)
 
-                        catch error
-                            bestMatch = null
+                    catch error
+                        bestMatch = null
 
-                if not bestMatch
-                    # Check for function or closure parameter type hints and the docblock.
-                    regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
+            if not bestMatch
+                # Check for function or closure parameter type hints and the docblock.
+                regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
 
-                    matches = regexFunction.exec(line)
+                matches = regexFunction.exec(line)
 
-                    if null != matches
-                        typeHint = matches[2]
+                if matches?
+                    typeHint = matches[2]
 
-                        if typeHint?.length > 0
-                            return @determineFullClassName(editor, typeHint)
+                    if typeHint?.length > 0
+                        return @determineFullClassName(editor, typeHint)
 
-                        funcName = matches[1]
+                    funcName = matches[1]
 
-                        # Can be empty for closures.
-                        if funcName and funcName.length > 0
-                            response = @proxy.getDocParams(@determineFullClassName(editor), funcName)
+                    # Can be empty for closures.
+                    if funcName and funcName.length > 0
+                        response = @proxy.getDocParams(@determineFullClassName(editor), funcName)
 
-                            if response.params? and response.params[element]?
-                                return @determineFullClassName(editor, response.params[element].type)
+                        if response.params? and response.params[element]?
+                            return @determineFullClassName(editor, response.params[element].type)
+
+                    break;
 
             # We've reached the function definition, other variables don't apply to this scope.
-            if chain.indexOf("function") != -1
+            if chain.indexOf(".storage.type.function") != -1
                 break
 
             --lineNumber
