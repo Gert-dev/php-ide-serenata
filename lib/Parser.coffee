@@ -22,6 +22,12 @@ class Parser
     namespaceDeclarationRegex : /(?:namespace)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:;)/
 
     ###*
+     * A string that can be inserted into regular expressions that will match a class name, including its namespace,
+     * if present.
+    ###
+    classRegexPart = '(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*)+'
+
+    ###*
      * The proxy that can be used to query information about the code.
     ###
     proxy: null
@@ -523,8 +529,8 @@ class Parser
 
         # Regex variable definition
         regexElement = ///#{elementForRegex}\s*=\s*([^;]+);///g
-        regexCatch = ///catch\s*\(\s*([A-Za-z0-9_\\]+)\s+#{elementForRegex}\s*\)///g
-        regexNewInstance = ///#{elementForRegex}\s*=\s*new\s*(\\?[A-Z][a-zA-Z0-9_\\]*)+.*;///g
+        regexCatch = ///catch\s*\(\s*(#{classRegexPart})\s+#{elementForRegex}\s*\)///g
+        regexNewInstance = ///#{elementForRegex}\s*=\s*new\s*(#{classRegexPart}).*;///g
 
         lineNumber = bufferPosition.row
 
@@ -541,21 +547,21 @@ class Parser
                 # Check if the line before contains a /** @var FooType */, which overrides the type of the variable
                 # immediately below it. This will not evaluate to /** @var FooType $someVar */ (see below for that).
                 if bestMatchRow and lineNumber == (bestMatchRow - 1)
-                    regexVar = /\@var[\s]+([a-zA-Z0-9_\\]+)(?![\w]+\$)/g
+                    regexVar = ///\@var[\s]+(#{classRegexPart})(?![\w]+\$)///g
                     matches = regexVar.exec(line)
 
                     if null != matches
                         return @determineFullClassName(editor, matches[1])
 
                 # Check if there is an PHPStorm-style type inline docblock present /** @var FooType $someVar */.
-                regexVarWithVarName = ///@var\s+([a-zA-Z0-9_\\]+)\s+#{elementForRegex}///g
+                regexVarWithVarName = ///@var\s+(#{classRegexPart})\s+#{elementForRegex}///g
                 matches = regexVarWithVarName.exec(line)
 
                 if null != matches
                     return @determineFullClassName(editor, matches[1])
 
                 # Check if there is an IntelliJ-style type inline docblock present /** @var $someVar FooType */.
-                regexVarWithVarName = ///@var\s+#{elementForRegex}\s+([a-zA-Z0-9_\\]+)///g
+                regexVarWithVarName = ///@var\s+#{elementForRegex}\s+(#{classRegexPart})///g
                 matches = regexVarWithVarName.exec(line)
 
                 if null != matches
@@ -605,7 +611,7 @@ class Parser
 
                 if not bestMatch
                     # Check for function or closure parameter type hints and the docblock.
-                    regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:([a-zA-Z0-9_\\]+)\s+)?#{elementForRegex}[^{]*?\)///g
+                    regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
 
                     matches = regexFunction.exec(line)
 
@@ -685,7 +691,7 @@ class Parser
 
             if not className
                 # Check if this is a new instance of a class.
-                matches = firstElement.match(/^new\s+([^\(]+)(?:\(\))?/)
+                matches = firstElement.match(///^new\s+(#{classRegexPart})(?:\(\))?///)
 
                 if matches
                     firstElement = matches[1]
