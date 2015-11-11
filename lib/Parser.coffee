@@ -532,67 +532,6 @@ class Parser
             if lineNumber == bufferPosition.row
                 line = line.substr(0, bufferPosition.column)
 
-            if not bestMatch
-                # Check for $x = new XXXXX()
-                matchesNew = regexNewInstance.exec(line)
-
-                if null != matchesNew
-                    bestMatchRow = lineNumber
-                    bestMatch = @determineFullClassName(editor, matchesNew[1])
-
-            if not bestMatch
-                # Check for catch(XXX $xxx)
-                matchesCatch = regexCatch.exec(line)
-
-                if null != matchesCatch
-                    bestMatchRow = lineNumber
-                    bestMatch = @determineFullClassName(editor, matchesCatch[1])
-
-            if not bestMatch
-                # Check for a variable assignment $x = ...
-                matches = regexElement.exec(line)
-
-                if null != matches
-                    value = matches[1]
-                    elements = @retrieveSanitizedCallStack(value)
-
-                    newPosition =
-                        row : lineNumber
-                        column: bufferPosition.column
-
-                    # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
-                    # don't recognize the class name is irrelevant.
-                    bestMatchRow = lineNumber
-
-                    try
-                        bestMatch = @getResultingTypeFromCallStack(editor, newPosition, elements)
-
-                    catch error
-                        bestMatch = null
-
-            if not bestMatch
-                # Check for function or closure parameter type hints and the docblock.
-                tmpElement = '\\' + element
-
-                regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:([a-zA-Z0-9_\\]+)\s+)?#{tmpElement}[^{]*?\)///g
-
-                matches = regexFunction.exec(line)
-
-                if null != matches
-                    typeHint = matches[2]
-
-                    if typeHint?.length > 0
-                        return @determineFullClassName(editor, typeHint)
-
-                    funcName = matches[1]
-
-                    # Can be empty for closures.
-                    if funcName and funcName.length > 0
-                        response = @proxy.getDocParams(@determineFullClassName(editor), funcName)
-
-                        if response.params? and response.params[element]?
-                            return @determineFullClassName(editor, response.params[element].type)
-
             chain = editor.scopeDescriptorForBufferPosition([lineNumber, line.length]).getScopeChain()
 
             # Annotations in comments can optionally override the variable type.
@@ -619,6 +558,71 @@ class Parser
 
                 if null != matches
                     return @determineFullClassName(editor, matches[1])
+
+                --lineNumber
+                continue
+
+            else
+                if not bestMatch
+                    # Check for $x = new XXXXX()
+                    matchesNew = regexNewInstance.exec(line)
+
+                    if null != matchesNew
+                        bestMatchRow = lineNumber
+                        bestMatch = @determineFullClassName(editor, matchesNew[1])
+
+                if not bestMatch
+                    # Check for catch(XXX $xxx)
+                    matchesCatch = regexCatch.exec(line)
+
+                    if null != matchesCatch
+                        bestMatchRow = lineNumber
+                        bestMatch = @determineFullClassName(editor, matchesCatch[1])
+
+                if not bestMatch
+                    # Check for a variable assignment $x = ...
+                    matches = regexElement.exec(line)
+
+                    if null != matches
+                        value = matches[1]
+                        elements = @retrieveSanitizedCallStack(value)
+
+                        newPosition =
+                            row : lineNumber
+                            column: bufferPosition.column
+
+                        # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
+                        # don't recognize the class name is irrelevant.
+                        bestMatchRow = lineNumber
+
+                        try
+                            bestMatch = @getResultingTypeFromCallStack(editor, newPosition, elements)
+
+                        catch error
+                            bestMatch = null
+
+                if not bestMatch
+                    # Check for function or closure parameter type hints and the docblock.
+                    tmpElement = '\\' + element
+
+                    regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:([a-zA-Z0-9_\\]+)\s+)?#{tmpElement}[^{]*?\)///g
+
+                    matches = regexFunction.exec(line)
+
+                    if null != matches
+                        typeHint = matches[2]
+
+                        if typeHint?.length > 0
+                            return @determineFullClassName(editor, typeHint)
+
+                        funcName = matches[1]
+
+                        # Can be empty for closures.
+                        if funcName and funcName.length > 0
+                            response = @proxy.getDocParams(@determineFullClassName(editor), funcName)
+
+                            if response.params? and response.params[element]?
+                                return @determineFullClassName(editor, response.params[element].type)
 
             # We've reached the function definition, other variables don't apply to this scope.
             if chain.indexOf("function") != -1
