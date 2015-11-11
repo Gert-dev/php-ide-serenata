@@ -304,7 +304,7 @@ class Parser
         startedKeyword = false
         startedStaticClassName = false
 
-        while line > 0
+        while line >= 0
             lineText = editor.lineTextForBufferRow(line)
 
             if not lineText
@@ -380,6 +380,12 @@ class Parser
 
                     # Reached an operator that can never be part of the current statement.
                     else if lineText[i] == ';' or lineText[i] == '=' or lineText[i] == ',' or lineText[i] == '['
+                        ++i
+                        finished = true
+                        break
+
+                    # <?php open tag.
+                    else if scopeDescriptor.indexOf('.punctuation.section.embedded.begin') != -1
                         ++i
                         finished = true
                         break
