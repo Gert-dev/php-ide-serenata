@@ -22,6 +22,17 @@ describe "determineFullClassName", ->
         runs ->
             editor.setGrammar(grammar)
 
+    it "returns null if there is no namespace.", ->
+        source =
+            """
+            <?php
+            """
+
+        editor.setText(source)
+
+        expect(parser.determineFullClassName(editor, null)).toEqual(null)
+
+
     it "correctly determines the current class name when there is no namespace.", ->
         source =
             """

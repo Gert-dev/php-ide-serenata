@@ -166,6 +166,9 @@ class Parser
                 fullClass = className
         ###
 
+        if fullClass.length == 0
+            return null
+
         return fullClass
 
     ###*
