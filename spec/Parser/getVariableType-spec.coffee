@@ -20,7 +20,7 @@ describe "getVariableType", ->
                 }
 
         autocomplete: (className, element) ->
-            return {name: 'EXPECTED_TYPE'} if className == 'Foo' and element == 'bar()'
+            return {name: 'EXPECTED\\TYPE_1'} if className == 'EXPECTED\\TYPE_1' and element == 'bar()'
     }
 
     parser = new Parser(proxyMock)
@@ -109,7 +109,7 @@ describe "getVariableType", ->
             """
             <?php
 
-            $test = Foo::bar();
+            $test = EXPECTED\\TYPE_1::bar();
             """
 
         editor.setText(source)
@@ -121,14 +121,14 @@ describe "getVariableType", ->
             row    : row
             column : column
 
-        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED_TYPE')
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
 
     it "correctly returns the type of a variable through an instantiation.", ->
         source =
             """
             <?php
 
-            $test = new EXPECTED_TYPE();
+            $test = new EXPECTED\\TYPE_1();
             """
 
         editor.setText(source)
@@ -140,7 +140,7 @@ describe "getVariableType", ->
             row    : row
             column : column
 
-        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED_TYPE')
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
 
     it "correctly returns the type of a variable through a catch block type hint.", ->
         source =
@@ -149,7 +149,7 @@ describe "getVariableType", ->
 
             try {
 
-            } catch (EXPECTED_TYPE $test) {
+            } catch (EXPECTED\\TYPE_1 $test) {
 
             }
             """
@@ -163,7 +163,7 @@ describe "getVariableType", ->
             row    : row
             column : column
 
-        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED_TYPE')
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
 
     it "correctly returns the type of a variable through function parameter type hints.", ->
         source =
