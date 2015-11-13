@@ -32,8 +32,20 @@ describe "getResultingTypeFromCallStack", ->
         editor.setText(source)
 
         proxyMock = {
-            autocomplete: (className, element) ->
-                return {name: 'EXPECTED_TYPE'} if className == 'Bar' and element == 'testProperty'
+            getClassInfo: (className) ->
+                if className == 'Bar'
+                    return {
+                        properties:
+                            testProperty:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE'
+                    }
+
+                else if className == 'EXPECTED_TYPE'
+                    return {
+                        name: 'EXPECTED_TYPE'
+                    }
         }
 
         parser = new Parser(proxyMock)
@@ -64,8 +76,20 @@ describe "getResultingTypeFromCallStack", ->
         editor.setText(source)
 
         proxyMock = {
-            autocomplete: (className, element) ->
-                return {name: 'EXPECTED_TYPE'} if className == 'Bar' and element == 'testProperty'
+            getClassInfo: (className) ->
+                if className == 'Bar'
+                    return {
+                        properties:
+                            testProperty:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE'
+                    }
+
+                else if className == 'EXPECTED_TYPE'
+                    return {
+                        name: 'EXPECTED_TYPE'
+                    }
         }
 
         parser = new Parser(proxyMock)
@@ -96,8 +120,20 @@ describe "getResultingTypeFromCallStack", ->
         editor.setText(source)
 
         proxyMock = {
-            autocomplete: (className, element) ->
-                return {name: 'EXPECTED_TYPE'} if className == 'Bar' and element == 'testProperty'
+            getClassInfo: (className) ->
+                if className == 'Bar'
+                    return {
+                        properties:
+                            testProperty:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE'
+                    }
+
+                else if className == 'EXPECTED_TYPE'
+                    return {
+                        name: 'EXPECTED_TYPE'
+                    }
         }
 
         parser = new Parser(proxyMock)
@@ -131,6 +167,21 @@ describe "getResultingTypeFromCallStack", ->
             getClassInfo: (className) ->
                 return {parents: ['ParentClass']} if className == 'Bar'
 
+                if className == 'ParentClass'
+                    return {
+                        properties:
+                            testProperty:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE'
+                    }
+
+                else if className == 'EXPECTED_TYPE'
+                    return {
+                        name: 'EXPECTED_TYPE'
+                    }
+
+
             autocomplete: (className, element) ->
                 return {name: 'EXPECTED_TYPE'} if className == 'ParentClass' and element == 'testProperty'
         }
@@ -163,8 +214,20 @@ describe "getResultingTypeFromCallStack", ->
         editor.setText(source)
 
         proxyMock = {
-            autocomplete: (className, element) ->
-                return {name: 'EXPECTED_TYPE'} if className == 'Bar' and element == 'testProperty'
+            getClassInfo: (className) ->
+                if className == 'Bar'
+                    return {
+                        properties:
+                            testProperty:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE'
+                    }
+
+                else if className == 'EXPECTED_TYPE'
+                    return {
+                        name: 'EXPECTED_TYPE'
+                    }
         }
 
         parser = new Parser(proxyMock)
@@ -190,8 +253,20 @@ describe "getResultingTypeFromCallStack", ->
         editor.setText(source)
 
         proxyMock = {
-            autocomplete: (className, element) ->
-                return {name: 'EXPECTED_TYPE'} if className == 'Bar' and element == 'testProperty'
+            getClassInfo: (className) ->
+                if className == 'Bar'
+                    return {
+                        properties:
+                            testProperty:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE'
+                    }
+
+                else if className == 'EXPECTED_TYPE'
+                    return {
+                        name: 'EXPECTED_TYPE'
+                    }
         }
 
         parser = new Parser(proxyMock)
@@ -224,8 +299,24 @@ describe "getResultingTypeFromCallStack", ->
                                 type: '\\DateTime'
                 }
 
-            autocomplete: (className, element) ->
-                return {name: 'EXPECTED_TYPE'} if className == '\\DateTime' and element == ''
+            getClassInfo: (className) ->
+                if className == '\\DateTime'
+                    return {
+                        properties:
+                            '':
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE'
+                    }
+
+                else if className == 'EXPECTED_TYPE'
+                    return {
+                        name: 'EXPECTED_TYPE'
+                    }
+
+
+            # autocomplete: (className, element) ->
+                # return {name: 'EXPECTED_TYPE'} if className == '\\DateTime' and element == ''
         }
 
         parser = new Parser(proxyMock)
@@ -253,8 +344,20 @@ describe "getResultingTypeFromCallStack", ->
             getGlobalFunctions: () ->
                 return {}
 
-            autocomplete: (className, element) ->
-                return {name: 'EXPECTED_TYPE'} if className == 'Bar' and element == ''
+            getClassInfo: (className) ->
+                if className == 'Bar'
+                    return {
+                        properties:
+                            '':
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE'
+                    }
+
+                else if className == 'EXPECTED_TYPE'
+                    return {
+                        name: 'EXPECTED_TYPE'
+                    }
         }
 
         parser = new Parser(proxyMock)
@@ -288,10 +391,43 @@ describe "getResultingTypeFromCallStack", ->
             getGlobalFunctions: () ->
                 return {}
 
-            autocomplete: (className, element) ->
-                return {name: 'EXPECTED_TYPE_1'} if className == 'Bar' and element == 'testProperty'
-                return {name: 'EXPECTED_TYPE_2'} if className == 'EXPECTED_TYPE_1' and element == 'aMethod()'
-                return {name: 'EXPECTED_TYPE_3'} if className == 'EXPECTED_TYPE_2' and element == 'anotherProperty'
+
+
+            getClassInfo: (className) ->
+                if className == 'Bar'
+                    return {
+                        name: 'Bar'
+                        methods: {}
+                        properties:
+                            testProperty:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE_1'
+                    }
+
+                if className == 'EXPECTED_TYPE_1'
+                    return {
+                        name: 'EXPECTED_TYPE_1'
+                        methods:
+                            aMethod:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE_2'
+                    }
+
+                if className == 'EXPECTED_TYPE_2'
+                    return {
+                        name: 'EXPECTED_TYPE_2'
+                        methods: {}
+
+                        properties:
+                            anotherProperty:
+                                args:
+                                    return:
+                                        resolvedType: 'EXPECTED_TYPE_3'
+                    }
+
+                return {name: 'EXPECTED_TYPE_3'} if className == 'EXPECTED_TYPE_3'
         }
 
         parser = new Parser(proxyMock)

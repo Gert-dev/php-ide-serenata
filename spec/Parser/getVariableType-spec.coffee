@@ -19,8 +19,16 @@ describe "getVariableType", ->
                             type: 'EXPECTED\\TYPE_2'
                 }
 
-        autocomplete: (className, element) ->
-            return {name: 'EXPECTED\\TYPE_1'} if className == 'EXPECTED\\TYPE_1' and element == 'bar()'
+        getClassInfo: (className, element) ->
+            if className == 'EXPECTED\\TYPE_1'
+                return {
+                    name: 'EXPECTED\\TYPE_1'
+                    methods:
+                        bar:
+                            args:
+                                return:
+                                    resolvedType: 'EXPECTED\\TYPE_1'
+                }
     }
 
     parser = new Parser(proxyMock)
