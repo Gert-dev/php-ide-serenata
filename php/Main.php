@@ -13,7 +13,6 @@ require_once(__DIR__ . '/services/DocParser.php');
 require_once(__DIR__ . '/services/FileParser.php');
 
 require_once(__DIR__ . '/providers/ProviderInterface.php');
-require_once(__DIR__ . '/providers/AutocompleteProvider.php');
 require_once(__DIR__ . '/providers/ClassInfoProvider.php');
 require_once(__DIR__ . '/providers/ClassListProvider.php');
 require_once(__DIR__ . '/providers/ConstantsProvider.php');
@@ -27,7 +26,6 @@ $commands = [
     '--functions'    => 'PhpIntegrator\FunctionsProvider',
     '--constants'    => 'PhpIntegrator\ConstantsProvider',
     '--reindex'      => 'PhpIntegrator\ReindexProvider',
-    '--autocomplete' => 'PhpIntegrator\AutocompleteProvider',
     '--doc-params'   => 'PhpIntegrator\DocParamProvider'
 ];
 

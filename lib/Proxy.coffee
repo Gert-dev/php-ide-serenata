@@ -154,7 +154,38 @@ class Proxy
      * @return {Promise|Object}
     ###
     autocomplete: (className, name, async = false) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--autocomplete', className, name], async)
+        if not async
+            info = @getClassInfo(className, async)
+
+            if name.indexOf('()') != -1
+                name = name.replace('()', '')
+
+                if name of info.methods
+                    return @getClassInfo(info.methods[name].args.return.resolvedType, async)
+
+            else if name of info.properties
+                return @getClassInfo(info.properties[name].args.return.resolvedType, async)
+
+            else if name of info.constants
+                return @getClassInfo(info.constants[name].args.return.resolvedType, async)
+
+            return null
+
+        return @getClassInfo(className, async).then (info) =>
+            if name.indexOf('()') != -1
+                name = name.replace('()', '')
+
+                if name of info.methods
+                    return @getClassInfo(info.methods[name].args.return.resolvedType, async)
+
+            else if name of info.properties
+                return @getClassInfo(info.properties[name].args.return.resolvedType, async)
+
+            else if name of info.constants
+                return @getClassInfo(info.constants[name].args.return.resolvedType, async)
+
+            return new Promise (resolve, reject) ->
+                resolve(null)
 
     ###*
      * Returns information about parameters described in the docblock for the given method in the given class.

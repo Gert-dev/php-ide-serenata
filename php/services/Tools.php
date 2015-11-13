@@ -446,7 +446,7 @@ abstract class Tools
      */
     protected function getFunctionInfo(ReflectionFunctionAbstract $function)
     {
-        return [
+        $data = [
             'name'               => $function->getName(),
             'isMethod'           => true,
             'isProperty'         => false,
@@ -456,6 +456,10 @@ abstract class Tools
             'startLine'          => $function->getStartLine(),
             'filename'           => $function->getFileName()
         ];
+
+        $data['args']['return']['resolvedType'] = $this->determineFullReturnType($data);
+
+        return $data;
     }
 
     /**
@@ -468,7 +472,7 @@ abstract class Tools
      */
     protected function getMethodInfo(ReflectionMethod $method)
     {
-        return array_merge($this->getFunctionInfo($method), [
+        $data = array_merge($this->getFunctionInfo($method), [
             'override'           => $this->getOverrideInfo($method),
             'implementation'     => $this->getImplementationInfo($method),
 
@@ -480,6 +484,10 @@ abstract class Tools
             'declaringClass'     => $this->getDeclaringClassForMember($method),
             'declaringStructure' => $this->getDeclaringStructureForMember($method)
         ]);
+
+        $data['args']['return']['resolvedType'] = $this->determineFullReturnType($data);
+
+        return $data;
     }
 
     /**
@@ -491,7 +499,7 @@ abstract class Tools
      */
     protected function getPropertyInfo(ReflectionProperty $property)
     {
-        return [
+        $data = [
             'name'               => $property->getName(),
             'isMethod'           => false,
             'isProperty'         => true,
@@ -506,6 +514,92 @@ abstract class Tools
             'declaringClass'     => $this->getDeclaringClassForMember($property),
             'declaringStructure' => $this->getDeclaringStructureForMember($property)
         ];
+
+        $data['args']['return']['resolvedType'] = $this->determineFullReturnType($data);
+
+        return $data;
+    }
+
+    /**
+     * Resolves and determiens the full return type (class name) for the return value of the specified item.
+     *
+     * @param array $info
+     *
+     * @return string|null
+     */
+    protected function determineFullReturnType(array $info)
+    {
+        if (!isset($info['args']['return']['type']) || empty($info['args']['return']['type'])) {
+            return null;
+        }
+
+        $returnValue = $info['args']['return']['type'];
+
+        if ($returnValue == '$this' || $returnValue == 'self' || $returnValue == 'static') {
+            return isset($info['declaringClass']['name']) ? $info['declaringClass']['name'] : null;
+        }
+
+        $soleClassName = $this->getSoleClassName($returnValue);
+
+        if (!empty($soleClassName)) {
+            if ($soleClassName[0] !== "\\") {
+                $filename = isset($info['declaringStructure']['filename']) ? $info['declaringStructure']['filename'] : $info['filename'];
+                $parser = new FileParser($filename);
+
+                $completedClassName = $parser->getFullClassName($soleClassName, $useStatementFound);
+
+                return $completedClassName;
+            }
+
+            return $soleClassName;
+        }
+
+        return $returnValue;
+    }
+
+    /**
+     * Retrieves the sole class name from the specified return value statement.
+     *
+     * @example "null" returns null.
+     * @example "FooClass" returns "FooClass".
+     * @example "FooClass|null" returns "FooClass".
+     * @example "FooClass|BarClass|null" returns null (there is no single type).
+     *
+     * @param string $returnValueStatement
+     *
+     * @return string|null
+     */
+    protected function getSoleClassName($returnValueStatement)
+    {
+        if ($returnValueStatement) {
+            $types = explode(DocParser::TYPE_SPLITTER, $returnValueStatement);
+
+            $classTypes = [];
+
+            foreach ($types as $type) {
+                if ($this->isClassType($type)) {
+                    $classTypes[] = $type;
+                }
+            }
+
+            if (count($classTypes) === 1) {
+                return $classTypes[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns a boolean indicating if the specified value is a class type or not.
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    protected function isClassType($type)
+    {
+        return ucfirst($type) === $type;
     }
 
     /**
