@@ -141,53 +141,6 @@ class Proxy
         return @performRequest(@getFirstProjectDirectory(), ['--class-info', className], async)
 
     ###*
-     * Retrieves the members of the type that is returned by the member with the specified name in the specified class.
-     * This is essentially the same as determining the return type of the method (or type of the member variable) with
-     * the given name in the given class, and then calling {@see getMembers} for that type, hence autocompleting the
-     * 'name' in 'className'.
-     *
-     * @param {string} className
-     * @param {string} name
-     *
-     * @param {boolean} async
-     *
-     * @return {Promise|Object}
-    ###
-    autocomplete: (className, name, async = false) ->
-        if not async
-            info = @getClassInfo(className, async)
-
-            if name.indexOf('()') != -1
-                name = name.replace('()', '')
-
-                if name of info.methods
-                    return @getClassInfo(info.methods[name].args.return.resolvedType, async)
-
-            else if name of info.properties
-                return @getClassInfo(info.properties[name].args.return.resolvedType, async)
-
-            else if name of info.constants
-                return @getClassInfo(info.constants[name].args.return.resolvedType, async)
-
-            return null
-
-        return @getClassInfo(className, async).then (info) =>
-            if name.indexOf('()') != -1
-                name = name.replace('()', '')
-
-                if name of info.methods
-                    return @getClassInfo(info.methods[name].args.return.resolvedType, async)
-
-            else if name of info.properties
-                return @getClassInfo(info.properties[name].args.return.resolvedType, async)
-
-            else if name of info.constants
-                return @getClassInfo(info.constants[name].args.return.resolvedType, async)
-
-            return new Promise (resolve, reject) ->
-                resolve(null)
-
-    ###*
      * Returns information about parameters described in the docblock for the given method in the given class.
      *
      * @param {string} className

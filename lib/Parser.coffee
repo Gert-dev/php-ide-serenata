@@ -691,10 +691,57 @@ class Parser
         # We now know what class we need to start from, now it's just a matter of fetching the return types of members
         # in the call stack.
         for element in callStack
-            classInfo = @proxy.autocomplete(className, element)
+            classInfo = @autocomplete(className, element)
             className = classInfo.name
 
         return className
+
+    ###*
+     * Retrieves the members of the type that is returned by the member with the specified name in the specified class.
+     * This is essentially the same as determining the return type of the method (or type of the member variable) with
+     * the given name in the given class, and then calling {@see getMembers} for that type, hence autocompleting the
+     * 'name' in 'className'.
+     *
+     * @param {string} className
+     * @param {string} name
+     *
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
+    ###
+    autocomplete: (className, member, async = false) ->
+        if not async
+            info = @proxy.getClassInfo(className, async)
+
+            if member.indexOf('()') != -1
+                member = member.replace('()', '')
+
+                if member of info.methods
+                    return @proxy.getClassInfo(info.methods[member].args.return.resolvedType, async)
+
+            else if member of info.properties
+                return @proxy.getClassInfo(info.properties[member].args.return.resolvedType, async)
+
+            else if member of info.constants
+                return @proxy.getClassInfo(info.constants[member].args.return.resolvedType, async)
+
+            return null
+
+        return @proxy.getClassInfo(className, async).then (info) =>
+            if member.indexOf('()') != -1
+                member = member.replace('()', '')
+
+                if member of info.methods
+                    return @proxy.getClassInfo(info.methods[member].args.return.resolvedType, async)
+
+            else if member of info.properties
+                return @proxy.getClassInfo(info.properties[member].args.return.resolvedType, async)
+
+            else if member of info.constants
+                return @proxy.getClassInfo(info.constants[member].args.return.resolvedType, async)
+
+            return new Promise (resolve, reject) ->
+                resolve(null)
 
     ###*
      * Gets the correct selector when a class or namespace is clicked.
