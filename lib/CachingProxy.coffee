@@ -79,12 +79,6 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    #autocomplete: (className, name, async = false) ->
-    #    return @wrapCachedRequestToParent("autocomplete-#{className}-#{name}", 'autocomplete', arguments, async)
-
-    ###*
-     * @inherited
-    ###
     getDocParams: (className, functionName, async = false) ->
         return @wrapCachedRequestToParent("getDocParams-#{className}-#{functionName}", 'getDocParams', arguments, async)
 
