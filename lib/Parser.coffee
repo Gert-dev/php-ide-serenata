@@ -154,24 +154,6 @@ class Parser
         if fullClass and fullClass[0] == '\\'
             fullClass = fullClass.substr(1)
 
-        ###
-        # NOTE: Commented out because I think this code is wrong: paths are always relative to the current namespace.
-        # Absolute paths must be FQCN's, prefixed by a leading slash, e.g. when editing the Bar class, \My\Foo\Bar is a
-        # correct class name, but My\Foo\Bar isn't (you also can't instantiate the latter because it 'does not exist',
-        # the former works fine).
-
-        if not found
-            # At this point, this could either be a class name relative to the current namespace or a full class name
-            # without a leading slash. For example, Foo\Bar could also be relative (e.g. My\Foo\Bar), in which case its
-            # absolute path is determined by the namespace and use statements of the file containing it.
-            info = @proxy.getClassInfo(fullClass)
-
-            if not info?.filename
-                # The class, e.g. My\Foo\Bar, didn't exist. We can only assume its an absolute path, using a namespace
-                # set up in composer.json, without a leading slash.
-                fullClass = className
-        ###
-
         if fullClass.length == 0
             return null
 
