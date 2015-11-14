@@ -511,92 +511,98 @@ class Parser
         if element.trim().length == 0
             return null
 
-        bestMatch = null
-        scanStartPosition = [0, 0]
-
         elementForRegex = '\\' + element
 
-        # Check for a type annotation in the style of /** @var FooType $someVar */.
-        regexTypeAnnotation = ///\/\*\*\s*@var\s+(#{classRegexPart})\s+#{elementForRegex}\s*\*\////
+        bestMatch = null
 
-        editor.getBuffer().backwardsScanInRange regexTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
-            bestMatch = @determineFullClassName(editor, matchInfo.match[1])
+        scopeList = @getFunctionScopeListAt(editor, bufferPosition).reverse()
 
-            matchInfo.stop()
+        for range in scopeList
+            scanStartPosition = range.start
 
-        return bestMatch if bestMatch # An annotation is definitive.
+            # Check for a type annotation in the style of /** @var FooType $someVar */.
+            regexTypeAnnotation = ///\/\*\*\s*@var\s+(#{classRegexPart})\s+#{elementForRegex}\s*\*\////
 
-        # Check for a type annotation in the style of /** @var $someVar FooType */.
-        regexReverseTypeAnnotation = ///\/\*\*\s*@var\s+#{elementForRegex}\s+(#{classRegexPart})\s*\*\////
+            editor.getBuffer().backwardsScanInRange regexTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
+                bestMatch = @determineFullClassName(editor, matchInfo.match[1])
 
-        editor.getBuffer().backwardsScanInRange regexReverseTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
-            bestMatch = @determineFullClassName(editor, matchInfo.match[1])
+                matchInfo.stop()
 
-            matchInfo.stop()
+            return bestMatch if bestMatch # An annotation is definitive.
 
-        return bestMatch if bestMatch # An annotation is definitive.
+            # Check for a type annotation in the style of /** @var $someVar FooType */.
+            regexReverseTypeAnnotation = ///\/\*\*\s*@var\s+#{elementForRegex}\s+(#{classRegexPart})\s*\*\////
 
-        # Check to see if we can find an assignment somewhere, this is the most common case.
-        regexAssignment = ///#{elementForRegex}\s*=\s*([^;]+);///g
+            editor.getBuffer().backwardsScanInRange regexReverseTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
+                bestMatch = @determineFullClassName(editor, matchInfo.match[1])
 
-        editor.getBuffer().backwardsScanInRange regexAssignment, [scanStartPosition, bufferPosition], (matchInfo) =>
-            return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+                matchInfo.stop()
 
-            scanStartPosition = matchInfo.range.start
+            return bestMatch if bestMatch # An annotation is definitive.
 
-            elements = @retrieveSanitizedCallStack(matchInfo.match[1])
+            # Check to see if we can find an assignment somewhere, this is the most common case.
+            regexAssignment = ///#{elementForRegex}\s*=\s*([^;]+);///g
 
-            # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
-            # don't recognize the class name is irrelevant.
-            try
-                bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.end, elements)
+            editor.getBuffer().backwardsScanInRange regexAssignment, [scanStartPosition, bufferPosition], (matchInfo) =>
+                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
-            catch error
-                bestMatch = null
+                scanStartPosition = matchInfo.range.start
 
-            matchInfo.stop()
+                elements = @retrieveSanitizedCallStack(matchInfo.match[1])
 
-        # Check if we can find a type hint from a catch statement that is more closely located to the requested
-        # position (i.e. one that is a better match).
-        regexCatch = ///catch\s*\(\s*(#{classRegexPart})\s+#{elementForRegex}\s*\)///g
+                # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
+                # don't recognize the class name is irrelevant.
+                try
+                    bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.end, elements)
 
-        editor.getBuffer().backwardsScanInRange regexCatch, [scanStartPosition, bufferPosition], (matchInfo) =>
-            return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+                catch error
+                    bestMatch = null
 
-            scanStartPosition = matchInfo.range.start
+                matchInfo.stop()
 
-            bestMatch = @determineFullClassName(editor, matchInfo.match[1])
+            # Check if we can find a type hint from a catch statement that is more closely located to the requested
+            # position (i.e. one that is a better match).
+            regexCatch = ///catch\s*\(\s*(#{classRegexPart})\s+#{elementForRegex}\s*\)///g
 
-            matchInfo.stop()
+            editor.getBuffer().backwardsScanInRange regexCatch, [scanStartPosition, bufferPosition], (matchInfo) =>
+                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
-        # Check if there is a funtion definition with a type hint for the variable.
-        regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
+                scanStartPosition = matchInfo.range.start
 
-        editor.getBuffer().backwardsScanInRange regexFunction, [scanStartPosition, bufferPosition], (matchInfo) =>
-            return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+                bestMatch = @determineFullClassName(editor, matchInfo.match[1])
 
-            scanStartPosition = matchInfo.range.start
+                matchInfo.stop()
 
-            typeHint = matchInfo.match[2]
+            # Check if there is a funtion definition with a type hint for the variable.
+            regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
 
-            if typeHint?.length > 0
-                bestMatch = @determineFullClassName(editor, typeHint)
+            editor.getBuffer().backwardsScanInRange regexFunction, [scanStartPosition, bufferPosition], (matchInfo) =>
+                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
-            else
-                functionName = matchInfo.match[1]
+                scanStartPosition = matchInfo.range.start
 
-                # Can be empty for closures.
-                if functionName?.length > 0
-                    try
-                        response = @proxy.getDocParams(@determineFullClassName(editor), functionName)
+                typeHint = matchInfo.match[2]
 
-                        if response.params? and response.params[element]?
-                            bestMatch = @determineFullClassName(editor, response.params[element].type)
+                if typeHint?.length > 0
+                    bestMatch = @determineFullClassName(editor, typeHint)
 
-                    catch error
-                        # This data isn't useful.
+                else
+                    functionName = matchInfo.match[1]
 
-            matchInfo.stop()
+                    # Can be empty for closures.
+                    if functionName?.length > 0
+                        try
+                            response = @proxy.getDocParams(@determineFullClassName(editor), functionName)
+
+                            if response.params? and response.params[element]?
+                                bestMatch = @determineFullClassName(editor, response.params[element].type)
+
+                        catch error
+                            # This data isn't useful.
+
+                matchInfo.stop()
+
+            break if bestMatch
 
         if not bestMatch and name == '$this'
             bestMatch = @determineFullClassName(editor)
