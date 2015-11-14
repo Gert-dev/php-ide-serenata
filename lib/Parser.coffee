@@ -512,7 +512,6 @@ class Parser
         # Regex variable definition
         regexElement = ///#{elementForRegex}\s*=\s*([^;]+);///g
         regexCatch = ///catch\s*\(\s*(#{classRegexPart})\s+#{elementForRegex}\s*\)///g
-        regexNewInstance = ///#{elementForRegex}\s*=\s*new\s*(#{classRegexPart}).*;///g
 
         lineNumber = bufferPosition.row
 
@@ -551,14 +550,6 @@ class Parser
 
                 --lineNumber
                 continue
-
-            if not bestMatch
-                # Check for $x = new XXXXX()
-                matchesNew = regexNewInstance.exec(line)
-
-                if null != matchesNew
-                    bestMatchRow = lineNumber
-                    bestMatch = @determineFullClassName(editor, matchesNew[1])
 
             if not bestMatch
                 # Check for catch(XXX $xxx)
