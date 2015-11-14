@@ -178,7 +178,7 @@ describe "getVariableType", ->
             try {
 
             } catch (EXPECTED\\TYPE_1 $test) {
-
+                //
             }
             """
 
@@ -200,7 +200,7 @@ describe "getVariableType", ->
 
             function foo(EXPECTED\\TYPE_1 $test1, EXPECTED\\TYPE_2 $test2)
             {
-
+                //
             }
             """
 
@@ -223,7 +223,7 @@ describe "getVariableType", ->
 
             function foo($test1, $test2)
             {
-
+                //
             }
             """
 
