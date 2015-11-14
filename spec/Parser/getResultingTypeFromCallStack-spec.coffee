@@ -253,6 +253,9 @@ describe "getResultingTypeFromCallStack", ->
         editor.setText(source)
 
         proxyMock = {
+            getGlobalFunctions: () ->
+                return []
+
             getClassInfo: (className) ->
                 if className == 'Bar'
                     return {
