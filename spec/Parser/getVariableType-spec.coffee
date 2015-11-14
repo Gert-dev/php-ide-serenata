@@ -131,6 +131,26 @@ describe "getVariableType", ->
 
         expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
 
+    it "correctly returns the type of a variable through a multi-line call stack.", ->
+        source =
+            """
+            <?php
+
+            $test = EXPECTED\\TYPE_1
+                ::bar();
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
     it "correctly returns the type of a variable through an instantiation.", ->
         source =
             """
@@ -248,26 +268,6 @@ describe "getVariableType", ->
             /** @var $test EXPECTED\\TYPE_1 */
 
             some_code_here();
-            """
-
-        editor.setText(source)
-
-        row = editor.getLineCount() - 1
-        column = editor.getBuffer().lineLengthForRow(row)
-
-        bufferPosition =
-            row    : row
-            column : column
-
-        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
-
-    it "correctly returns the type of a variable through a simple type annotation on the line before.", ->
-        source =
-            """
-            <?php
-
-            /** @var EXPECTED\\TYPE_1 */
-            $test = 5;
             """
 
         editor.setText(source)

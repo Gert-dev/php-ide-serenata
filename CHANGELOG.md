@@ -1,3 +1,10 @@
+## 0.3.0
+### Features and enhancements
+* None so far.
+
+### Bugs fixed
+* Support for the short annotation style, `/** @var FooClass */`, was dropped. The reason for this is that it's not supported by any IDE and is very specific to this package. It's also completely inflexible because it needs to be directly above the last assignment or other type deduction (such as a catch block) for it to be picked up incorrectly. The other annotation styles have none of these restrictions and also work in IDE's such as PHPStorm.
+
 ## 0.2.0
 ### Features and enhancements
 * There was no convenient visual indicator of when indexing failed, a label is now shown in the status bar if that is indeed the case.
