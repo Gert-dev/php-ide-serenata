@@ -573,6 +573,18 @@ class Parser
 
                 matchInfo.stop()
 
+            # Check if we can find an instanceof
+            regexInstanceof = ///if\s*\(\s*#{elementForRegex}\s+instanceof\s+(#{classRegexPart})\s*\)///g
+
+            editor.getBuffer().backwardsScanInRange regexInstanceof, [scanStartPosition, bufferPosition], (matchInfo) =>
+                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+
+                scanStartPosition = matchInfo.range.start
+
+                bestMatch = @determineFullClassName(editor, matchInfo.match[1])
+
+                matchInfo.stop()
+
             # Check if there is a funtion definition with a type hint for the variable.
             regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
 
