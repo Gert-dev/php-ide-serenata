@@ -521,6 +521,10 @@ class Parser
             if lineNumber == bufferPosition.row
                 line = line.substr(0, bufferPosition.column)
 
+            if line.length == 0
+                --lineNumber
+                continue
+
             chain = editor.scopeDescriptorForBufferPosition([lineNumber, line.length]).getScopeChain()
 
             # Annotations in comments can optionally override the variable type.
