@@ -290,7 +290,7 @@ describe "getVariableType", ->
 
             try {
 
-            } catch (\EXPECTED\\TYPE_1 $test) {
+            } catch (EXPECTED\\TYPE_1 $test) {
 
             }
             """
