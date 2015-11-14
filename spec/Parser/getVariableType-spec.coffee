@@ -280,3 +280,28 @@ describe "getVariableType", ->
             column : column
 
         expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
+    it "correctly returns the last type of a variable who's type changes over time.", ->
+        source =
+            """
+            <?php
+
+            $test = new \\EXPECTED_TYPE\\WRONG_TYPE();
+
+            try {
+
+            } catch (\EXPECTED\\TYPE_1 $test) {
+
+            }
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
