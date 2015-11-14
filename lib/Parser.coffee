@@ -591,9 +591,6 @@ class Parser
 
             matchInfo.stop()
 
-        # TODO: We should probably not be using [0, 0] as position, but we should be using getFunctionScopeListAt
-        # instead. This also wasn't supported before, so we can add that later on as an enhancement.
-
         if not bestMatch and name == '$this'
             bestMatch = @determineFullClassName(editor)
 
