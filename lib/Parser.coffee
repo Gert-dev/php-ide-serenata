@@ -671,6 +671,10 @@ class Parser
                     className = functions[functionName].args.return.type
 
             if not className
+                if ///^function\s*\(///.test(firstElement)
+                    className = '\\Closure'
+
+            if not className
                 # Check if this is a new instance of a class.
                 matches = firstElement.match(///^new\s+(#{classRegexPart})(?:\(\))?///)
 

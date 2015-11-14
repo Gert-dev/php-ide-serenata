@@ -316,10 +316,6 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         name: 'EXPECTED_TYPE'
                     }
-
-
-            # autocomplete: (className, element) ->
-                # return {name: 'EXPECTED_TYPE'} if className == '\\DateTime' and element == ''
         }
 
         parser = new Parser(proxyMock)
@@ -332,6 +328,48 @@ describe "getResultingTypeFromCallStack", ->
             column : column
 
         expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['global_function()', ''])).toEqual('EXPECTED_TYPE')
+
+    it "correctly deals with closures.", ->
+        source =
+            """
+            <?php
+
+            $var = function () {
+
+            };
+
+            $var->bindTo();
+            """
+
+        editor.setText(source)
+
+        proxyMock = {
+            getGlobalFunctions: () ->
+                return []
+
+            getClassInfo: (className) ->
+                if className == '\\Closure'
+                    return {
+                        name: '\\Closure'
+
+                        methods:
+                            bindTo:
+                                args:
+                                    return:
+                                        resolvedType: '\\Closure'
+                    }
+        }
+
+        parser = new Parser(proxyMock)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['$var', 'bindTo()'])).toEqual('\\Closure')
 
     it "correctly deals with new instances of classes.", ->
         source =

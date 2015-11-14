@@ -1,11 +1,21 @@
 ## 0.3.0
 ### Features and enhancements
-* If statements that have (only) an 'instanceof' of a variable in them will now be used to deduce the type of a variable. (More complex if statements will, at least for now, not be picked up.) For example:
+* If statements that have (only) an 'instanceof' of a variable in them will now be used to deduce the type of a variable. (More complex if statements will, at least for now, not be picked up.) For example (when using php-integrator-autocomplete-plus):
 
 ```php
 if ($foo instanceof Foo) {
     $foo-> // Autocompletion for Foo will be shown.
 }
+```
+
+* Closures will now receive autocompletion, for example (when using php-integrator-autocomplete-plus):
+
+```php
+$foo = function () {
+
+};
+
+$foo-> // Autocompletion for Closure, listing bind and bindTo.
 ```
 
 ### Bugs fixed
