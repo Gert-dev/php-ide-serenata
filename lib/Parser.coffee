@@ -219,9 +219,13 @@ class Parser
 
             break if currentScopeFunctionStart?
 
+        beganInFunction = false
 
         if not currentScopeFunctionStart?
             currentScopeFunctionStart = new Point(0, 0)
+
+        else
+            beganInFunction = true
 
         # Now start scanning the range to find the actual scopes.
         ranges = []
@@ -267,6 +271,9 @@ class Parser
                             isInFunction = false
 
         ranges.push(new Range(lastStart, bufferPosition))
+
+        if beganInFunction
+            ranges[0].start.column -= 'function'.length
 
         return ranges
 

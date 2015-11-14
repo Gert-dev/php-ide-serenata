@@ -76,7 +76,7 @@ describe "getFunctionScopeListAt", ->
             column: 0
 
         expectedResult = [
-            new Range(new Point(2, 8), bufferPosition)
+            new Range(new Point(2, 0), bufferPosition)
         ]
 
         expect(parser.getFunctionScopeListAt(editor, bufferPosition)).toEqual(expectedResult)
@@ -103,7 +103,7 @@ describe "getFunctionScopeListAt", ->
             column: 0
 
         expectedResult = [
-            new Range(new Point(2, 8), new Point(4, 15)),
+            new Range(new Point(2, 0), new Point(4, 15)),
             new Range(new Point(6, 4), bufferPosition)
         ]
 
