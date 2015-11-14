@@ -1,9 +1,16 @@
 ## 0.3.0
 ### Features and enhancements
-* None so far.
+* If statements that have (only) an 'instanceof' of a variable in them will now be used to deduce the type of a variable. (More complex if statements will, at least for now, not be picked up.) For example:
+
+```php
+if ($foo instanceof Foo) {
+    $foo-> // Autocompletion for Foo will be shown.
+}
+```
 
 ### Bugs fixed
 * Types of variables that had their assigned values spread over multiple lines will now correctly have their type deduced.
+* Only the relevant scopes will now be searched for the type of variables, previously all code was examined, even code outside the current scope.
 * Support for the short annotation style, `/** @var FooClass */`, was dropped. The reason for this is that it's not supported by any IDE and is very specific to this package. It's also completely inflexible because it needs to be directly above the last assignment or other type deduction (such as a catch block) for it to be picked up incorrectly. The other annotation styles have none of these restrictions and also work in IDE's such as PHPStorm.
 
 ## 0.2.0
