@@ -23,7 +23,6 @@ Currently the following is required in order to get the package up and running:
     * (Type hints in functions and methods will also be checked.)
   * You can also use comment-style type hints to override automatically deduced types or specify the type if the type can't be deduced automatically with...
     * ... IntellJ-style variable annotations `/** @var MyType $var */` as well as `/** @var $var MyType */`.
-    * ... shortcut variable annotations (must appear right above the respective variable) `/** @var MyType */`.
 
 Some features may or may not work outside these restrictions. For example, Composer is primarily used for its classmap and autoloading, so it may be possible to get everything working with another autoloading script and class map file. The wiki has more information about this. Reflection is used to fetch information about classes.
 
