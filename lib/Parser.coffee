@@ -546,7 +546,7 @@ class Parser
             editor.getBuffer().backwardsScanInRange regexAssignment, [scanStartPosition, bufferPosition], (matchInfo) =>
                 return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
-                scanStartPosition = matchInfo.range.start
+                scanStartPosition = matchInfo.range.end
 
                 elements = @retrieveSanitizedCallStack(matchInfo.match[1])
 
@@ -567,7 +567,7 @@ class Parser
             editor.getBuffer().backwardsScanInRange regexCatch, [scanStartPosition, bufferPosition], (matchInfo) =>
                 return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
-                scanStartPosition = matchInfo.range.start
+                scanStartPosition = matchInfo.range.end
 
                 bestMatch = @determineFullClassName(editor, matchInfo.match[1])
 
@@ -579,7 +579,7 @@ class Parser
             editor.getBuffer().backwardsScanInRange regexInstanceof, [scanStartPosition, bufferPosition], (matchInfo) =>
                 return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
-                scanStartPosition = matchInfo.range.start
+                scanStartPosition = matchInfo.range.end
 
                 bestMatch = @determineFullClassName(editor, matchInfo.match[1])
 
@@ -591,7 +591,7 @@ class Parser
             editor.getBuffer().backwardsScanInRange regexFunction, [scanStartPosition, bufferPosition], (matchInfo) =>
                 return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
-                scanStartPosition = matchInfo.range.start
+                scanStartPosition = matchInfo.range.end
 
                 typeHint = matchInfo.match[2]
 
