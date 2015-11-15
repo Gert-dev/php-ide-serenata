@@ -29,7 +29,6 @@ describe "getVariableType", ->
                                 '$test2':
                                     type: 'TYPE_2'
 
-
                         bar:
                             return:
                                 resolvedType: 'EXPECTED\\TYPE_1'
@@ -347,6 +346,28 @@ describe "getVariableType", ->
             } catch (EXPECTED\\TYPE_1 $test) {
 
             }
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
+    it "correctly returns the type of a variable who's assigned to a member from itself and doesn't get stuck in an infinite loop.", ->
+        source =
+            """
+            <?php
+
+            $test = new EXPECTED\\TYPE_1();
+            $test = $test->bar();
+
+            //
             """
 
         editor.setText(source)

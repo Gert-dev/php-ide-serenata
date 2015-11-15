@@ -553,7 +553,7 @@ class Parser
                 # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
                 # don't recognize the class name is irrelevant.
                 try
-                    bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.end, elements)
+                    bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.start, elements)
 
                 catch error
                     bestMatch = null
