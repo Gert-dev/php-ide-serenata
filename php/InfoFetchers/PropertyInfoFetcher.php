@@ -20,8 +20,8 @@ class PropertyInfoFetcher implements InfoFetcherInterface
      *
      * @return array
      */
-   protected function getDocumentation(ReflectionProperty $property)
-   {
+    protected function getDocumentation(ReflectionProperty $property)
+    {
        $parser = new DocParser();
        $docComment = $property->getDocComment() ?: '';
 
@@ -52,7 +52,40 @@ class PropertyInfoFetcher implements InfoFetcherInterface
        }
 
        return $docParseResult;
-   }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createDefaultInfo(array $options)
+    {
+       $data = array_merge([
+           'name'               => null,
+           'isMethod'           => false,
+           'isProperty'         => true,
+           'isPublic'           => true,
+           'isProtected'        => false,
+           'isPrivate'          => false,
+           'isStatic'           => false,
+           'override'           => false,
+           'declaringClass'     => null,
+           'declaringStructure' => null,
+
+           'deprecated'         => false,
+           'descriptions'       => [
+               'short' => null,
+               'long'  => null
+           ],
+           'return'             => [
+               'type'        => null,
+               'description' => null
+           ]
+       ], $options);
+
+        $data['return']['resolvedType'] = $this->determineFullReturnType($data);
+
+        return $data;
+    }
 
     /**
      * Retrieves a data structure containing information about the specified property.

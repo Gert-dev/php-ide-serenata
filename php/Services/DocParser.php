@@ -7,15 +7,20 @@ namespace PhpIntegrator;
  */
 class DocParser
 {
-    const RETURN_VALUE = '@return';
-    const PARAM_TYPE = '@param';
-    const VAR_TYPE = '@var';
-    const DEPRECATED = '@deprecated';
-    const THROWS = '@throws';
-    const DESCRIPTION = 'description';
-    const INHERITDOC = '{@inheritDoc}';
+    const VAR_TYPE        = '@var';
+    const PARAM_TYPE      = '@param';
+    const THROWS          = '@throws';
+    const RETURN_VALUE    = '@return';
+    const DEPRECATED      = '@deprecated';
 
-    const TYPE_SPLITTER = '|';
+    const PROPERTY        = '@property';
+    const PROPERTY_READ   = '@property-read';
+    const PROPERTY_WRITE  = '@property-write';
+
+    const DESCRIPTION     = 'description';
+    const INHERITDOC      = '{@inheritDoc}';
+
+    const TYPE_SPLITTER   = '|';
     const TAG_START_REGEX = '/^\s*\*\s*\@[^@]+$/';
 
     /**
@@ -98,7 +103,11 @@ class DocParser
             static::VAR_TYPE     => 'filterVar',
             static::DEPRECATED   => 'filterDeprecated',
             static::THROWS       => 'filterThrows',
-            static::DESCRIPTION  => 'filterDescription'
+            static::DESCRIPTION  => 'filterDescription',
+
+            static::PROPERTY       => 'filterProperty',
+            static::PROPERTY_READ  => 'filterPropertyRead',
+            static::PROPERTY_WRITE => 'filterPropertyWrite'
         ];
 
         foreach ($filters as $filter) {
@@ -278,6 +287,93 @@ class DocParser
 
         return [
             'throws' => $throws
+        ];
+    }
+
+    /**
+     * Filters out information about the magic properties of a class.
+     *
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterProperty($docblock, $methodName, array $tags)
+    {
+        $properties = [];
+
+        if (isset($tags[static::PROPERTY])) {
+            foreach ($tags[static::PROPERTY] as $tag) {
+                list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
+
+                $properties[$variableName] = [
+                    'type'        => $type,
+                    'description' => $description
+                ];
+            }
+        }
+
+        return [
+            'properties' => $properties
+        ];
+    }
+
+    /**
+     * Filters out information about the magic properties of a class.
+     *
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterPropertyRead($docblock, $methodName, array $tags)
+    {
+        $properties = [];
+
+        if (isset($tags[static::PROPERTY_READ])) {
+            foreach ($tags[static::PROPERTY_READ] as $tag) {
+                list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
+
+                $properties[$variableName] = [
+                    'type'        => $type,
+                    'description' => $description
+                ];
+            }
+        }
+
+        return [
+            'propertiesReadOnly' => $properties
+        ];
+    }
+
+    /**
+     * Filters out information about the magic properties of a class.
+     *
+     * @param string $docblock
+     * @param string $methodName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterPropertyWrite($docblock, $methodName, array $tags)
+    {
+        $properties = [];
+
+        if (isset($tags[static::PROPERTY_WRITE])) {
+            foreach ($tags[static::PROPERTY_WRITE] as $tag) {
+                list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
+
+                $properties[$variableName] = [
+                    'type'        => $type,
+                    'description' => $description
+                ];
+            }
+        }
+
+        return [
+            'propertiesWriteOnly' => $properties
         ];
     }
 

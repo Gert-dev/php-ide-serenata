@@ -2,6 +2,7 @@
 
 namespace PhpIntegrator;
 
+use Reflection;
 use ReflectionClass;
 
 /**
@@ -77,8 +78,73 @@ class ClassInfoFetcher implements InfoFetcherInterface
 
         return $parser->parse($docComment, [
             DocParser::DEPRECATED,
-            DocParser::DESCRIPTION
+            DocParser::DESCRIPTION,
+            DocParser::PROPERTY,
+            DocParser::PROPERTY_READ,
+            DocParser::PROPERTY_WRITE
         ], $class->getShortName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createDefaultInfo(array $options)
+    {
+        throw new \LogicException("Not implemented yet!");
+    }
+
+    /**
+     * Retrieves information about magic members (properties and methods).
+     *
+     * @param ReflectionClass $class
+     *
+     * @return array
+     */
+    protected function getMagicMembers(ReflectionClass $class)
+    {
+        $data = [];
+
+        $fillClosure = function (ReflectionClass $class, $key, array $list) use (&$data) {
+            if (!isset($data[$key])) {
+                $data[$key] = [];
+            }
+
+            $declaringClass = [
+                'name'      => $class->getName(),
+                'filename'  => $class->getFilename(),
+                'startLine' => null
+            ];
+
+            foreach ($list as $magicPropertyName => $magicPropertyData) {
+                $data[$key][$magicPropertyName] = $this->propertyFetcher->createDefaultInfo([
+                    'name'               => mb_substr($magicPropertyName, 1),
+                    'descriptions'       => ['short' => $magicPropertyData['description']],
+                    'return'             => ['type'  => $magicPropertyData['type']],
+                    'declaringClass'     => $declaringClass,
+                    'declaringStructure' => $declaringClass
+                ]);
+            }
+        };
+
+        foreach ($class->getInterfaces() as $interface) {
+            $documentation = $this->getDocumentation($interface);
+
+            $fillClosure($interface, 'properties', $documentation['properties']);
+            $fillClosure($interface, 'propertiesReadOnly', $documentation['propertiesReadOnly']);
+            $fillClosure($interface, 'propertiesWriteOnly', $documentation['propertiesWriteOnly']);
+        }
+
+        do {
+            $documentation = $this->getDocumentation($class);
+
+            $fillClosure($class, 'properties', $documentation['properties']);
+            $fillClosure($class, 'propertiesReadOnly', $documentation['propertiesReadOnly']);
+            $fillClosure($class, 'propertiesWriteOnly', $documentation['propertiesWriteOnly']);
+
+            $class = $class->getParentClass();
+        } while ($class);
+
+        return $data;
     }
 
     /**
@@ -111,8 +177,18 @@ class ClassInfoFetcher implements InfoFetcherInterface
             'descriptions' => $documentation['descriptions'],
             'properties'   => [],
             'methods'      => [],
-            'constants'    => [],
+            'constants'    => []
         ];
+
+        $magicMembers = $this->getMagicMembers($class);
+
+        $data['properties'] = array_merge(
+            $magicMembers['properties'],
+            $magicMembers['propertiesReadOnly'],
+            $magicMembers['propertiesWriteOnly']
+        );
+
+        // TODO: Also implement magic methods.
 
         foreach ($class->getMethods() as $method) {
             $data['methods'][$method->getName()] = $this->methodFetcher->getInfo($method);

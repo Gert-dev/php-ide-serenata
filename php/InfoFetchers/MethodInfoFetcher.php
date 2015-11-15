@@ -42,6 +42,14 @@ class MethodInfoFetcher extends FunctionInfoFetcher implements InfoFetcherInterf
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function createDefaultInfo(array $options)
+    {
+        throw new \LogicException("Not implemented yet!");
+    }
+
+    /**
      * Retrieves a data structure containing information about the specified method, expanding upon
      * {@see getFunctionInfo} to provide additional information.
      *

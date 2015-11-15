@@ -113,6 +113,14 @@ class FunctionInfoFetcher implements InfoFetcherInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function createDefaultInfo(array $options)
+    {
+        throw new \LogicException("Not implemented yet!");
+    }
+
+    /**
      * Retrieves a data structure containing information about the specified function (or method).
      *
      * @param ReflectionFunctionAbstract $function
