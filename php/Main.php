@@ -8,8 +8,8 @@ ErrorHandler::register();
 
 require_once(__DIR__ . '/Config.php');
 
-require_once(__DIR__ . '/services/DocParser.php');
-require_once(__DIR__ . '/services/FileParser.php');
+require_once(__DIR__ . '/Services/DocParser.php');
+require_once(__DIR__ . '/Services/FileParser.php');
 
 require_once(__DIR__ . '/InfoFetchers/InfoFetcherInterface.php');
 require_once(__DIR__ . '/InfoFetchers/FetcherInfoTrait.php');
@@ -20,12 +20,12 @@ require_once(__DIR__ . '/InfoFetchers/FunctionInfoFetcher.php');
 require_once(__DIR__ . '/InfoFetchers/MethodInfoFetcher.php');
 require_once(__DIR__ . '/InfoFetchers/PropertyInfoFetcher.php');
 
-require_once(__DIR__ . '/providers/ProviderInterface.php');
-require_once(__DIR__ . '/providers/ClassInfoProvider.php');
-require_once(__DIR__ . '/providers/ClassListProvider.php');
-require_once(__DIR__ . '/providers/ConstantsProvider.php');
-require_once(__DIR__ . '/providers/FunctionsProvider.php');
-require_once(__DIR__ . '/providers/ReindexProvider.php');
+require_once(__DIR__ . '/Providers/ProviderInterface.php');
+require_once(__DIR__ . '/Providers/ClassInfoProvider.php');
+require_once(__DIR__ . '/Providers/ClassListProvider.php');
+require_once(__DIR__ . '/Providers/ConstantsProvider.php');
+require_once(__DIR__ . '/Providers/FunctionsProvider.php');
+require_once(__DIR__ . '/Providers/ReindexProvider.php');
 
 $commands = [
     '--class-list'   => 'PhpIntegrator\ClassListProvider',
