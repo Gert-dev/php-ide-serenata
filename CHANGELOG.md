@@ -1,5 +1,6 @@
 ## 0.3.0
 ### Features and enhancements
+* Performance in general should be improved as the same parsing operations are now cached as often as possible.
 * If statements that have (only) an 'instanceof' of a variable in them will now be used to deduce the type of a variable. (More complex if statements will, at least for now, not be picked up.) For example (when using php-integrator-autocomplete-plus):
 
 ```php
