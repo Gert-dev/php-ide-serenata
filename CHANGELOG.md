@@ -19,6 +19,18 @@ $foo = function () {
 $foo-> // Autocompletion for Closure, listing bind and bindTo.
 ```
 
+* Added support for parsing magic properties for classes, which will now also be returned (property-read and property-write are also returned):
+
+```php
+/**
+ * @property Foo $someProperty A description.
+ */
+class MyClass
+{
+
+}
+```
+
 ### Bugs fixed
 * Docblock parameters weren't being analyzed for deducing the type of local variables when in a global function.
 * Types of variables that had their assigned values spread over multiple lines will now correctly have their type deduced.
