@@ -67,6 +67,8 @@ class MethodInfoFetcher extends FunctionInfoFetcher implements InfoFetcherInterf
             'override'           => $this->getOverrideInfo($method),
             'implementation'     => $this->getImplementationInfo($method),
 
+            'isMagic'            => false,
+
             'isPublic'           => $method->isPublic(),
             'isProtected'        => $method->isProtected(),
             'isPrivate'          => $method->isPrivate(),

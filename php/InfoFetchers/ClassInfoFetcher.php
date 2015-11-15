@@ -112,12 +112,19 @@ class ClassInfoFetcher implements InfoFetcherInterface
             $declaringClass = [
                 'name'      => $class->getName(),
                 'filename'  => $class->getFilename(),
-                'startLine' => null
+                'startLine' => $class->getStartLine()
             ];
 
             foreach ($list as $magicPropertyName => $magicPropertyData) {
-                $data[$key][$magicPropertyName] = $this->propertyFetcher->createDefaultInfo([
-                    'name'               => mb_substr($magicPropertyName, 1),
+                if ($magicPropertyName[0] == '$') {
+                    $actualName = mb_substr($magicPropertyName, 1);
+                } else {
+                    $actualName = $magicPropertyName;
+                }
+
+                $data[$key][$actualName] = $this->propertyFetcher->createDefaultInfo([
+                    'isMagic'            => true,
+                    'name'               => $actualName,
                     'descriptions'       => ['short' => $magicPropertyData['description']],
                     'return'             => ['type'  => $magicPropertyData['type']],
                     'declaringClass'     => $declaringClass,
