@@ -188,8 +188,6 @@ class ClassInfoFetcher implements InfoFetcherInterface
             $magicMembers['propertiesWriteOnly']
         );
 
-        // TODO: Also implement magic methods.
-
         foreach ($class->getMethods() as $method) {
             $data['methods'][$method->getName()] = $this->methodFetcher->getInfo($method);
         }
