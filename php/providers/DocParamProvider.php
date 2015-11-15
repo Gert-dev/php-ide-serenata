@@ -2,7 +2,10 @@
 
 namespace PhpIntegrator;
 
-class DocParamProvider extends Tools implements ProviderInterface
+/**
+ * Provides information about the docblock for a specific method.
+ */
+class DocParamProvider implements ProviderInterface
 {
     /**
      * {@inheritDoc}
@@ -12,15 +15,30 @@ class DocParamProvider extends Tools implements ProviderInterface
         $class = $args[0];
         $name  = $args[1];
 
-        if (strpos($class, '\\') == 0) {
-            $class = substr($class, 1);
+        if (mb_strpos($class, '\\') == 0) {
+            $class = mb_substr($class, 1);
         }
 
-        $parser = new DocParser();
+        // TODO: This provider is redundant, we can just fetch method information on the CoffeeScript side instead
+        // (which also translates to more caching).
+
+        $test = new ClassInfoProvider();
+        $response = $test->execute([$class]);
+
+        if ($response['success']) {
+            $info = $response['result'];
+
+            if (isset($info['methods'][$name])) {
+                return [
+                    'success' => true,
+                    'result'  => $info['methods'][$name]['docParameters']
+                ];
+            }
+        }
 
         return [
-            'success' => true,
-            'result'  => $parser->get($class, 'method', $name, [DocParser::PARAM_TYPE])
+            'success' => false,
+            'result'  => null
         ];
     }
 }

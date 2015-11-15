@@ -2,6 +2,9 @@
 
 namespace PhpIntegrator;
 
+/**
+ * Interface for providers.
+ */
 interface ProviderInterface
 {
     /**

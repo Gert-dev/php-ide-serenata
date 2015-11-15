@@ -2,22 +2,38 @@
 
 namespace PhpIntegrator;
 
-class ClassInfoProvider extends Tools implements ProviderInterface
+use ReflectionClass;
+
+class ClassInfoProvider implements ProviderInterface
 {
     /**
      * {@inheritDoc}
      */
     public function execute(array $args = [])
     {
-        $class = $args[0];
+        $className = $args[0];
 
-        if (mb_strpos($class, '\\') === 0) {
-            $class = substr($class, 1);
+        if (mb_strpos($className, '\\') === 0) {
+            $className = mb_substr($className, 1);
+        }
+
+        $classInfoFetcher = new ClassInfoFetcher(
+            new PropertyInfoFetcher(),
+            new MethodInfoFetcher(),
+            new ConstantInfoFetcher()
+        );
+
+        $reflectionClass = null;
+
+        try {
+            $reflectionClass = new ReflectionClass($className);
+        } catch (\Exception $e) {
+
         }
 
         return [
-            'success' => true,
-            'result'  => $this->getClassInfo($class)
+            'success' => !!$reflectionClass,
+            'result'  => $reflectionClass ? $classInfoFetcher->getInfo($reflectionClass) : null
         ];
     }
 }

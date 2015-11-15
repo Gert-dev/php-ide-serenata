@@ -2,7 +2,12 @@
 
 namespace PhpIntegrator;
 
-class FunctionsProvider extends Tools implements ProviderInterface
+use ReflectionFunction;
+
+/**
+ * Provides global functions. Class methods are not handled by this provider.
+ */
+class FunctionsProvider implements ProviderInterface
 {
     /**
      * {@inheritDoc}
@@ -12,16 +17,17 @@ class FunctionsProvider extends Tools implements ProviderInterface
         $result = [];
 
         $definedFunctions = get_defined_functions();
+        $functionInfoFetcher = new FunctionInfoFetcher();
 
         foreach ($definedFunctions as $group => $functions) {
             foreach ($functions as $functionName) {
                 try {
-                    $function = new \ReflectionFunction($functionName);
+                    $function = new ReflectionFunction($functionName);
                 } catch (\Exception $e) {
                     continue;
                 }
 
-                $result[$function->getName()] = $this->getFunctionInfo($function);
+                $result[$function->getName()] = $functionInfoFetcher->getInfo($function);
 
                 if ($group === 'internal') {
                     // PHP's built-in functions don't have docblocks, so per exception, this doesn't mean they return

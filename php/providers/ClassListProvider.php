@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator;
 
-class ClassListProvider extends Tools implements ProviderInterface
+class ClassListProvider implements ProviderInterface
 {
     /**
      * {@inheritDoc}
@@ -20,7 +20,7 @@ class ClassListProvider extends Tools implements ProviderInterface
             'success' => true,
             // If it evaluates to false, the class map hasn't been generated yet, don't error out as it can take a while
             // for it to be generated.
-            'result' => $index ?: []
+            'result'  => $index ?: []
         ];
     }
 }

@@ -2,7 +2,10 @@
 
 namespace PhpIntegrator;
 
-class ReindexProvider extends Tools implements ProviderInterface
+/**
+ * Provides functionality for reindexing (the class list).
+ */
+class ReindexProvider implements ProviderInterface
 {
     /**
      * @var ClassInfoProvider

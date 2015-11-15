@@ -8,9 +8,17 @@ ErrorHandler::register();
 
 require_once(__DIR__ . '/Config.php');
 
-require_once(__DIR__ . '/services/Tools.php');
 require_once(__DIR__ . '/services/DocParser.php');
 require_once(__DIR__ . '/services/FileParser.php');
+
+require_once(__DIR__ . '/InfoFetchers/InfoFetcherInterface.php');
+require_once(__DIR__ . '/InfoFetchers/FetcherInfoTrait.php');
+require_once(__DIR__ . '/InfoFetchers/MemberInfoFetcherTrait.php');
+require_once(__DIR__ . '/InfoFetchers/ClassInfoFetcher.php');
+require_once(__DIR__ . '/InfoFetchers/ConstantInfoFetcher.php');
+require_once(__DIR__ . '/InfoFetchers/FunctionInfoFetcher.php');
+require_once(__DIR__ . '/InfoFetchers/MethodInfoFetcher.php');
+require_once(__DIR__ . '/InfoFetchers/PropertyInfoFetcher.php');
 
 require_once(__DIR__ . '/providers/ProviderInterface.php');
 require_once(__DIR__ . '/providers/ClassInfoProvider.php');
