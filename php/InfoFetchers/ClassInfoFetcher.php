@@ -108,7 +108,10 @@ class ClassInfoFetcher implements InfoFetcherInterface
             'isInterface'  => $class->isInterface(),
             'parents'      => $this->getParentClasses($class),
             'deprecated'   => $documentation['deprecated'],
-            'descriptions' => $documentation['descriptions']
+            'descriptions' => $documentation['descriptions'],
+            'properties'   => [],
+            'methods'      => [],
+            'constants'    => [],
         ];
 
         foreach ($class->getMethods() as $method) {

@@ -229,9 +229,11 @@ class Service
      * @return {Object|null}
     ###
     getClassMethod: (className, name) ->
-        classInfo = @proxy.getClassInfo(className)
+        try
+            classInfo = @proxy.getClassInfo(className)
 
-        return if not classInfo or (classInfo.error? and classInfo.error != '')
+        catch
+            return null
 
         if name of classInfo.methods
             return classInfo.methods[name]
@@ -247,9 +249,11 @@ class Service
      * @return {Object|null}
     ###
     getClassProperty: (className, name) ->
-        classInfo = @proxy.getClassInfo(className)
+        try
+            classInfo = @proxy.getClassInfo(className)
 
-        return if not classInfo or (classInfo.error? and classInfo.error != '')
+        catch
+            return null
 
         if name of classInfo.properties
             return classInfo.properties[name]
@@ -265,9 +269,11 @@ class Service
      * @return {Object|null}
     ###
     getClassConstant: (className, name) ->
-        classInfo = @proxy.getClassInfo(className)
+        try
+            classInfo = @proxy.getClassInfo(className)
 
-        return if not classInfo or (classInfo.error? and classInfo.error != '')
+        catch
+            return null
 
         if name of classInfo.constants
             return classInfo.constants[name]

@@ -668,7 +668,7 @@ class Parser
                 functions = @proxy.getGlobalFunctions()
 
                 if functionName of functions
-                    className = functions[functionName].args.return.type
+                    className = functions[functionName].return.type
 
             if not className
                 if ///^function\s*\(///.test(firstElement)
@@ -715,13 +715,13 @@ class Parser
                 member = member.replace('()', '')
 
                 if member of info.methods
-                    return @proxy.getClassInfo(info.methods[member].args.return.resolvedType, async)
+                    return @proxy.getClassInfo(info.methods[member].return.resolvedType, async)
 
             else if member of info.properties
-                return @proxy.getClassInfo(info.properties[member].args.return.resolvedType, async)
+                return @proxy.getClassInfo(info.properties[member].return.resolvedType, async)
 
             else if member of info.constants
-                return @proxy.getClassInfo(info.constants[member].args.return.resolvedType, async)
+                return @proxy.getClassInfo(info.constants[member].return.resolvedType, async)
 
             return null
 
@@ -730,13 +730,13 @@ class Parser
                 member = member.replace('()', '')
 
                 if member of info.methods
-                    return @proxy.getClassInfo(info.methods[member].args.return.resolvedType, async)
+                    return @proxy.getClassInfo(info.methods[member].return.resolvedType, async)
 
             else if member of info.properties
-                return @proxy.getClassInfo(info.properties[member].args.return.resolvedType, async)
+                return @proxy.getClassInfo(info.properties[member].return.resolvedType, async)
 
             else if member of info.constants
-                return @proxy.getClassInfo(info.constants[member].args.return.resolvedType, async)
+                return @proxy.getClassInfo(info.constants[member].return.resolvedType, async)
 
             return new Promise (resolve, reject) ->
                 resolve(null)

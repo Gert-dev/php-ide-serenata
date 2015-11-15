@@ -25,9 +25,8 @@ describe "getVariableType", ->
                     name: 'EXPECTED\\TYPE_1'
                     methods:
                         bar:
-                            args:
-                                return:
-                                    resolvedType: 'EXPECTED\\TYPE_1'
+                            return:
+                                resolvedType: 'EXPECTED\\TYPE_1'
                 }
     }
 

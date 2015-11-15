@@ -37,9 +37,8 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         properties:
                             testProperty:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE'
                     }
 
                 else if className == 'EXPECTED_TYPE'
@@ -81,9 +80,8 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         properties:
                             testProperty:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE'
                     }
 
                 else if className == 'EXPECTED_TYPE'
@@ -125,9 +123,8 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         properties:
                             testProperty:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE'
                     }
 
                 else if className == 'EXPECTED_TYPE'
@@ -171,9 +168,8 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         properties:
                             testProperty:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE'
                     }
 
                 else if className == 'EXPECTED_TYPE'
@@ -219,9 +215,8 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         properties:
                             testProperty:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE'
                     }
 
                 else if className == 'EXPECTED_TYPE'
@@ -261,9 +256,8 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         properties:
                             testProperty:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE'
                     }
 
                 else if className == 'EXPECTED_TYPE'
@@ -297,9 +291,8 @@ describe "getResultingTypeFromCallStack", ->
             getGlobalFunctions: () ->
                 return {
                     global_function:
-                        args:
-                            return:
-                                type: '\\DateTime'
+                        return:
+                            type: '\\DateTime'
                 }
 
             getClassInfo: (className) ->
@@ -307,9 +300,8 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         properties:
                             '':
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE'
                     }
 
                 else if className == 'EXPECTED_TYPE'
@@ -354,9 +346,8 @@ describe "getResultingTypeFromCallStack", ->
 
                         methods:
                             bindTo:
-                                args:
-                                    return:
-                                        resolvedType: '\\Closure'
+                                return:
+                                    resolvedType: '\\Closure'
                     }
         }
 
@@ -390,9 +381,8 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         properties:
                             '':
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE'
                     }
 
                 else if className == 'EXPECTED_TYPE'
@@ -441,9 +431,8 @@ describe "getResultingTypeFromCallStack", ->
                         methods: {}
                         properties:
                             testProperty:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE_1'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE_1'
                     }
 
                 if className == 'EXPECTED_TYPE_1'
@@ -451,9 +440,8 @@ describe "getResultingTypeFromCallStack", ->
                         name: 'EXPECTED_TYPE_1'
                         methods:
                             aMethod:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE_2'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE_2'
                     }
 
                 if className == 'EXPECTED_TYPE_2'
@@ -463,9 +451,8 @@ describe "getResultingTypeFromCallStack", ->
 
                         properties:
                             anotherProperty:
-                                args:
-                                    return:
-                                        resolvedType: 'EXPECTED_TYPE_3'
+                                return:
+                                    resolvedType: 'EXPECTED_TYPE_3'
                     }
 
                 return {name: 'EXPECTED_TYPE_3'} if className == 'EXPECTED_TYPE_3'
