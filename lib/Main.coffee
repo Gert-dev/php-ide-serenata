@@ -2,12 +2,12 @@
 
 $ = require 'jquery'
 
-Parser           = require './Parser'
 Utility          = require './Utility'
 Service          = require './Service'
 AtomConfig       = require './AtomConfig'
-CachingProxy     = require './CachingProxy'
 ConfigTester     = require './ConfigTester'
+CachingProxy     = require './CachingProxy'
+CachingParser    = require './CachingParser'
 StatusBarManager = require "./Widgets/StatusBarManager"
 
 module.exports =
@@ -189,7 +189,7 @@ module.exports =
 
         proxy = new CachingProxy(@configuration)
 
-        parser = new Parser(proxy)
+        parser = new CachingParser(proxy)
 
         @service = new Service(proxy, parser)
 
@@ -220,7 +220,11 @@ module.exports =
                         path = path.substr(directory.path.length + 1)
                         break
 
-                @performIndex(classPath + Utility.normalizeSeparators(path))
+                filePath = classPath + Utility.normalizeSeparators(path)
+
+                parser.clearCache(filePath)
+
+                @performIndex(filePath)
 
     ###*
      * Deactivates the package.
