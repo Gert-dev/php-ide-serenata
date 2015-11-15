@@ -604,10 +604,21 @@ class Parser
                     # Can be empty for closures.
                     if functionName?.length > 0
                         try
-                            response = @proxy.getDocParams(@determineFullClassName(editor), functionName)
+                            currentClass = @determineFullClassName(editor)
 
-                            if response.params? and response.params[element]?
-                                bestMatch = @determineFullClassName(editor, response.params[element].type)
+                            functionInfo = null
+
+                            if currentClass
+                                response = @proxy.getClassInfo(currentClass)
+
+                                if (functionName of response.methods) and (element of response.methods[functionName].docParameters)
+                                    bestMatch = @determineFullClassName(editor, response.methods[functionName].docParameters[element].type)
+
+                            else
+                                response = @proxy.getGlobalFunctions()
+
+                                if (functionName of response) and (element of response[functionName].docParameters)
+                                    bestMatch = @determineFullClassName(editor, response[functionName].docParameters[element].type)
 
                         catch error
                             # This data isn't useful.

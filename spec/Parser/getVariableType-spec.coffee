@@ -6,24 +6,30 @@ describe "getVariableType", ->
 
     proxyMock = {
         getGlobalFunctions: () ->
-            return {}
-
-        getDocParams: (className, funcName) ->
-            if className == null and funcName == 'foo'
-                return {
-                    params:
+            return {
+                foo:
+                    docParameters:
                         '$test1':
                             type: 'EXPECTED\\TYPE_1'
 
                         '$test2':
                             type: 'EXPECTED\\TYPE_2'
-                }
+            }
 
         getClassInfo: (className, element) ->
             if className == 'EXPECTED\\TYPE_1'
                 return {
                     name: 'EXPECTED\\TYPE_1'
                     methods:
+                        foo:
+                            docParameters:
+                                '$test1':
+                                    type: 'TYPE_1'
+
+                                '$test2':
+                                    type: 'TYPE_2'
+
+
                         bar:
                             return:
                                 resolvedType: 'EXPECTED\\TYPE_1'
@@ -250,6 +256,34 @@ describe "getVariableType", ->
         editor.setText(source)
 
         row = editor.getLineCount() - 2
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test1')).toEqual('EXPECTED\\TYPE_1')
+        expect(parser.getVariableType(editor, bufferPosition, '$test2')).toEqual('EXPECTED\\TYPE_2')
+
+    it "correctly returns the type of a variable through the method's docblock.", ->
+        source =
+            """
+            <?php
+
+            namespace EXPECTED;
+
+            class TYPE_1
+            {
+                function foo($test1, $test2)
+                {
+                    //
+                }
+            }
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 3
         column = editor.getBuffer().lineLengthForRow(row)
 
         bufferPosition =

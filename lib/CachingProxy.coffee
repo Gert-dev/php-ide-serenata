@@ -79,12 +79,6 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    getDocParams: (className, functionName, async = false) ->
-        return @wrapCachedRequestToParent("getDocParams-#{className}-#{functionName}", 'getDocParams', arguments, async)
-
-    ###*
-     * @inherited
-    ###
     reindex: (filename) ->
         return super(filename).then (output) =>
             @clearCache()

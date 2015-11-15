@@ -87,18 +87,6 @@ class Service
         return @proxy.getClassInfo(className, async)
 
     ###*
-     * Returns information about parameters described in the docblock for the given method in the given class.
-     *
-     * @param {string}  className
-     * @param {string}  name
-     * @param {boolean} async
-     *
-     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
-    ###
-    getDocParams: (className, name, async = false) ->
-        return @proxy.getDocParams(className, name, async)
-
-    ###*
      * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
      * projects!). This method is asynchronous and will return immediately.
      *

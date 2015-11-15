@@ -19,12 +19,14 @@ $foo-> // Autocompletion for Closure, listing bind and bindTo.
 ```
 
 ### Bugs fixed
+* Docblock parameters weren't being analyzed for deducing the type of local variables when in a global function.
 * Types of variables that had their assigned values spread over multiple lines will now correctly have their type deduced.
 * Only the relevant scopes will now be searched for the type of variables, previously all code was examined, even code outside the current scope.
 * Support for the short annotation style, `/** @var FooClass */`, was dropped. The reason for this is that it's not supported by any IDE and is very specific to this package. It's also completely inflexible because it needs to be directly above the last assignment or other type deduction (such as a catch block) for it to be picked up incorrectly. The other annotation styles have none of these restrictions and also work in IDE's such as PHPStorm.
 
 ### Changes for developers
 * Changes to the service
+  * The `getDocParams` method has been removed. It was obsolete as the same information is already returned by `getClassInfo`. Also more caches can be reused by using `getClassInfo`.
   * Data returned about methods, constants, functions and structures will no longer have an 'args' property containing information such as descriptions. Instead these were moved up one level (in other words you can just replace the `.args.property` with just `.property` everywhere). It wasn't clear what exactly belonged in `args` and what didn't, hence its entire removal.
 
 ## 0.2.0

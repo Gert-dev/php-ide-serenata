@@ -141,19 +141,6 @@ class Proxy
         return @performRequest(@getFirstProjectDirectory(), ['--class-info', className], async)
 
     ###*
-     * Returns information about parameters described in the docblock for the given method in the given class.
-     *
-     * @param {string} className
-     * @param {string} name
-     *
-     * @param {boolean} async
-     *
-     * @return {Promise|Object}
-    ###
-    getDocParams: (className, name, async = false) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--doc-params', className, name], async)
-
-    ###*
      * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
      * projects!). This method is asynchronous and will return immediately.
      *

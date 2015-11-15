@@ -26,15 +26,13 @@ require_once(__DIR__ . '/providers/ClassListProvider.php');
 require_once(__DIR__ . '/providers/ConstantsProvider.php');
 require_once(__DIR__ . '/providers/FunctionsProvider.php');
 require_once(__DIR__ . '/providers/ReindexProvider.php');
-require_once(__DIR__ . '/providers/DocParamProvider.php');
 
 $commands = [
     '--class-list'   => 'PhpIntegrator\ClassListProvider',
     '--class-info'   => 'PhpIntegrator\ClassInfoProvider',
     '--functions'    => 'PhpIntegrator\FunctionsProvider',
     '--constants'    => 'PhpIntegrator\ConstantsProvider',
-    '--reindex'      => 'PhpIntegrator\ReindexProvider',
-    '--doc-params'   => 'PhpIntegrator\DocParamProvider'
+    '--reindex'      => 'PhpIntegrator\ReindexProvider'
 ];
 
 // NOTE: This is explicitly not a global function so it doesn't end up in the items returned by FunctionProvider.
