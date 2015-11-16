@@ -666,30 +666,25 @@ class Parser
             if currentClassInfo.parents.length > 0
                 className = currentClassInfo.parents[0]
 
+        else if ///^function\s*\(///.test(firstElement)
+            className = '\\Closure'
+
+        else if (matches = firstElement.match(///^new\s+(#{classRegexPart})(?:\(\))?///))
+            className = @determineFullClassName(editor, matches[1])
+
+        else if (matches = firstElement.match(/^(.*?)\(\)$/))
+            # Global PHP function.
+            functions = @proxy.getGlobalFunctions()
+
+            if matches[1] of functions
+                className = functions[matches[1]].return.type
+
+        else if ///#{classRegexPart}///.test(firstElement)
+            # Static class name.
+            className = @determineFullClassName(editor, firstElement)
+
         else
-            # Check if this is perhaps a PHP global function.
-            matches = firstElement.match(/^(.*?)\(\)$/)
-
-            if matches
-                functionName = matches[1]
-                functions = @proxy.getGlobalFunctions()
-
-                if functionName of functions
-                    className = functions[functionName].return.type
-
-            if not className
-                if ///^function\s*\(///.test(firstElement)
-                    className = '\\Closure'
-
-            if not className
-                # Check if this is a new instance of a class.
-                matches = firstElement.match(///^new\s+(#{classRegexPart})(?:\(\))?///)
-
-                if matches
-                    firstElement = matches[1]
-
-                # This is probably a static class name.
-                className = @determineFullClassName(editor, firstElement)
+            className = null # No idea what this is.
 
         return null if not className
 
