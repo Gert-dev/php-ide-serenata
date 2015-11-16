@@ -49,25 +49,17 @@ class Parser
     ###
     getAvailableVariables: (editor, bufferPosition) ->
         matches = {}
-        thisFound = false
 
         scopeList = @getFunctionScopeListAt(editor, bufferPosition).reverse()
 
         for range in scopeList
             editor.getBuffer().backwardsScanInRange /(\$[a-zA-Z_][a-zA-Z0-9_]*)/g, range, (matchInfo) =>
-                if matchInfo.matchText == '$this'
-                    thisFound = true
-
                 if matchInfo.matchText not of matches
                     matches[matchInfo.matchText] =
                         name : matchInfo.matchText
                         type : @getVariableType(editor, bufferPosition, matchInfo.matchText)
 
-
-        # If the row and column equal 0, 0, the scope is at the start of the file, hence we're not in a function.
-        # NOTE: Commented out as this can never be fool proof anyway, when not in a function we can still be in a file
-        # that has a '$this' variable if it is included via a class.
-        if not thisFound #and scopeList.length > 0 and not (scopeList[0].start.row == 0 and scopeList[0].start.column == 0)
+        if '$this' not of matches
             matches['$this'] =
                 name : '$this'
                 type : @getVariableType(editor, bufferPosition, '$this')
