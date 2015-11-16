@@ -468,3 +468,25 @@ describe "getResultingTypeFromCallStack", ->
             column : column
 
         expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['$this', 'testProperty', 'aMethod()', 'anotherProperty'])).toEqual('EXPECTED_TYPE_3')
+
+    it "correctly detects basic types.", ->
+        parser = new Parser({})
+
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['5'])).toEqual('int')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['05'])).toEqual('int')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['0x5'])).toEqual('int')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['5.5'])).toEqual('float')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['true'])).toEqual('bool')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['false'])).toEqual('bool')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['"test"'])).toEqual('string')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['\'test\''])).toEqual('string')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['[$test1, function() {}]'])).toEqual('array')
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['array($test1, function())'])).toEqual('array')
+
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['"
+            test
+        "'])).toEqual('string')
+
+        expect(parser.getResultingTypeFromCallStack(editor, [0, 0], ['\'
+            test
+        \''])).toEqual('string')

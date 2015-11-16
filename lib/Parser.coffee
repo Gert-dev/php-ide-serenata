@@ -666,7 +666,28 @@ class Parser
             if currentClassInfo.parents.length > 0
                 className = currentClassInfo.parents[0]
 
-        else if ///^function\s*\(///.test(firstElement)
+        else if firstElement[0] == '['
+            className = 'array'
+
+        else if /^(0x)?\d+$/.test(firstElement)
+            className = 'int'
+
+        else if /^\d+.\d+$/.test(firstElement)
+            className = 'float'
+
+        else if /^(true|false)$/.test(firstElement)
+            className = 'bool'
+
+        else if /^"(.|\n)*"$/.test(firstElement)
+            className = 'string'
+
+        else if /^'(.|\n)*'$/.test(firstElement)
+            className = 'string'
+
+        else if /^array\s*\(/.test(firstElement)
+            className = 'array'
+
+        else if /^function\s*\(/.test(firstElement)
             className = '\\Closure'
 
         else if (matches = firstElement.match(///^new\s+(#{classRegexPart})(?:\(\))?///))
