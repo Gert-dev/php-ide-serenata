@@ -656,10 +656,6 @@ class Parser
         if firstElement[0] == '$'
             className = @getVariableType(editor, bufferPosition, firstElement)
 
-            # NOTE: The type of $this can also be overridden locally by a docblock.
-            if firstElement == '$this' and not className
-                className = @determineFullClassName(editor)
-
         else if firstElement == 'static' or firstElement == 'self'
             className = @determineFullClassName(editor)
 
