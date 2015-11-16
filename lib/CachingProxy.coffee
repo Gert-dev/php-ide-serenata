@@ -37,12 +37,12 @@ class CachingProxy extends Proxy
     ###
     wrapCachedRequestToParent: (cacheKey, parentMethodName, parameters, async) ->
         if not async
-            if not @cache[cacheKey]?
+            if cacheKey not of @cache
                 @cache[cacheKey] = CachingProxy.__super__[parentMethodName].apply(this, parameters)
 
             return @cache[cacheKey]
 
-        else if @cache[cacheKey]?
+        else if cacheKey not of @cache
             return new Promise (resolve, reject) =>
                 resolve(@cache[cacheKey])
 
