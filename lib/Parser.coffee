@@ -51,10 +51,10 @@ class Parser
         matches = {}
         thisFound = false
 
-        scopeList = @getFunctionScopeListAt(editor, bufferPosition)
+        scopeList = @getFunctionScopeListAt(editor, bufferPosition).reverse()
 
         for range in scopeList
-            editor.getBuffer().backwardsScanInRange /(\$[a-zA-Z0-9_]+)/g, range, (matchInfo) =>
+            editor.getBuffer().backwardsScanInRange /(\$[a-zA-Z_][a-zA-Z0-9_]*)/g, range, (matchInfo) =>
                 if matchInfo.matchText == '$this'
                     thisFound = true
 

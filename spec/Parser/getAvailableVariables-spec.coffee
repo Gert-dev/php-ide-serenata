@@ -60,9 +60,9 @@ describe "getAvailableVariables", ->
             column: 0
 
         expectedResult = [
-            '$var1'
-            '$var2'
             '$var3'
+            '$var2'
+            '$var1'
             '$this'
         ]
 
