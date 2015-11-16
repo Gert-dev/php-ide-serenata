@@ -1,6 +1,16 @@
 ## 0.3.0
 ### Features and enhancements
 * Performance in general should be improved as the same parsing operations are now cached as often as possible.
+* Types of variables that are assigned to basic type expressions will now be deduced properly instead of just having the expression as type:
+
+```php
+$var = 5;    // $var = int
+$var = 5.0;  // $var = float
+$var = true; // $var = bool
+$var = "";   // $var = string
+$var = [];   // $var = array
+```
+
 * If statements that have (only) an 'instanceof' of a variable in them will now be used to deduce the type of a variable. (More complex if statements will, at least for now, not be picked up.) For example (when using php-integrator-autocomplete-plus):
 
 ```php
