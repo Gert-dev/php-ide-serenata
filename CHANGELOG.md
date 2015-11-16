@@ -45,6 +45,7 @@ class MyClass
 * Docblock parameters weren't being analyzed for deducing the type of local variables when in a global function.
 * Types of variables that had their assigned values spread over multiple lines will now correctly have their type deduced.
 * Only the relevant scopes will now be searched for the type of variables, previously all code was examined, even code outside the current scope.
+* The wrong type was sometimes shown for variables as their type was determined at the point they were found instead of the point at which they were requested.
 * Support for the short annotation style, `/** @var FooClass */`, was dropped. The reason for this is that it's not supported by any IDE and is very specific to this package. It's also completely inflexible because it needs to be directly above the last assignment or other type deduction (such as a catch block) for it to be picked up incorrectly. The other annotation styles have none of these restrictions and also work in IDE's such as PHPStorm.
 
 ### Changes for developers
