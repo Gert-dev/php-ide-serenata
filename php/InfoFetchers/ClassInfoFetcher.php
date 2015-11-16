@@ -170,6 +170,7 @@ class ClassInfoFetcher implements InfoFetcherInterface
         $documentation = $this->getDocumentation($class);
 
         $data = [
+            'class'        => $class->getName(),
             'wasFound'     => true,
             'startLine'    => $class->getStartLine(),
             'name'         => $class->getName(),
