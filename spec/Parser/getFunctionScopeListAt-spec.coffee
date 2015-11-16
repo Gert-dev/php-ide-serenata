@@ -36,8 +36,11 @@ describe "getFunctionScopeListAt", ->
 
             function test($param1, $param2)
             {
-                $closure = function ($closureParam) use ($something) {
-                    $test = 3;
+                $test = function (\TestNamespace\Bar\BarInterface $blub, \TestNamespace\Bar\BarClass $bar2) {
+                    // $test2->
+                    // $test3->
+                    // $bar2->
+                    // $blub->
                 };
             }
 
@@ -53,7 +56,7 @@ describe "getFunctionScopeListAt", ->
         expectedResult = [
             new Range(new Point(0, 0), new Point(2, 0)),
             new Range(new Point(5, 0), new Point(7, 0)),
-            new Range(new Point(12, 0), bufferPosition)
+            new Range(new Point(15, 0), bufferPosition)
         ]
 
         expect(parser.getFunctionScopeListAt(editor, bufferPosition)).toEqual(expectedResult)
@@ -88,8 +91,11 @@ describe "getFunctionScopeListAt", ->
 
             function test($param1, $param2)
             {
-                $closure = function ($closureParam) use ($something) {
-
+                $closure = function (\TestNamespace\Bar\BarInterface $blub, \TestNamespace\Bar\BarClass $bar2) {
+                    // $test2->
+                    // $test3->
+                    // $bar2->
+                    // $blub->
                 };
 
                 //
@@ -104,7 +110,7 @@ describe "getFunctionScopeListAt", ->
 
         expectedResult = [
             new Range(new Point(2, 0), new Point(4, 15)),
-            new Range(new Point(6, 4), bufferPosition)
+            new Range(new Point(9, 4), bufferPosition)
         ]
 
         expect(parser.getFunctionScopeListAt(editor, bufferPosition)).toEqual(expectedResult)
