@@ -61,7 +61,7 @@ class Parser
                 if matchInfo.matchText not of matches
                     matches[matchInfo.matchText] =
                         name : matchInfo.matchText
-                        type : @getVariableType(editor, range.end, matchInfo.matchText)
+                        type : @getVariableType(editor, bufferPosition, matchInfo.matchText)
 
 
         # If the row and column equal 0, 0, the scope is at the start of the file, hence we're not in a function.
@@ -70,7 +70,7 @@ class Parser
         if not thisFound #and scopeList.length > 0 and not (scopeList[0].start.row == 0 and scopeList[0].start.column == 0)
             matches['$this'] =
                 name : '$this'
-                type : @getVariableType(editor, range.end, '$this')
+                type : @getVariableType(editor, bufferPosition, '$this')
 
         return matches
 
