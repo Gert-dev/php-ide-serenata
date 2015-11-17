@@ -87,6 +87,9 @@ class Parser
         if className and className[0] == "\\"
             return className.substr(1) # FQCN, not subject to any further context.
 
+        if @isBasicType(className)
+            return className
+
         found = false
         fullClass = className
 
@@ -714,8 +717,13 @@ class Parser
         # We now know what class we need to start from, now it's just a matter of fetching the return types of members
         # in the call stack.
         for element in callStack
-            classInfo = @autocomplete(className, element)
-            className = classInfo.name
+            if not @isBasicType(className)
+                classInfo = @autocomplete(className, element)
+                className = classInfo.name
+
+            else
+                className = null
+                break
 
         return className
 
@@ -725,16 +733,15 @@ class Parser
      * the given name in the given class, and then calling {@see getMembers} for that type, hence autocompleting the
      * 'name' in 'className'.
      *
-     * @param {string} className
-     * @param {string} name
-     *
+     * @param {string}  type
+     * @param {string}  name
      * @param {boolean} async
      *
      * @return {Promise|Object}
     ###
-    autocomplete: (className, member, async = false) ->
+    autocomplete: (type, member, async = false) ->
         if not async
-            info = @proxy.getClassInfo(className, async)
+            info = @proxy.getClassInfo(type, async)
 
             if member.indexOf('()') != -1
                 member = member.replace('()', '')
@@ -750,7 +757,7 @@ class Parser
 
             return null
 
-        return @proxy.getClassInfo(className, async).then (info) =>
+        return @proxy.getClassInfo(type, async).then (info) =>
             if member.indexOf('()') != -1
                 member = member.replace('()', '')
 

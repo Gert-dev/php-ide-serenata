@@ -147,3 +147,19 @@ describe "determineFullClassName", ->
         editor.setText(source)
 
         expect(parser.determineFullClassName(editor, 'Bar\\Test')).toEqual('My\\Bar\\Test')
+
+    it "does not touch basic types.", ->
+        source =
+            """
+            <?php
+
+            namespace My;
+            """
+
+        editor.setText(source)
+
+        expect(parser.determineFullClassName(editor, 'int')).toEqual('int')
+        expect(parser.determineFullClassName(editor, 'INT')).toEqual('INT')
+        expect(parser.determineFullClassName(editor, 'bool')).toEqual('bool')
+        expect(parser.determineFullClassName(editor, 'string')).toEqual('string')
+        expect(parser.determineFullClassName(editor, 'STRING')).toEqual('STRING')
