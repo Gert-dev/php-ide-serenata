@@ -42,7 +42,7 @@ class CachingProxy extends Proxy
 
             return @cache[cacheKey]
 
-        else if cacheKey not of @cache
+        else if cacheKey of @cache
             return new Promise (resolve, reject) =>
                 resolve(@cache[cacheKey])
 
