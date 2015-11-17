@@ -168,6 +168,16 @@ class Parser
         return (scopeDescriptor.indexOf('.property') != -1)
 
     ###*
+     * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
+     *
+     * @param {string} type
+     *
+     * @return {boolean}
+    ###
+    isBasicType: (type) ->
+        return /^(array|object|bool|string|static|null|boolean|void|int|integer|mixed|callable)$/i.test(type)
+
+    ###*
      * Retrieves an array of ranges that contain code that apply to the function the specified buffer position is in.
      * In other words, all these ranges are "inside this function's scope". If not currently inside a function, the
      * global scope is analyzed instead.

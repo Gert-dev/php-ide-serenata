@@ -137,6 +137,16 @@ class Service
         return @parser.determineFullClassName(editor, className)
 
     ###*
+     * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
+     *
+     * @param {string} type
+     *
+     * @return {boolean}
+    ###
+    isBasicType: (type) ->
+        return @parser.isBasicType(type)
+
+    ###*
      * Retrieves all variables that are available at the specified buffer position.
      *
      * @param {TextEditor} editor

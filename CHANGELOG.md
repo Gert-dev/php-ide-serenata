@@ -50,6 +50,7 @@ class MyClass
 
 ### Changes for developers
 * Changes to the service
+  * A new method `isBasicType` has been introduced, that will return true for basic types such as "int", "BOOL", "array", "string", ...
   * The `getDocParams` method has been removed. It was obsolete as the same information is already returned by `getClassInfo`. Also more caches can be reused by using `getClassInfo`.
   * Data returned about methods, constants, functions and structures will no longer have an 'args' property containing information such as descriptions. Instead these were moved up one level (in other words you can just replace the `.args.property` with just `.property` everywhere). It wasn't clear what exactly belonged in `args` and what didn't, hence its entire removal.
 
