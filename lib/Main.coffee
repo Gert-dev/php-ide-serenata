@@ -211,8 +211,17 @@ module.exports =
             editor.onDidSave (event) =>
                 return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
-                parser.clearCache(event.path)
-                @performIndex(event.path)
+                isContainedInProject = false
+
+                for projectDirectory in atom.project.getDirectories()
+                    if event.path.indexOf(projectDirectory.path) != -1
+                        isContainedInProject = true
+                        break
+
+                # Do not try to index files outside the project.
+                if isContainedInProject
+                    parser.clearCache(event.path)
+                    @performIndex(event.path)
 
     ###*
      * Deactivates the package.

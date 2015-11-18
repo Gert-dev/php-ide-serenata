@@ -42,6 +42,7 @@ class MyClass
 ```
 
 ### Bugs fixed
+* The indexer will no longer try to index PHP files that don't belong to the project on save.
 * Docblock parameters weren't being analyzed for deducing the type of local variables when in a global function.
 * Types of variables that had their assigned values spread over multiple lines will now correctly have their type deduced.
 * Only the relevant scopes will now be searched for the type of variables, previously all code was examined, even code outside the current scope.
