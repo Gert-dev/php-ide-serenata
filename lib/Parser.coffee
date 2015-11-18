@@ -393,13 +393,20 @@ class Parser
                         break
 
                     # Reached an operator that can never be part of the current statement.
-                    else if lineText[i] == ';' or lineText[i] == '=' or lineText[i] == ',' or lineText[i] == '['
+                    else if lineText[i] == ','
                         ++i
                         finished = true
                         break
 
-                    # <?php open tag.
-                    else if scopeDescriptor.indexOf('.punctuation.section.embedded.begin') != -1
+                    # All kinds of operators, such as the equals sign, the array key-value operator, ...
+                    # (the -> and :: for addressing class members are allowed).
+                    else if scopeDescriptor.indexOf('.keyword.operator') != -1 and scopeDescriptor.indexOf('.keyword.operator.class') == -1
+                        ++i
+                        finished = true
+                        break
+
+                    # <?php open tag, semi-colon, array opening braces, ... (the \ for inheritance is allowed).
+                    else if scopeDescriptor.indexOf('.punctuation') != -1 and scopeDescriptor.indexOf('.punctuation.separator.inheritance') == -1
                         ++i
                         finished = true
                         break

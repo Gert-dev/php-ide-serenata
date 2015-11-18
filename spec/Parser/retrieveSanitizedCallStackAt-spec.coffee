@@ -211,6 +211,32 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
+    it "correctly stops when the first element is an instantiation as array value in a key-value pair.", ->
+        source =
+            """
+            <?php
+
+            $test = [
+                'test' => (new Foo\\Bar())->doFoo()
+            ];
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            'new Foo\\Bar()',
+            'doFoo()'
+        ]
+
+        row = editor.getLineCount() - 2
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row: row
+            column: column
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
     it "correctly stops when the first element is an instantiation wrapped in parentheses and it is inside an array.", ->
         source =
             """
