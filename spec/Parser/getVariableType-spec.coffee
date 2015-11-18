@@ -265,6 +265,7 @@ describe "getVariableType", ->
         expect(parser.getVariableType(editor, bufferPosition, '$test2')).toEqual('EXPECTED\\TYPE_2')
 
     it "correctly returns the type of a variable through the method's docblock.", ->
+        # NOTE: The docblock data is returned by the proxy and does not need to be explicitly present here.
         source =
             """
             <?php
