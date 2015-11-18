@@ -36,7 +36,7 @@ describe "getFunctionScopeListAt", ->
 
             function test($param1, $param2)
             {
-                $test = function (\TestNamespace\Bar\BarInterface $blub, \TestNamespace\Bar\BarClass $bar2) {
+                $test = function (\\TestNamespace\\Bar\\BarInterface $blub, \\TestNamespace\\Bar\\BarClass $bar2) {
                     // $test2->
                     // $test3->
                     // $bar2->
@@ -91,7 +91,7 @@ describe "getFunctionScopeListAt", ->
 
             function test($param1, $param2)
             {
-                $closure = function (\TestNamespace\Bar\BarInterface $blub, \TestNamespace\Bar\BarClass $bar2) {
+                $closure = function (\\TestNamespace\\Bar\\BarInterface $blub, \\TestNamespace\\Bar\\BarClass $bar2) {
                     // $test2->
                     // $test3->
                     // $bar2->
@@ -111,6 +111,29 @@ describe "getFunctionScopeListAt", ->
         expectedResult = [
             new Range(new Point(2, 0), new Point(4, 15)),
             new Range(new Point(9, 4), bufferPosition)
+        ]
+
+        expect(parser.getFunctionScopeListAt(editor, bufferPosition)).toEqual(expectedResult)
+
+    it "correctly returns nothing useful when in a function signature.", ->
+        source =
+            """
+            <?php
+
+            function test($param1, $param2)
+            {
+
+            }
+            """
+
+        editor.setText(source)
+
+        bufferPosition =
+            row: editor.getLineCount() - 4
+            column: 20
+
+        expectedResult = [
+
         ]
 
         expect(parser.getFunctionScopeListAt(editor, bufferPosition)).toEqual(expectedResult)

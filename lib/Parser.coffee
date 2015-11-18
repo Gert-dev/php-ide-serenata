@@ -202,10 +202,15 @@ class Parser
 
             continue if not line
 
+            lastIndex = line.length - 1
+
+            if row == bufferPosition.row
+                lastIndex = bufferPosition.column
+
             # Scan the entire line, fetching the scope for each character position as one line can contain both a scope
             # start and end such as "} elseif (true) {". Here the scope descriptor will differ for different character
             # positions on the line.
-            for i in [line.length - 1 .. 0]
+            for i in [lastIndex .. 0]
                 chain = editor.scopeDescriptorForBufferPosition([row, i]).getScopeChain()
 
                 continue if chain.indexOf('comment') != -1
@@ -217,10 +222,16 @@ class Parser
                 if line[i] == '{'
                     ++openedScopes
 
-                # If openedScopes == closedScopes at this point, we're probably in a closure or nested function.
-                if chain.indexOf(".storage.type.function") != -1 and openedScopes > closedScopes
-                    currentScopeFunctionStart = new Point(row, i + 1)
-                    break
+                if chain.indexOf(".storage.type.function") != -1
+                    # If openedScopes == closedScopes at this point, we're probably in a closure or nested function.
+                    if openedScopes > closedScopes
+                        currentScopeFunctionStart = new Point(row, i + 1)
+                        break
+
+                    # This can only happen if we're somewhere between the keyword and opening paranthesis of a function
+                    # (e.g. in the parameter list, name, ...)
+                    else if openedScopes == 0
+                        return []
 
             break if currentScopeFunctionStart?
 
