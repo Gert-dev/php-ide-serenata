@@ -718,8 +718,7 @@ class Parser
         # in the call stack.
         for element in callStack
             if not @isBasicType(className)
-                classInfo = @autocomplete(className, element)
-                className = classInfo.name
+                className = @getTypeForMember(className, element)
 
             else
                 className = null
@@ -728,50 +727,29 @@ class Parser
         return className
 
     ###*
-     * Retrieves the members of the type that is returned by the member with the specified name in the specified class.
-     * This is essentially the same as determining the return type of the method (or type of the member variable) with
-     * the given name in the given class, and then calling {@see getMembers} for that type, hence autocompleting the
-     * 'name' in 'className'.
+     * Retrieves the type that is returned by the member with the specified name in the specified class.
      *
-     * @param {string}  type
-     * @param {string}  name
-     * @param {boolean} async
+     * @param {string} className
+     * @param {string} name
      *
-     * @return {Promise|Object}
+     * @return {string}
     ###
-    autocomplete: (type, member, async = false) ->
-        if not async
-            info = @proxy.getClassInfo(type, async)
+    getTypeForMember: (className, member) ->
+        info = @proxy.getClassInfo(className)
 
-            if member.indexOf('()') != -1
-                member = member.replace('()', '')
+        if member.indexOf('()') != -1
+            member = member.replace('()', '')
 
-                if member of info.methods
-                    return @proxy.getClassInfo(info.methods[member].return.resolvedType, async)
+            if member of info.methods
+                return info.methods[member].return.resolvedType
 
-            else if member of info.properties
-                return @proxy.getClassInfo(info.properties[member].return.resolvedType, async)
+        else if member of info.properties
+            return info.properties[member].return.resolvedType
 
-            else if member of info.constants
-                return @proxy.getClassInfo(info.constants[member].return.resolvedType, async)
+        else if member of info.constants
+            return info.constants[member].return.resolvedType
 
-            return null
-
-        return @proxy.getClassInfo(type, async).then (info) =>
-            if member.indexOf('()') != -1
-                member = member.replace('()', '')
-
-                if member of info.methods
-                    return @proxy.getClassInfo(info.methods[member].return.resolvedType, async)
-
-            else if member of info.properties
-                return @proxy.getClassInfo(info.properties[member].return.resolvedType, async)
-
-            else if member of info.constants
-                return @proxy.getClassInfo(info.constants[member].return.resolvedType, async)
-
-            return new Promise (resolve, reject) ->
-                resolve(null)
+        return null
 
     ###*
      * Gets the correct selector when a class or namespace is clicked.
