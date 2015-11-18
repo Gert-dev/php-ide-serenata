@@ -211,20 +211,8 @@ module.exports =
             editor.onDidSave (event) =>
                 return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
-                # For Windows - Replace \ in class namespace to / because composer use / instead of \.
-                path = event.path
-
-                for directory in atom.project.getDirectories()
-                    if path.indexOf(directory.path) == 0
-                        classPath = path.substr(0, directory.path.length+1)
-                        path = path.substr(directory.path.length + 1)
-                        break
-
-                filePath = classPath + Utility.normalizeSeparators(path)
-
-                parser.clearCache(filePath)
-
-                @performIndex(filePath)
+                parser.clearCache(event.path)
+                @performIndex(event.path)
 
     ###*
      * Deactivates the package.

@@ -152,4 +152,7 @@ class Proxy
         if not filename
             filename = ''
 
+        # For Windows - Replace \ in class namespace to / because composer use / instead of \.
+        filename = Utility.normalizeSeparators(filename)
+
         return @performRequest(@getFirstProjectDirectory(), ['--reindex', filename], true)
