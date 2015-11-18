@@ -108,21 +108,6 @@ class Service
         return @parser.getClassSelectorFromEvent(event)
 
     ###*
-     * Retrieves the members of the type that is returned by the member with the specified name in the specified class.
-     * This is essentially the same as determining the return type of the method (or type of the member variable) with
-     * the given name in the given class, and then calling {@see getMembers} for that type, hence autocompleting the
-     * 'name' in 'className'.
-     *
-     * @param {string}  className
-     * @param {string}  name
-     * @param {boolean} async
-     *
-     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
-    ###
-    autocomplete: (className, name, async = false) ->
-        return @parser.autocomplete(className, name, async)
-
-    ###*
      * Determines the full class name (without leading slash) of the specified class in the specified editor. If no
      * class name is passed, the full class name of the class defined in the current file is returned instead.
      *
