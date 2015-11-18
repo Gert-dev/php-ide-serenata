@@ -28,10 +28,10 @@ Some features may or may not work outside these restrictions. For example, Compo
 
 Don't forget to open the settings page after installing to set up the package!
 
-## I'm A Package Developer - How Do I Use This?
+## I'm a package developer - How do I use this?
 You can very easily start using the service by simply consuming the service in your package (see also the `package.json` and `Main.coffee` files of the packages listed above for an example). The service is a single exposed class, which is located in the [Service.coffee](https://github.com/Gert-dev/php-integrator-base/blob/master/lib/Service.coffee) file, along with docblocks explaining what they do and what they accept as parameters..
 
-## What Does Not Work?
+## What does not work?
 Most of the issue reports indicate things that are missing, but indexing inside the artificial limitations specified above should be working fairly well in general. There are also some things that won't be supported at this time because they are fairly complex to implement (usually for fairly little benefit).
 These limitations may affect other packages using the provided service:
 
