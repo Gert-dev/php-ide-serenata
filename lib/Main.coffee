@@ -209,7 +209,7 @@ module.exports =
 
         atom.workspace.observeTextEditors (editor) =>
             editor.onDidSave (event) =>
-                return unless editor.getGrammar().scopeName.match /text.html.php$/
+                return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
                 # For Windows - Replace \ in class namespace to / because composer use / instead of \.
                 path = event.path
