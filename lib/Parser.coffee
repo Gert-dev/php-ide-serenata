@@ -604,7 +604,7 @@ class Parser
 
                 scanStartPosition = matchInfo.range.end
 
-                bestMatch = @determineFullClassName(editor, matchInfo.match[1])
+                bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.start, [matchInfo.match[1]])
 
                 matchInfo.stop()
 

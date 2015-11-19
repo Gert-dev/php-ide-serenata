@@ -218,6 +218,35 @@ describe "getVariableType", ->
 
         expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
 
+    it "correctly returns the last type of a variable that's checked with instanceof in an if statement when it's not a class name.", ->
+        source =
+            """
+            <?php
+
+            namespace EXPECTED;
+
+            class TYPE_1
+            {
+                public function foo()
+                {
+                    if ($test instanceof self) {
+                        //
+                    }
+                }
+            }
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 4
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
     it "correctly returns the type of a variable through function parameter type hints.", ->
         source =
             """
