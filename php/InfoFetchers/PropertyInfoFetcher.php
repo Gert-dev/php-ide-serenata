@@ -121,6 +121,12 @@ class PropertyInfoFetcher implements InfoFetcherInterface
             'return'             => $documentation['var']
         ];
 
+        // You can place documentation after the @var tag as well as at the start of the docblock. Fall back from the
+        // latter to the former.
+        if (empty($data['descriptions']['short'])) {
+            $data['descriptions']['short'] = $documentation['var']['description'];
+        }
+
         $data['return']['resolvedType'] = $this->determineFullReturnType($data);
 
         return $data;

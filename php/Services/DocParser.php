@@ -168,12 +168,12 @@ class DocParser
      * Filters out information about the return value of the function or method.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterReturn($docblock, $methodName, array $tags)
+    protected function filterReturn($docblock, $itemName, array $tags)
     {
         if (isset($tags[static::RETURN_VALUE])) {
             list($type, $description) = $this->filterTwoParameterTag($tags[static::RETURN_VALUE][0]);
@@ -181,7 +181,7 @@ class DocParser
             // According to http://www.phpdoc.org/docs/latest/guides/docblocks.html, a method that does
             // have a docblock, but no explicit return type returns void. Constructors, however, must
             // return self. If there is no docblock at all, we can't assume either of these types.
-            $type = ($methodName === '__construct') ? 'self' : 'void';
+            $type = ($itemName === '__construct') ? 'self' : 'void';
             $description = null;
         }
 
@@ -197,12 +197,12 @@ class DocParser
      * Filters out information about the parameters of the function or method.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterParams($docblock, $methodName, array $tags)
+    protected function filterParams($docblock, $itemName, array $tags)
     {
         $params = [];
 
@@ -226,18 +226,25 @@ class DocParser
      * Filters out information about the variable.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterVar($docblock, $methodName, array $tags)
+    protected function filterVar($docblock, $itemName, array $tags)
     {
+        $type = null;
+        $description = null;
+
         if (isset($tags[static::VAR_TYPE])) {
-            list($type, $description) = $this->filterTwoParameterTag($tags[static::VAR_TYPE][0]);
-        } else {
-            $type = null;
-            $description = null;
+            list($varType, $varName, $varDescription) = $this->filterThreeParameterTag($tags[static::VAR_TYPE][0]);
+
+            // @var contains the name of the property it documents, it must match the property we're fetching
+            // documentation about.
+            if ($varName && mb_substr($varName, 1) == $itemName) {
+                $type = $varType;
+                $description = $varDescription;
+            }
         }
 
         return [
@@ -252,12 +259,12 @@ class DocParser
      * Filters out deprecation information.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterDeprecated($docblock, $methodName, array $tags)
+    protected function filterDeprecated($docblock, $itemName, array $tags)
     {
         return [
             'deprecated' => isset($tags[static::DEPRECATED])
@@ -268,12 +275,12 @@ class DocParser
      * Filters out information about what exceptions the method can throw.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterThrows($docblock, $methodName, array $tags)
+    protected function filterThrows($docblock, $itemName, array $tags)
     {
         $throws = [];
 
@@ -294,12 +301,12 @@ class DocParser
      * Filters out information about the magic properties of a class.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterProperty($docblock, $methodName, array $tags)
+    protected function filterProperty($docblock, $itemName, array $tags)
     {
         $properties = [];
 
@@ -323,12 +330,12 @@ class DocParser
      * Filters out information about the magic properties of a class.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterPropertyRead($docblock, $methodName, array $tags)
+    protected function filterPropertyRead($docblock, $itemName, array $tags)
     {
         $properties = [];
 
@@ -352,12 +359,12 @@ class DocParser
      * Filters out information about the magic properties of a class.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterPropertyWrite($docblock, $methodName, array $tags)
+    protected function filterPropertyWrite($docblock, $itemName, array $tags)
     {
         $properties = [];
 
@@ -381,12 +388,12 @@ class DocParser
      * Filters out information about the description.
      *
      * @param string $docblock
-     * @param string $methodName
+     * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterDescription($docblock, $methodName, array $tags)
+    protected function filterDescription($docblock, $itemName, array $tags)
     {
         $summary = '';
         $description = '';
