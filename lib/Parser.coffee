@@ -657,8 +657,9 @@ class Parser
 
 
     ###*
-     * Parses all elements from the given call stack to return the last type (if any). Returns null if the type of the
-     * member could not be deduced (i.e. because it does not exist).
+     * Parses all elements from the given call stack to return the last type (if any). Returns null if the type of a
+     * member could not be deduced (e.g. because it does not exist). This method can also deal with call stacks of one
+     * element to fetch the type of a single item.
      *
      * @param {TextEditor} editor
      * @param {Point}      bufferPosition
