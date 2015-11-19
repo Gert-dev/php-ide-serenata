@@ -294,16 +294,15 @@ class Parser
         return ranges
 
     ###*
-     * Does exactly the same as {@see retrieveSanitizedCallStack}, but will automatically retrieve the relevant code
-     * of the call at the specified location in the buffer.
+     * Starts at the specified buffer position, and walks backwards or forwards to find the end of an expression.
      *
      * @param  {TextEditor} editor
      * @param  {Point}      bufferPosition
      * @param  {boolean}    backwards      Whether to walk backwards from the buffer position or forwards.
      *
-     * @return {Object}
+     * @return {Point}
     ###
-    retrieveSanitizedCallStackAt: (editor, bufferPosition, backwards = true) ->
+    determineBoundaryOfExpression: (editor, bufferPosition, backwards = true) ->
         finishedOn = null
         parenthesesOpened = 0
         parenthesesClosed = 0
@@ -437,8 +436,22 @@ class Parser
         if backwards and finishedOn == true
             ++i
 
-        # Fetch everything we ran through up until the location we started from.
-        textSlice = editor.getTextInBufferRange([[line, i], bufferPosition])
+        return new Point(line, i)
+
+    ###*
+     * Does exactly the same as {@see retrieveSanitizedCallStack}, but will automatically retrieve the relevant code
+     * of the call at the specified location in the buffer.
+     *
+     * @param  {TextEditor} editor
+     * @param  {Point}      bufferPosition
+     * @param  {boolean}    backwards      Whether to walk backwards from the buffer position or forwards.
+     *
+     * @return {Object}
+    ###
+    retrieveSanitizedCallStackAt: (editor, bufferPosition, backwards = true) ->
+        boundary = @determineBoundaryOfExpression(editor, bufferPosition, backwards)
+
+        textSlice = editor.getTextInBufferRange([boundary, bufferPosition])
 
         return @retrieveSanitizedCallStack(textSlice)
 
