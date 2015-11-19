@@ -427,7 +427,7 @@ class Parser
                 break
 
         # Fetch everything we ran through up until the location we started from.
-        textSlice = editor.getTextInBufferRange([[line, i], bufferPosition]).trim()
+        textSlice = editor.getTextInBufferRange([[line, i], bufferPosition])
 
         return @retrieveSanitizedCallStack(textSlice)
 
@@ -477,6 +477,8 @@ class Parser
      * @return {array}
     ###
     retrieveSanitizedCallStack: (text) ->
+        text = text.trim()
+
         # Remove singe line comments
         regex = /\/\/.*\n/g
         text = text.replace regex, (match) =>
