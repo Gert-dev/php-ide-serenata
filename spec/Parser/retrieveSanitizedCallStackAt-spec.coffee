@@ -56,6 +56,10 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
+        bufferPosition.column = 0
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
+
     it "correctly stops at static class names containing a namespace.", ->
         source =
             """
@@ -80,6 +84,10 @@ describe "retrieveSanitizedCallStackAt", ->
             column: 29
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
+        bufferPosition.column = 0
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
     it "correctly stops at control keywords.", ->
         source =
@@ -106,6 +114,10 @@ describe "retrieveSanitizedCallStackAt", ->
             column: 24
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
+        bufferPosition.column = 7
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
 
     it "correctly stops at built-in constructs.", ->
@@ -134,6 +146,10 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
+        bufferPosition.column = 5
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
+
     it "correctly stops at keywords such as self and parent.", ->
         source =
             """
@@ -159,6 +175,10 @@ describe "retrieveSanitizedCallStackAt", ->
             column: 19
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
+        bufferPosition.column = 0
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
     it "correctly stops when when the bracket syntax is used for dynamic access to members.", ->
         source =
@@ -186,6 +206,10 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
+        bufferPosition.column = 0
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
+
     it "correctly stops when the first element is an instantiation wrapped in parentheses.", ->
         source =
             """
@@ -210,6 +234,10 @@ describe "retrieveSanitizedCallStackAt", ->
             column: 26
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
+        bufferPosition.column = 0
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
     it "correctly stops when the first element is an instantiation as array value in a key-value pair.", ->
         source =
@@ -237,6 +265,10 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
+        bufferPosition.column = 14
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
+
     it "correctly stops when the first element is an instantiation wrapped in parentheses and it is inside an array.", ->
         source =
             """
@@ -260,6 +292,10 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
+        bufferPosition.column = 0
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
+
     it "correctly stops when the first element is an instantiation wrapped in parentheses and it is inside a function call.", ->
         source =
             """
@@ -280,6 +316,10 @@ describe "retrieveSanitizedCallStackAt", ->
             column: 45
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
+        bufferPosition.column = 21
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
     it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =
@@ -334,3 +374,9 @@ describe "retrieveSanitizedCallStackAt", ->
             column: 14
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
+        bufferPosition =
+            row: 2
+            column: 0
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)

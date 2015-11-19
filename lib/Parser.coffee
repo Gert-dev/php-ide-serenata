@@ -299,11 +299,12 @@ class Parser
      *
      * @param  {TextEditor} editor
      * @param  {Point}      bufferPosition
+     * @param  {boolean}    backwards      Whether to walk backwards from the buffer position or forwards.
      *
      * @return {Object}
     ###
-    retrieveSanitizedCallStackAt: (editor, bufferPosition) ->
-        finished = false
+    retrieveSanitizedCallStackAt: (editor, bufferPosition, backwards = true) ->
+        finishedOn = null
         parenthesesOpened = 0
         parenthesesClosed = 0
         squareBracketsOpened = 0
@@ -314,18 +315,20 @@ class Parser
         startedKeyword = false
         startedStaticClassName = false
 
-        for line in [bufferPosition.row .. -1]
+        range = if backwards then [bufferPosition.row .. -1] else [bufferPosition.row .. editor.getLineCount()]
+
+        for line in range
             lineText = editor.lineTextForBufferRow(line)
 
             continue if not lineText
 
             if line != bufferPosition.row
-                maxIndex = (lineText.length - 1)
+                lineRange = if backwards then [(lineText.length - 1) .. 0] else [0 .. (lineText.length - 1)]
 
             else
-                maxIndex = bufferPosition.column - 1
+                lineRange = if backwards then [(bufferPosition.column - 1) .. 0] else [bufferPosition.column .. (lineText.length - 1)]
 
-            for i in [maxIndex .. 0]
+            for i in lineRange
                 scopeDescriptor = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
                 if scopeDescriptor.indexOf('.comment') != -1
@@ -336,37 +339,46 @@ class Parser
 
                     # Ticket #164 - We're walking backwards, if we find an opening paranthesis that hasn't been closed
                     # anywhere, we know we must stop.
-                    if parenthesesOpened > parenthesesClosed
-                        ++i
-                        finished = true
+                    if backwards and parenthesesOpened > parenthesesClosed
+                        finishedOn = true
                         break
 
                 else if lineText[i] == ')'
                     ++parenthesesClosed
 
+                    if not backwards and parenthesesClosed > parenthesesOpened
+                        finishedOn = true
+                        break
+
                 else if lineText[i] == '['
                     ++squareBracketsOpened
 
                     # Same as above.
-                    if squareBracketsOpened > squareBracketsClosed
-                        ++i
-                        finished = true
+                    if backwards and squareBracketsOpened > squareBracketsClosed
+                        finishedOn = true
                         break
 
                 else if lineText[i] == ']'
                     ++squareBracketsClosed
 
+                    if not backwards and squareBracketsClosed > squareBracketsOpened
+                        finishedOn = true
+                        break
+
                 else if lineText[i] == '{'
                     ++squiggleBracketsOpened
 
                     # Same as above.
-                    if squiggleBracketsOpened > squiggleBracketsClosed
-                        ++i
-                        finished = true
+                    if backwards and squiggleBracketsOpened > squiggleBracketsClosed
+                        finishedOn = true
                         break
 
                 else if lineText[i] == '}'
                     ++squiggleBracketsClosed
+
+                    if not backwards and squiggleBracketsClosed > squiggleBracketsOpened
+                        finishedOn = true
+                        break
 
                     if parenthesesOpened == parenthesesClosed
                         # Subscopes can only exist when e.g. a closure is embedded as an argument to a function call,
@@ -374,7 +386,7 @@ class Parser
                         # means we've moved beyond the call stack to e.g. the end of an if statement.
                         if scopeDescriptor.indexOf('.scope.end') != -1
                             ++i
-                            finished = true
+                            finishedOn = true
                             break
 
                 # These will not be the same if, for example, we've entered a closure.
@@ -383,48 +395,47 @@ class Parser
                         squiggleBracketsOpened == squiggleBracketsClosed
                     # Variable name.
                     if lineText[i] == '$'
-                        finished = true
-                        break
+                        if backwards
+                            finishedOn = false
+                            break
 
                     # Reached an operator that can never be part of the current statement.
                     else if lineText[i] == ','
-                        ++i
-                        finished = true
+                        finishedOn = true
                         break
 
                     # All kinds of operators, such as the equals sign, the array key-value operator, ...
                     # (the -> and :: for addressing class members are allowed).
                     else if scopeDescriptor.indexOf('.keyword.operator') != -1 and scopeDescriptor.indexOf('.keyword.operator.class') == -1
-                        ++i
-                        finished = true
+                        finishedOn = true
                         break
 
                     # <?php open tag, semi-colon, array opening braces, ... (the \ for inheritance is allowed).
                     else if scopeDescriptor.indexOf('.punctuation') != -1 and scopeDescriptor.indexOf('.punctuation.separator.inheritance') == -1
-                        ++i
-                        finished = true
+                        finishedOn = true
                         break
 
                     # For static class names and things like the self and parent keywords, we won't know when to stop.
                     # These always appear the start of the call stack, so we know we can stop if we find them.
-                    else if scopeDescriptor.indexOf('.support.class') != -1
+                    else if backwards and scopeDescriptor.indexOf('.support.class') != -1
                         startedStaticClassName = true
 
-                    else if scopeDescriptor.indexOf('.storage.type') != -1
+                    else if backwards and scopeDescriptor.indexOf('.storage.type') != -1
                         startedKeyword = true
 
                 if startedStaticClassName and scopeDescriptor.indexOf('.support.class') == -1 and scopeDescriptor.indexOf('.support.other.namespace') == -1
-                    ++i
-                    finished = true
+                    finishedOn = true
                     break
 
                 else if startedKeyword and scopeDescriptor.indexOf('.storage.type') == -1
-                    ++i
-                    finished = true
+                    finishedOn = true
                     break
 
-            if finished
+            if finishedOn?
                 break
+
+        if backwards and finishedOn == true
+            ++i
 
         # Fetch everything we ran through up until the location we started from.
         textSlice = editor.getTextInBufferRange([[line, i], bufferPosition])
