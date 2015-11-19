@@ -584,6 +584,46 @@ class Parser
 
             return bestMatch if bestMatch # An annotation is definitive.
 
+            # Check if there is a funtion definition with a type hint for the variable.
+            regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
+
+            editor.getBuffer().backwardsScanInRange regexFunction, [scanStartPosition, bufferPosition], (matchInfo) =>
+                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+
+                scanStartPosition = matchInfo.range.end
+
+                typeHint = matchInfo.match[2]
+
+                if typeHint?.length > 0
+                    bestMatch = @determineFullClassName(editor, typeHint)
+
+                else
+                    functionName = matchInfo.match[1]
+
+                    # Can be empty for closures.
+                    if functionName?.length > 0
+                        try
+                            currentClass = @determineFullClassName(editor)
+
+                            functionInfo = null
+
+                            if currentClass
+                                response = @proxy.getClassInfo(currentClass)
+
+                                if (functionName of response.methods) and (element of response.methods[functionName].docParameters)
+                                    bestMatch = @determineFullClassName(editor, response.methods[functionName].docParameters[element].type)
+
+                            else
+                                response = @proxy.getGlobalFunctions()
+
+                                if (functionName of response) and (element of response[functionName].docParameters)
+                                    bestMatch = @determineFullClassName(editor, response[functionName].docParameters[element].type)
+
+                        catch error
+                            # This data isn't useful.
+
+                matchInfo.stop()
+
             # Check to see if we can find an assignment somewhere, this is the most common case.
             regexAssignment = ///#{elementForRegex}\s*=\s*///g
 
@@ -633,45 +673,6 @@ class Parser
 
                 matchInfo.stop()
 
-            # Check if there is a funtion definition with a type hint for the variable.
-            regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
-
-            editor.getBuffer().backwardsScanInRange regexFunction, [scanStartPosition, bufferPosition], (matchInfo) =>
-                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
-
-                scanStartPosition = matchInfo.range.end
-
-                typeHint = matchInfo.match[2]
-
-                if typeHint?.length > 0
-                    bestMatch = @determineFullClassName(editor, typeHint)
-
-                else
-                    functionName = matchInfo.match[1]
-
-                    # Can be empty for closures.
-                    if functionName?.length > 0
-                        try
-                            currentClass = @determineFullClassName(editor)
-
-                            functionInfo = null
-
-                            if currentClass
-                                response = @proxy.getClassInfo(currentClass)
-
-                                if (functionName of response.methods) and (element of response.methods[functionName].docParameters)
-                                    bestMatch = @determineFullClassName(editor, response.methods[functionName].docParameters[element].type)
-
-                            else
-                                response = @proxy.getGlobalFunctions()
-
-                                if (functionName of response) and (element of response[functionName].docParameters)
-                                    bestMatch = @determineFullClassName(editor, response[functionName].docParameters[element].type)
-
-                        catch error
-                            # This data isn't useful.
-
-                matchInfo.stop()
 
             break if bestMatch
 
