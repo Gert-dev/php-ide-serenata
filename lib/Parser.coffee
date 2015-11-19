@@ -567,14 +567,14 @@ class Parser
             return bestMatch if bestMatch # An annotation is definitive.
 
             # Check to see if we can find an assignment somewhere, this is the most common case.
-            regexAssignment = ///#{elementForRegex}\s*=\s*([^;]+);///g
+            regexAssignment = ///#{elementForRegex}\s*=\s*///g
 
             editor.getBuffer().backwardsScanInRange regexAssignment, [scanStartPosition, bufferPosition], (matchInfo) =>
                 return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
                 scanStartPosition = matchInfo.range.end
 
-                elements = @retrieveSanitizedCallStack(matchInfo.match[1])
+                elements = @retrieveSanitizedCallStackAt(editor, matchInfo.range.end, false)
 
                 # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
                 # don't recognize the class name is irrelevant.
