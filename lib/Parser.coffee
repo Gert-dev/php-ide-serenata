@@ -443,26 +443,28 @@ class Parser
         return @retrieveSanitizedCallStack(textSlice)
 
     ###*
-     * Removes content inside parantheses (including nested parantheses).
+     * Removes content inside the specified open and close character pairs (including nested pairs).
      *
-     * @param {string} text String to analyze.
+     * @param {string} text           String to analyze.
+     * @param {string} openCharacter  The character that opens the pair.
+     * @param {string} closeCharacter The character that closes the pair.
      *
      * @return {string}
     ###
-    stripParenthesesContent: (text) ->
+    stripPairContent: (text, openCharacter, closeCharacter) ->
         i = 0
         openCount = 0
         closeCount = 0
         startIndex = -1
 
         while i < text.length
-            if text[i] == '('
+            if text[i] == openCharacter
                 ++openCount
 
                 if openCount == 1
                     startIndex = i
 
-            else if text[i] == ')'
+            else if text[i] == closeCharacter
                 ++closeCount
 
                 if closeCount == openCount
@@ -506,8 +508,11 @@ class Parser
         text = text.replace regex, (match) =>
             return match.substr(1, match.length - 2)
 
+        if /function\s+([A-Za-z0-9_]\s*)?\(/.test(text)
+            text = @stripPairContent(text, '{', '}')
+
         # Remove content inside parantheses (including nested parantheses).
-        text = @stripParenthesesContent(text)
+        text = @stripPairContent(text, '(', ')')
 
         return [] if not text
 

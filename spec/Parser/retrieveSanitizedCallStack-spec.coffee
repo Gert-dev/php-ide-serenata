@@ -45,6 +45,20 @@ describe "retrieveSanitizedCallStack", ->
 
         expect(parser.retrieveSanitizedCallStack(source)).toEqual(expectedResult)
 
+    it "correctly sanitizes closures.", ->
+        source =
+            """
+            function () {
+                $value['a'] = $this->method($value['a']);
+            }
+            """
+
+        expectedResult = [
+            'function () {}'
+        ]
+
+        expect(parser.retrieveSanitizedCallStack(source)).toEqual(expectedResult)
+
     it "correctly sanitizes complex call stacks, interleaved with things such as comments, closures and chaining.", ->
         source =
             """

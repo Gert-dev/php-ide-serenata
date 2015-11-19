@@ -1,6 +1,6 @@
 Parser = require '../../lib/Parser'
 
-describe "stripParenthesesContent", ->
+describe "stripPairContent", ->
     parser = new Parser(null)
 
     it "correctly strips parentheses.", ->
@@ -54,4 +54,4 @@ describe "stripParenthesesContent", ->
                 ->testChai
             """
 
-        expect(parser.stripParenthesesContent(source)).toEqual(expectedResult)
+        expect(parser.stripPairContent(source, '(', ')')).toEqual(expectedResult)
