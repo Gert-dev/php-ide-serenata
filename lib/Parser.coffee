@@ -590,9 +590,13 @@ class Parser
             editor.getBuffer().backwardsScanInRange regexAssignment, [scanStartPosition, bufferPosition], (matchInfo) =>
                 return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
 
-                scanStartPosition = matchInfo.range.end
+                boundary = @determineBoundaryOfExpression(editor, matchInfo.range.end, false)
 
-                elements = @retrieveSanitizedCallStackAt(editor, matchInfo.range.end, false)
+                scanStartPosition = boundary
+
+                textSlice = editor.getTextInBufferRange([matchInfo.range.end, boundary])
+
+                elements = @retrieveSanitizedCallStack(textSlice)
 
                 # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
                 # don't recognize the class name is irrelevant.
