@@ -303,10 +303,6 @@ class Parser
      * @return {Object}
     ###
     retrieveSanitizedCallStackAt: (editor, bufferPosition) ->
-        return unless bufferPosition?
-
-        line = bufferPosition.row
-
         finished = false
         parenthesesOpened = 0
         parenthesesClosed = 0
@@ -318,20 +314,18 @@ class Parser
         startedKeyword = false
         startedStaticClassName = false
 
-        while line >= 0
+        for line in [bufferPosition.row .. -1]
             lineText = editor.lineTextForBufferRow(line)
 
-            if not lineText
-                --line
-                continue
+            continue if not lineText
 
             if line != bufferPosition.row
-                i = (lineText.length - 1)
+                maxIndex = (lineText.length - 1)
 
             else
-                i = bufferPosition.column - 1
+                maxIndex = bufferPosition.column - 1
 
-            while i >= 0
+            for i in [maxIndex .. 0]
                 scopeDescriptor = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
                 if scopeDescriptor.indexOf('.comment') != -1
@@ -429,12 +423,8 @@ class Parser
                     finished = true
                     break
 
-                --i
-
             if finished
                 break
-
-            --line
 
         # Fetch everything we ran through up until the location we started from.
         textSlice = editor.getTextInBufferRange([[line, i], bufferPosition]).trim()
