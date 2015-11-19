@@ -28,12 +28,6 @@ class FunctionsProvider implements ProviderInterface
                 }
 
                 $result[$function->getName()] = $functionInfoFetcher->getInfo($function);
-
-                if ($group === 'internal') {
-                    // PHP's built-in functions don't have docblocks, so per exception, this doesn't mean they return
-                    // void.
-                    $result[$function->getName()]['args']['return']['type'] = '';
-                }
             }
         }
 

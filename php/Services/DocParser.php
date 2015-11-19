@@ -178,11 +178,15 @@ class DocParser
         if (isset($tags[static::RETURN_VALUE])) {
             list($type, $description) = $this->filterTwoParameterTag($tags[static::RETURN_VALUE][0]);
         } else {
-            // According to http://www.phpdoc.org/docs/latest/guides/docblocks.html, a method that does
-            // have a docblock, but no explicit return type returns void. Constructors, however, must
-            // return self. If there is no docblock at all, we can't assume either of these types.
-            $type = ($itemName === '__construct') ? 'self' : 'void';
+            $type = null;
             $description = null;
+
+            // According to http://www.phpdoc.org/docs/latest/guides/docblocks.html, a method that does have a docblock,
+            // but no explicit return type returns void. Constructors, however, must return self. If there is no
+            // docblock at all, we can't assume either of these types.
+            if ($docblock !== null) {
+                $type = ($itemName === '__construct') ? 'self' : 'void';
+            }
         }
 
         return [
