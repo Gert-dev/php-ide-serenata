@@ -19,7 +19,7 @@ if ($foo instanceof Foo) {
 }
 ```
 
-* Closures will now receive autocompletion, for example (when using php-integrator-autocomplete-plus):
+* Closures will now be detected, for example (when using php-integrator-autocomplete-plus):
 
 ```php
 $foo = function () {
