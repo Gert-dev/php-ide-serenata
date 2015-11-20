@@ -4,7 +4,7 @@ use PhpIntegrator\Config;
 use PhpIntegrator\ErrorHandler;
 
 require_once(__DIR__ . '/ErrorHandler.php');
-// ErrorHandler::register();
+ErrorHandler::register();
 
 require_once(__DIR__ . '/Config.php');
 
