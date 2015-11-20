@@ -322,7 +322,7 @@ class DocParser
             foreach ($tags[static::METHOD] as $tag) {
                 // The method signature can contain spaces, so we can't use a simple filterTwoParameterTag or
                 // filterThreeParameterTag.
-                if (preg_match('/^(?:(\S+)\s+)?([A-Za-z0-9_]+\(.*\))\s+(.+)?$/', $tag, $match) !== false) {
+                if (preg_match('/^(?:(\S+)\s+)?([A-Za-z0-9_]+\(.*\))(?:\s+(.+))?$/', $tag, $match) !== false) {
                     $partCount = count($match);
 
                     if ($partCount == 4) {
@@ -330,8 +330,11 @@ class DocParser
                         $methodSignature = $match[2];
                         $description = $match[3];
                     } else if ($partCount == 3) {
-                        // This could be either a type and a signature or a signature and a description.
-                        if (mb_strpos($match[1], '(') != false) {
+                        if (empty($match[1])) {
+                            $type = 'void';
+                            $methodSignature = $match[2];
+                            $description = null;
+                        } elseif (mb_strpos($match[1], '(') != false) {
                             // The return type was omitted, e.g. '@method foo() My description.', in which case the
                             // method returns 'void'.
                             $type = 'void';
@@ -343,15 +346,12 @@ class DocParser
                             $methodSignature = $match[2];
                             $description = null;
                         }
-                    } else if ($partCount == 2) {
-                        $tpe = 'void';
-                        $methodSignature = $match[1];
-                        $description = null;
                     } else {
                         continue; // Empty @method tag, skip it.
                     }
 
-                    $parameters = [];
+                    $requiredParameters = [];
+                    $optionalParameters = [];
 
                     if (preg_match('/^([A-Za-z0-9_]+)\((.*)\)$/', $methodSignature, $match) !== false) {
                         $methodName = $match[1];
@@ -359,6 +359,7 @@ class DocParser
 
                         // NOTE: Example string: "$param1, int $param2, $param3 = array(), SOME\\TYPE_1 $param4 = null".
                         preg_match_all('/(?:(\S+)\s+)?(\$[A-Za-z0-9_]+)(?:\s*=\s*([^,]+))?(?:,|$)/', $methodParameterList, $matches, PREG_SET_ORDER);
+
 
                         foreach ($matches as $match) {
                             $partCount = count($match);
@@ -368,37 +369,43 @@ class DocParser
                                 $parameterName = $match[2];
                                 $defaultValue = $match[3];
                             } elseif ($partCount == 3) {
-                                if ($match[1][0] == '$') {
+                                if (!empty($match[1]) && $match[1][0] == '$') {
                                     $parameterType = null;
                                     $parameterName = $match[1];
                                     $defaultValue = $match[2];
                                 } else {
-                                    $parameterType = $match[1];
+                                    $parameterType = $match[1] ?: null;
                                     $parameterName = $match[2];
                                     $defaultValue = null;
                                 }
-                            } elseif ($partCount == 2) {
+                            } /*elseif ($partCount == 2) {
+                                // NOTE: Caught by $partCount == 3 (the type will be an empty string).
                                 $parameterType = null;
                                 $parameterName = $match[1];
                                 $defaultValue = null;
+                            } */
+
+                            $data = [
+                                'type'         => $parameterType,
+                                'defaultValue' => $defaultValue
+                            ];
+
+                            if (!$defaultValue) {
+                                $requiredParameters[$parameterName] = $data;
                             } else {
-                                continue; // Invalid parameter list.
+                                $optionalParameters[$parameterName] = $data;
                             }
 
-                            $parameters[$parameterName] = [
-                                'type'         => $parameterType,
-                                'defaultValue' => $defaultValue,
-                                'isOptional'   => !!$defaultValue
-                            ];
                         }
                     } else {
                         continue; // Invalid method signature.
                     }
 
                     $methods[$methodName] = [
-                        'type'        => $type,
-                        'parameters'  => $parameters,
-                        'description' => $description
+                        'type'                => $type,
+                        'requiredParameters'  => $requiredParameters,
+                        'optionalParameters'  => $optionalParameters,
+                        'description'         => $description
                     ];
                 }
             }

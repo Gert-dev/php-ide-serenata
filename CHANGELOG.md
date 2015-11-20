@@ -29,11 +29,12 @@ $foo = function () {
 $foo-> // Autocompletion for Closure, listing bind and bindTo.
 ```
 
-* Added support for parsing magic properties for classes, which will now also be returned (property-read and property-write are also returned):
+* Added support for parsing magic properties and methods for classes, which will now also be returned (property-read and property-write are also returned):
 
 ```php
 /**
  * @property Foo $someProperty A description.
+ * @method magicFoo($param1, array $param2 = null) My magic method.
  */
 class MyClass
 {

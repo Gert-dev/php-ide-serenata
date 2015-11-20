@@ -59,29 +59,31 @@ class PropertyInfoFetcher implements InfoFetcherInterface
      */
     public function createDefaultInfo(array $options)
     {
-       $data = array_merge([
-           'name'               => null,
-           'isMethod'           => false,
-           'isProperty'         => true,
-           'isMagic'            => false,
-           'isPublic'           => true,
-           'isProtected'        => false,
-           'isPrivate'          => false,
-           'isStatic'           => false,
-           'override'           => false,
-           'declaringClass'     => null,
-           'declaringStructure' => null,
+        $data = array_merge([
+            'name'               => null,
+            'isMethod'           => false,
+            'isProperty'         => true,
+            'isMagic'            => false,
+            'isPublic'           => true,
+            'isProtected'        => false,
+            'isPrivate'          => false,
+            'isStatic'           => false,
+            'override'           => false,
+            'declaringClass'     => null,
+            'declaringStructure' => null,
 
-           'deprecated'         => false,
-           'descriptions'       => [
-               'short' => null,
-               'long'  => null
-           ],
-           'return'             => [
-               'type'        => null,
-               'description' => null
-           ]
-       ], $options);
+            'deprecated'         => false,
+
+            'descriptions'       => [
+                'short' => null,
+                'long'  => null
+            ],
+
+            'return'             => [
+                'type'        => null,
+                'description' => null
+            ]
+        ], $options);
 
         $data['return']['resolvedType'] = $this->determineFullReturnType($data);
 
@@ -103,7 +105,7 @@ class PropertyInfoFetcher implements InfoFetcherInterface
 
         $documentation = $this->getDocumentation($property);
 
-        $data = [
+        $data = $this->createDefaultInfo([
             'name'               => $property->getName(),
             'isMethod'           => false,
             'isProperty'         => true,
@@ -119,15 +121,13 @@ class PropertyInfoFetcher implements InfoFetcherInterface
             'deprecated'         => $documentation['deprecated'],
             'descriptions'       => $documentation['descriptions'],
             'return'             => $documentation['var']
-        ];
+        ]);
 
         // You can place documentation after the @var tag as well as at the start of the docblock. Fall back from the
         // latter to the former.
         if (empty($data['descriptions']['short'])) {
             $data['descriptions']['short'] = $documentation['var']['description'];
         }
-
-        $data['return']['resolvedType'] = $this->determineFullReturnType($data);
 
         return $data;
     }

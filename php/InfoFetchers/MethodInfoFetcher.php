@@ -46,7 +46,20 @@ class MethodInfoFetcher extends FunctionInfoFetcher implements InfoFetcherInterf
      */
     public function createDefaultInfo(array $options)
     {
-        throw new \LogicException("Not implemented yet!");
+        return parent::createDefaultInfo(array_merge([
+            'override'           => null,
+            'implementation'     => null,
+
+            'isMagic'            => false,
+
+            'isPublic'           => true,
+            'isProtected'        => false,
+            'isPrivate'          => false,
+            'isStatic'           => false,
+
+            'declaringClass'     => null,
+            'declaringStructure' => null
+        ], $options));
     }
 
     /**
@@ -77,8 +90,6 @@ class MethodInfoFetcher extends FunctionInfoFetcher implements InfoFetcherInterf
             'declaringClass'     => $this->getDeclaringClass($method),
             'declaringStructure' => $this->getDeclaringStructure($method)
         ]);
-
-        $data['return']['resolvedType'] = $this->determineFullReturnType($data);
 
         return $data;
     }

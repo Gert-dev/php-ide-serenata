@@ -79,6 +79,7 @@ class ClassInfoFetcher implements InfoFetcherInterface
         return $parser->parse($docComment, [
             DocParser::DEPRECATED,
             DocParser::DESCRIPTION,
+            DocParser::METHOD,
             DocParser::PROPERTY,
             DocParser::PROPERTY_READ,
             DocParser::PROPERTY_WRITE
@@ -104,7 +105,7 @@ class ClassInfoFetcher implements InfoFetcherInterface
     {
         $data = [];
 
-        $fillClosure = function (ReflectionClass $class, $key, array $list) use (&$data) {
+        $parseProperty = function (ReflectionClass $class, $key, array $list) use (&$data) {
             if (!isset($data[$key])) {
                 $data[$key] = [];
             }
@@ -133,20 +134,47 @@ class ClassInfoFetcher implements InfoFetcherInterface
             }
         };
 
+        $parseMethods = function (ReflectionClass $class, $key, array $list) use (&$data) {
+            if (!isset($data[$key])) {
+                $data[$key] = [];
+            }
+
+            $declaringClass = [
+                'name'      => $class->getName(),
+                'filename'  => $class->getFilename(),
+                'startLine' => $class->getStartLine()
+            ];
+
+            foreach ($list as $magicMethodName => $magicMethodData) {
+                $data[$key][$magicMethodName] = $this->methodFetcher->createDefaultInfo([
+                    'isMagic'            => true,
+                    'name'               => $magicMethodName,
+                    'descriptions'       => ['short' => $magicMethodData['description']],
+                    'return'             => ['type'  => $magicMethodData['type']],
+                    'declaringClass'     => $declaringClass,
+                    'declaringStructure' => $declaringClass,
+                    'parameters'         => array_keys($magicMethodData['requiredParameters']),
+                    'optionals'          => array_keys($magicMethodData['optionalParameters'])
+                ]);
+            }
+        };
+
         foreach ($class->getInterfaces() as $interface) {
             $documentation = $this->getDocumentation($interface);
 
-            $fillClosure($interface, 'properties', $documentation['properties']);
-            $fillClosure($interface, 'propertiesReadOnly', $documentation['propertiesReadOnly']);
-            $fillClosure($interface, 'propertiesWriteOnly', $documentation['propertiesWriteOnly']);
+            $parseMethods($interface, 'methods', $documentation['methods']);
+            $parseProperty($interface, 'properties', $documentation['properties']);
+            $parseProperty($interface, 'propertiesReadOnly', $documentation['propertiesReadOnly']);
+            $parseProperty($interface, 'propertiesWriteOnly', $documentation['propertiesWriteOnly']);
         }
 
         do {
             $documentation = $this->getDocumentation($class);
 
-            $fillClosure($class, 'properties', $documentation['properties']);
-            $fillClosure($class, 'propertiesReadOnly', $documentation['propertiesReadOnly']);
-            $fillClosure($class, 'propertiesWriteOnly', $documentation['propertiesWriteOnly']);
+            $parseMethods($class, 'methods', $documentation['methods']);
+            $parseProperty($class, 'properties', $documentation['properties']);
+            $parseProperty($class, 'propertiesReadOnly', $documentation['propertiesReadOnly']);
+            $parseProperty($class, 'propertiesWriteOnly', $documentation['propertiesWriteOnly']);
 
             $class = $class->getParentClass();
         } while ($class);
@@ -167,6 +195,7 @@ class ClassInfoFetcher implements InfoFetcherInterface
             throw new \InvalidArgumentException("The passed argument is not of the correct type!");
         }
 
+        $magicMembers = $this->getMagicMembers($class);
         $documentation = $this->getDocumentation($class);
 
         $data = [
@@ -183,18 +212,14 @@ class ClassInfoFetcher implements InfoFetcherInterface
             'parents'      => $this->getParentClasses($class),
             'deprecated'   => $documentation['deprecated'],
             'descriptions' => $documentation['descriptions'],
-            'properties'   => [],
-            'methods'      => [],
+            'properties'   => array_merge(
+                $magicMembers['properties'],
+                $magicMembers['propertiesReadOnly'],
+                $magicMembers['propertiesWriteOnly']
+            ),
+            'methods'      => $magicMembers['methods'],
             'constants'    => []
         ];
-
-        $magicMembers = $this->getMagicMembers($class);
-
-        $data['properties'] = array_merge(
-            $magicMembers['properties'],
-            $magicMembers['propertiesReadOnly'],
-            $magicMembers['propertiesWriteOnly']
-        );
 
         foreach ($class->getMethods() as $method) {
             $data['methods'][$method->getName()] = $this->methodFetcher->getInfo($method);

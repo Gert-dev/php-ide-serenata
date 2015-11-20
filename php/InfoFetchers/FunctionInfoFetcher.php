@@ -117,7 +117,33 @@ class FunctionInfoFetcher implements InfoFetcherInterface
      */
     public function createDefaultInfo(array $options)
     {
-        throw new \LogicException("Not implemented yet!");
+        $data = array_merge([
+            'name'          => null,
+            'isMethod'      => true,
+            'isProperty'    => false,
+            'isBuiltin'     => true,
+            'startLine'     => null,
+            'filename'      => null,
+            'parameters'    => [],
+            'optionals'     => [],
+            'docParameters' => [],
+            'throws'        => [],
+            'deprecated'    => false,
+
+            'descriptions'  => [
+                'short' => null,
+                'long'  => null
+            ],
+
+            'return'        => [
+                'type'        => null,
+                'description' => null
+            ]
+        ], $options);
+
+        $data['return']['resolvedType'] = $this->determineFullReturnType($data);
+
+        return $data;
     }
 
     /**
@@ -166,7 +192,7 @@ class FunctionInfoFetcher implements InfoFetcherInterface
 
         $documentation = $this->getDocumentation($function);
 
-        $data = [
+        $data = $this->createDefaultInfo([
             'name'          => $function->getName(),
             'isMethod'      => true,
             'isProperty'    => false,
@@ -180,9 +206,7 @@ class FunctionInfoFetcher implements InfoFetcherInterface
             'descriptions'  => $documentation['descriptions'],
             'deprecated'    => $function->isDeprecated() || $documentation['deprecated'],
             'return'        => $documentation['return']
-        ];
-
-        $data['return']['resolvedType'] = $this->determineFullReturnType($data);
+        ]);
 
         return $data;
     }
