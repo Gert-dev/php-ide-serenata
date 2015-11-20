@@ -13,6 +13,8 @@ class DocParser
     const RETURN_VALUE    = '@return';
     const DEPRECATED      = '@deprecated';
 
+    const METHOD          = "@method";
+
     const PROPERTY        = '@property';
     const PROPERTY_READ   = '@property-read';
     const PROPERTY_WRITE  = '@property-write';
@@ -98,12 +100,14 @@ class DocParser
         }
 
         $filterMethodMap = [
-            static::RETURN_VALUE => 'filterReturn',
-            static::PARAM_TYPE   => 'filterParams',
-            static::VAR_TYPE     => 'filterVar',
-            static::DEPRECATED   => 'filterDeprecated',
-            static::THROWS       => 'filterThrows',
-            static::DESCRIPTION  => 'filterDescription',
+            static::RETURN_VALUE   => 'filterReturn',
+            static::PARAM_TYPE     => 'filterParams',
+            static::VAR_TYPE       => 'filterVar',
+            static::DEPRECATED     => 'filterDeprecated',
+            static::THROWS         => 'filterThrows',
+            static::DESCRIPTION    => 'filterDescription',
+
+            static::METHOD         => 'filterMethod',
 
             static::PROPERTY       => 'filterProperty',
             static::PROPERTY_READ  => 'filterPropertyRead',
@@ -298,6 +302,110 @@ class DocParser
 
         return [
             'throws' => $throws
+        ];
+    }
+
+    /**
+     * Filters out information about the magic methods of a class.
+     *
+     * @param string $docblock
+     * @param string $itemName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterMethod($docblock, $itemName, array $tags)
+    {
+        $methods = [];
+
+        if (isset($tags[static::METHOD])) {
+            foreach ($tags[static::METHOD] as $tag) {
+                // The method signature can contain spaces, so we can't use a simple filterTwoParameterTag or
+                // filterThreeParameterTag.
+                if (preg_match('/^(?:(\S+)\s+)?([A-Za-z0-9_]+\(.*\))\s+(.+)?$/', $tag, $match) !== false) {
+                    $partCount = count($match);
+
+                    if ($partCount == 4) {
+                        $type = $match[1];
+                        $methodSignature = $match[2];
+                        $description = $match[3];
+                    } else if ($partCount == 3) {
+                        // This could be either a type and a signature or a signature and a description.
+                        if (mb_strpos($match[1], '(') != false) {
+                            // The return type was omitted, e.g. '@method foo() My description.', in which case the
+                            // method returns 'void'.
+                            $type = 'void';
+                            $methodSignature = $match[1];
+                            $description = $match[2];
+                        } else {
+                            // The description was omitted.
+                            $type = $match[1];
+                            $methodSignature = $match[2];
+                            $description = null;
+                        }
+                    } else if ($partCount == 2) {
+                        $tpe = 'void';
+                        $methodSignature = $match[1];
+                        $description = null;
+                    } else {
+                        continue; // Empty @method tag, skip it.
+                    }
+
+                    $parameters = [];
+
+                    if (preg_match('/^([A-Za-z0-9_]+)\((.*)\)$/', $methodSignature, $match) !== false) {
+                        $methodName = $match[1];
+                        $methodParameterList = $match[2];
+
+                        // NOTE: Example string: "$param1, int $param2, $param3 = array(), SOME\\TYPE_1 $param4 = null".
+                        preg_match_all('/(?:(\S+)\s+)?(\$[A-Za-z0-9_]+)(?:\s*=\s*([^,]+))?(?:,|$)/', $methodParameterList, $matches, PREG_SET_ORDER);
+
+                        foreach ($matches as $match) {
+                            $partCount = count($match);
+
+                            if ($partCount == 4) {
+                                $parameterType = $match[1];
+                                $parameterName = $match[2];
+                                $defaultValue = $match[3];
+                            } elseif ($partCount == 3) {
+                                if ($match[1][0] == '$') {
+                                    $parameterType = null;
+                                    $parameterName = $match[1];
+                                    $defaultValue = $match[2];
+                                } else {
+                                    $parameterType = $match[1];
+                                    $parameterName = $match[2];
+                                    $defaultValue = null;
+                                }
+                            } elseif ($partCount == 2) {
+                                $parameterType = null;
+                                $parameterName = $match[1];
+                                $defaultValue = null;
+                            } else {
+                                continue; // Invalid parameter list.
+                            }
+
+                            $parameters[$parameterName] = [
+                                'type'         => $parameterType,
+                                'defaultValue' => $defaultValue,
+                                'isOptional'   => !!$defaultValue
+                            ];
+                        }
+                    } else {
+                        continue; // Invalid method signature.
+                    }
+
+                    $methods[$methodName] = [
+                        'type'        => $type,
+                        'parameters'  => $parameters,
+                        'description' => $description
+                    ];
+                }
+            }
+        }
+
+        return [
+            'methods' => $methods
         ];
     }
 
