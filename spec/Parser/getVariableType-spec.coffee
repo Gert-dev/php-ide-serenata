@@ -327,7 +327,8 @@ describe "getVariableType", ->
             """
             <?php
 
-            /** @var EXPECTED\\TYPE_1 $test */
+            /** @var EXPECTED\\TYPE_1 $test1 A description. */
+            /** @var EXPECTED\\TYPE_1 $test2 */
 
             some_code_here();
             """
@@ -341,14 +342,16 @@ describe "getVariableType", ->
             row    : row
             column : column
 
-        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+        expect(parser.getVariableType(editor, bufferPosition, '$test1')).toEqual('EXPECTED\\TYPE_1')
+        expect(parser.getVariableType(editor, bufferPosition, '$test2')).toEqual('EXPECTED\\TYPE_1')
 
     it "correctly returns the type of a variable through a reverse type annotation.", ->
         source =
             """
             <?php
 
-            /** @var $test EXPECTED\\TYPE_1 */
+            /** @var $test1 EXPECTED\\TYPE_1 A description. */
+            /** @var $test2 EXPECTED\\TYPE_1 */
 
             some_code_here();
             """
@@ -362,7 +365,8 @@ describe "getVariableType", ->
             row    : row
             column : column
 
-        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+        expect(parser.getVariableType(editor, bufferPosition, '$test1')).toEqual('EXPECTED\\TYPE_1')
+        expect(parser.getVariableType(editor, bufferPosition, '$test2')).toEqual('EXPECTED\\TYPE_1')
 
     it "correctly returns the last type of a variable who's type changes over time.", ->
         source =

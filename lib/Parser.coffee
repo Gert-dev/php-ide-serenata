@@ -565,7 +565,7 @@ class Parser
             scanStartPosition = range.start
 
             # Check for a type annotation in the style of /** @var FooType $someVar */.
-            regexTypeAnnotation = ///\/\*\*\s*@var\s+(#{classRegexPart})\s+#{elementForRegex}\s*\*\////
+            regexTypeAnnotation = ///\/\*\*\s*@var\s+(#{classRegexPart})\s+#{elementForRegex}\s*(\s.*)?\*\////
 
             editor.getBuffer().backwardsScanInRange regexTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
                 bestMatch = @determineFullClassName(editor, matchInfo.match[1])
@@ -575,7 +575,7 @@ class Parser
             return bestMatch if bestMatch # An annotation is definitive.
 
             # Check for a type annotation in the style of /** @var $someVar FooType */.
-            regexReverseTypeAnnotation = ///\/\*\*\s*@var\s+#{elementForRegex}\s+(#{classRegexPart})\s*\*\////
+            regexReverseTypeAnnotation = ///\/\*\*\s*@var\s+#{elementForRegex}\s+(#{classRegexPart})\s*(\s.*)?\*\////
 
             editor.getBuffer().backwardsScanInRange regexReverseTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
                 bestMatch = @determineFullClassName(editor, matchInfo.match[1])
