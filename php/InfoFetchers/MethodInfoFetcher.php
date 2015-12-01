@@ -91,6 +91,10 @@ class MethodInfoFetcher extends FunctionInfoFetcher implements InfoFetcherInterf
             'declaringStructure' => $this->getDeclaringStructure($method)
         ]);
 
+        // Determine this again as members can return types such as 'static', which requires the declaring class, which
+        // was not available yet before.
+        $data['return']['resolvedType'] = $this->determineFullReturnType($data);
+
         return $data;
     }
 }
