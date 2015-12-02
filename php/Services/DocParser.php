@@ -236,6 +236,9 @@ class DocParser
             if ($varName && mb_substr($varName, 1) == $itemName) {
                 $type = $varType;
                 $description = $varDescription;
+            } else if (!$varName && !$varDescription) {
+                // Support the alternative short-hand syntax with only a type: "@var DateTime".
+                $type = $varType;
             }
         }
 
