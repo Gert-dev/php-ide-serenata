@@ -79,6 +79,7 @@ trait MemberInfoFetcherTrait
         // This will point to the class that contains the member, which will resolve to the parent class if it's
         // inherited (and not overridden).
         $declaringClass = $reflectionMember->getDeclaringClass();
+        $isMethod = ($reflectionMember instanceof ReflectionMethod);
 
         $data = [
             'name'      => $declaringClass->name,
