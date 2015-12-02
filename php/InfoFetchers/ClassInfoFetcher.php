@@ -111,9 +111,10 @@ class ClassInfoFetcher implements InfoFetcherInterface
             }
 
             $declaringClass = [
-                'name'      => $class->getName(),
-                'filename'  => $class->getFilename(),
-                'startLine' => $class->getStartLine()
+                'name'            => $class->getName(),
+                'filename'        => $class->getFileName(),
+                'startLine'       => $class->getStartLine(),
+                'startLineMember' => $class->getStartLine()
             ];
 
             foreach ($list as $magicPropertyName => $magicPropertyData) {
@@ -141,9 +142,10 @@ class ClassInfoFetcher implements InfoFetcherInterface
             }
 
             $declaringClass = [
-                'name'      => $class->getName(),
-                'filename'  => $class->getFilename(),
-                'startLine' => $class->getStartLine()
+                'name'            => $class->getName(),
+                'filename'        => $class->getFileName(),
+                'startLine'       => $class->getStartLine(),
+                'startLineMember' => $class->getStartLine()
             ];
 
             foreach ($list as $magicMethodName => $magicMethodData) {

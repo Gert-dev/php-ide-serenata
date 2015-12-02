@@ -9,29 +9,50 @@ class FileParser
     const DEFINITION_PATTERN = '/^\s*(?:abstract class|class|trait|interface)\s+(\w+)/';
 
     /**
-     * @var string Handler to the file
+     * @var string
      */
-    protected $file;
+    protected $filename;
 
     /**
-     * Open the given file
-     * @param string $filePath Path to the PHP file
+     * Constructor.
+     *
+     * @param string $filename
      */
-    public function __construct($filePath)
+    public function __construct($filename)
     {
-        if (!file_exists($filePath)) {
-            throw new \Exception(sprintf('File %s not found', $filePath));
+        if (!file_exists($filename)) {
+            throw new \Exception(sprintf('File %s not found', $filename));
         }
 
-        $this->file = fopen($filePath, 'r');
+        $this->filename = $filename;
     }
 
     /**
-     * Destructor.
+     * Retrieves the line the specified regular expression first matches at. The first line has a value of 1.
+     *
+     * @return int|null
      */
-    public function __destruct()
+    public function getLineForRegex($regex)
     {
-        fclose($this->file);
+        $lineNum = 1;
+        $found = false;
+        $matches = null;
+        $file = fopen($this->filename, 'r');
+
+        while (!feof($file)) {
+            $line = fgets($file);
+
+            if (preg_match($regex, $line, $matches) === 1) {
+                $found = true;
+                break;
+            }
+
+            ++$lineNum;
+        }
+
+        fclose($file);
+
+        return $found ? $lineNum : null;
     }
 
     /**
@@ -55,8 +76,10 @@ class FileParser
         $found = false;
         $fullClass = $className;
 
-        while (!feof($this->file)) {
-            $line = fgets($this->file);
+        $file = fopen($this->filename, 'r');
+
+        while (!feof($file)) {
+            $line = fgets($file);
 
             if (preg_match(self::NAMESPACE_PATTERN, $line, $matches) === 1) {
                 // The class name is relative to the namespace of the class it is contained in, unless a use statement
@@ -97,6 +120,8 @@ class FileParser
         if ($fullClass && $fullClass[0] == '\\') {
             $fullClass = substr($fullClass, 1);
         }
+
+        fclose($file);
 
         return $fullClass;
     }

@@ -33,8 +33,10 @@ class ConstantInfoFetcher implements InfoFetcherInterface
         }
 
         return [
-            'name'     => $declaringClass->name,
-            'filename' => $declaringClass->getFileName()
+            'name'            => $declaringClass->name,
+            'filename'        => $declaringClass->getFileName(),
+            'startLine'       => $declaringClass->getStartLine(),
+            'startLineMember' => $this->getStartLineIn($declaringClass->getFileName(), $name)
         ];
     }
 
@@ -49,27 +51,44 @@ class ConstantInfoFetcher implements InfoFetcherInterface
     protected function getDeclaringStructure($name, ReflectionClass $class)
     {
         $parent = $class;
-        $declaringClass = $class;
+        $declaringStructure = $class;
 
         while ($parent = $parent->getParentClass()) {
             if (!$parent->hasConstant($name)) {
                 break;
             }
 
-            $declaringClass = $parent;
+            $declaringStructure = $parent;
         }
 
-        foreach ($declaringClass->getInterfaces() as $interface) {
+        foreach ($declaringStructure->getInterfaces() as $interface) {
             if ($interface->hasConstant($name)) {
-                $declaringClass = $interface;
+                $declaringStructure = $interface;
                 break;
             }
         }
 
         return [
-            'name'     => $declaringClass->name,
-            'filename' => $declaringClass->getFileName()
+            'name'            => $declaringStructure->name,
+            'filename'        => $declaringStructure->getFileName(),
+            'startLine'       => $declaringStructure->getStartLine(),
+            'startLineMember' => $this->getStartLineIn($declaringStructure->getFileName(), $name)
         ];
+    }
+
+    /**
+     * Retrieves the line the specified constant starts at.
+     *
+     * @param string $filename
+     * @param string $name
+     *
+     * @return int|null
+     */
+    protected function getStartLineIn($filename, $name)
+    {
+        $parser = new FileParser($filename);
+
+        return $parser->getLineForRegex("/const\\s+$name/");
     }
 
     /**

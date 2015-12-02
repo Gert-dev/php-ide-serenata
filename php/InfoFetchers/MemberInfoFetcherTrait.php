@@ -80,11 +80,19 @@ trait MemberInfoFetcherTrait
         // inherited (and not overridden).
         $declaringClass = $reflectionMember->getDeclaringClass();
 
-        return [
+        $data = [
             'name'      => $declaringClass->name,
-            'filename'  => $declaringClass->getFilename(),
+            'filename'  => $declaringClass->getFileName(),
             'startLine' => $declaringClass->getStartLine()
         ];
+
+        if ($isMethod) {
+            $data['startLineMember'] = $declaringClass->getMethod($reflectionMember->name)->getStartLine();
+        } else {
+            $data['startLineMember'] = $this->getStartLineForPropertyIn($declaringClass->getFileName(), $reflectionMember->name);
+        }
+
+        return $data;
     }
 
     /**
@@ -112,10 +120,33 @@ trait MemberInfoFetcherTrait
             }
         }
 
-        return [
+        $data = [
             'name'      => $declaringStructure->name,
-            'filename'  => $declaringStructure->getFilename(),
+            'filename'  => $declaringStructure->getFileName(),
             'startLine' => $declaringStructure->getStartLine()
         ];
+
+        if ($isMethod) {
+            $data['startLineMember'] = $declaringStructure->getMethod($reflectionMember->name)->getStartLine();
+        } else {
+            $data['startLineMember'] = $this->getStartLineForPropertyIn($declaringStructure->getFileName(), $reflectionMember->name);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Retrieves the line the specified property starts at.
+     *
+     * @param string $filename
+     * @param string $name
+     *
+     * @return int|null
+     */
+    protected function getStartLineForPropertyIn($filename, $name)
+    {
+        $parser = new FileParser($filename);
+
+        return $parser->getLineForRegex("/(?:protected|public|private|static)\\s+\\$$name/");
     }
 }
