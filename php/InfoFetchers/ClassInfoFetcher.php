@@ -125,6 +125,7 @@ class ClassInfoFetcher implements InfoFetcherInterface
 
                 $data[$key][$actualName] = $this->propertyFetcher->createDefaultInfo([
                     'isMagic'            => true,
+                    'isStatic'           => $magicPropertyData['isStatic'],
                     'name'               => $actualName,
                     'descriptions'       => ['short' => $magicPropertyData['description']],
                     'return'             => ['type'  => $magicPropertyData['type']],
@@ -148,6 +149,7 @@ class ClassInfoFetcher implements InfoFetcherInterface
             foreach ($list as $magicMethodName => $magicMethodData) {
                 $data[$key][$magicMethodName] = $this->methodFetcher->createDefaultInfo([
                     'isMagic'            => true,
+                    'isStatic'           => $magicMethodData['isStatic'],
                     'name'               => $magicMethodName,
                     'descriptions'       => ['short' => $magicMethodData['description']],
                     'return'             => ['type'  => $magicMethodData['type']],

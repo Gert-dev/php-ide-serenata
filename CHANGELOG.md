@@ -1,3 +1,18 @@
+## ?.?.?
+### Features and enhancements
+* Made it possible to make magic members static. This is not documented in phpDocumentor's documentation, but useful and also used by PHPStorm:
+
+```php
+/**
+ * @method static void foo()
+ * @property static Foo $test
+ */
+class Foo
+{
+    ...
+}
+```
+
 ## 0.3.1
 ### Bugs Fixed
 * Fixed methods returning 'static', 'self' or '$this' not properly having their full type deduced.

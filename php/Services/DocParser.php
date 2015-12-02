@@ -129,6 +129,30 @@ class DocParser
     }
 
     /**
+     * Returns an array of $partCount values, the first value will go up until the first space, the second value will
+     * go up until the second space, and so on. The last value will contain the rest of the string. Convenience method
+     * for tags that consist of multiple parameters. This method returns an array with guaranteed $partCount elements.
+     *
+     * @param string $value
+     * @param int    $partCount
+     *
+     * @return string[]
+     */
+    protected function filterParameterTag($value, $partCount)
+    {
+        $segments = [];
+        $parts = explode(' ', $value);
+
+        $partCount = count($parts);
+
+        for ($i = 0; $i < $partCount; ++$i) {
+            $segments[$i] = ($i < $partCount) ? $this->sanitizeText($parts[$i]) : null;
+        }
+
+        return $segments;
+    }
+
+    /**
      * Returns an array of three values, the first value will go up until the first space, the second value will go up
      * until the second space, and the third value will contain the rest of the string. Convenience method for tags that
      * consist of three parameters.
@@ -139,18 +163,7 @@ class DocParser
      */
     protected function filterThreeParameterTag($value)
     {
-        $parts = explode(' ', $value);
-
-        $firstPart = $this->sanitizeText(array_shift($parts));
-        $secondPart = $this->sanitizeText(array_shift($parts));
-
-        if (!empty($parts)) {
-            $thirdPart = $this->sanitizeText(implode(' ', $parts));
-        } else {
-            $thirdPart = null;
-        }
-
-        return [$firstPart ?: null, $secondPart ?: null, $thirdPart];
+        return $this->filterParameterTag($value, 3);
     }
 
     /**
@@ -163,9 +176,7 @@ class DocParser
      */
     protected function filterTwoParameterTag($value)
     {
-        list($firstPart, $secondPart, $thirdPart) = $this->filterThreeParameterTag($value);
-
-        return [$firstPart, trim($secondPart . ' ' . $thirdPart)];
+        return $this->filterParameterTag($value, 2);
     }
 
     /**
@@ -322,33 +333,36 @@ class DocParser
             foreach ($tags[static::METHOD] as $tag) {
                 // The method signature can contain spaces, so we can't use a simple filterTwoParameterTag or
                 // filterThreeParameterTag.
-                if (preg_match('/^(?:(\S+)\s+)?([A-Za-z0-9_]+\(.*\))(?:\s+(.+))?$/', $tag, $match) !== false) {
+                if (preg_match('/^(static\s+)?(?:(\S+)\s+)?([A-Za-z0-9_]+\(.*\))(?:\s+(.+))?$/', $tag, $match) !== false) {
                     $partCount = count($match);
 
-                    if ($partCount == 4) {
-                        $type = $match[1];
-                        $methodSignature = $match[2];
-                        $description = $match[3];
-                    } else if ($partCount == 3) {
-                        if (empty($match[1])) {
+                    if ($partCount == 5) {
+                        $type = $match[2];
+                        $methodSignature = $match[3];
+                        $description = $match[4];
+                    } else if ($partCount == 4) {
+                        if (empty($match[2])) {
                             $type = 'void';
-                            $methodSignature = $match[2];
+                            $methodSignature = $match[3];
                             $description = null;
-                        } elseif (mb_strpos($match[1], '(') != false) {
+                        } elseif (mb_strpos($match[2], '(') != false) {
                             // The return type was omitted, e.g. '@method foo() My description.', in which case the
                             // method returns 'void'.
                             $type = 'void';
-                            $methodSignature = $match[1];
-                            $description = $match[2];
+                            $methodSignature = $match[2];
+                            $description = $match[3];
                         } else {
                             // The description was omitted.
-                            $type = $match[1];
-                            $methodSignature = $match[2];
+                            $type = $match[2];
+                            $methodSignature = $match[3];
                             $description = null;
                         }
                     } else {
                         continue; // Empty @method tag, skip it.
                     }
+
+                    $isStatic = (trim($match[1]) === 'static');
+                    // $isStatic = $match[1];
 
                     $requiredParameters = [];
                     $optionalParameters = [];
@@ -403,6 +417,7 @@ class DocParser
 
                     $methods[$methodName] = [
                         'type'                => $type,
+                        'isStatic'            => $isStatic,
                         'requiredParameters'  => $requiredParameters,
                         'optionalParameters'  => $optionalParameters,
                         'description'         => $description
@@ -431,10 +446,17 @@ class DocParser
 
         if (isset($tags[static::PROPERTY])) {
             foreach ($tags[static::PROPERTY] as $tag) {
-                list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
+                list($staticKeyword, $type, $variableName, $description) = $this->filterParameterTag($tag, 4);
+
+                // Normally, this tag consists of three parts. However, PHPStorm uses an extended syntax that allows
+                // putting the keyword 'static' as first part of the tag to indicate that the property is indeed static.
+                if ($staticKeyword !== 'static') {
+                    list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
+                }
 
                 $properties[$variableName] = [
                     'type'        => $type,
+                    'isStatic'    => ($staticKeyword === 'static'),
                     'description' => $description
                 ];
             }
