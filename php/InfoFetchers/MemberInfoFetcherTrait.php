@@ -146,6 +146,10 @@ trait MemberInfoFetcherTrait
      */
     protected function getStartLineForPropertyIn($filename, $name)
     {
+        if (!$filename) {
+            return null;
+        }
+
         $parser = new FileParser($filename);
 
         return $parser->getLineForRegex("/(?:protected|public|private|static)\\s+\\$$name/");

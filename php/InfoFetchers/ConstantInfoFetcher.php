@@ -86,6 +86,10 @@ class ConstantInfoFetcher implements InfoFetcherInterface
      */
     protected function getStartLineIn($filename, $name)
     {
+        if (!$filename) {
+            return null;
+        }
+
         $parser = new FileParser($filename);
 
         return $parser->getLineForRegex("/const\\s+$name/");
