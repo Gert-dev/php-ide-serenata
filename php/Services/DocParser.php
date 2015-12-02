@@ -362,7 +362,6 @@ class DocParser
                     }
 
                     $isStatic = (trim($match[1]) === 'static');
-                    // $isStatic = $match[1];
 
                     $requiredParameters = [];
                     $optionalParameters = [];
@@ -434,18 +433,20 @@ class DocParser
     /**
      * Filters out information about the magic properties of a class.
      *
+     * @param string $tagName
+     * @param string $keyName
      * @param string $docblock
      * @param string $itemName
      * @param array  $tags
      *
      * @return array
      */
-    protected function filterProperty($docblock, $itemName, array $tags)
+    protected function filterPropertyTag($tagName, $keyName, $docblock, $itemName, array $tags)
     {
         $properties = [];
 
-        if (isset($tags[static::PROPERTY])) {
-            foreach ($tags[static::PROPERTY] as $tag) {
+        if (isset($tags[$tagName])) {
+            foreach ($tags[$tagName] as $tag) {
                 list($staticKeyword, $type, $variableName, $description) = $this->filterParameterTag($tag, 4);
 
                 // Normally, this tag consists of three parts. However, PHPStorm uses an extended syntax that allows
@@ -463,8 +464,22 @@ class DocParser
         }
 
         return [
-            'properties' => $properties
+            $keyName => $properties
         ];
+    }
+
+    /**
+     * Filters out information about the magic properties of a class.
+     *
+     * @param string $docblock
+     * @param string $itemName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterProperty($docblock, $itemName, array $tags)
+    {
+        return $this->filterPropertyTag(static::PROPERTY, 'properties', $docblock, $itemName, $tags);
     }
 
     /**
@@ -478,22 +493,7 @@ class DocParser
      */
     protected function filterPropertyRead($docblock, $itemName, array $tags)
     {
-        $properties = [];
-
-        if (isset($tags[static::PROPERTY_READ])) {
-            foreach ($tags[static::PROPERTY_READ] as $tag) {
-                list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
-
-                $properties[$variableName] = [
-                    'type'        => $type,
-                    'description' => $description
-                ];
-            }
-        }
-
-        return [
-            'propertiesReadOnly' => $properties
-        ];
+        return $this->filterPropertyTag(static::PROPERTY_READ, 'propertiesReadOnly', $docblock, $itemName, $tags);
     }
 
     /**
@@ -507,22 +507,7 @@ class DocParser
      */
     protected function filterPropertyWrite($docblock, $itemName, array $tags)
     {
-        $properties = [];
-
-        if (isset($tags[static::PROPERTY_WRITE])) {
-            foreach ($tags[static::PROPERTY_WRITE] as $tag) {
-                list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
-
-                $properties[$variableName] = [
-                    'type'        => $type,
-                    'description' => $description
-                ];
-            }
-        }
-
-        return [
-            'propertiesWriteOnly' => $properties
-        ];
+        return $this->filterPropertyTag(static::PROPERTY_WRITE, 'propertiesWriteOnly', $docblock, $itemName, $tags);
     }
 
     /**
