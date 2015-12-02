@@ -153,33 +153,6 @@ class DocParser
     }
 
     /**
-     * Returns an array of three values, the first value will go up until the first space, the second value will go up
-     * until the second space, and the third value will contain the rest of the string. Convenience method for tags that
-     * consist of three parameters.
-     *
-     * @param string $value
-     *
-     * @return string[]
-     */
-    protected function filterThreeParameterTag($value)
-    {
-        return $this->filterParameterTag($value, 3);
-    }
-
-    /**
-     * Returns an array of two values, the first value will go up until the first space and the second value will
-     * contain the rest of the string. Convenience method for tags that consist of two parameters.
-     *
-     * @param string $value
-     *
-     * @return string[]
-     */
-    protected function filterTwoParameterTag($value)
-    {
-        return $this->filterParameterTag($value, 2);
-    }
-
-    /**
      * Filters out information about the return value of the function or method.
      *
      * @param string $docblock
@@ -191,7 +164,7 @@ class DocParser
     protected function filterReturn($docblock, $itemName, array $tags)
     {
         if (isset($tags[static::RETURN_VALUE])) {
-            list($type, $description) = $this->filterTwoParameterTag($tags[static::RETURN_VALUE][0]);
+            list($type, $description) = $this->filterParameterTag($tags[static::RETURN_VALUE][0], 2);
         } else {
             $type = null;
             $description = null;
@@ -227,7 +200,7 @@ class DocParser
 
         if (isset($tags[static::PARAM_TYPE])) {
             foreach ($tags[static::PARAM_TYPE] as $tag) {
-                list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
+                list($type, $variableName, $description) = $this->filterParameterTag($tag, 3);
 
                 $params[$variableName] = [
                     'type'        => $type,
@@ -256,7 +229,7 @@ class DocParser
         $description = null;
 
         if (isset($tags[static::VAR_TYPE])) {
-            list($varType, $varName, $varDescription) = $this->filterThreeParameterTag($tags[static::VAR_TYPE][0]);
+            list($varType, $varName, $varDescription) = $this->filterParameterTag($tags[static::VAR_TYPE][0], 3);
 
             // @var contains the name of the property it documents, it must match the property we're fetching
             // documentation about.
@@ -305,7 +278,7 @@ class DocParser
 
         if (isset($tags[static::THROWS])) {
             foreach ($tags[static::THROWS] as $tag) {
-                list($type, $description) = $this->filterTwoParameterTag($tag);
+                list($type, $description) = $this->filterParameterTag($tag, 2);
 
                 $throws[$type] = $description;
             }
@@ -331,8 +304,7 @@ class DocParser
 
         if (isset($tags[static::METHOD])) {
             foreach ($tags[static::METHOD] as $tag) {
-                // The method signature can contain spaces, so we can't use a simple filterTwoParameterTag or
-                // filterThreeParameterTag.
+                // The method signature can contain spaces, so we can't use a simple filterParameterTag.
                 if (preg_match('/^(static\s+)?(?:(\S+)\s+)?([A-Za-z0-9_]+\(.*\))(?:\s+(.+))?$/', $tag, $match) !== false) {
                     $partCount = count($match);
 
@@ -452,7 +424,7 @@ class DocParser
                 // Normally, this tag consists of three parts. However, PHPStorm uses an extended syntax that allows
                 // putting the keyword 'static' as first part of the tag to indicate that the property is indeed static.
                 if ($staticKeyword !== 'static') {
-                    list($type, $variableName, $description) = $this->filterThreeParameterTag($tag);
+                    list($type, $variableName, $description) = $this->filterParameterTag($tag, 3);
                 }
 
                 $properties[$variableName] = [
