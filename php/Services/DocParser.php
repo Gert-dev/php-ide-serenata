@@ -143,10 +143,10 @@ class DocParser
         $segments = [];
         $parts = explode(' ', $value);
 
-        $partCount = count($parts);
+        $detectedPartCount = count($parts);
 
         for ($i = 0; $i < $partCount; ++$i) {
-            $segments[$i] = ($i < $partCount) ? $this->sanitizeText($parts[$i]) : null;
+            $segments[$i] = ($i < $detectedPartCount) ? $this->sanitizeText($parts[$i]) : null;
         }
 
         return $segments;
