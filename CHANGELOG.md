@@ -15,7 +15,7 @@ class Foo
 
 ### Changes for developers
 * Changes to the service
-  * Constants and class properties will now retrieve their startLine as well. These items not being available was previously manually worked around in the php-integrator-navigation package. This manual workaround is now present in the base package as CoffeeScript should not have to bend itself backwars to get this information because PHP Reflection does not offer it.
+  * Constants and class properties will now retrieve their start line as well. These items not being available was previously manually worked around in the php-integrator-navigation package. This manual workaround is now present in the base package as CoffeeScript should not have to bend itself backwars to get this information because PHP Reflection does not offer it.
   * declaringClass and declaringStructure will now also contain a startLineMember property that indicates the start line of the member in the respective class or structural element.
 
 ## 0.3.1
