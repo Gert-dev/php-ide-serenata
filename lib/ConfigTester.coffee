@@ -20,7 +20,7 @@ class ConfigTester
         response = child_process.spawnSync(@config.get('phpCommand'), ["-v"])
 
         if response.status = null or response.status != 0
-            return false
+            return -1
 
         # Test Composer.
         response = child_process.spawnSync(@config.get('phpCommand'), [@config.get('composerCommand'), "--version"])
@@ -30,6 +30,6 @@ class ConfigTester
 
             # Try executing Composer directly.
             if response.status = null or response.status != 0
-                return false
+                return -2
 
         return true
