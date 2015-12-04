@@ -13,6 +13,8 @@ class Foo
 }
 ```
 
+* When testing your configuration, the error message will now try to determine if the problem is with PHP or Composer instead of mentioning "PHP or Composer" in the error message (thanks to @wcatron).
+
 ### Changes for developers
 * Changes to the service
   * Constants and class properties will now retrieve their start line as well. These items not being available was previously manually worked around in the php-integrator-navigation package. This manual workaround is now present in the base package as CoffeeScript should not have to bend itself backwars to get this information because PHP Reflection does not offer it.
