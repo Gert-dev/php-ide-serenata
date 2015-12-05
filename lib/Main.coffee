@@ -84,24 +84,26 @@ module.exports =
     ###
     testConfig: () ->
         configTester = new ConfigTester(@configuration)
+
         result = configTester.test()
+
         if result < 0
+            errorItem = null
             errorTitle = 'Incorrect setup!'
-            if (result == -1) {
-              # PHP Error
-              errorMessage = 'PHP is not correctly set up and as a result PHP integrator will not ' +
-                'work. Please visit the settings screen to correct this error. If you are not specifying an absolute ' +
-                'path for PHP or Composer, make sure they are in your PATH.'
-            } else if (result == -2) {
-              # Composer Error
-              errorMessage = 'Composer is not correctly set up and as a result PHP integrator will not ' +
-                'work. Please visit the settings screen to correct this error. If you are not specifying an absolute ' +
-                'path for PHP or Composer, make sure they are in your PATH.'
-            } else {
-              errorMessage = 'Either PHP or Composer is not correctly set up and as a result PHP integrator will not ' +
-                'work. Please visit the settings screen to correct this error. If you are not specifying an absolute ' +
-                'path for PHP or Composer, make sure they are in your PATH.'
-            }
+
+            if result == -1
+                errorItem = 'PHP'
+
+            else if result == -2
+                errorItem = 'Composer'
+
+            else
+                errorItem = 'Either PHP or Composer'
+
+            errorMessage =
+                "#{errorItem} is not correctly set up and as a result PHP integrator will not
+                 work. Please visit the settings screen to correct this error. If you are not specifying an absolute
+                 path for PHP or Composer, make sure they are in your PATH."
 
             atom.notifications.addError(errorTitle, {'detail': errorMessage})
 
