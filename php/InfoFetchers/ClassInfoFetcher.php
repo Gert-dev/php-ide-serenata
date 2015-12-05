@@ -189,11 +189,12 @@ class ClassInfoFetcher implements InfoFetcherInterface
     /**
      * Returns information about the specified class.
      *
-     * @param ReflectionClass $class
+     * @param ReflectionClass      $class
+     * @param ReflectionClass|null $unusedClass
      *
      * @return array
      */
-    public function getInfo($class)
+    public function getInfo($class, ReflectionClass $unusedClass = null)
     {
         if (!$class instanceof ReflectionClass) {
             throw new \InvalidArgumentException("The passed argument is not of the correct type!");
@@ -226,11 +227,11 @@ class ClassInfoFetcher implements InfoFetcherInterface
         ];
 
         foreach ($class->getMethods() as $method) {
-            $data['methods'][$method->getName()] = $this->methodFetcher->getInfo($method);
+            $data['methods'][$method->getName()] = $this->methodFetcher->getInfo($method, $class);
         }
 
         foreach ($class->getProperties() as $property) {
-            $data['properties'][$property->getName()] = $this->propertyFetcher->getInfo($property);
+            $data['properties'][$property->getName()] = $this->propertyFetcher->getInfo($property, $class);
         }
 
         foreach ($class->getConstants() as $constant => $value) {

@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator;
 
+use ReflectionClass;
+
 /**
  * Interface for information fetchers.
  */
@@ -19,9 +21,10 @@ interface InfoFetcherInterface
     /**
      * Fetches information about the specified item.
      *
-     * @param mixed $item
+     * @param mixed                $item
+     * @param ReflectionClass|null $class
      *
      * @return array
      */
-    public function getInfo($item);
+    public function getInfo($item, ReflectionClass $class = null);
 }

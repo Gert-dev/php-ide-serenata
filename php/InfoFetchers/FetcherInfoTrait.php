@@ -55,11 +55,12 @@ trait FetcherInfoTrait
     /**
      * Resolves and determiens the full return type (class name) for the return value of the specified item.
      *
-     * @param array $info
+     * @param array       $info
+     * @param string|null $currentClass The class that contains the method (either through inheritance or directly).
      *
      * @return string|null
      */
-    protected function determineFullReturnType(array $info)
+    protected function determineFullReturnType(array $info, $currentClass = null)
     {
         if (!isset($info['return']['type']) || empty($info['return']['type'])) {
             return null;
@@ -67,8 +68,10 @@ trait FetcherInfoTrait
 
         $returnValue = $info['return']['type'];
 
-        if ($returnValue == '$this' || $returnValue == 'self' || $returnValue == 'static') {
+        if ($returnValue == '$this' || $returnValue == 'self') {
             return isset($info['declaringClass']['name']) ? $info['declaringClass']['name'] : null;
+        } elseif ($returnValue == 'static') {
+            return $currentClass ?: null;
         }
 
         $soleClassName = $this->getSoleClassName($returnValue);

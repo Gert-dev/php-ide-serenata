@@ -43,12 +43,12 @@ class ConstantInfoFetcher implements InfoFetcherInterface
     /**
      * Retrieves information about the structure (class, trait, interface, ...) that contains the specified constant.
      *
-     * @param string          $name
-     * @param ReflectionClass $class
+     * @param string               $name
+     * @param ReflectionClass|null $class
      *
      * @return array
      */
-    protected function getDeclaringStructure($name, ReflectionClass $class)
+    protected function getDeclaringStructure($name, ReflectionClass $class = null)
     {
         $parent = $class;
         $declaringStructure = $class;

@@ -2,6 +2,7 @@
 
 namespace PhpIntegrator;
 
+use ReflectionClass;
 use ReflectionFunctionAbstract;
 
 /**
@@ -150,10 +151,11 @@ class FunctionInfoFetcher implements InfoFetcherInterface
      * Retrieves a data structure containing information about the specified function (or method).
      *
      * @param ReflectionFunctionAbstract $function
+     * @param ReflectionClass|null       $class
      *
      * @return array
      */
-    public function getInfo($function)
+    public function getInfo($function, ReflectionClass $class = null)
     {
         if (!$function instanceof ReflectionFunctionAbstract) {
             throw new \InvalidArgumentException("The passed argument is not of the correct type!");

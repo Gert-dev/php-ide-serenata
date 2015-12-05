@@ -2,6 +2,7 @@
 
 namespace PhpIntegrator;
 
+use ReflectionClass;
 use ReflectionMethod;
 
 /**
@@ -66,11 +67,12 @@ class MethodInfoFetcher extends FunctionInfoFetcher implements InfoFetcherInterf
      * Retrieves a data structure containing information about the specified method, expanding upon
      * {@see getFunctionInfo} to provide additional information.
      *
-     * @param ReflectionMethod $method
+     * @param ReflectionMethod     $method
+     * @param ReflectionClass|null $class
      *
      * @return array
      */
-    public function getInfo($method)
+    public function getInfo($method, ReflectionClass $class = null)
     {
         if (!$method instanceof ReflectionMethod) {
             throw new \InvalidArgumentException("The passed argument is not of the correct type!");
@@ -93,7 +95,7 @@ class MethodInfoFetcher extends FunctionInfoFetcher implements InfoFetcherInterf
 
         // Determine this again as members can return types such as 'static', which requires the declaring class, which
         // was not available yet before.
-        $data['return']['resolvedType'] = $this->determineFullReturnType($data);
+        $data['return']['resolvedType'] = $this->determineFullReturnType($data, $class->name);
 
         return $data;
     }

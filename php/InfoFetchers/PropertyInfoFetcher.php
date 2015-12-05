@@ -93,11 +93,12 @@ class PropertyInfoFetcher implements InfoFetcherInterface
     /**
      * Retrieves a data structure containing information about the specified property.
      *
-     * @param ReflectionProperty $property
+     * @param ReflectionProperty   $property
+     * @param ReflectionClass|null $class
      *
      * @return array
      */
-    public function getInfo($property)
+    public function getInfo($property, ReflectionClass $class = null)
     {
         if (!$property instanceof ReflectionProperty) {
             throw new \InvalidArgumentException("The passed argument is not of the correct type!");
@@ -122,6 +123,10 @@ class PropertyInfoFetcher implements InfoFetcherInterface
             'descriptions'       => $documentation['descriptions'],
             'return'             => $documentation['var']
         ]);
+
+        // Determine this again as members can return types such as 'static', which requires the declaring class, which
+        // was not available yet before.
+        $data['return']['resolvedType'] = $this->determineFullReturnType($data, $class->name);
 
         // You can place documentation after the @var tag as well as at the start of the docblock. Fall back from the
         // latter to the former.
