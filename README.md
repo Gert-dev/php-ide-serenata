@@ -38,7 +38,7 @@ These limitations may affect other packages using the provided service:
   * Classes can override a method from a direct trait they're using, even if it is not abstract. In this case the class method will take precedence. With Reflection, there currently seems to be no way to detect this. This may lead to things such as code navigation taking you to the trait method instead of the overridding class method.
   * `static` and `self` behave mostly like `$this` in **non-static** contexts, i.e. they can also access non-static members.
 
-## Do you accept donations?
+## Regarding donations
 I do accept donations and am very grateful for any donation you may give, but they were not my primary intention when releasing this project as open source. As such, a link to the (PayPal) donation screen is located [here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ), at the bottom of the readme, hidden from initial sight and not even in the form of a fancy button ;-).
 
 ![GPLv3 Logo](http://gplv3.fsf.org/gplv3-127x51.png)
