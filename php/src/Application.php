@@ -34,32 +34,74 @@ class Application
         try {
             $command = $this->parseRequiredArguments($arguments);
 
-            if ($command === '--class-list') {
-                // TODO: Class list with constructor information.
-            } elseif ($command === '--class-info') {
-                // TODO: Class info on specified FQSEN.
-            } elseif ($command === '--functions') {
-                // TODO: Global functions.
-            } elseif ($command === '--constants') {
-                $constants = $this->indexDatabase->getConnection()->createQueryBuilder()
-                    ->select('*')
-                    ->from(IndexStorageItemEnum::CONSTANTS)
-                    ->where('structural_element_id IS NULL')
-                    ->execute()
-                    ->fetchAll();
+            $commands = [
+                '--class-list' => 'getClassList',
+                '--class-info' => 'getClassInfo',
+                '--functions'  => 'getGlobalFunctions',
+                '--constants'  => 'getGlobalConstants',
+                '--reindex'    => 'reindexProject'
+            ];
 
-                die(var_dump($constants));
-                // TODO: Global constants, still need to parse them into the appropriate format.
-
-                return $constants;
-            } elseif ($command === '--reindex') {
-                return $this->reindexProject($arguments);
+            if (isset($commands[$command])) {
+                $this->{$commands[$command]}($arguments);
             }
 
-            throw new UnexpectedValueException("Unknown command {$command}");
+            $supportedCommands = implode(', ', array_keys($commands));
+
+            throw new UnexpectedValueException("Unknown command {$command}, supported commands: {$supportedCommands}");
         } catch (UnexpectedValueException $e) {
             return $this->outputJson(false, $e->getMessage());
         }
+    }
+
+    /**
+     * @param array $arguments
+     *
+     * @return array
+     */
+    protected function getClassList(array $arguments)
+    {
+        // TODO: Class list with constructor information.
+    }
+
+    /**
+     * @param array $arguments
+     *
+     * @return array
+     */
+    protected function getClassInfo(array $arguments)
+    {
+        // TODO: Class info on specified FQSEN.
+    }
+
+    /**
+     * @param array $arguments
+     *
+     * @return array
+     */
+    protected function getGlobalFunctions(array $arguments)
+    {
+        // TODO: Global functions.
+    }
+
+    /**
+     * @param array $arguments
+     *
+     * @return array
+     */
+    protected function getGlobalConstants(array $arguments)
+    {
+        $constants = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::CONSTANTS)
+            ->where('structural_element_id IS NULL')
+            ->execute()
+            ->fetchAll();
+
+        die(var_dump($constants));
+        // TODO: Global constants, still need to parse them into the appropriate format.
+
+        return $constants;
     }
 
     /**
