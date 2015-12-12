@@ -62,6 +62,22 @@ class Application
     protected function getClassList(array $arguments)
     {
         // TODO: Class list with constructor information.
+
+        /*
+        $index = null;
+        $indexFile = Config::get('indexClasses');
+
+        if (file_exists($indexFile)) {
+            $index = json_decode(file_get_contents($indexFile), true);
+        }
+
+        return [
+            'success' => true,
+            // If it evaluates to false, the class map hasn't been generated yet, don't error out as it can take a while
+            // for it to be generated.
+            'result'  => $index ?: []
+        ];
+        */
     }
 
     /**
@@ -72,6 +88,33 @@ class Application
     protected function getClassInfo(array $arguments)
     {
         // TODO: Class info on specified FQSEN.
+
+        /*
+        $className = $args[0];
+
+        if (mb_strpos($className, '\\') === 0) {
+            $className = mb_substr($className, 1);
+        }
+
+        $classInfoFetcher = new ClassInfoFetcher(
+            new PropertyInfoFetcher(),
+            new MethodInfoFetcher(),
+            new ConstantInfoFetcher()
+        );
+
+        $reflectionClass = null;
+
+        try {
+            $reflectionClass = new ReflectionClass($className);
+        } catch (\Exception $e) {
+
+        }
+
+        return [
+            'success' => !!$reflectionClass,
+            'result'  => $reflectionClass ? $classInfoFetcher->getInfo($reflectionClass) : null
+        ];
+        */
     }
 
     /**
@@ -81,7 +124,35 @@ class Application
      */
     protected function getGlobalFunctions(array $arguments)
     {
-        // TODO: Global functions.
+        $result = [];
+
+        $definedFunctions = get_defined_functions();
+        $functionInfoFetcher = new FunctionInfoFetcher();
+
+        foreach ($definedFunctions as $group => $functions) {
+            foreach ($functions as $functionName) {
+                try {
+                    $function = new \ReflectionFunction($functionName);
+                } catch (\Exception $e) {
+                    continue;
+                }
+
+                $result[$function->getName()] = $functionInfoFetcher->getInfo($function);
+            }
+        }
+
+        /*$indexFunctions = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::CONSTANTS)
+            ->where('structural_element_id IS NULL')
+            ->execute()
+            ->fetchAll();
+
+        foreach ($indexFunctions as $function) {
+            $result[$function['name']] = $functionInfoFetcher->getInfo($function['name']);
+        }*/
+
+        return $this->outputJson(true, $result);
     }
 
     /**
@@ -167,6 +238,26 @@ class Application
         $projectPath = array_shift($arguments);
 
         $indexer = new Indexer($this->indexDatabase);
+
+        // TODO: Also index built-in classes (do this in the indexer).
+
+        /*
+        foreach (get_declared_classes() as $class) {
+            if (mb_strpos($class, 'PhpIntegrator') === 0) {
+                continue; // Don't include our own classes.
+            }
+
+            if ($value = $this->fetchClassInfo($class, false)) {
+                $index[$class] = $value;
+            }
+        }
+
+        foreach ($this->buildClassMap() as $class => $filePath) {
+            if ($value = $this->fetchClassInfo($class, true)) {
+                $index[$class] = $value;
+            }
+        }
+        */
 
         $indexer->indexProject($projectPath);
     }
