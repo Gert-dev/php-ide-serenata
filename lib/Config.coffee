@@ -79,6 +79,7 @@ class Config
      * Synchronizes the active relevant settings to a temporary file that can be used by the PHP side.
     ###
     synchronizeToPhpConfig: () ->
+        ###
         autoloadScripts = @get('autoloadScripts')
 
         if autoloadScripts?.length > 0
@@ -110,3 +111,4 @@ class Config
                """
 
         fs.writeFileSync(@data.packagePath + '/php/generated_config.php', text)
+        ###

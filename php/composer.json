@@ -1,0 +1,13 @@
+{
+    "autoload": {
+        "classmap": ["src/"],
+        "psr-0": {
+            "PhpIntegrator\\": "src/"
+        }
+    },
+
+    "require": {
+        "nikic/php-parser": "2.0.0beta1",
+        "doctrine/dbal": "2.5"
+    }
+}
