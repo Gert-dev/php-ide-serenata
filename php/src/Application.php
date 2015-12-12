@@ -43,7 +43,7 @@ class Application
             ];
 
             if (isset($commands[$command])) {
-                $this->{$commands[$command]}($arguments);
+                return $this->{$commands[$command]}($arguments);
             }
 
             $supportedCommands = implode(', ', array_keys($commands));
@@ -91,17 +91,37 @@ class Application
      */
     protected function getGlobalConstants(array $arguments)
     {
-        $constants = $this->indexDatabase->getConnection()->createQueryBuilder()
+        $constants = [];
+
+        $constantInfoFetcher = new ConstantInfoFetcher();
+
+        foreach (get_defined_constants(true) as $namespace => $constantList) {
+            if ($namespace === 'user') {
+                continue; // User constants are indexed.
+            }
+
+            // NOTE: Be very careful if you want to pass back the value, there are also escaped paths, newlines
+            // (PHP_EOL), etc. in there.
+            foreach ($constantList as $name => $value) {
+                $constants[$name] = $constantInfoFetcher->getInfo($name);
+                $constants[$name]['isBuiltin'] = true;
+                // $constants[$name]['isBuiltin'] = ($namespace !== 'user');
+            }
+        }
+
+        $indexConstants = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('*')
             ->from(IndexStorageItemEnum::CONSTANTS)
             ->where('structural_element_id IS NULL')
             ->execute()
             ->fetchAll();
 
-        die(var_dump($constants));
-        // TODO: Global constants, still need to parse them into the appropriate format.
+        foreach ($indexConstants as $constant) {
+            $constants[$constant['name']] = $constantInfoFetcher->getInfo($constant['name']);
+            $constants[$constant['name']]['isBuiltin'] = false;
+        }
 
-        return $constants;
+        return $this->outputJson(true, $constants);
     }
 
     /**
