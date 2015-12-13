@@ -3,7 +3,7 @@
 namespace PhpIntegrator;
 
 /**
- * Parser for PHP documentation
+ * Parser for PHP documentation.
  */
 class DocParser
 {

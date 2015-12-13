@@ -219,10 +219,19 @@ class Indexer
             'path' => $filename
         ]);
 
-        foreach ($outlineIndexingVisitor->getStructuralElements() as $fqsen => $structuralElement) {
-            // TODO: Need the DocParser for the remaining bits.
+        $docParser = new DocParser();
 
+        foreach ($outlineIndexingVisitor->getStructuralElements() as $fqsen => $structuralElement) {
             $seTypeId = $this->storage->getStructuralElementTypeId($structuralElement['type']);
+
+            $documentation = $docParser->parse($structuralElement['docComment'], [
+                DocParser::DEPRECATED,
+                DocParser::DESCRIPTION,
+                DocParser::METHOD,
+                DocParser::PROPERTY,
+                DocParser::PROPERTY_READ,
+                DocParser::PROPERTY_WRITE
+            ], $structuralElement['name']);
 
             $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, [
                 'name'                       => $structuralElement['name'],
@@ -231,9 +240,9 @@ class Indexer
                 'start_line'                 => $structuralElement['startLine'],
                 'structural_element_type_id' => $seTypeId,
                 'is_abstract'                => (isset($structuralElement['is_abstract']) && $structuralElement['is_abstract']) ? 1 : 0,
-                // 'is_deprecated'              => $structuralElement['is_deprecated'],
-                // 'short_description'          => $structuralElement['short_description'],
-                // 'long_description'           => $structuralElement['long_description']
+                'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
+                'short_description'          => $documentation['descriptions']['short'],
+                'long_description'           => $documentation['descriptions']['long']
             ]);
 
             if (isset($structuralElement['parent'])) {
@@ -303,18 +312,23 @@ class Indexer
 
                 $amId = $this->storage->getAccessModifierid($accessModifier);
 
+                $documentation = $docParser->parse($property['docComment'], [
+                    DocParser::VAR_TYPE,
+                    DocParser::DEPRECATED,
+                    DocParser::DESCRIPTION
+                ], $property['name']);
+
                 $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
                     'name'                  => $property['name'],
                     'file_id'               => $fileId,
                     'start_line'            => $property['startLine'],
-                    // 'is_deprecated'         => '',
-                    // 'short_description'     => '',
-                    // 'long_description'      => '',
-                    // 'return_type'           => '',
-                    // 'return_description'    => '',
+                    'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+                    'short_description'     => $documentation['descriptions']['short'],
+                    'long_description'      => $documentation['descriptions']['long'],
+                    'return_type'           => $documentation['var']['type'],
+                    'return_description'    => $documentation['var']['description'],
                     'structural_element_id' => $seId,
                     'access_modifier_id'    => $amId,
-
                     'is_magic'              => 0,
                     'is_static'             => $property['isStatic'] ? 1 : 0
                 ]);
@@ -335,97 +349,138 @@ class Indexer
 
                 $amId = $this->storage->getAccessModifierid($accessModifier);
 
-                // TODO: Try to determine return type from the docblock if it is null here.
+                $documentation = $docParser->parse($method['docComment'], [
+                    DocParser::THROWS,
+                    DocParser::PARAM_TYPE,
+                    DocParser::DEPRECATED,
+                    DocParser::DESCRIPTION,
+                    DocParser::RETURN_VALUE
+                ], $method['name']);
 
                 $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
                     'name'                  => $method['name'],
                     'file_id'               => $fileId,
                     'start_line'            => $method['startLine'],
                     'is_builtin'            => 0,
-                    // 'is_deprecated'         => '',
-                    // 'short_description'     => '',
-                    // 'long_description'      => '',
-                    'return_type'           => $method['returnType'],
-                    // 'return_description'    => '',
+                    'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+                    'short_description'     => $documentation['descriptions']['short'],
+                    'long_description'      => $documentation['descriptions']['long'],
+                    'return_type'           => $method['returnType'] ?: $documentation['return']['type'],
+                    'return_description'    => $documentation['return']['description'],
                     'structural_element_id' => $seId,
                     'access_modifier_id'    => $amId,
-
                     'is_magic'              => 0,
                     'is_static'             => $method['isStatic'] ? 1 : 0
                 ]);
 
                 foreach ($method['parameters'] as $parameter) {
-                    // TODO: Try to determine type from the docblock if it is null here.
+                    $parameterKey = '$' . $parameter['name'];
+                    $parameterDoc = isset($documentation['params'][$parameterKey]) ?
+                        $documentation['params'][$parameterKey] : null;
 
                     $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
                         'function_id' => $functionId,
                         'name'        => $parameter['name'],
-                        'type'        => $parameter['type'] ?: null,
+                        'type'        => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                        'description' => $parameterDoc ? $parameterDoc['description'] : null,
                         'is_optional' => $parameter['isOptional'] ? 1 : 0,
                         'is_variadic' => $parameter['isVariadic'] ? 1 : 0
                     ]);
                 }
 
-                // TODO: functions_throws, which we can fetch from the docblock.
+                foreach ($documentation['throws'] as $type => $description) {
+                    $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, [
+                        'function_id' => $functionId,
+                        'type'        => $type,
+                        'description' => $description ?: null
+                    ]);
+                }
             }
 
             foreach ($structuralElement['constants'] as $constant) {
+                $documentation = $docParser->parse($constant['docComment'], [
+                    DocParser::VAR_TYPE,
+                    DocParser::DEPRECATED,
+                    DocParser::DESCRIPTION
+                ], $constant['name']);
+
                 $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
                     'name'                  => $constant['name'],
                     'file_id'               => $fileId,
                     'start_line'            => $constant['startLine'],
                     'is_builtin'            => 0,
-                    // 'is_deprecated'         => '',
-                    // 'short_description'     => '',
-                    // 'long_description'      => '',
-                    // 'return_type'           => '',
-                    // 'return_description'    => '',
+                    'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+                    'short_description'     => $documentation['descriptions']['short'],
+                    'long_description'      => $documentation['descriptions']['long'],
+                    'return_type'           => $documentation['var']['type'],
+                    'return_description'    => $documentation['var']['description'],
                     'structural_element_id' => $seId
                 ]);
             }
         }
 
         foreach ($outlineIndexingVisitor->getGlobalFunctions() as $function) {
-            // TODO: Try to determine return type from the docblock if it is null here.
+            $documentation = $docParser->parse($function['docComment'], [
+                DocParser::THROWS,
+                DocParser::PARAM_TYPE,
+                DocParser::DEPRECATED,
+                DocParser::DESCRIPTION,
+                DocParser::RETURN_VALUE
+            ], $function['name']);
 
             $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
                 'name'                  => $function['name'],
                 'file_id'               => $fileId,
                 'start_line'            => $function['startLine'],
                 'is_builtin'            => 0,
-                // 'is_deprecated'         => '',
-                // 'short_description'     => '',
-                // 'long_description'      => '',
-                'return_type'           => $function['returnType'],
-                // 'return_description'    => ''
+                'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+                'short_description'     => $documentation['descriptions']['short'],
+                'long_description'      => $documentation['descriptions']['long'],
+                'return_type'           => $function['returnType'] ?: $documentation['return']['type'],
+                'return_description'    => $documentation['return']['description'],
             ]);
 
             foreach ($function['parameters'] as $parameter) {
-                // TODO: Try to determine type from the docblock if it is null here.
+                $parameterKey = '$' . $parameter['name'];
+                $parameterDoc = isset($documentation['params'][$parameterKey]) ?
+                    $documentation['params'][$parameterKey] : null;
 
                 $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
                     'function_id' => $functionId,
                     'name'        => $parameter['name'],
-                    'type'        => $parameter['type'] ?: null,
+                    'type'        => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                    'description' => $parameterDoc ? $parameterDoc['description'] : null,
                     'is_optional' => $parameter['isOptional'] ? 1 : 0,
                     'is_variadic' => $parameter['isVariadic'] ? 1 : 0
                 ]);
             }
 
-            // TODO: functions_throws, which we can fetch from the docblock.
+            foreach ($documentation['throws'] as $type => $description) {
+                $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, [
+                    'function_id' => $functionId,
+                    'type'        => $type,
+                    'description' => $description ?: null
+                ]);
+            }
         }
 
         foreach ($outlineIndexingVisitor->getGlobalConstants() as $constant) {
+            $documentation = $docParser->parse($constant['docComment'], [
+                DocParser::VAR_TYPE,
+                DocParser::DEPRECATED,
+                DocParser::DESCRIPTION
+            ], $constant['name']);
+
             $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
                 'name'                  => $constant['name'],
                 'file_id'               => $fileId,
                 'start_line'            => $constant['startLine'],
                 'is_builtin'            => 0,
-                // 'is_deprecated'         => '',
-                // 'short_description'     => '',
-                // 'long_description'      => '',
-                // 'return_type'           => '',
-                // 'return_description'    => ''
+                'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+                'short_description'     => $documentation['descriptions']['short'],
+                'long_description'      => $documentation['descriptions']['long'],
+                'return_type'           => $documentation['var']['type'],
+                'return_description'    => $documentation['var']['description']
             ]);
         }
     }

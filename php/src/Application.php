@@ -141,16 +141,35 @@ class Application
             }
         }
 
-        /*$indexFunctions = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('*')
-            ->from(IndexStorageItemEnum::CONSTANTS)
+        $indexFunctions = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('fu.*', 'fi.path')
+            ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
+            ->innerJoin(IndexStorageItemEnum::FILES, 'fi')
             ->where('structural_element_id IS NULL')
             ->execute()
             ->fetchAll();
 
         foreach ($indexFunctions as $function) {
-            $result[$function['name']] = $functionInfoFetcher->getInfo($function['name']);
-        }*/
+            $result[$function['name']] = [
+                'name'          => $function['name'],
+                'isBuiltin'     => false,
+                'startLine'     => $function['start_line'],
+                'filename'      => $function['path'],
+
+                // 'parameters'    => $parameters,
+                // 'optionals'     => $optionals,
+                // 'docParameters' => $documentation['params'],
+                // 'throws'        => $documentation['throws'],
+                // 'descriptions'  => $documentation['descriptions'],
+
+                'deprecated'    => $function['is_deprecated'],
+
+                'return'        => [
+                    'type'        => $function['return_type'],
+                    'description' => $function['return_description']
+                ]
+            ];
+        }
 
         return $this->outputJson(true, $result);
     }
@@ -213,6 +232,12 @@ class Application
         }
 
         $databasePath = array_shift($arguments);
+
+
+        unlink($databasePath); // TODO: Remove me. for testing purposes.
+
+
+
         $this->indexDatabase = new IndexDatabase($databasePath, static::DATABASE_VERSION);
 
         $command = array_shift($arguments);
@@ -229,8 +254,6 @@ class Application
      */
     protected function reindexProject(array $arguments)
     {
-        @unlink($this->databasePath); // TODO: Remove me. for testing purposes.
-
         if (empty($arguments)) {
             throw new UnexpectedValueException('The path to index is required for this command.');
         }

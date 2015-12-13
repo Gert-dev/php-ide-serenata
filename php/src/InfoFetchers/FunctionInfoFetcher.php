@@ -120,8 +120,6 @@ class FunctionInfoFetcher implements InfoFetcherInterface
     {
         $data = array_merge([
             'name'          => null,
-            'isMethod'      => true,
-            'isProperty'    => false,
             'isBuiltin'     => true,
             'startLine'     => null,
             'filename'      => null,
@@ -196,8 +194,6 @@ class FunctionInfoFetcher implements InfoFetcherInterface
 
         $data = $this->createDefaultInfo([
             'name'          => $function->getName(),
-            'isMethod'      => true,
-            'isProperty'    => false,
             'isBuiltin'     => ($function->getFileName() === false),
             'startLine'     => $function->getStartLine(),
             'filename'      => $function->getFileName(),

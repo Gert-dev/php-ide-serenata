@@ -150,6 +150,9 @@ CREATE TABLE functions_parameters(
 
     name        varchar(255) NOT NULL,
     type        varchar(255),
+
+    description text,
+
     is_optional tinyint(1) NOT NULL DEFAULT 0,
     is_variadic tinyint(1) NOT NULL DEFAULT 0,
 
