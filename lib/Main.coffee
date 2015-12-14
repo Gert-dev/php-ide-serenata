@@ -115,6 +115,9 @@ module.exports =
      * Registers any commands that are available to the user.
     ###
     registerCommands: () ->
+        atom.commands.add 'atom-workspace', "php-integrator-base:indexProject": =>
+            return @performIndex()
+
         atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
             return unless @testConfig()
 

@@ -33,7 +33,7 @@ class Proxy
     performRequest: (directory, args, async) ->
         return false unless directory
 
-        parameters = [__dirname + "/../php/src/Main.php", directory]
+        parameters = [Utility.escapePath(__dirname + "/../php/src/Main.php"), Utility.escapePath(directory)]
 
         for a in args
             parameters.push(Utility.escapeSeparators(a))
@@ -154,5 +154,6 @@ class Proxy
 
         # For Windows - Replace \ in class namespace to / because composer use / instead of \.
         filename = Utility.normalizeSeparators(filename)
+        filename = Utility.escapePath(filename)
 
         return @performRequest(@getFirstProjectDirectory(), ['--reindex', filename], true)

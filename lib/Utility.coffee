@@ -21,5 +21,17 @@ module.exports =
     ###
     normalizeSeparators: (text) ->
         return '' if not text
-        
+
         return text.replace(/\\/g, '/')
+
+    ###*
+     * Escapes the specified path by replacing spaces with a backslash.
+     *
+     * @param {string} text
+     *
+     * @return {string}
+    ###
+    escapePath: (text) ->
+      return '' if not text
+
+      return text.replace(' ', '\\ ')
