@@ -33,7 +33,7 @@ class Proxy
     performRequest: (directory, args, async) ->
         return false unless directory
 
-        parameters = [__dirname + "/../php/Main.php", directory]
+        parameters = [Utility.escapePath(__dirname + "/../php/Main.php"), Utility.escapePath(directory)]
 
         for a in args
             parameters.push(Utility.escapeSeparators(a))
