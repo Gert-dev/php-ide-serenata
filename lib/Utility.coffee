@@ -23,3 +23,15 @@ module.exports =
         return '' if not text
         
         return text.replace(/\\/g, '/')
+
+    ###*
+     *
+     *
+     * @param {string} text
+     *
+     * @return {string}
+    ###
+    escapePath: (text) ->
+      return '' if not text
+      
+      return text.replace(' ','\\ ')
