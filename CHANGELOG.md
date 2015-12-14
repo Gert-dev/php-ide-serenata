@@ -18,6 +18,7 @@ class Foo
 
 ### Bugs Fixed
 * Methods returning `static` were not properly resolving to the current class if they were not overridden (they were resolving to the closest parent class that defined them).
+* Project and file paths that contain spaces should no longer pose a problem (thanks to @wcatron).
 
 ### Changes for developers
 * Changes to the service
