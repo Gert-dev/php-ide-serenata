@@ -121,6 +121,8 @@ module.exports =
             atom.notifications.addSuccess 'Success', {
                 'detail' : 'Your PHP integrator configuration is working correctly!'
             }
+        atom.commands.add 'atom-workspace', "php-integrator-base:indexProject": =>
+            return @performIndex()
 
     ###*
      * Registers listeners for config changes.
