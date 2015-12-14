@@ -154,5 +154,6 @@ class Proxy
 
         # For Windows - Replace \ in class namespace to / because composer use / instead of \.
         filename = Utility.normalizeSeparators(filename)
+        filename = Utility.escapePath(filename)
 
         return @performRequest(@getFirstProjectDirectory(), ['--reindex', filename], true)
