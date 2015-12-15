@@ -132,7 +132,7 @@ class Application
         $indexFunctions = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('fu.*', 'fi.path')
             ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
-            ->innerJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
+            ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
             ->where('structural_element_id IS NULL')
             ->execute()
             ->fetchAll();
