@@ -23,6 +23,11 @@ class Application
     protected $indexDatabase;
 
     /**
+     * @var ConstantInfoFetcher
+     */
+    protected $constantInfoFetcher;
+
+    /**
      * Handles the application process.
      *
      * @param array $arguments The arguments to pass.
@@ -141,8 +146,6 @@ class Application
             }
         }
 
-        // TODO: Needs refactoring.
-
         $indexFunctions = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('fu.*', 'fi.path')
             ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
@@ -152,68 +155,78 @@ class Application
             ->fetchAll();
 
         foreach ($indexFunctions as $function) {
-            $parameters = $this->indexDatabase->getConnection()->createQueryBuilder()
-                ->select('*')
-                ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
-                ->where('is_optional != 1 AND function_id = ?')
-                ->setParameter(0, $function['id'])
-                ->execute()
-                ->fetchAll();
-
-            $parameters = array_map(function (array $parameter) {
-                return $parameter['name'];
-            }, $parameters);
-
-            $optionals = $this->indexDatabase->getConnection()->createQueryBuilder()
-                ->select('*')
-                ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
-                ->where('is_optional = 1 AND function_id = ?')
-                ->setParameter(0, $function['id'])
-                ->execute()
-                ->fetchAll();
-
-            $optionals = array_map(function (array $parameter) {
-                return $parameter['name'];
-            }, $optionals);
-
-            $throws = $this->indexDatabase->getConnection()->createQueryBuilder()
-                ->select('*')
-                ->from(IndexStorageItemEnum::FUNCTIONS_THROWS)
-                ->where('function_id = ?')
-                ->setParameter(0, $function['id'])
-                ->execute()
-                ->fetchAll();
-
-            $throwsAssoc = [];
-
-            foreach ($throws as $throws) {
-                $throwsAssoc[$throws['type']] = $throws['description'];
-            }
-
-            $result[$function['name']] = [
-                'name'          => $function['name'],
-                'isBuiltin'     => false,
-                'startLine'     => $function['start_line'],
-                'filename'      => $function['path'],
-
-                'parameters'    => $parameters,
-                'optionals'     => $optionals,
-                'throws'        => $throwsAssoc,
-                'deprecated'    => $function['is_deprecated'],
-
-                'descriptions'  => [
-                    'short' => $function['short_description'],
-                    'long'  => $function['long_description']
-                ],
-
-                'return'        => [
-                    'type'        => $function['return_type'],
-                    'description' => $function['return_description']
-                ]
-            ];
+            $result[$function['name']] = $this->getFunctionInfo($function);
         }
 
         return $this->outputJson(true, $result);
+    }
+
+    /**
+     * @param array $rawInfo
+     *
+     * @return array
+     */
+    protected function getFunctionInfo(array $rawInfo)
+    {
+        $parameters = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
+            ->where('is_optional != 1 AND function_id = ?')
+            ->setParameter(0, $rawInfo['id'])
+            ->execute()
+            ->fetchAll();
+
+        $parameters = array_map(function (array $parameter) {
+            return $parameter['name'];
+        }, $parameters);
+
+        $optionals = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
+            ->where('is_optional = 1 AND function_id = ?')
+            ->setParameter(0, $rawInfo['id'])
+            ->execute()
+            ->fetchAll();
+
+        $optionals = array_map(function (array $parameter) {
+            return $parameter['name'];
+        }, $optionals);
+
+        $throws = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::FUNCTIONS_THROWS)
+            ->where('function_id = ?')
+            ->setParameter(0, $rawInfo['id'])
+            ->execute()
+            ->fetchAll();
+
+        $throwsAssoc = [];
+
+        foreach ($throws as $throws) {
+            $throwsAssoc[$throws['type']] = $throws['description'];
+        }
+
+        return [
+            'name'          => $rawInfo['name'],
+            'isBuiltin'     => false,
+            'startLine'     => $rawInfo['start_line'],
+            'filename'      => $rawInfo['path'],
+
+            'parameters'    => $parameters,
+            'optionals'     => $optionals,
+            'throws'        => $throwsAssoc,
+            'deprecated'    => $rawInfo['is_deprecated'],
+
+            'descriptions'  => [
+                'short' => $rawInfo['short_description'],
+                'long'  => $rawInfo['long_description']
+            ],
+
+            'return'        => [
+                'type'        => $rawInfo['return_type'],
+                'description' => $rawInfo['return_description']
+            ]
+        ];
     }
 
     /**
@@ -225,8 +238,6 @@ class Application
     {
         $constants = [];
 
-        $constantInfoFetcher = new ConstantInfoFetcher();
-
         foreach (get_defined_constants(true) as $namespace => $constantList) {
             if ($namespace === 'user') {
                 continue; // User constants are indexed.
@@ -235,7 +246,7 @@ class Application
             // NOTE: Be very careful if you want to pass back the value, there are also escaped paths, newlines
             // (PHP_EOL), etc. in there.
             foreach ($constantList as $name => $value) {
-                $constants[$name] = $constantInfoFetcher->getInfo($name);
+                $constants[$name] = $this->getConstantInfoFetcher()->getInfo($name);
                 $constants[$name]['isBuiltin'] = true;
                 // $constants[$name]['isBuiltin'] = ($namespace !== 'user');
             }
@@ -249,11 +260,37 @@ class Application
             ->fetchAll();
 
         foreach ($indexConstants as $constant) {
-            $constants[$constant['name']] = $constantInfoFetcher->getInfo($constant['name']);
-            $constants[$constant['name']]['isBuiltin'] = false;
+            $constants[$constant['name']] = $this->getConstantInfo($constant);
         }
 
         return $this->outputJson(true, $constants);
+    }
+
+    /**
+     * @param array $rawInfo
+     *
+     * @return array
+     */
+    protected function getConstantInfo(array $rawInfo)
+    {
+        $info = [];
+
+        $info = $this->getConstantInfoFetcher()->getInfo($rawInfo['name']);
+        $info['isBuiltin'] = false;
+
+        return $info;
+    }
+
+    /**
+     * @return ConstantInfoFetcher
+     */
+    protected function getConstantInfoFetcher()
+    {
+        if (!$this->constantInfoFetcher) {
+            $this->constantInfoFetcher = new ConstantInfoFetcher();
+        }
+
+        return $this->constantInfoFetcher;
     }
 
     /**
