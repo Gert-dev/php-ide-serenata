@@ -110,8 +110,8 @@ CREATE TABLE functions(
     id                    integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                  varchar(255) NOT NULL,
-    file_id               integer NOT NULL,
-    start_line            integer unsigned NOT NULL,
+    file_id               integer,
+    start_line            integer unsigned,
 
     is_builtin            tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
@@ -215,8 +215,8 @@ CREATE TABLE constants(
     id                    integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                  varchar(255) NOT NULL,
-    file_id               integer NOT NULL,
-    start_line            integer unsigned NOT NULL,
+    file_id               integer,
+    start_line            integer unsigned,
 
     is_builtin            tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,

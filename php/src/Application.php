@@ -129,23 +129,6 @@ class Application
      */
     protected function getGlobalFunctions(array $arguments)
     {
-        $result = [];
-
-        $definedFunctions = get_defined_functions();
-        $functionInfoFetcher = new FunctionInfoFetcher();
-
-        foreach ($definedFunctions as $group => $functions) {
-            foreach ($functions as $functionName) {
-                try {
-                    $function = new \ReflectionFunction($functionName);
-                } catch (\Exception $e) {
-                    continue;
-                }
-
-                $result[$function->getName()] = $functionInfoFetcher->getInfo($function);
-            }
-        }
-
         $indexFunctions = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('fu.*', 'fi.path')
             ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
@@ -153,6 +136,8 @@ class Application
             ->where('structural_element_id IS NULL')
             ->execute()
             ->fetchAll();
+
+        $result = [];
 
         foreach ($indexFunctions as $function) {
             $result[$function['name']] = $this->getFunctionInfo($function);
@@ -236,28 +221,14 @@ class Application
      */
     protected function getGlobalConstants(array $arguments)
     {
-        $constants = [];
-
-        foreach (get_defined_constants(true) as $namespace => $constantList) {
-            if ($namespace === 'user') {
-                continue; // User constants are indexed.
-            }
-
-            // NOTE: Be very careful if you want to pass back the value, there are also escaped paths, newlines
-            // (PHP_EOL), etc. in there.
-            foreach ($constantList as $name => $value) {
-                $constants[$name] = $this->getConstantInfoFetcher()->getInfo($name);
-                $constants[$name]['isBuiltin'] = true;
-                // $constants[$name]['isBuiltin'] = ($namespace !== 'user');
-            }
-        }
-
         $indexConstants = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('*')
             ->from(IndexStorageItemEnum::CONSTANTS)
             ->where('structural_element_id IS NULL')
             ->execute()
             ->fetchAll();
+
+        $constants = [];
 
         foreach ($indexConstants as $constant) {
             $constants[$constant['name']] = $this->getConstantInfo($constant);

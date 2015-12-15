@@ -99,8 +99,15 @@ class Indexer
             $this->logMessage('  - ' . $filename);
         }
 
-        $this->logBanner('Pass 2 - Indexing outline...');
+        $this->logBanner('Pass 2...');
 
+        $this->logMessage('Indexing built-in constants...');
+        $this->indexBuiltinConstants();
+
+        $this->logMessage('Indexing built-in functions...');
+        $this->indexBuiltinFunctions();
+
+        $this->logMessage('Indexing outline...');
         $this->indexFileOutlines(array_keys($fileClassMap));
     }
 
@@ -200,6 +207,95 @@ class Indexer
     {
         foreach ($filePaths as $filePath) {
             $this->indexFileOutline($filePath);
+        }
+    }
+
+    /**
+     * Indexes built-in PHP constants.
+     */
+    protected function indexBuiltinConstants()
+    {
+        foreach (get_defined_constants(true) as $namespace => $constantList) {
+            if ($namespace === 'user') {
+                continue; // User constants are indexed in the outline.
+            }
+
+            // NOTE: Be very careful if you want to pass back the value, there are also escaped paths, newlines
+            // (PHP_EOL), etc. in there.
+            foreach ($constantList as $name => $value) {
+                $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
+                    'name'                  => $name,
+                    'file_id'               => null,
+                    'start_line'            => null,
+                    'is_builtin'            => 1, // ($namespace !== 'user' ? 1 : 0)
+                    'is_deprecated'         => false,
+                    'short_description'     => null,
+                    'long_description'      => null,
+                    'return_type'           => null,
+                    'return_description'    => null
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Indexes built-in PHP functions.
+     */
+    protected function indexBuiltinFunctions()
+    {
+        foreach (get_defined_functions() as $group => $functions) {
+            foreach ($functions as $functionName) {
+                try {
+                    $function = new \ReflectionFunction($functionName);
+                } catch (\Exception $e) {
+                    continue;
+                }
+
+                $returnType = null;
+
+                // Requires PHP >= 7.
+                if (method_exists($function, 'getReturnType')) {
+                    $returnTYpe = $function->getReturnType();
+                }
+
+                $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
+                    'name'                  => $functionName,
+                    'file_id'               => null,
+                    'start_line'            => null,
+                    'is_builtin'            => 1,
+                    'is_deprecated'         => $function->isDeprecated() ? 1 : 0,
+                    'short_description'     => null,
+                    'long_description'      => null,
+                    'return_type'           => $returnType,
+                    'return_description'    => null
+                ]);
+
+                foreach ($function->getParameters() as $parameter) {
+                    $isVariadic = false;
+
+                    // Requires PHP >= 5.6.
+                    if (method_exists($parameter, 'isVariadic')) {
+                        $isVariadic = $parameter->isVariadic();
+                    }
+
+                    $type = null;
+
+                    // Requires PHP >= 7, good thing this only affects built-in functions, which don't have any type
+                    // hinting yet anyways (at least in PHP < 7).
+                    if (method_exists($function, 'getType')) {
+                        $type = $function->getType();
+                    }
+
+                    $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
+                        'function_id' => $functionId,
+                        'name'        => $parameter->getName(),
+                        'type'        => $type,
+                        'description' => null,
+                        'is_optional' => $parameter->isOptional() ? 1 : 0,
+                        'is_variadic' => $isVariadic ? 1 : 0
+                    ]);
+                }
+            }
         }
     }
 
