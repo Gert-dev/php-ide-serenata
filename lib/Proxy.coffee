@@ -24,16 +24,16 @@ class Proxy
     ###*
      * Performs a request to the PHP side.
      *
-     * @param {string}   directory The directory in which to execute the PHP side (e.g. the project folder).
      * @param {array}    args      The arguments to pass.
      * @param {boolean}  async     Whether to execute the method asynchronously or not.
      *
      * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    performRequest: (directory, args, async) ->
-        return false unless directory
-
-        parameters = [Utility.escapePath(__dirname + "/../php/src/Main.php"), Utility.escapePath(directory)]
+    performRequest: (args, async) ->
+        parameters = [
+            Utility.escapePath(__dirname + "/../php/src/Main.php"),
+            Utility.escapePath(@config.get('packagePath') + '/indexes/test.sqlite')
+        ]
 
         for a in args
             parameters.push(Utility.escapeSeparators(a))
@@ -91,14 +91,6 @@ class Proxy
                 )
 
     ###*
-     * Returns the first available project directory.
-     *
-     * @return {string|null}
-    ###
-    getFirstProjectDirectory: () ->
-        return atom.project.getDirectories()[0]?.path
-
-    ###*
      * Retrieves a list of available classes.
      *
      * @param {boolean} async
@@ -106,7 +98,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getClassList: (async = false) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--class-list'], async)
+        return @performRequest(['--class-list'], async)
 
     ###*
      * Retrieves a list of available global constants.
@@ -116,7 +108,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getGlobalConstants: (async = false) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--constants'], async)
+        return @performRequest(['--constants'], async)
 
     ###*
      * Retrieves a list of available global functions.
@@ -126,7 +118,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getGlobalFunctions: (async = false) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--functions'], async)
+        return @performRequest(['--functions'], async)
 
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
@@ -138,7 +130,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getClassInfo: (className, async = false) ->
-        return @performRequest(@getFirstProjectDirectory(), ['--class-info', className], async)
+        return @performRequest(['--class-info', className], async)
 
     ###*
      * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
@@ -150,10 +142,10 @@ class Proxy
     ###
     reindex: (filename) ->
         if not filename
-            filename = ''
+            filename = atom.project.getDirectories()[0]?.path
 
         # For Windows - Replace \ in class namespace to / because composer use / instead of \.
         filename = Utility.normalizeSeparators(filename)
         filename = Utility.escapePath(filename)
 
-        return @performRequest(@getFirstProjectDirectory(), ['--reindex', filename], true)
+        return @performRequest(['--reindex', filename], true)

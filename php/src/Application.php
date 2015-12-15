@@ -141,28 +141,70 @@ class Application
             }
         }
 
+        // TODO: Needs refactoring.
+
         $indexFunctions = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('fu.*', 'fi.path')
             ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
-            ->innerJoin(IndexStorageItemEnum::FILES, 'fi')
+            ->innerJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
             ->where('structural_element_id IS NULL')
             ->execute()
             ->fetchAll();
 
         foreach ($indexFunctions as $function) {
+            $parameters = $this->indexDatabase->getConnection()->createQueryBuilder()
+                ->select('*')
+                ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
+                ->where('is_optional != 1 AND function_id = ?')
+                ->setParameter(0, $function['id'])
+                ->execute()
+                ->fetchAll();
+
+            $parameters = array_map(function (array $parameter) {
+                return $parameter['name'];
+            }, $parameters);
+
+            $optionals = $this->indexDatabase->getConnection()->createQueryBuilder()
+                ->select('*')
+                ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
+                ->where('is_optional = 1 AND function_id = ?')
+                ->setParameter(0, $function['id'])
+                ->execute()
+                ->fetchAll();
+
+            $optionals = array_map(function (array $parameter) {
+                return $parameter['name'];
+            }, $optionals);
+
+            $throws = $this->indexDatabase->getConnection()->createQueryBuilder()
+                ->select('*')
+                ->from(IndexStorageItemEnum::FUNCTIONS_THROWS)
+                ->where('function_id = ?')
+                ->setParameter(0, $function['id'])
+                ->execute()
+                ->fetchAll();
+
+            $throwsAssoc = [];
+
+            foreach ($throws as $throws) {
+                $throwsAssoc[$throws['type']] = $throws['description'];
+            }
+
             $result[$function['name']] = [
                 'name'          => $function['name'],
                 'isBuiltin'     => false,
                 'startLine'     => $function['start_line'],
                 'filename'      => $function['path'],
 
-                // 'parameters'    => $parameters,
-                // 'optionals'     => $optionals,
-                // 'docParameters' => $documentation['params'],
-                // 'throws'        => $documentation['throws'],
-                // 'descriptions'  => $documentation['descriptions'],
-
+                'parameters'    => $parameters,
+                'optionals'     => $optionals,
+                'throws'        => $throwsAssoc,
                 'deprecated'    => $function['is_deprecated'],
+
+                'descriptions'  => [
+                    'short' => $function['short_description'],
+                    'long'  => $function['long_description']
+                ],
 
                 'return'        => [
                     'type'        => $function['return_type'],
@@ -234,7 +276,11 @@ class Application
         $databasePath = array_shift($arguments);
 
 
-        unlink($databasePath); // TODO: Remove me. for testing purposes.
+
+
+        if ($arguments[0] === '--reindex') {
+            @unlink($databasePath); // TODO: Remove me. for testing purposes.
+        }
 
 
 
@@ -258,9 +304,16 @@ class Application
             throw new UnexpectedValueException('The path to index is required for this command.');
         }
 
+        $showOutput = false;
         $projectPath = array_shift($arguments);
 
-        $indexer = new Indexer($this->indexDatabase);
+        if (!empty($arguments)) {
+            if (array_shift($arguments) === '--show-output') {
+                $showOutput = true;
+            }
+        }
+
+        $indexer = new Indexer($this->indexDatabase, $showOutput);
 
         // TODO: Also index built-in classes (do this in the indexer).
 
@@ -283,6 +336,8 @@ class Application
         */
 
         $indexer->indexProject($projectPath);
+
+        return $this->outputJson(true, null);
     }
 
     /**

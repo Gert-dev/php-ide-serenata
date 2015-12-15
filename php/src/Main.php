@@ -2,7 +2,9 @@
 
 use PhpIntegrator\Application;
 
-require 'vendor/autoload.php';
+chdir(__DIR__);
+
+require '../vendor/autoload.php';
 
 $arguments = $argv;
 

@@ -32,13 +32,22 @@ class Indexer
     protected $storage;
 
     /**
+     * Whether to display (debug) output.
+     *
+     * @var bool
+     */
+    protected $showOutput;
+
+    /**
      * Constructor.
      *
      * @param IndexStorageInterface $storage
+     * @param bool                  $showOutput
      */
-    public function __construct(IndexStorageInterface $storage)
+    public function __construct(IndexStorageInterface $storage, $showOutput = false)
     {
         $this->storage = $storage;
+        $this->showOutput = $showOutput;
     }
 
     /**
@@ -48,6 +57,10 @@ class Indexer
      */
     protected function logBanner($message)
     {
+        if (!$this->showOutput) {
+            return;
+        }
+
         echo str_repeat('=', 80) . PHP_EOL;
         echo $message . PHP_EOL;
         echo str_repeat('=', 80) . PHP_EOL;
@@ -60,6 +73,10 @@ class Indexer
      */
     protected function logMessage($message)
     {
+        if (!$this->showOutput) {
+            return;
+        }
+
         echo $message . PHP_EOL;
     }
 
@@ -79,7 +96,7 @@ class Indexer
         $fileClassMap = $this->sortScanResultByDependencies($fileClassMap);
 
         foreach ($fileClassMap as $filename => $fqsens) {
-            echo '  - ' . $filename . PHP_EOL;
+            $this->logMessage('  - ' . $filename);
         }
 
         $this->logBanner('Pass 2 - Indexing outline...');
