@@ -173,8 +173,7 @@ class Application
             ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
             ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
             ->where('structural_element_id IS NULL')
-            ->execute()
-            ->fetchAll();
+            ->execute();
 
         $result = [];
 
@@ -197,8 +196,7 @@ class Application
             ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
             ->where('is_optional != 1 AND function_id = ?')
             ->setParameter(0, $rawInfo['id'])
-            ->execute()
-            ->fetchAll();
+            ->execute();
 
         $parameters = array_map(function (array $parameter) {
             return $parameter['name'];
@@ -209,8 +207,7 @@ class Application
             ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
             ->where('is_optional = 1 AND function_id = ?')
             ->setParameter(0, $rawInfo['id'])
-            ->execute()
-            ->fetchAll();
+            ->execute();
 
         $optionals = array_map(function (array $parameter) {
             return $parameter['name'];
@@ -221,8 +218,7 @@ class Application
             ->from(IndexStorageItemEnum::FUNCTIONS_THROWS)
             ->where('function_id = ?')
             ->setParameter(0, $rawInfo['id'])
-            ->execute()
-            ->fetchAll();
+            ->execute();
 
         $throwsAssoc = [];
 
@@ -264,8 +260,7 @@ class Application
             ->select('*')
             ->from(IndexStorageItemEnum::CONSTANTS)
             ->where('structural_element_id IS NULL')
-            ->execute()
-            ->fetchAll();
+            ->execute();
 
         $constants = [];
 
