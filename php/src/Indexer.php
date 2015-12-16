@@ -83,15 +83,15 @@ class Indexer
     /**
      * Indexes the specified project using the specified database.
      *
-     * @param string $projectPath
+     * @param string $directory
      */
-    public function indexProject($projectPath)
+    public function indexDirectory($directory)
     {
-        $this->logMessage('Indexing project ' . $projectPath);
+        $this->logMessage('Indexing project ' . $directory);
 
         $this->logBanner('Pass 1 - Scanning and sorting by dependencies...');
 
-        $fileClassMap = $this->scan($projectPath);
+        $fileClassMap = $this->scan($directory);
 
         $fileClassMap = $this->sortScanResultByDependencies($fileClassMap);
 
@@ -106,6 +106,9 @@ class Indexer
 
         $this->logMessage('Indexing built-in functions...');
         $this->indexBuiltinFunctions();
+
+        $this->logMessage('Indexing built-in classes...');
+        $this->indexBuiltinClasses();
 
         $this->logMessage('Indexing outline...');
         $this->indexFileOutlines(array_keys($fileClassMap));
@@ -296,6 +299,27 @@ class Indexer
                     ]);
                 }
             }
+        }
+    }
+
+    /**
+     * Indexes built-in PHP classes.
+     */
+    protected function indexBuiltinClasses()
+    {
+        // TODO: Also index get_declared_traits.
+        // TODO: Also index get_declared_interfaces.
+
+        foreach (get_declared_classes() as $class) {
+            // TODO: Only index built-in classes (do this in the indexer).
+
+            /*if (mb_strpos($class, 'PhpIntegrator') === 0) {
+                continue; // Don't include our own classes.
+            }
+
+            if ($value = $this->fetchClassInfo($class, false)) {
+                $index[$class] = $value;
+            }*/
         }
     }
 

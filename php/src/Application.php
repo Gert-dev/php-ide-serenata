@@ -44,7 +44,7 @@ class Application
                 '--class-info' => 'getClassInfo',
                 '--functions'  => 'getGlobalFunctions',
                 '--constants'  => 'getGlobalConstants',
-                '--reindex'    => 'reindexProject'
+                '--reindex'    => 'reindex'
             ];
 
             if (isset($commands[$command])) {
@@ -66,23 +66,62 @@ class Application
      */
     protected function getClassList(array $arguments)
     {
-        // TODO: Class list with constructor information.
+        $structuralElements = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('se.*', 'fi.path', '(setype.name) AS type_name', 'sepl.linked_structural_element_id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENT_TYPES, 'setype', 'setype.id = se.structural_element_type_id')
+            ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
+            ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id')
+            ->execute();
 
-        /*
-        $index = null;
-        $indexFile = Config::get('indexClasses');
+        $result = [];
 
-        if (file_exists($indexFile)) {
-            $index = json_decode(file_get_contents($indexFile), true);
+        foreach ($structuralElements as $element) {
+            $parentFqsens = [];
+
+            $parentId = $element['linked_structural_element_id'];
+
+            while ($parentId) {
+                $parentSe = $this->indexDatabase->getConnection()->createQueryBuilder()
+                    ->select('se.*', 'sepl.linked_structural_element_id')
+                    ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+                    ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
+                    ->where('id = ?')
+                    ->setParameter(0, $parentId)
+                    ->execute()
+                    ->fetch();
+
+                $parentFqsens = $parentSe['fqsen'];
+
+                $parentId = $parentSe['linked_structural_element_id'];
+            }
+
+            $result[$element['fqsen']] = [
+                'class'        => $element['fqsen'],
+                'wasFound'     => true,
+                'startLine'    => $element['start_line'],
+                'name'         => $element['fqsen'],
+                'shortName'    => $element['name'],
+                'filename'     => $element['path'],
+                'isTrait'      => ($element['type_name'] === 'trait'),
+                'isClass'      => ($element['type_name'] === 'cass'),
+                'isInterface'  => ($element['type_name'] === 'interface'),
+                'isAbstract'   => !!$element['is_abstract'],
+                'parents'      => $parentFqsens,
+                'deprecated'   => !!$element['is_deprecated'],
+                'descriptions' => [
+                    'short' => $element['short_description'],
+                    'long'  => $element['long_description']
+                ]
+            ];
+
+            // TODO: A constructor can be an override, need inheritance support implemented for this.
+            // if ($constructor) {
+                // $result[$element['fqsen']]['methods']['__construct'] = [];
+            // }
         }
 
-        return [
-            'success' => true,
-            // If it evaluates to false, the class map hasn't been generated yet, don't error out as it can take a while
-            // for it to be generated.
-            'result'  => $index ?: []
-        ];
-        */
+        return $this->outputJson(true, $result);
     }
 
     /**
@@ -200,7 +239,7 @@ class Application
             'parameters'    => $parameters,
             'optionals'     => $optionals,
             'throws'        => $throwsAssoc,
-            'deprecated'    => $rawInfo['is_deprecated'],
+            'deprecated'    => !!$rawInfo['is_deprecated'],
 
             'descriptions'  => [
                 'short' => $rawInfo['short_description'],
@@ -306,14 +345,14 @@ class Application
      *
      * @throws UnexpectedValueException
      */
-    protected function reindexProject(array $arguments)
+    protected function reindex(array $arguments)
     {
         if (empty($arguments)) {
             throw new UnexpectedValueException('The path to index is required for this command.');
         }
 
         $showOutput = false;
-        $projectPath = array_shift($arguments);
+        $path = array_shift($arguments);
 
         if (!empty($arguments)) {
             if (array_shift($arguments) === '--show-output') {
@@ -323,27 +362,11 @@ class Application
 
         $indexer = new Indexer($this->indexDatabase, $showOutput);
 
-        // TODO: Also index built-in classes (do this in the indexer).
-
-        /*
-        foreach (get_declared_classes() as $class) {
-            if (mb_strpos($class, 'PhpIntegrator') === 0) {
-                continue; // Don't include our own classes.
-            }
-
-            if ($value = $this->fetchClassInfo($class, false)) {
-                $index[$class] = $value;
-            }
+        if (is_dir($path)) {
+            $indexer->indexDirectory($path);
+        } else {
+            // TODO: Reindex a single file.
         }
-
-        foreach ($this->buildClassMap() as $class => $filePath) {
-            if ($value = $this->fetchClassInfo($class, true)) {
-                $index[$class] = $value;
-            }
-        }
-        */
-
-        $indexer->indexProject($projectPath);
 
         return $this->outputJson(true, null);
     }
