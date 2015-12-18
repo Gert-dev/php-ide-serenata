@@ -1,4 +1,5 @@
 fs            = require 'fs'
+md5           = require 'md5'
 child_process = require "child_process"
 
 Utility = require "./Utility"
@@ -32,7 +33,7 @@ class Proxy
     performRequest: (args, async) ->
         parameters = [
             Utility.escapePath(__dirname + "/../php/src/Main.php"),
-            Utility.escapePath(@config.get('packagePath') + '/indexes/test.sqlite')
+            Utility.escapePath(@config.get('packagePath') + '/indexes/' + @getIndexDatabaseName() + '.sqlite')
         ]
 
         for a in args
@@ -149,3 +150,16 @@ class Proxy
         filename = Utility.escapePath(filename)
 
         return @performRequest(['--reindex', filename], true)
+
+    ###*
+     * Retrieves the name of the database to use.
+     *
+     * @return {string}
+    ###
+    getIndexDatabaseName: () ->
+        pathStrings = ''
+
+        for i,project of atom.project.getDirectories()
+            pathStrings += project.path
+
+        return md5(pathStrings)

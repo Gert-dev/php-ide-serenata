@@ -77,24 +77,8 @@ class Application
         $result = [];
 
         foreach ($structuralElements as $element) {
-            $parentFqsens = [];
-
-            $parentId = $element['linked_structural_element_id'];
-
-            while ($parentId) {
-                $parentSe = $this->indexDatabase->getConnection()->createQueryBuilder()
-                    ->select('se.*', 'sepl.linked_structural_element_id')
-                    ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-                    ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
-                    ->where('id = ?')
-                    ->setParameter(0, $parentId)
-                    ->execute()
-                    ->fetch();
-
-                $parentFqsens = $parentSe['fqsen'];
-
-                $parentId = $parentSe['linked_structural_element_id'];
-            }
+            // TODO: Rewrite this in terms of getClassInfo, remove anything but the constructor from the methods,
+            // properties and constants.
 
             $result[$element['fqsen']] = [
                 'class'        => $element['fqsen'],
@@ -104,10 +88,10 @@ class Application
                 'shortName'    => $element['name'],
                 'filename'     => $element['path'],
                 'isTrait'      => ($element['type_name'] === 'trait'),
-                'isClass'      => ($element['type_name'] === 'cass'),
+                'isClass'      => ($element['type_name'] === 'class'),
                 'isInterface'  => ($element['type_name'] === 'interface'),
                 'isAbstract'   => !!$element['is_abstract'],
-                'parents'      => $parentFqsens,
+                'parents'      => array_values($this->getParentFqsens($element['id'])),
                 'deprecated'   => !!$element['is_deprecated'],
                 'descriptions' => [
                     'short' => $element['short_description'],
@@ -125,41 +109,240 @@ class Application
     }
 
     /**
+     * Retrieves a list of parent FQSEN's for the specified structural element.
+     *
+     * @param int $seId
+     *
+     * @return array An associative array mapping structural element ID's to their FQSEN.
+     */
+    protected function getParentFqsens($seId)
+    {
+        $parentFqsens = [];
+
+        while ($seId) {
+            $parentSe = $this->indexDatabase->getConnection()->createQueryBuilder()
+                ->select('se.id', 'se.fqsen')
+                ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+                ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.linked_structural_element_id = se.id')
+                ->where('sepl.structural_element_id = ?')
+                ->setParameter(0, $seId)
+                ->execute()
+                ->fetch();
+
+            if (!$parentSe) {
+                break;
+            }
+
+            $seId = $parentSe['id'];
+            $parentFqsens[$parentSe['id']] = $parentSe['fqsen'];
+        }
+
+        return $parentFqsens;
+    }
+
+    /**
      * @param array $arguments
      *
      * @return array
      */
     protected function getClassInfo(array $arguments)
     {
-        // TODO: Class info on specified FQSEN.
-
-        /*
-        $className = $args[0];
-
-        if (mb_strpos($className, '\\') === 0) {
-            $className = mb_substr($className, 1);
+        if (empty($arguments)) {
+            throw new UnexpectedValueException(
+                'The fully qualified name of the structural element is required for this command.'
+            );
         }
 
-        $classInfoFetcher = new ClassInfoFetcher(
-            new PropertyInfoFetcher(),
-            new MethodInfoFetcher(),
-            new ConstantInfoFetcher()
-        );
+        $fqsen = array_shift($arguments);
 
-        $reflectionClass = null;
-
-        try {
-            $reflectionClass = new ReflectionClass($className);
-        } catch (\Exception $e) {
-
+        if ($fqsen[0] === '\\') {
+            $fqsen = mb_substr($fqsen, 1);
         }
 
-        return [
-            'success' => !!$reflectionClass,
-            'result'  => $reflectionClass ? $classInfoFetcher->getInfo($reflectionClass) : null
-        ];
-        */
+        $element = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS)
+            ->where('fqsen = ?')
+            ->setParameter(0, $fqsen)
+            ->execute()
+            ->fetch();
+
+        if (!$element) {
+            throw new UnexpectedValueException('The specified structural element was not found!');
+        }
+
+        $result = $this->getStructuralElementInfo($element['id']);
+
+        return $this->outputJson(true, $result);
     }
+
+    /**
+     * Retrieves information about the specified structural element.
+     *
+     * @param int $id
+     *
+     * @return array
+     */
+    protected function getStructuralElementInfo($id)
+    {
+        $element = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('se.*', 'fi.path', '(setype.name) AS type_name', 'sepl.linked_structural_element_id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENT_TYPES, 'setype', 'setype.id = se.structural_element_type_id')
+            ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
+            ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id')
+            ->where('se.id = ?')
+            ->setParameter(0, $id)
+            ->execute()
+            ->fetch();
+
+        if (!$element) {
+            throw new UnexpectedValueException('The specified structural element was not found!');
+        }
+
+        $parentFqsens = $this->getParentFqsens($element['id']);
+
+        $result = [
+            'class'        => $element['fqsen'],
+            'wasFound'     => true,
+            'startLine'    => $element['start_line'],
+            'name'         => $element['fqsen'],
+            'shortName'    => $element['name'],
+            'filename'     => $element['path'],
+            'isTrait'      => ($element['type_name'] === 'trait'),
+            'isClass'      => ($element['type_name'] === 'class'),
+            'isInterface'  => ($element['type_name'] === 'interface'),
+            'isAbstract'   => !!$element['is_abstract'],
+            'parents'      => array_values($parentFqsens),
+            'deprecated'   => !!$element['is_deprecated'],
+            'descriptions' => [
+                'short' => $element['short_description'],
+                'long'  => $element['long_description']
+            ],
+            'constants'    => [],
+            'properties'   => [],
+            'methods'      => []
+        ];
+
+        // Take all members from the base class as a starting point.
+        $baseClassInfo = !empty($parentFqsens) ? $this->getStructuralElementInfo(array_keys($parentFqsens)[0]) : null;
+
+        if ($baseClassInfo) {
+            $result['constants']  = $baseClassInfo['constants'];
+            $result['properties'] = $baseClassInfo['properties'];
+            $result['methods']    = $baseClassInfo['methods'];
+        }
+
+        $interfaces = [];  // TODO
+
+        // Append members from direct interfaces to the pool of members. These only supply additional members, but will
+        // never overwrite any existing members as they have a lower priority than inherited members.
+        foreach ($interfaces as $interface) {
+            foreach ($interface['constants'] as $constant) {
+                if (!isset($result['constants'][$constant['name']])) {
+                    $result['constants'][$constant['name']] = $constant;
+                }
+            }
+
+            foreach ($interface['properties'] as $property) {
+                if (!isset($result['properties'][$property['name']])) {
+                    $result['properties'][$property['name']] = $property;
+                }
+            }
+
+            foreach ($interface['methods'] as $method) {
+                if (!isset($result['methods'][$method['name']])) {
+                    $result['methods'][$method['name']] = $method;
+                }
+            }
+        }
+
+        $traits = []; // TODO
+
+        foreach ($traits as $trait) {
+            foreach ($interface['constants'] as $constant) {
+                if (isset($result['constants'][$constant['name']])) {
+                    // TODO: Inherit description from existing member if not present.
+                }
+
+                $result['constants'][$constant['name']] = $constant;
+            }
+
+            foreach ($interface['properties'] as $property) {
+                if (isset($result['properties'][$property['name']])) {
+                    // TODO: Inherit description from existing member if not present.
+                }
+
+                $result['properties'][$property['name']] = $property;
+            }
+
+            foreach ($interface['methods'] as $method) {
+                if (isset($result['methods'][$method['name']])) {
+                    // TODO: Inherit description from existing member if not present.
+                }
+
+                $result['methods'][$method['name']] = $method;
+            }
+        }
+
+        $constants = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::CONSTANTS)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $element['id'])
+            ->execute();
+
+        foreach ($constants as $constant) {
+            if (isset($result['constants'][$constant['name']])) {
+                // TODO: Inherit description from existing member if not present.
+            }
+
+            $result['constants'][$constant['name']] = $this->getConstantInfo($constant);
+        }
+
+        $properties = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('p.*', 'am.name AS access_modifier')
+            ->from(IndexStorageItemEnum::PROPERTIES, 'p')
+            ->innerJoin('p', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = p.access_modifier_id')
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $element['id'])
+            ->execute();
+
+        foreach ($properties as $property) {
+            if (isset($result['properties'][$property['name']])) {
+                // TODO: Inherit description from existing member if not present.
+            }
+
+            $result['properties'][$property['name']] = $this->getPropertyInfo($property);
+        }
+
+        $methods = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('fu.*', 'fi.path', 'am.name AS access_modifier')
+            ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
+            ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
+            ->innerJoin('fu', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = fu.access_modifier_id')
+            ->where('structural_eleme`nt_id = ?')
+            ->setParameter(0, $element['id'])
+            ->execute();
+
+        foreach ($methods as $method) {
+            if (isset($result['methods'][$method['name']])) {
+                // TODO: Inherit description from existing member if not present.
+            }
+
+            $result['methods'][$method['name']] = $this->getFunctionInfo($method);
+
+            // TODO: Additional method information.
+        }
+
+
+        // TODO: Fill in declaringStructure and declaringClass for all members.
+
+        // die(var_dump($result));
+
+        return $result;
+    }
+
 
     /**
      * @param array $arguments
@@ -196,7 +379,8 @@ class Application
             ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
             ->where('is_optional != 1 AND function_id = ?')
             ->setParameter(0, $rawInfo['id'])
-            ->execute();
+            ->execute()
+            ->fetchAll();
 
         $parameters = array_map(function (array $parameter) {
             return $parameter['name'];
@@ -207,7 +391,8 @@ class Application
             ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
             ->where('is_optional = 1 AND function_id = ?')
             ->setParameter(0, $rawInfo['id'])
-            ->execute();
+            ->execute()
+            ->fetchAll();
 
         $optionals = array_map(function (array $parameter) {
             return $parameter['name'];
@@ -269,6 +454,37 @@ class Application
         }
 
         return $this->outputJson(true, $constants);
+    }
+
+    /**
+     * @param array $rawInfo
+     *
+     * @return array
+     */
+    protected function getPropertyInfo(array $rawInfo)
+    {
+        return [
+            'name'               => $rawInfo['name'],
+            'isMagic'            => false,
+            'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
+            'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
+            'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
+            'isStatic'           => !!$rawInfo['is_static'],
+            // 'override'           => $this->getOverrideInfo($property),
+            // 'declaringClass'     => $this->getDeclaringClass($property),
+            // 'declaringStructure' => $this->getDeclaringStructure($property),
+            'deprecated'         => !!$rawInfo['is_deprecated'],
+
+            'descriptions'  => [
+                'short' => $rawInfo['short_description'],
+                'long'  => $rawInfo['long_description']
+            ],
+
+            'return'        => [
+                'type'        => $rawInfo['return_type'],
+                'description' => $rawInfo['return_description']
+            ]
+        ];
     }
 
     /**

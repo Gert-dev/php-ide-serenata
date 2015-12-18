@@ -313,6 +313,8 @@ class Indexer
         foreach (get_declared_classes() as $class) {
             // TODO: Only index built-in classes (do this in the indexer).
             // TODO: need to build a dependency chain here, as well, to ensure we index dependencies first.
+            //  -> Can also do it the easy way: check if current class has parent/interface/trait, if yes, index that
+            //     first and simply skip items here that were already indexed.
 
             /*if (mb_strpos($class, 'PhpIntegrator') === 0) {
                 continue; // Don't include our own classes.
@@ -320,7 +322,20 @@ class Indexer
 
             if ($value = $this->fetchClassInfo($class, false)) {
                 $index[$class] = $value;
-            }*/
+            }
+
+
+
+
+
+            $reflectionClass = null;
+
+            try {
+                $reflectionClass = new ReflectionClass($className);
+            } catch (\Exception $e) {
+
+            }
+            */
         }
     }
 

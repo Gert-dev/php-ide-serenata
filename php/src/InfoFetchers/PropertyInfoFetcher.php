@@ -124,9 +124,20 @@ class PropertyInfoFetcher implements InfoFetcherInterface
             'return'             => $documentation['var']
         ]);
 
+
+
+
+
+
+        // TODO: This should be checked and stored in Indexer.php.
+
         // Determine this again as members can return types such as 'static', which requires the declaring class, which
         // was not available yet before.
         $data['return']['resolvedType'] = $this->determineFullReturnType($data, $class->name);
+
+
+
+        // TODO: This should be checked in Indexer.php.
 
         // You can place documentation after the @var tag as well as at the start of the docblock. Fall back from the
         // latter to the former.
