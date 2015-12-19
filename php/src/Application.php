@@ -522,7 +522,7 @@ class Application
             ->fetchAll();
 
         $parameters = array_map(function (array $parameter) {
-            return $parameter['name'];
+            return '$' . $parameter['name'];
         }, $parameters);
 
         $optionals = $this->indexDatabase->getConnection()->createQueryBuilder()
@@ -534,7 +534,7 @@ class Application
             ->fetchAll();
 
         $optionals = array_map(function (array $parameter) {
-            return $parameter['name'];
+            return '$' . $parameter['name'];
         }, $optionals);
 
         $throws = $this->indexDatabase->getConnection()->createQueryBuilder()
