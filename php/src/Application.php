@@ -294,7 +294,9 @@ class Application
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
-                        'startLineMember' => null
+                        'isTrait'         => ($element['type_name'] === 'trait'),
+                        'isClass'         => ($element['type_name'] === 'class'),
+                        'isInterface'     => ($element['type_name'] === 'interface')
                     ]
                 ]);
             }
@@ -309,7 +311,9 @@ class Application
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
-                        'startLineMember' => null
+                        'isTrait'         => ($element['type_name'] === 'trait'),
+                        'isClass'         => ($element['type_name'] === 'class'),
+                        'isInterface'     => ($element['type_name'] === 'interface')
                     ]
                 ]);
             }
@@ -324,7 +328,9 @@ class Application
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
-                        'startLineMember' => null
+                        'isTrait'         => ($element['type_name'] === 'trait'),
+                        'isClass'         => ($element['type_name'] === 'class'),
+                        'isInterface'     => ($element['type_name'] === 'interface')
                     ]
                 ]);
             }
@@ -347,13 +353,18 @@ class Application
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'startLineMember' => $constant['start_line']
+                    'isTrait'         => ($element['type_name'] === 'trait'),
+                    'isClass'         => ($element['type_name'] === 'class'),
+                    'isInterface'     => ($element['type_name'] === 'interface')
                 ],
 
                 'declaringStructure' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'isTrait'         => ($element['type_name'] === 'trait'),
+                    'isClass'         => ($element['type_name'] === 'class'),
+                    'isInterface'     => ($element['type_name'] === 'interface'),
                     'startLineMember' => $constant['start_line']
                 ]
             ]);
@@ -368,22 +379,40 @@ class Application
             ->execute();
 
         foreach ($properties as $property) {
+            $overriddenProperty = null;
+
             if (isset($result['properties'][$property['name']])) {
                 // TODO: Inherit description from existing member if not present.
+
+                $existingProperty = $result['properties'][$property['name']];
+
+                $overriddenProperty = [
+                    'declaringClass'     => $existingProperty['declaringClass'],
+                    'declaringStructure' => $existingProperty['declaringStructure'],
+                    'startLine'          => $existingProperty['startLine']
+                ];
             }
 
             $result['properties'][$property['name']] = array_merge($this->getPropertyInfo($property), [
+                'override'       => $overriddenProperty,
+                'implementation' => null,
+
                 'declaringClass' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'startLineMember' => $property['start_line']
+                    'isTrait'         => ($element['type_name'] === 'trait'),
+                    'isClass'         => ($element['type_name'] === 'class'),
+                    'isInterface'     => ($element['type_name'] === 'interface')
                 ],
 
                 'declaringStructure' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'isTrait'         => ($element['type_name'] === 'trait'),
+                    'isClass'         => ($element['type_name'] === 'class'),
+                    'isInterface'     => ($element['type_name'] === 'interface'),
                     'startLineMember' => $property['start_line']
                 ]
             ]);
@@ -399,22 +428,49 @@ class Application
             ->execute();
 
         foreach ($methods as $method) {
+            $overriddenMethod = null;
+            $implementedMethod = null;
+
             if (isset($result['methods'][$method['name']])) {
                 // TODO: Inherit description from existing member if not present.
+
+                $existingMethod = $result['methods'][$method['name']];
+
+                if ($existingMethod['declaringStructure']['isInterface']) {
+                    $implementedMethod = [
+                        'declaringClass'     => $existingMethod['declaringClass'],
+                        'declaringStructure' => $existingMethod['declaringStructure'],
+                        'startLine'          => $existingMethod['startLine']
+                    ];
+                } else {
+                    $overriddenMethod = [
+                        'declaringClass'     => $existingMethod['declaringClass'],
+                        'declaringStructure' => $existingMethod['declaringStructure'],
+                        'startLine'          => $existingMethod['startLine']
+                    ];
+                }
             }
 
             $result['methods'][$method['name']] = array_merge($this->getMethodInfo($method), [
+                'override'       => $overriddenMethod,
+                'implementation' => $implementedMethod,
+
                 'declaringClass' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'startLineMember' => $method['start_line']
+                    'isTrait'         => ($element['type_name'] === 'trait'),
+                    'isClass'         => ($element['type_name'] === 'class'),
+                    'isInterface'     => ($element['type_name'] === 'interface')
                 ],
 
                 'declaringStructure' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'isTrait'         => ($element['type_name'] === 'trait'),
+                    'isClass'         => ($element['type_name'] === 'class'),
+                    'isInterface'     => ($element['type_name'] === 'interface'),
                     'startLineMember' => $method['start_line']
                 ]
             ]);
@@ -455,8 +511,10 @@ class Application
     protected function getMethodInfo(array $rawInfo)
     {
         return array_merge($this->getFunctionInfo($rawInfo), [
-            'override'           => [], // TODO: $this->getOverrideInfo($method),
-            'implementation'     => [], // TODO: $this->getImplementationInfo($method),
+            'isMethod'           => true,
+
+            'override'           => null, // TODO: $this->getOverrideInfo($method),
+            'implementation'     => null, // TODO: $this->getImplementationInfo($method),
 
             'isMagic'            => !!$rawInfo['is_magic'],
 
@@ -465,8 +523,8 @@ class Application
             'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
             'isStatic'           => !!$rawInfo['is_static'],
 
-            'declaringClass'     => [], // TODO: $this->getDeclaringClass($method),
-            'declaringStructure' => [], // TODO: $this->getDeclaringStructure($method)
+            'declaringClass'     => null,
+            'declaringStructure' => null
         ]);
     }
 
@@ -569,6 +627,8 @@ class Application
     {
         return [
             'name'               => $rawInfo['name'],
+            'isProperty'         => true,
+            'startLine'          => $rawInfo['start_line'],
             'isMagic'            => !!$rawInfo['is_magic'],
             'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
@@ -639,8 +699,7 @@ class Application
 
 
 
-
-        if ($arguments[0] === '--reindex') {
+        if ($arguments[0] === '--reindex' && is_dir($arguments[1])) {
             @unlink($databasePath); // TODO: Remove me. for testing purposes.
         }
 
