@@ -162,14 +162,6 @@ class Application
 
         $result = $this->getStructuralElementInfo($element['id']);
 
-
-
-
-        // die(var_dump($result)); // TODO: Remove me.
-
-
-
-
         return $this->outputJson(true, $result);
     }
 
@@ -644,12 +636,25 @@ class Application
      */
     protected function getConstantInfo(array $rawInfo)
     {
-        $info = [];
+        return [
+            'name'        => $rawInfo['name'],
+            'isBuiltin'   => !!$rawInfo['is_builtin'],
+            'isPublic'    => true,
+            'isProtected' => false,
+            'isPrivate'   => false,
+            'isStatic'    => true,
+            'deprecated'  => !!$rawInfo['is_deprecated'],
 
-        $info = $this->getConstantInfoFetcher()->getInfo($rawInfo['name']);
-        $info['isBuiltin'] = false;
+            'descriptions'  => [
+                'short' => $rawInfo['short_description'],
+                'long'  => $rawInfo['long_description']
+            ],
 
-        return $info;
+            'return'        => [
+                'type'        => $rawInfo['return_type'],
+                'description' => $rawInfo['return_description']
+            ],
+        ];
     }
 
     /**
