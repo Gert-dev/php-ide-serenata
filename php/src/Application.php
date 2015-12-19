@@ -77,32 +77,21 @@ class Application
         $result = [];
 
         foreach ($structuralElements as $element) {
-            // TODO: Rewrite this in terms of getClassInfo, remove anything but the constructor from the methods,
-            // properties and constants.
+            $info = $this->getStructuralElementInfo($element['id']);
 
-            $result[$element['fqsen']] = [
-                'class'        => $element['fqsen'],
-                'wasFound'     => true,
-                'startLine'    => $element['start_line'],
-                'name'         => $element['fqsen'],
-                'shortName'    => $element['name'],
-                'filename'     => $element['path'],
-                'isTrait'      => ($element['type_name'] === 'trait'),
-                'isClass'      => ($element['type_name'] === 'class'),
-                'isInterface'  => ($element['type_name'] === 'interface'),
-                'isAbstract'   => !!$element['is_abstract'],
-                'parents'      => array_values($this->getParentFqsens($element['id'])),
-                'deprecated'   => !!$element['is_deprecated'],
-                'descriptions' => [
-                    'short' => $element['short_description'],
-                    'long'  => $element['long_description']
-                ]
-            ];
+            $constructor = null;
 
-            // TODO: A constructor can be an override, need inheritance support implemented for this.
-            // if ($constructor) {
-                // $result[$element['fqsen']]['methods']['__construct'] = [];
-            // }
+            if (isset($info['methods']['__construct'])) {
+                $constructor = $info['methods']['__construct'];
+            }
+
+            unset($info['constants'], $info['properties'], $info['methods']);
+
+            if ($constructor) {
+                $info['methods']['__construct'] = $constructor;
+            }
+
+            $result[$element['fqsen']] = $info;
         }
 
         return $this->outputJson(true, $result);
