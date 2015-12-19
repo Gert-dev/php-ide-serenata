@@ -522,7 +522,13 @@ class Application
             ->fetchAll();
 
         $parameters = array_map(function (array $parameter) {
-            return '$' . $parameter['name'];
+            $name = '$' . $parameter['name'];
+
+            if ($parameter['is_variadic']) {
+                $name .= '...';
+            }
+
+            return $name;
         }, $parameters);
 
         $optionals = $this->indexDatabase->getConnection()->createQueryBuilder()
@@ -534,7 +540,13 @@ class Application
             ->fetchAll();
 
         $optionals = array_map(function (array $parameter) {
-            return '$' . $parameter['name'];
+            $name = '$' . $parameter['name'];
+
+            if ($parameter['is_variadic']) {
+                $name .= '...';
+            }
+
+            return $name;
         }, $optionals);
 
         $throws = $this->indexDatabase->getConnection()->createQueryBuilder()
