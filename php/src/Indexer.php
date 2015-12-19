@@ -472,12 +472,20 @@ class Indexer
                     DocParser::DESCRIPTION
                 ], $property['name']);
 
+                $shortDescription = $documentation['descriptions']['short'];
+
+                // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
+                // from the latter to the former.
+                if (empty($shortDescription)) {
+                    $shortDescription = $documentation['var']['description'];
+                }
+
                 $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
                     'name'                  => $property['name'],
                     'file_id'               => $fileId,
                     'start_line'            => $property['startLine'],
                     'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-                    'short_description'     => $documentation['descriptions']['short'],
+                    'short_description'     => $shortDescription,
                     'long_description'      => $documentation['descriptions']['long'],
                     'return_type'           => $documentation['var']['type'],
                     'return_description'    => $documentation['var']['description'],
