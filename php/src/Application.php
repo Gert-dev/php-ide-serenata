@@ -173,6 +173,14 @@ class Application
 
         $result = $this->getStructuralElementInfo($element['id']);
 
+
+
+
+        // die(var_dump($result)); // TODO: Remove me.
+
+
+
+
         return $this->outputJson(true, $result);
     }
 
@@ -233,11 +241,19 @@ class Application
             $result['methods']    = $baseClassInfo['methods'];
         }
 
-        $interfaces = [];  // TODO
+        $interfaces = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('se.id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_INTERFACES_LINKED, 'seil', 'seil.linked_structural_element_id = se.id')
+            ->where('seil.structural_element_id = ?')
+            ->setParameter(0, $element['id'])
+            ->execute();
 
         // Append members from direct interfaces to the pool of members. These only supply additional members, but will
         // never overwrite any existing members as they have a lower priority than inherited members.
         foreach ($interfaces as $interface) {
+            $interface = $this->getStructuralElementInfo($interface['id']);
+
             foreach ($interface['constants'] as $constant) {
                 if (!isset($result['constants'][$constant['name']])) {
                     $result['constants'][$constant['name']] = $constant;
@@ -257,31 +273,60 @@ class Application
             }
         }
 
-        $traits = []; // TODO
+        $traits = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('se.id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED, 'setl', 'setl.linked_structural_element_id = se.id')
+            ->where('setl.structural_element_id = ?')
+            ->setParameter(0, $element['id'])
+            ->execute();
 
         foreach ($traits as $trait) {
-            foreach ($interface['constants'] as $constant) {
+            $trait = $this->getStructuralElementInfo($trait['id']);
+
+            foreach ($trait['constants'] as $constant) {
                 if (isset($result['constants'][$constant['name']])) {
                     // TODO: Inherit description from existing member if not present.
                 }
 
-                $result['constants'][$constant['name']] = $constant;
+                $result['constants'][$constant['name']] = array_merge($constant, [
+                    'declaringClass' => [
+                        'name'            => $element['fqsen'],
+                        'filename'        => $element['path'],
+                        'startLine'       => $element['start_line'],
+                        'startLineMember' => null
+                    ]
+                ]);
             }
 
-            foreach ($interface['properties'] as $property) {
+            foreach ($trait['properties'] as $property) {
                 if (isset($result['properties'][$property['name']])) {
                     // TODO: Inherit description from existing member if not present.
                 }
 
-                $result['properties'][$property['name']] = $property;
+                $result['constants'][$property['name']] = array_merge($property, [
+                    'declaringClass' => [
+                        'name'            => $element['fqsen'],
+                        'filename'        => $element['path'],
+                        'startLine'       => $element['start_line'],
+                        'startLineMember' => null
+                    ]
+                ]);
             }
 
-            foreach ($interface['methods'] as $method) {
+            foreach ($trait['methods'] as $method) {
                 if (isset($result['methods'][$method['name']])) {
                     // TODO: Inherit description from existing member if not present.
                 }
 
-                $result['methods'][$method['name']] = $method;
+                $result['constants'][$method['name']] = array_merge($method, [
+                    'declaringClass' => [
+                        'name'            => $element['fqsen'],
+                        'filename'        => $element['path'],
+                        'startLine'       => $element['start_line'],
+                        'startLineMember' => null
+                    ]
+                ]);
             }
         }
 
@@ -297,7 +342,21 @@ class Application
                 // TODO: Inherit description from existing member if not present.
             }
 
-            $result['constants'][$constant['name']] = $this->getConstantInfo($constant);
+            $result['constants'][$constant['name']] = array_merge($this->getConstantInfo($constant), [
+                'declaringClass' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => $element['start_line'],
+                    'startLineMember' => $constant['start_line']
+                ],
+
+                'declaringStructure' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => $element['start_line'],
+                    'startLineMember' => $constant['start_line']
+                ]
+            ]);
         }
 
         $properties = $this->indexDatabase->getConnection()->createQueryBuilder()
@@ -313,7 +372,21 @@ class Application
                 // TODO: Inherit description from existing member if not present.
             }
 
-            $result['properties'][$property['name']] = $this->getPropertyInfo($property);
+            $result['properties'][$property['name']] = array_merge($this->getPropertyInfo($property), [
+                'declaringClass' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => $element['start_line'],
+                    'startLineMember' => $property['start_line']
+                ],
+
+                'declaringStructure' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => $element['start_line'],
+                    'startLineMember' => $property['start_line']
+                ]
+            ]);
         }
 
         $methods = $this->indexDatabase->getConnection()->createQueryBuilder()
@@ -321,7 +394,7 @@ class Application
             ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
             ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
             ->innerJoin('fu', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = fu.access_modifier_id')
-            ->where('structural_eleme`nt_id = ?')
+            ->where('structural_element_id = ?')
             ->setParameter(0, $element['id'])
             ->execute();
 
@@ -330,19 +403,25 @@ class Application
                 // TODO: Inherit description from existing member if not present.
             }
 
-            $result['methods'][$method['name']] = $this->getFunctionInfo($method);
+            $result['methods'][$method['name']] = array_merge($this->getMethodInfo($method), [
+                'declaringClass' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => $element['start_line'],
+                    'startLineMember' => $method['start_line']
+                ],
 
-            // TODO: Additional method information.
+                'declaringStructure' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => $element['start_line'],
+                    'startLineMember' => $method['start_line']
+                ]
+            ]);
         }
-
-
-        // TODO: Fill in declaringStructure and declaringClass for all members.
-
-        // die(var_dump($result));
 
         return $result;
     }
-
 
     /**
      * @param array $arguments
@@ -366,6 +445,31 @@ class Application
 
         return $this->outputJson(true, $result);
     }
+
+
+    /**
+     * @param array $rawInfo
+     *
+     * @return array
+     */
+    protected function getMethodInfo(array $rawInfo)
+    {
+        return array_merge($this->getFunctionInfo($rawInfo), [
+            'override'           => [], // TODO: $this->getOverrideInfo($method),
+            'implementation'     => [], // TODO: $this->getImplementationInfo($method),
+
+            'isMagic'            => !!$rawInfo['is_magic'],
+
+            'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
+            'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
+            'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
+            'isStatic'           => !!$rawInfo['is_static'],
+
+            'declaringClass'     => [], // TODO: $this->getDeclaringClass($method),
+            'declaringStructure' => [], // TODO: $this->getDeclaringStructure($method)
+        ]);
+    }
+
 
     /**
      * @param array $rawInfo
@@ -465,7 +569,7 @@ class Application
     {
         return [
             'name'               => $rawInfo['name'],
-            'isMagic'            => false,
+            'isMagic'            => !!$rawInfo['is_magic'],
             'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
             'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
