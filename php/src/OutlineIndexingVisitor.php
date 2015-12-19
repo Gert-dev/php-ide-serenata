@@ -168,10 +168,11 @@ class OutlineIndexingVisitor extends NameResolver
         /** @var \PhpParser\Node\Param $param */
         foreach ($node->params as $param) {
             $parameters[] = [
-                'name'       => $param->name,
-                'type'       => $param->type,
-                'isVariadic' => $param->variadic,
-                'isOptional' => $param->default ? true : false
+                'name'        => $param->name,
+                'type'        => $param->type,
+                'isReference' => $param->byRef,
+                'isVariadic'  => $param->variadic,
+                'isOptional'  => $param->default ? true : false
             ];
         }
 

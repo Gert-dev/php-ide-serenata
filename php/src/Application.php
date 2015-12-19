@@ -521,15 +521,21 @@ class Application
             ->execute()
             ->fetchAll();
 
-        $parameters = array_map(function (array $parameter) {
-            $name = '$' . $parameter['name'];
+        $parameterMapper = function (array $parameter) {
+            $name = '';
+
+            if ($parameter['is_reference']) {
+                $name .= '&';
+            }
+
+            $name .= '$' . $parameter['name'];
 
             if ($parameter['is_variadic']) {
                 $name .= '...';
             }
 
             return $name;
-        }, $parameters);
+        };
 
         $optionals = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('*')
@@ -538,16 +544,6 @@ class Application
             ->setParameter(0, $rawInfo['id'])
             ->execute()
             ->fetchAll();
-
-        $optionals = array_map(function (array $parameter) {
-            $name = '$' . $parameter['name'];
-
-            if ($parameter['is_variadic']) {
-                $name .= '...';
-            }
-
-            return $name;
-        }, $optionals);
 
         $throws = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('*')
@@ -568,8 +564,8 @@ class Application
             'startLine'     => $rawInfo['start_line'],
             'filename'      => $rawInfo['path'],
 
-            'parameters'    => $parameters,
-            'optionals'     => $optionals,
+            'parameters'    => array_map($parameterMapper, $parameters),
+            'optionals'     => array_map($parameterMapper, $optionals),
             'throws'        => $throwsAssoc,
             'deprecated'    => !!$rawInfo['is_deprecated'],
 

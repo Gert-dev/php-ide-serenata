@@ -144,17 +144,18 @@ CREATE TABLE functions(
 
 -- Contains parameters for functions and methods.
 CREATE TABLE functions_parameters(
-    id          integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id           integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
-    function_id integer unsigned,
+    function_id  integer unsigned,
 
-    name        varchar(255) NOT NULL,
-    type        varchar(255),
+    name         varchar(255) NOT NULL,
+    type         varchar(255),
 
-    description text,
+    description  text,
 
-    is_optional tinyint(1) NOT NULL DEFAULT 0,
-    is_variadic tinyint(1) NOT NULL DEFAULT 0,
+    is_reference tinyint(1) NOT NULL DEFAULT 0,
+    is_optional  tinyint(1) NOT NULL DEFAULT 0,
+    is_variadic  tinyint(1) NOT NULL DEFAULT 0,
 
     FOREIGN KEY(function_id) REFERENCES functions(id)
         ON DELETE CASCADE

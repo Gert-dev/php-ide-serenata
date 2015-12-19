@@ -290,12 +290,13 @@ class Indexer
                     }
 
                     $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
-                        'function_id' => $functionId,
-                        'name'        => $parameter->getName(),
-                        'type'        => $type,
-                        'description' => null,
-                        'is_optional' => $parameter->isOptional() ? 1 : 0,
-                        'is_variadic' => $isVariadic ? 1 : 0
+                        'function_id'  => $functionId,
+                        'name'         => $parameter->getName(),
+                        'type'         => $type,
+                        'description'  => null,
+                        'is_reference' => $parameter->isPassedByReference() ? 1 : 0,
+                        'is_optional'  => $parameter->isOptional() ? 1 : 0,
+                        'is_variadic'  => $isVariadic ? 1 : 0
                     ]);
                 }
             }
@@ -532,12 +533,13 @@ class Indexer
                         $documentation['params'][$parameterKey] : null;
 
                     $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
-                        'function_id' => $functionId,
-                        'name'        => $parameter['name'],
-                        'type'        => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
-                        'description' => $parameterDoc ? $parameterDoc['description'] : null,
-                        'is_optional' => $parameter['isOptional'] ? 1 : 0,
-                        'is_variadic' => $parameter['isVariadic'] ? 1 : 0
+                        'function_id'  => $functionId,
+                        'name'         => $parameter['name'],
+                        'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                        'description'  => $parameterDoc ? $parameterDoc['description'] : null,
+                        'is_reference' => $parameter['isReference'] ? 1 : 0,
+                        'is_optional'  => $parameter['isOptional'] ? 1 : 0,
+                        'is_variadic'  => $parameter['isVariadic'] ? 1 : 0
                     ]);
                 }
 
@@ -599,12 +601,13 @@ class Indexer
                     $documentation['params'][$parameterKey] : null;
 
                 $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
-                    'function_id' => $functionId,
-                    'name'        => $parameter['name'],
-                    'type'        => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
-                    'description' => $parameterDoc ? $parameterDoc['description'] : null,
-                    'is_optional' => $parameter['isOptional'] ? 1 : 0,
-                    'is_variadic' => $parameter['isVariadic'] ? 1 : 0
+                    'function_id'  => $functionId,
+                    'name'         => $parameter['name'],
+                    'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                    'description'  => $parameterDoc ? $parameterDoc['description'] : null,
+                    'is_reference' => $parameter['isReference'] ? 1 : 0,
+                    'is_optional'  => $parameter['isOptional'] ? 1 : 0,
+                    'is_variadic'  => $parameter['isVariadic'] ? 1 : 0
                 ]);
             }
 
