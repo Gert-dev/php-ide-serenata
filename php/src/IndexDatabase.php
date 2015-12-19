@@ -121,7 +121,7 @@ class IndexDatabase implements IndexStorageInterface
     /**
      * {@inheritDoc}
      */
-    public function getAccessModifierid($name)
+    public function getAccessModifierId($name)
     {
         $result = $this->getConnection()->createQueryBuilder()
             ->select('id')

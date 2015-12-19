@@ -3,6 +3,7 @@
 namespace PhpIntegrator;
 
 use FilesystemIterator;
+use UnexpectedValueException;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 
@@ -30,6 +31,11 @@ class Indexer
      * @var IndexStorageInterface
      */
     protected $storage;
+
+    /**
+     * @var DocParser
+     */
+    protected $docParser;
 
     /**
      * Whether to display (debug) output.
@@ -351,9 +357,6 @@ class Indexer
      */
     protected function indexFileOutline($filename)
     {
-        // TODO: Initial version, has some low-hanging fruit regarding optimization.
-        // TODO: Needs refactoring as well.
-
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $nodes = [];
 
@@ -373,279 +376,283 @@ class Indexer
             'path' => $filename
         ]);
 
-        $docParser = new DocParser();
-
         foreach ($outlineIndexingVisitor->getStructuralElements() as $fqsen => $structuralElement) {
-            $seTypeId = $this->storage->getStructuralElementTypeId($structuralElement['type']);
-
-            $documentation = $docParser->parse($structuralElement['docComment'], [
-                DocParser::DEPRECATED,
-                DocParser::DESCRIPTION,
-                DocParser::METHOD,
-                DocParser::PROPERTY,
-                DocParser::PROPERTY_READ,
-                DocParser::PROPERTY_WRITE
-            ], $structuralElement['name']);
-
-            $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, [
-                'name'                       => $structuralElement['name'],
-                'fqsen'                      => $fqsen,
-                'file_id'                    => $fileId,
-                'start_line'                 => $structuralElement['startLine'],
-                'structural_element_type_id' => $seTypeId,
-                'is_abstract'                => (isset($structuralElement['is_abstract']) && $structuralElement['is_abstract']) ? 1 : 0,
-                'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
-                'short_description'          => $documentation['descriptions']['short'],
-                'long_description'           => $documentation['descriptions']['long']
-            ]);
-
-            if (isset($structuralElement['parent'])) {
-                $parentSeId = $this->storage->getStructuralElementId($structuralElement['parent']);
-
-                if ($parentSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, [
-                        'structural_element_id'        => $seId,
-                        'linked_structural_element_id' => $parentSeId
-                    ]);
-                } else {
-                    $this->logMessage(
-                        '  - WARNING: Could not find a record for the parent class ' .
-                        $structuralElement['parent']
-                    );
-                }
-            }
-
-            if (isset($structuralElement['interfaces'])) {
-                foreach ($structuralElement['interfaces'] as $interface) {
-                    $interfaceSeId = $this->storage->getStructuralElementId($interface);
-
-                    if ($interfaceSeId) {
-                        $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_INTERFACES_LINKED, [
-                            'structural_element_id'        => $seId,
-                            'linked_structural_element_id' => $interfaceSeId
-                        ]);
-                    } else {
-                        $this->logMessage(
-                            '  - WARNING: Could not find a record for the interface ' .
-                            $interface
-                        );
-                    }
-                }
-            }
-
-            if (isset($structuralElement['traits'])) {
-                foreach ($structuralElement['traits'] as $trait) {
-                    $traitSeId = $this->storage->getStructuralElementId($trait);
-
-                    if ($traitSeId) {
-                        $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED, [
-                            'structural_element_id'        => $seId,
-                            'linked_structural_element_id' => $traitSeId
-                        ]);
-                    } else {
-                        $this->logMessage(
-                            '  - WARNING: Could not find a record for the trait ' .
-                            $trait
-                        );
-                    }
-                }
-            }
-
-            foreach ($structuralElement['properties'] as $property) {
-                $accessModifier = null;
-
-                if ($property['isPublic']) {
-                    $accessModifier = 'public';
-                } elseif ($property['isProtected']) {
-                    $accessModifier = 'protected';
-                } elseif ($property['isPrivate']) {
-                    $accessModifier = 'private';
-                } else {
-                    throw new \UnexpectedValueException('Unknown access modifier returned!');
-                }
-
-                $amId = $this->storage->getAccessModifierid($accessModifier);
-
-                $documentation = $docParser->parse($property['docComment'], [
-                    DocParser::VAR_TYPE,
-                    DocParser::DEPRECATED,
-                    DocParser::DESCRIPTION
-                ], $property['name']);
-
-                $shortDescription = $documentation['descriptions']['short'];
-
-                // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
-                // from the latter to the former.
-                if (empty($shortDescription)) {
-                    $shortDescription = $documentation['var']['description'];
-                }
-
-                $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
-                    'name'                  => $property['name'],
-                    'file_id'               => $fileId,
-                    'start_line'            => $property['startLine'],
-                    'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-                    'short_description'     => $shortDescription,
-                    'long_description'      => $documentation['descriptions']['long'],
-                    'return_type'           => $documentation['var']['type'],
-                    'return_description'    => $documentation['var']['description'],
-                    'structural_element_id' => $seId,
-                    'access_modifier_id'    => $amId,
-                    'is_magic'              => 0,
-                    'is_static'             => $property['isStatic'] ? 1 : 0
-                ]);
-            }
-
-            foreach ($structuralElement['methods'] as $method) {
-                $accessModifier = null;
-
-                if ($method['isPublic']) {
-                    $accessModifier = 'public';
-                } elseif ($method['isProtected']) {
-                    $accessModifier = 'protected';
-                } elseif ($method['isPrivate']) {
-                    $accessModifier = 'private';
-                } else {
-                    throw new \UnexpectedValueException('Unknown access modifier returned!');
-                }
-
-                $amId = $this->storage->getAccessModifierid($accessModifier);
-
-                $documentation = $docParser->parse($method['docComment'], [
-                    DocParser::THROWS,
-                    DocParser::PARAM_TYPE,
-                    DocParser::DEPRECATED,
-                    DocParser::DESCRIPTION,
-                    DocParser::RETURN_VALUE
-                ], $method['name']);
-
-                $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
-                    'name'                  => $method['name'],
-                    'file_id'               => $fileId,
-                    'start_line'            => $method['startLine'],
-                    'is_builtin'            => 0,
-                    'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-                    'short_description'     => $documentation['descriptions']['short'],
-                    'long_description'      => $documentation['descriptions']['long'],
-                    'return_type'           => $method['returnType'] ?: $documentation['return']['type'],
-                    'return_description'    => $documentation['return']['description'],
-                    'structural_element_id' => $seId,
-                    'access_modifier_id'    => $amId,
-                    'is_magic'              => 0,
-                    'is_static'             => $method['isStatic'] ? 1 : 0
-                ]);
-
-                foreach ($method['parameters'] as $parameter) {
-                    $parameterKey = '$' . $parameter['name'];
-                    $parameterDoc = isset($documentation['params'][$parameterKey]) ?
-                        $documentation['params'][$parameterKey] : null;
-
-                    $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
-                        'function_id'  => $functionId,
-                        'name'         => $parameter['name'],
-                        'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
-                        'description'  => $parameterDoc ? $parameterDoc['description'] : null,
-                        'is_reference' => $parameter['isReference'] ? 1 : 0,
-                        'is_optional'  => $parameter['isOptional'] ? 1 : 0,
-                        'is_variadic'  => $parameter['isVariadic'] ? 1 : 0
-                    ]);
-                }
-
-                foreach ($documentation['throws'] as $type => $description) {
-                    $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, [
-                        'function_id' => $functionId,
-                        'type'        => $type,
-                        'description' => $description ?: null
-                    ]);
-                }
-            }
-
-            foreach ($structuralElement['constants'] as $constant) {
-                $documentation = $docParser->parse($constant['docComment'], [
-                    DocParser::VAR_TYPE,
-                    DocParser::DEPRECATED,
-                    DocParser::DESCRIPTION
-                ], $constant['name']);
-
-                $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
-                    'name'                  => $constant['name'],
-                    'file_id'               => $fileId,
-                    'start_line'            => $constant['startLine'],
-                    'is_builtin'            => 0,
-                    'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-                    'short_description'     => $documentation['descriptions']['short'],
-                    'long_description'      => $documentation['descriptions']['long'],
-                    'return_type'           => $documentation['var']['type'],
-                    'return_description'    => $documentation['var']['description'],
-                    'structural_element_id' => $seId
-                ]);
-            }
+            $this->indexStructuralElement($structuralElement, $fileId, $fqsen);
         }
 
         foreach ($outlineIndexingVisitor->getGlobalFunctions() as $function) {
-            $documentation = $docParser->parse($function['docComment'], [
-                DocParser::THROWS,
-                DocParser::PARAM_TYPE,
-                DocParser::DEPRECATED,
-                DocParser::DESCRIPTION,
-                DocParser::RETURN_VALUE
-            ], $function['name']);
-
-            $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
-                'name'                  => $function['name'],
-                'file_id'               => $fileId,
-                'start_line'            => $function['startLine'],
-                'is_builtin'            => 0,
-                'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-                'short_description'     => $documentation['descriptions']['short'],
-                'long_description'      => $documentation['descriptions']['long'],
-                'return_type'           => $function['returnType'] ?: $documentation['return']['type'],
-                'return_description'    => $documentation['return']['description'],
-            ]);
-
-            foreach ($function['parameters'] as $parameter) {
-                $parameterKey = '$' . $parameter['name'];
-                $parameterDoc = isset($documentation['params'][$parameterKey]) ?
-                    $documentation['params'][$parameterKey] : null;
-
-                $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
-                    'function_id'  => $functionId,
-                    'name'         => $parameter['name'],
-                    'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
-                    'description'  => $parameterDoc ? $parameterDoc['description'] : null,
-                    'is_reference' => $parameter['isReference'] ? 1 : 0,
-                    'is_optional'  => $parameter['isOptional'] ? 1 : 0,
-                    'is_variadic'  => $parameter['isVariadic'] ? 1 : 0
-                ]);
-            }
-
-            foreach ($documentation['throws'] as $type => $description) {
-                $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, [
-                    'function_id' => $functionId,
-                    'type'        => $type,
-                    'description' => $description ?: null
-                ]);
-            }
+            $this->indexFunction($function, $fileId);
         }
 
         foreach ($outlineIndexingVisitor->getGlobalConstants() as $constant) {
-            $documentation = $docParser->parse($constant['docComment'], [
-                DocParser::VAR_TYPE,
-                DocParser::DEPRECATED,
-                DocParser::DESCRIPTION
-            ], $constant['name']);
+            $this->indexConstant($constant, $fileId);
+        }
+    }
 
-            $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
-                'name'                  => $constant['name'],
-                'file_id'               => $fileId,
-                'start_line'            => $constant['startLine'],
-                'is_builtin'            => 0,
-                'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-                'short_description'     => $documentation['descriptions']['short'],
-                'long_description'      => $documentation['descriptions']['long'],
-                'return_type'           => $documentation['var']['type'],
-                'return_description'    => $documentation['var']['description']
+    /**
+     * Indexes the specified structural element.
+     *
+     * @param array  $rawData
+     * @param int    $fileId
+     * @param string $fqsen
+     */
+    protected function indexStructuralElement(array $rawData, $fileId, $fqsen)
+    {
+        $seTypeId = $this->storage->getStructuralElementTypeId($rawData['type']);
+
+        $documentation = $this->getDocParser()->parse($rawData['docComment'], [
+            DocParser::DEPRECATED,
+            DocParser::DESCRIPTION,
+            DocParser::METHOD,
+            DocParser::PROPERTY,
+            DocParser::PROPERTY_READ,
+            DocParser::PROPERTY_WRITE
+        ], $rawData['name']);
+
+        $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, [
+            'name'                       => $rawData['name'],
+            'fqsen'                      => $fqsen,
+            'file_id'                    => $fileId,
+            'start_line'                 => $rawData['startLine'],
+            'structural_element_type_id' => $seTypeId,
+            'is_abstract'                => (isset($rawData['is_abstract']) && $rawData['is_abstract']) ? 1 : 0,
+            'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
+            'short_description'          => $documentation['descriptions']['short'],
+            'long_description'           => $documentation['descriptions']['long']
+        ]);
+
+        if (isset($rawData['parent'])) {
+            $parentSeId = $this->storage->getStructuralElementId($rawData['parent']);
+
+            if ($parentSeId) {
+                $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, [
+                    'structural_element_id'        => $seId,
+                    'linked_structural_element_id' => $parentSeId
+                ]);
+            } else {
+                $this->logMessage(
+                    '  - WARNING: Could not find a record for the parent class ' .
+                    $rawData['parent']
+                );
+            }
+        }
+
+        if (isset($rawData['interfaces'])) {
+            foreach ($rawData['interfaces'] as $interface) {
+                $interfaceSeId = $this->storage->getStructuralElementId($interface);
+
+                if ($interfaceSeId) {
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_INTERFACES_LINKED, [
+                        'structural_element_id'        => $seId,
+                        'linked_structural_element_id' => $interfaceSeId
+                    ]);
+                } else {
+                    $this->logMessage(
+                        '  - WARNING: Could not find a record for the interface ' .
+                        $interface
+                    );
+                }
+            }
+        }
+
+        if (isset($rawData['traits'])) {
+            foreach ($rawData['traits'] as $trait) {
+                $traitSeId = $this->storage->getStructuralElementId($trait);
+
+                if ($traitSeId) {
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED, [
+                        'structural_element_id'        => $seId,
+                        'linked_structural_element_id' => $traitSeId
+                    ]);
+                } else {
+                    $this->logMessage(
+                        '  - WARNING: Could not find a record for the trait ' .
+                        $trait
+                    );
+                }
+            }
+        }
+
+        foreach ($rawData['properties'] as $property) {
+            $accessModifier = $this->parseAccessModifier($property);
+
+            $amId = $this->storage->getAccessModifierId($accessModifier);
+
+            $this->indexProperty($property, $fileId, $seId, $amId, false);
+        }
+
+        foreach ($rawData['methods'] as $method) {
+            $accessModifier = $this->parseAccessModifier($method);
+
+            $amId = $this->storage->getAccessModifierId($accessModifier);
+
+            $this->indexFunction($method, $fileId, $seId, $amId, false);
+        }
+
+        foreach ($rawData['constants'] as $constant) {
+            $this->indexConstant($constant, $fileId);
+        }
+    }
+
+    /**
+     * Indexes the specified constant.
+     *
+     * @param array    $rawData
+     * @param int      $fileId
+     * @param int|null $seId
+     */
+    protected function indexConstant(array $rawData, $fileId, $seId = null)
+    {
+        $documentation = $this->getDocParser()->parse($rawData['docComment'], [
+            DocParser::VAR_TYPE,
+            DocParser::DEPRECATED,
+            DocParser::DESCRIPTION
+        ], $rawData['name']);
+
+        $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
+            'name'                  => $rawData['name'],
+            'file_id'               => $fileId,
+            'start_line'            => $rawData['startLine'],
+            'is_builtin'            => 0,
+            'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+            'short_description'     => $documentation['descriptions']['short'],
+            'long_description'      => $documentation['descriptions']['long'],
+            'return_type'           => $documentation['var']['type'],
+            'return_description'    => $documentation['var']['description'],
+            'structural_element_id' => $seId
+        ]);
+    }
+
+    /**
+     * Indexes the specified property.
+     *
+     * @param array $rawData
+     * @param int   $fileId
+     * @param int   $seId
+     * @param int   $amId
+     * @param bool  $isMagic
+     */
+    protected function indexProperty(array $rawData, $fileId, $seId, $amId, $isMagic = false)
+    {
+        $documentation = $this->getDocParser()->parse($rawData['docComment'], [
+            DocParser::VAR_TYPE,
+            DocParser::DEPRECATED,
+            DocParser::DESCRIPTION
+        ], $rawData['name']);
+
+        $shortDescription = $documentation['descriptions']['short'];
+
+        // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
+        // from the latter to the former.
+        if (empty($shortDescription)) {
+            $shortDescription = $documentation['var']['description'];
+        }
+
+        $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
+            'name'                  => $rawData['name'],
+            'file_id'               => $fileId,
+            'start_line'            => $rawData['startLine'],
+            'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+            'short_description'     => $shortDescription,
+            'long_description'      => $documentation['descriptions']['long'],
+            'return_type'           => $documentation['var']['type'],
+            'return_description'    => $documentation['var']['description'],
+            'structural_element_id' => $seId,
+            'access_modifier_id'    => $amId,
+            'is_magic'              => $isMagic ? 1 : 0,
+            'is_static'             => $rawData['isStatic'] ? 1 : 0
+        ]);
+    }
+
+    /**
+     * Indexes the specified function.
+     *
+     * @param array    $rawData
+     * @param int      $fileId
+     * @param int|null $seId
+     * @param int|null $amId
+     * @param bool     $isMagic
+     */
+    protected function indexFunction(array $rawData, $fileId, $seId = null, $amId = null, $isMagic = false)
+    {
+        $documentation = $this->getDocParser()->parse($rawData['docComment'], [
+            DocParser::THROWS,
+            DocParser::PARAM_TYPE,
+            DocParser::DEPRECATED,
+            DocParser::DESCRIPTION,
+            DocParser::RETURN_VALUE
+        ], $rawData['name']);
+
+        $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
+            'name'                  => $rawData['name'],
+            'file_id'               => $fileId,
+            'start_line'            => $rawData['startLine'],
+            'is_builtin'            => 0,
+            'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+            'short_description'     => $documentation['descriptions']['short'],
+            'long_description'      => $documentation['descriptions']['long'],
+            'return_type'           => $rawData['returnType'] ?: $documentation['return']['type'],
+            'return_description'    => $documentation['return']['description'],
+            'structural_element_id' => $seId,
+            'access_modifier_id'    => $amId,
+            'is_magic'              => $isMagic ? 1 : 0,
+            'is_static'             => isset($rawData['isStatic']) ? ($rawData['isStatic'] ? 1 : 0) : 0
+        ]);
+
+        foreach ($rawData['parameters'] as $parameter) {
+            $parameterKey = '$' . $parameter['name'];
+            $parameterDoc = isset($documentation['params'][$parameterKey]) ?
+                $documentation['params'][$parameterKey] : null;
+
+            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
+                'function_id'  => $functionId,
+                'name'         => $parameter['name'],
+                'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                'description'  => $parameterDoc ? $parameterDoc['description'] : null,
+                'is_reference' => $parameter['isReference'] ? 1 : 0,
+                'is_optional'  => $parameter['isOptional'] ? 1 : 0,
+                'is_variadic'  => $parameter['isVariadic'] ? 1 : 0
             ]);
         }
+
+        foreach ($documentation['throws'] as $type => $description) {
+            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, [
+                'function_id' => $functionId,
+                'type'        => $type,
+                'description' => $description ?: null
+            ]);
+        }
+    }
+
+    /**
+     * @param array $rawData
+     *
+     * @return string
+     *
+     * @throws UnexpectedValueException
+     */
+    protected function parseAccessModifier(array $rawData)
+    {
+        if ($rawData['isPublic']) {
+            return 'public';
+        } elseif ($rawData['isProtected']) {
+            return 'protected';
+        } elseif ($rawData['isPrivate']) {
+            return 'private';
+        }
+
+        throw new UnexpectedValueException('Unknown access modifier returned!');
+    }
+
+    /**
+     * @return DocParser
+     */
+    protected function getDocParser()
+    {
+        if (!$this->docParser) {
+            $this->docParser = new DocParser();
+        }
+
+        return new DocParser();
     }
 }

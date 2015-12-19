@@ -13,7 +13,7 @@ interface IndexStorageInterface
      *
      * @return int|null
      */
-    public function getAccessModifierid($name);
+    public function getAccessModifierId($name);
 
     /**
      * Retrieves the ID of the structural element type with the specified name.
