@@ -502,7 +502,6 @@ class Application
         return $this->outputJson(true, $result);
     }
 
-
     /**
      * @param array $rawInfo
      *
@@ -512,22 +511,19 @@ class Application
     {
         return array_merge($this->getFunctionInfo($rawInfo), [
             'isMethod'           => true,
-
-            'override'           => null, // TODO: $this->getOverrideInfo($method),
-            'implementation'     => null, // TODO: $this->getImplementationInfo($method),
-
             'isMagic'            => !!$rawInfo['is_magic'],
-
             'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
             'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
             'isStatic'           => !!$rawInfo['is_static'],
 
+            'override'           => null,
+            'implementation'     => null,
+
             'declaringClass'     => null,
             'declaringStructure' => null
         ]);
     }
-
 
     /**
      * @param array $rawInfo
@@ -634,9 +630,6 @@ class Application
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
             'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
             'isStatic'           => !!$rawInfo['is_static'],
-            // 'override'           => $this->getOverrideInfo($property),
-            // 'declaringClass'     => $this->getDeclaringClass($property),
-            // 'declaringStructure' => $this->getDeclaringStructure($property),
             'deprecated'         => !!$rawInfo['is_deprecated'],
 
             'descriptions'  => [
@@ -647,7 +640,11 @@ class Application
             'return'        => [
                 'type'        => $rawInfo['return_type'],
                 'description' => $rawInfo['return_description']
-            ]
+            ],
+
+            'override'           => null,
+            'declaringClass'     => null,
+            'declaringStructure' => null
         ];
     }
 
