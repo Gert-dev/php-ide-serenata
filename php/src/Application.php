@@ -374,7 +374,13 @@ class Application
                 ];
             }
 
-            $result['properties'][$property['name']] = array_merge($this->getPropertyInfo($property), [
+            $propertyInfo = $this->getPropertyInfo($property);
+
+            if ($propertyInfo['return']['type'] === 'self') {
+                $propertyInfo['return']['resolvedType'] = $element['fqsen'];
+            }
+
+            $result['properties'][$property['name']] = array_merge($propertyInfo, [
                 'override'       => $overriddenProperty,
                 'implementation' => null,
 
@@ -432,7 +438,13 @@ class Application
                 }
             }
 
-            $result['methods'][$method['name']] = array_merge($this->getMethodInfo($method), [
+            $methodInfo = $this->getMethodInfo($method);
+
+            if ($methodInfo['return']['type'] === 'self') {
+                $methodInfo['return']['resolvedType'] = $element['fqsen'];
+            }
+
+            $result['methods'][$method['name']] = array_merge($methodInfo, [
                 'override'       => $overriddenMethod,
                 'implementation' => $implementedMethod,
 
@@ -455,6 +467,23 @@ class Application
                     'startLineMember' => $method['start_line']
                 ]
             ]);
+        }
+
+        // Resolve return types.
+        foreach ($result['methods'] as $name => &$method) {
+            if ($method['return']['type'] === '$this' || $method['return']['type'] === 'static') {
+                $method['return']['resolvedType'] = $element['fqsen'];
+            } elseif (!isset($method['return']['resolvedType'])) {
+                $method['return']['resolvedType'] = $method['return']['type'];
+            }
+        }
+
+        foreach ($result['properties'] as $name => &$property) {
+            if ($property['return']['type'] === '$this' || $property['return']['type'] === 'static') {
+                $property['return']['resolvedType'] = $element['fqsen'];
+            } elseif (!isset($property['return']['resolvedType'])) {
+                $property['return']['resolvedType'] = $property['return']['type'];
+            }
         }
 
         return $result;
@@ -576,7 +605,6 @@ class Application
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
-                'resolvedType' => $rawInfo['return_type'],
                 'description'  => $rawInfo['return_description']
             ]
         ];
@@ -629,7 +657,6 @@ class Application
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
-                'resolvedType' => $rawInfo['return_type'],
                 'description'  => $rawInfo['return_description']
             ],
 
@@ -662,7 +689,6 @@ class Application
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
-                'resolvedType' => $rawInfo['return_type'],
                 'description'  => $rawInfo['return_description']
             ],
         ];
