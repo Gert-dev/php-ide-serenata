@@ -2,6 +2,7 @@
 
 namespace PhpIntegrator;
 
+use ReflectionClass;
 use FilesystemIterator;
 use UnexpectedValueException;
 use RecursiveIteratorIterator;
@@ -314,36 +315,131 @@ class Indexer
      */
     protected function indexBuiltinClasses()
     {
-        // TODO: Also index get_declared_traits.
-        // TODO: Also index get_declared_interfaces.
+        foreach (get_declared_traits() as $trait) {
+            $element = new ReflectionClass($trait);
+
+            if ($element->isInternal()) {
+                $this->indexBuiltinStructuralElement($element);
+            }
+        }
+
+        foreach (get_declared_interfaces() as $interface) {
+            $element = new ReflectionClass($interface);
+
+            if ($element->isInternal()) {
+                $this->indexBuiltinStructuralElement($element);
+            }
+        }
 
         foreach (get_declared_classes() as $class) {
-            // TODO: Only index built-in classes (do this in the indexer).
-            // TODO: need to build a dependency chain here, as well, to ensure we index dependencies first.
-            //  -> Can also do it the easy way: check if current class has parent/interface/trait, if yes, index that
-            //     first and simply skip items here that were already indexed.
+            $element = new ReflectionClass($class);
 
-            /*if (mb_strpos($class, 'PhpIntegrator') === 0) {
-                continue; // Don't include our own classes.
+            if ($element->isInternal()) {
+                $this->indexBuiltinStructuralElement($element);
             }
-
-            if ($value = $this->fetchClassInfo($class, false)) {
-                $index[$class] = $value;
-            }
-
-
-
-
-
-            $reflectionClass = null;
-
-            try {
-                $reflectionClass = new ReflectionClass($className);
-            } catch (\Exception $e) {
-
-            }
-            */
         }
+    }
+
+    /**
+     * Indexes the specified built-in structural element.
+     *
+     * @param ReflectionClass $element
+     */
+    protected function indexBuiltinStructuralElement(ReflectionClass $element)
+    {
+        $type = null;
+
+        if ($element->isTrait()) {
+            $type = 'trait';
+        } elseif ($element->isInterface()) {
+            $type = 'interface';
+        } else {
+            $type = 'class';
+        }
+
+        // Adapt the data from the ReflectionClass to the data from the OutlineIndexingVisitor.
+        $rawData = [
+            'name'       => $element->getName(),
+            'type'       => $type,
+            'startLine'  => null,
+            'isAbstract' => $element->isAbstract(),
+            'docComment' => null,
+            'parent'     => $element->getParentClass() ? $element->getParentClass()->getName() : null,
+            'interfaces' => $element->getInterfaceNames(),
+            'traits'     => $element->getTraitNames(),
+            'methods'    => [],
+            'properties' => [],
+            'constants'  => []
+        ];
+
+        foreach ($element->getMethods() as $method) {
+            $parameters = [];
+
+            /** @var \ReflectionParameter $param */
+            foreach ($method->getParameters() as $param) {
+                $type = null;
+                $isVariadic = false;
+
+                // Requires PHP >= 5.6.
+                if (method_exists($param, 'isVariadic')) {
+                    $isVariadic = $param->isVariadic();
+                }
+
+                // Requires PHP >= 7.0.
+                if (method_exists($param, 'getType')) {
+                    $type = $param->getType();
+                }
+
+                $parameters[] = [
+                    'name'        => $param->getName(),
+                    'type'        => $type,
+                    'isReference' => $param->isPassedByReference(),
+                    'isVariadic'  => $isVariadic,
+                    'isOptional'  => $param->isOptional()
+                ];
+            }
+
+            // Requires PHP >= 7.0.
+            $returnType = null;
+
+            if (method_exists($method, 'getReturnType')) {
+                $returnType = $method->getReturnType();
+            }
+
+            $rawData['methods'][$method->getName()] = [
+                'name'        => $method->getName(),
+                'startLine'   => null,
+                'isPublic'    => $method->isPublic(),
+                'isPrivate'   => $method->isPrivate(),
+                'isProtected' => $method->isProtected(),
+                'isStatic'    => $method->isStatic(),
+                'returnType'  => $returnType,
+                'parameters'  => $parameters,
+                'docComment'  => null
+            ];
+        }
+
+        foreach ($element->getProperties() as $property) {
+            $rawData['properties'][$property->getName()] = [
+                'name'        => $property->getName(),
+                'startLine'   => null,
+                'isPublic'    => $property->isPublic(),
+                'isPrivate'   => $property->isPrivate(),
+                'isStatic'    => $property->isStatic(),
+                'isProtected' => $property->isProtected(),
+                'docComment'  => null
+            ];
+        }
+
+        foreach ($element->getConstants() as $constant) {
+            $rawData['constants'][$constant] = [
+                'name'       => $constant,
+                'startLine'  => null,
+                'docComment' => null
+            ];
+        }
+
+        $this->indexStructuralElement($rawData, null, $element->getName());
     }
 
     /**

@@ -40,8 +40,8 @@ CREATE TABLE structural_elements(
 
     name                       varchar(255) NOT NULL,
     fqsen                      varchar(255) NOT NULL,
-    file_id                    integer NOT NULL,
-    start_line                 integer unsigned NOT NULL,
+    file_id                    integer,
+    start_line                 integer unsigned,
     structural_element_type_id integer NOT NULL,
     is_abstract                tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated              tinyint(1) NOT NULL DEFAULT 0,
@@ -181,8 +181,8 @@ CREATE TABLE properties(
     id                    integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                  varchar(255) NOT NULL,
-    file_id               integer NOT NULL,
-    start_line            integer unsigned NOT NULL,
+    file_id               integer,
+    start_line            integer unsigned,
 
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
 
