@@ -727,6 +727,29 @@ class Application
 
         $indexer = new Indexer($this->indexDatabase, $showOutput);
 
+        $hasIndexedBuiltin = $this->indexDatabase->getConnection()->createQueryBuilder()
+            ->select('id', 'value')
+            ->from(IndexStorageItemEnum::SETTINGS)
+            ->where('name = ?')
+            ->setParameter(0, 'has_indexed_builtin')
+            ->execute()
+            ->fetch();
+
+        if (!$hasIndexedBuiltin || !$hasIndexedBuiltin['value']) {
+            $indexer->indexBuiltinItems();
+
+            if ($hasIndexedBuiltin) {
+                $this->indexDatabase->update(IndexStorageItemEnum::SETTINGS, $hasIndexedBuiltin['id'], [
+                    'value' => 1
+                ]);
+            } else {
+                $this->indexDatabase->insert(IndexStorageItemEnum::SETTINGS, [
+                    'name'  => 'has_indexed_builtin',
+                    'value' => 1
+                ]);
+            }
+        }
+
         if (is_dir($path)) {
             $indexer->indexDirectory($path);
         } else {

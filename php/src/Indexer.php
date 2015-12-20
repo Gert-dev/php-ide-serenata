@@ -118,15 +118,6 @@ class Indexer
 
         $this->logBanner('Pass 2...');
 
-        $this->logMessage('Indexing built-in constants...');
-        $this->indexBuiltinConstants();
-
-        $this->logMessage('Indexing built-in functions...');
-        $this->indexBuiltinFunctions();
-
-        $this->logMessage('Indexing built-in classes...');
-        $this->indexBuiltinClasses();
-
         $this->logMessage('Indexing outline...');
         $this->indexFileOutlines(array_keys($fileClassMap));
     }
@@ -139,6 +130,21 @@ class Indexer
     public function indexFile($filePath)
     {
         $this->indexFileOutline($filePath);
+    }
+
+    /**
+     * Indexes built-in functions, classes, constants, ...
+     */
+    public function indexBuiltinItems()
+    {
+        $this->logMessage('Indexing built-in constants...');
+        $this->indexBuiltinConstants();
+
+        $this->logMessage('Indexing built-in functions...');
+        $this->indexBuiltinFunctions();
+
+        $this->logMessage('Indexing built-in classes...');
+        $this->indexBuiltinClasses();
     }
 
     /**
