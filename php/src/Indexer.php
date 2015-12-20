@@ -588,6 +588,94 @@ class Indexer
         foreach ($rawData['constants'] as $constant) {
             $this->indexConstant($constant, $fileId);
         }
+
+        // Index magic properties.
+        $magicProperties = array_merge(
+            $documentation['properties'],
+            $documentation['propertiesReadOnly'],
+            $documentation['propertiesWriteOnly']
+        );
+
+        $amId = $this->storage->getAccessModifierId('public');
+
+        foreach ($magicProperties as $propertyName => $propertyData) {
+            $data = $this->adaptMagicPropertyData($propertyName, $propertyData);
+
+            $this->indexProperty($data, $fileId, $seId, $amId, true);
+        }
+
+        // Index magic methods.
+        foreach ($documentation['methods'] as $methodName => $methodData) {
+            $data = $this->adaptMagicMethodData($methodName, $methodData);
+
+            $this->indexFunction($data, $fileId, $seId, $amId, true);
+        }
+    }
+
+    /**
+     * Adapts data about the specified magic property to be in the same format returned by the outline indexer.
+     *
+     * @param string $name
+     * @param array  $data
+     *
+     * @return array
+     */
+    protected function adaptMagicPropertyData($name, array $data)
+    {
+        return [
+            'name'        => $name,
+            'startLine'   => null,
+            'isPublic'    => true,
+            'isPrivate'   => false,
+            'isProtected' => false,
+            'isStatic'    => $data['isStatic'],
+            'docComment'  => "/** {$data['description']} */"
+        ];
+    }
+
+    /**
+     * Adapts data about the specified magic method to be in the same format returned by the outline indexer.
+     *
+     * @param string $name
+     * @param array  $data
+     *
+     * @return array
+     */
+    protected function adaptMagicMethodData($name, array $data)
+    {
+        $parameters = [];
+
+        foreach ($data['requiredParameters'] as $parameterName => $parameter) {
+            $parameters[] = [
+                'name'        => $parameterName,
+                'type'        => $parameter['type'],
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => false
+            ];
+        }
+
+        foreach ($data['optionalParameters'] as $parameterName => $parameter) {
+            $parameters[] = [
+                'name'        => $parameterName,
+                'type'        => $parameter['type'],
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true
+            ];
+        }
+
+        return [
+            'name'        => $name,
+            'startLine'   => null,
+            'returnType'  => $data['type'],
+            'parameters'  => $parameters,
+            'docComment'  => "/** {$data['description']} */",
+            'isPublic'    => true,
+            'isPrivate'   => false,
+            'isProtected' => false,
+            'isStatic'    => $data['isStatic']
+        ];
     }
 
     /**
