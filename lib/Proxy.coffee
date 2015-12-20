@@ -16,7 +16,7 @@ class Proxy
     config: null
 
     ###*
-     * Cosntructor.
+     * Constructor.
      *
      * @param {Config} config
     ###
