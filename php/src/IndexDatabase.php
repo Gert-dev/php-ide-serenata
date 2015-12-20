@@ -59,8 +59,6 @@ class IndexDatabase implements IndexStorageInterface
                 'path'   => $this->databasePath
             ], $configuration);
 
-            $statement = $this->connection->executeQuery('PRAGMA foreign_keys=ON');
-
             $outOfDate = null;
 
             try {
@@ -91,6 +89,9 @@ class IndexDatabase implements IndexStorageInterface
             }
         }
 
+        // Have to be a douche about this as it seems to reset itself, even though the connection is not closed.
+        $statement = $this->connection->executeQuery('PRAGMA foreign_keys=ON');
+
         return $this->connection;
     }
 
@@ -116,6 +117,41 @@ class IndexDatabase implements IndexStorageInterface
             'name'  => 'version',
             'value' => $this->databaseVersion
         ]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFileModifiedMap()
+    {
+        $result = $this->getConnection()->createQueryBuilder()
+            ->select('path', 'indexed_time')
+            ->from(IndexStorageItemEnum::FILES)
+            ->execute();
+
+        $files = [];
+
+        foreach ($result as $record) {
+            $files[$record['path']] = new \DateTime($record['indexed_time']);
+        }
+
+        return $files;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFileId($path)
+    {
+        $result = $this->getConnection()->createQueryBuilder()
+            ->select('id')
+            ->from(IndexStorageItemEnum::FILES)
+            ->where('path = ?')
+            ->setParameter(0, $path)
+            ->execute()
+            ->fetchColumn();
+
+        return $result ? $result : null;
     }
 
     /**
@@ -169,6 +205,114 @@ class IndexDatabase implements IndexStorageInterface
     /**
      * {@inheritDoc}
      */
+    public function deletePropertiesByFileId($fileId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::PROPERTIES)
+            ->where('file_id = ?')
+            ->setParameter(0, $fileId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteConstantsByFileId($fileId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::CONSTANTS)
+            ->where('file_id = ?')
+            ->setParameter(0, $fileId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteFunctionsByFileId($fileId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::FUNCTIONS)
+            ->where('file_id = ?')
+            ->setParameter(0, $fileId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deletePropertiesFor($seId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::PROPERTIES)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteMethodsFor($seId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::FUNCTIONS)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteConstantsFor($seId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::CONSTANTS)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteParentLinksFor($seId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteInterfaceLinksFor($seId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_INTERFACES_LINKED)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function deleteTraitLinksFor($seId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function insert($indexStorageItem, array $data)
     {
         $this->getConnection()->insert($indexStorageItem, $data);
@@ -177,20 +321,10 @@ class IndexDatabase implements IndexStorageInterface
     }
 
     /**
-     * Retrieves all storage items of the specified type.
-     *
-     * @param string $indexStorageItem
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    /*public function getAll($indexStorageItem)
+    public function update($indexStorageItem, $id, array $data)
     {
-        $result = $this->getConnection()->createQueryBuilder()
-            ->select('*')
-            ->from($indexStorageItem)
-            ->execute()
-            ->fetchAll();
-
-        return $result;
-    }*/
+        $this->getConnection()->update($indexStorageItem, $data, is_array($id) ? $id : ['id' => $id]);
+    }
 }

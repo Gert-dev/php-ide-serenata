@@ -696,14 +696,6 @@ class Application
 
         $databasePath = array_shift($arguments);
 
-
-
-        if ($arguments[0] === '--reindex' && is_dir($arguments[1])) {
-            @unlink($databasePath); // TODO: Remove me. for testing purposes.
-        }
-
-
-
         $this->indexDatabase = new IndexDatabase($databasePath, static::DATABASE_VERSION);
 
         $command = array_shift($arguments);

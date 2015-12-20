@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator;
 
+use DateTime;
+use SplFileInfo;
 use ReflectionClass;
 use FilesystemIterator;
 use UnexpectedValueException;
@@ -23,6 +25,14 @@ use PhpParser\NodeVisitor\NameResolver;
 
 /**
  * Handles indexation of PHP code.
+ *
+ * The index only contains "direct" data, meaning that it only contains data that is directly attached to an element.
+ * For example, classes will only have their direct members attached in the index. The index will also keep track of
+ * links between structural elements and parents, implemented interfaces, and more, but it will not duplicate data,
+ * meaning parent methods will not be copied and attached to child classes.
+ *
+ * The index keeps track of 'outlines' that are confined to a single file. It in itself does not do anything
+ * "intelligent" such as automatically inheriting docblocks from overridden methods.
  */
 class Indexer
 {
@@ -99,7 +109,7 @@ class Indexer
         $this->logBanner('Pass 1 - Scanning and sorting by dependencies...');
 
         $fileClassMap = $this->scan($directory);
-
+        $fileClassMap = $this->filterScanResult($fileClassMap);
         $fileClassMap = $this->sortScanResultByDependencies($fileClassMap);
 
         foreach ($fileClassMap as $filename => $fqsens) {
@@ -109,13 +119,13 @@ class Indexer
         $this->logBanner('Pass 2...');
 
         $this->logMessage('Indexing built-in constants...');
-        $this->indexBuiltinConstants();
+        // $this->indexBuiltinConstants();
 
         $this->logMessage('Indexing built-in functions...');
-        $this->indexBuiltinFunctions();
+        // $this->indexBuiltinFunctions();
 
         $this->logMessage('Indexing built-in classes...');
-        $this->indexBuiltinClasses();
+        // $this->indexBuiltinClasses();
 
         $this->logMessage('Indexing outline...');
         $this->indexFileOutlines(array_keys($fileClassMap));
@@ -123,13 +133,16 @@ class Indexer
 
     /**
      * Scans the specified directory, returning a mapping of file names to a list of FQSEN's contained in the file, each
-     * of which are then mapped to a list of FQSEN's they depend on.
+     * of which are then mapped to a list of FQSEN's they depend on. Only files that have actually been updated since
+     * the previous index will be retrieved by default.
      *
      * @param string $directory
+     * @param bool   $isIncremental Whether to only return files modified since their last index (or otherwise: all
+     *                              files).
      *
      * @return array
      */
-    protected function scan($directory)
+    protected function scan($directory, $isIncremental = true)
     {
         $fileClassMap = [];
 
@@ -148,6 +161,32 @@ class Indexer
         }
 
         return $fileClassMap;
+    }
+
+    /**
+     * Filters the specified result set from the {@see scan} method to filter out files that are already up-to-date.
+     *
+     * @param array $scanResult
+     *
+     * @return array The input value, after filtering.
+     */
+    protected function filterScanResult(array $scanResult)
+    {
+        $fileModifiedMap = $this->storage->getFileModifiedMap();
+
+        $result = [];
+
+        foreach ($scanResult as $filename => $fqsens) {
+            $fileInfo = new SplFileInfo($filename);
+
+            if (!isset($fileModifiedMap[$filename])
+            || $fileInfo->getMTime() > $fileModifiedMap[$filename]->getTimestamp()
+            ) {
+                $result[$filename] = $fqsens;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -468,9 +507,21 @@ class Indexer
         $traverser->addVisitor($outlineIndexingVisitor);
         $traverser->traverse($nodes);
 
-        $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
-            'path' => $filename
-        ]);
+        $fileId = $this->storage->getFileId($filename);
+
+        if ($fileId) {
+            $this->storage->deletePropertiesByFileId($fileId);
+            $this->storage->deleteConstantsByFileId($fileId);
+            $this->storage->deleteFunctionsByFileId($fileId);
+
+            $this->storage->update(IndexStorageItemEnum::FILES, $fileId, [
+                'indexed_time' => (new DateTime())->format('Y-m-d H:i:s')
+            ]);
+        } else {
+            $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
+                'path' => $filename
+            ]);
+        }
 
         foreach ($outlineIndexingVisitor->getStructuralElements() as $fqsen => $structuralElement) {
             $this->indexStructuralElement($structuralElement, $fileId, $fqsen);
@@ -505,7 +556,7 @@ class Indexer
             DocParser::PROPERTY_WRITE
         ], $rawData['name']);
 
-        $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, [
+        $seData = [
             'name'                       => $rawData['name'],
             'fqsen'                      => $fqsen,
             'file_id'                    => $fileId,
@@ -515,7 +566,23 @@ class Indexer
             'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
             'short_description'          => $documentation['descriptions']['short'],
             'long_description'           => $documentation['descriptions']['long']
-        ]);
+        ];
+
+        $seId = $this->storage->getStructuralElementId($fqsen);
+
+        if ($seId) {
+            $this->storage->deletePropertiesFor($seId);
+            $this->storage->deleteMethodsFor($seId);
+            $this->storage->deleteConstantsFor($seId);
+
+            $this->storage->deleteParentLinksFor($seId);
+            $this->storage->deleteInterfaceLinksFor($seId);
+            $this->storage->deleteTraitLinksFor($seId);
+
+            $this->storage->update(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, $seId, $seData);
+        } else {
+            $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, $seData);
+        }
 
         if (isset($rawData['parent'])) {
             $parentSeId = $this->storage->getStructuralElementId($rawData['parent']);
