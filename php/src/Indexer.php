@@ -788,6 +788,15 @@ class Indexer
             DocParser::DESCRIPTION
         ], $rawData['name']);
 
+        $returnType = null;
+
+        if ($documentation['var']['type']) {
+            $filename = $this->storage->getFilePathById($fileId);
+
+            $returnType = $documentation['var']['type'];
+            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $filename);
+        }
+
         $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'                  => $rawData['name'],
             'file_id'               => $fileId,
@@ -796,7 +805,7 @@ class Indexer
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
             'short_description'     => $documentation['descriptions']['short'],
             'long_description'      => $documentation['descriptions']['long'],
-            'return_type'           => $documentation['var']['type'],
+            'return_type'           => $returnType,
             'return_description'    => $documentation['var']['description'],
             'structural_element_id' => $seId
         ]);
@@ -827,6 +836,15 @@ class Indexer
             $shortDescription = $documentation['var']['description'];
         }
 
+        $returnType = null;
+
+        if ($documentation['var']['type']) {
+            $filename = $this->storage->getFilePathById($fileId);
+
+            $returnType = $documentation['var']['type'];
+            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $filename);
+        }
+
         $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
             'name'                  => $rawData['name'],
             'file_id'               => $fileId,
@@ -834,7 +852,7 @@ class Indexer
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
-            'return_type'           => $documentation['var']['type'],
+            'return_type'           => $returnType,
             'return_description'    => $documentation['var']['description'],
             'structural_element_id' => $seId,
             'access_modifier_id'    => $amId,
@@ -862,6 +880,15 @@ class Indexer
             DocParser::RETURN_VALUE
         ], $rawData['name']);
 
+        $returnType = $rawData['returnType'];
+
+        if (!$returnType) {
+            $filename = $this->storage->getFilePathById($fileId);
+
+            $returnType = $documentation['return']['type'];
+            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $filename);
+        }
+
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
             'name'                  => $rawData['name'],
             'file_id'               => $fileId,
@@ -870,7 +897,7 @@ class Indexer
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
             'short_description'     => $documentation['descriptions']['short'],
             'long_description'      => $documentation['descriptions']['long'],
-            'return_type'           => $rawData['returnType'] ?: $documentation['return']['type'],
+            'return_type'           => $returnType,
             'return_description'    => $documentation['return']['description'],
             'structural_element_id' => $seId,
             'access_modifier_id'    => $amId,
@@ -921,6 +948,82 @@ class Indexer
         }
 
         throw new UnexpectedValueException('Unknown access modifier returned!');
+    }
+
+    /**
+     * Returns a boolean indicating if the specified value is a class type or not.
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    protected function isClassType($type)
+    {
+        return ucfirst($type) === $type;
+    }
+
+    /**
+     * Retrieves the sole class name from the specified return value statement.
+     *
+     * @example "null" returns null.
+     * @example "FooClass" returns "FooClass".
+     * @example "FooClass|null" returns "FooClass".
+     * @example "FooClass|BarClass|null" returns null (there is no single type).
+     *
+     * @param string $returnValueStatement
+     *
+     * @return string|null
+     */
+    protected function getSoleClassName($returnValueStatement)
+    {
+        if ($returnValueStatement) {
+            $types = explode(DocParser::TYPE_SPLITTER, $returnValueStatement);
+
+            $classTypes = [];
+
+            foreach ($types as $type) {
+                if ($this->isClassType($type)) {
+                    $classTypes[] = $type;
+                }
+            }
+
+            if (count($classTypes) === 1) {
+                return $classTypes[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolves and determines the FQSEN of the specified return type.
+     *
+     * @param string $returnType
+     * @param string $filename
+     *
+     * @return string|null
+     */
+    protected function getFullReturnTypeForDocblockType($returnType, $filename)
+    {
+        if (!isset($returnType) || empty($returnType)) {
+            return null;
+        }
+
+        $soleClassName = $this->getSoleClassName($returnType);
+
+        if (!empty($soleClassName)) {
+            if ($soleClassName[0] !== "\\") {
+                $parser = new FileParser($filename);
+
+                $completedClassName = $parser->getFullClassName($soleClassName, $useStatementFound);
+
+                return $completedClassName;
+            }
+
+            return $soleClassName;
+        }
+
+        return $returnType;
     }
 
     /**

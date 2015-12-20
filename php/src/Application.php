@@ -575,8 +575,9 @@ class Application
             ],
 
             'return'        => [
-                'type'        => $rawInfo['return_type'],
-                'description' => $rawInfo['return_description']
+                'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['return_type'],
+                'description'  => $rawInfo['return_description']
             ]
         ];
     }
@@ -627,8 +628,9 @@ class Application
             ],
 
             'return'        => [
-                'type'        => $rawInfo['return_type'],
-                'description' => $rawInfo['return_description']
+                'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['return_type'],
+                'description'  => $rawInfo['return_description']
             ],
 
             'override'           => null,
@@ -659,8 +661,9 @@ class Application
             ],
 
             'return'        => [
-                'type'        => $rawInfo['return_type'],
-                'description' => $rawInfo['return_description']
+                'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['return_type'],
+                'description'  => $rawInfo['return_description']
             ],
         ];
     }

@@ -16,6 +16,13 @@ interface IndexStorageInterface
     public function getFileModifiedMap();
 
     /**
+     * @param int $id
+     *
+     * @return string|null
+     */
+    public function getFilePathById($id);
+
+    /**
      * Retrieves the ID of the file with the specified path.
      *
      * @param string $path
