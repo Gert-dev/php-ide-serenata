@@ -730,7 +730,7 @@ class Application
         if (is_dir($path)) {
             $indexer->indexDirectory($path);
         } else {
-            // TODO: Reindex a single file.
+            $indexer->indexFile($path);
         }
 
         return $this->outputJson(true, null);

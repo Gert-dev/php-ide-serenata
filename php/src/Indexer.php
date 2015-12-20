@@ -98,7 +98,7 @@ class Indexer
     }
 
     /**
-     * Indexes the specified project using the specified database.
+     * Indexes the specified project.
      *
      * @param string $directory
      */
@@ -129,6 +129,16 @@ class Indexer
 
         $this->logMessage('Indexing outline...');
         $this->indexFileOutlines(array_keys($fileClassMap));
+    }
+
+    /**
+     * Indexes the specified file.
+     *
+     * @param string $filePath
+     */
+    public function indexFile($filePath)
+    {
+        $this->indexFileOutline($filePath);
     }
 
     /**
@@ -509,17 +519,20 @@ class Indexer
 
         $fileId = $this->storage->getFileId($filename);
 
+        $time = (new DateTime())->format('Y-m-d H:i:s');
+
         if ($fileId) {
             $this->storage->deletePropertiesByFileId($fileId);
             $this->storage->deleteConstantsByFileId($fileId);
             $this->storage->deleteFunctionsByFileId($fileId);
 
             $this->storage->update(IndexStorageItemEnum::FILES, $fileId, [
-                'indexed_time' => (new DateTime())->format('Y-m-d H:i:s')
+                'indexed_time' => $time
             ]);
         } else {
             $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
-                'path' => $filename
+                'path'         => $filename,
+                'indexed_time' => $time
             ]);
         }
 
