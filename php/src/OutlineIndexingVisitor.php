@@ -83,7 +83,6 @@ class OutlineIndexingVisitor extends NameResolver
             'parent'     => $node->extends ? $node->extends->toString() : null,
             'interfaces' => $interfaces,
             'traits'     => [],
-            'docComment' => $node->getDocComment() ? $node->getDocComment()->getReformattedText() : null,
             'methods'    => [],
             'properties' => [],
             'constants'  => []
