@@ -313,6 +313,19 @@ class IndexDatabase implements IndexStorageInterface
     /**
      * {@inheritDoc}
      */
+    public function deleteExcludedStructuralElementsByFileId($fileId, array $excludedIds)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS)
+            ->where('file_id = ? AND id NOT IN (?)')
+            ->setParameter(0, $fileId)
+            ->setParameter(0, $excludedIds, Connection::PARAM_INT_ARRAY)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function insert($indexStorageItem, array $data)
     {
         $this->getConnection()->insert($indexStorageItem, $data);

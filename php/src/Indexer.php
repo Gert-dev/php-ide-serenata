@@ -119,13 +119,13 @@ class Indexer
         $this->logBanner('Pass 2...');
 
         $this->logMessage('Indexing built-in constants...');
-        // $this->indexBuiltinConstants();
+        $this->indexBuiltinConstants();
 
         $this->logMessage('Indexing built-in functions...');
-        // $this->indexBuiltinFunctions();
+        $this->indexBuiltinFunctions();
 
         $this->logMessage('Indexing built-in classes...');
-        // $this->indexBuiltinClasses();
+        $this->indexBuiltinClasses();
 
         $this->logMessage('Indexing outline...');
         $this->indexFileOutlines(array_keys($fileClassMap));
@@ -536,8 +536,10 @@ class Indexer
             ]);
         }
 
+        $indexedSeIds = [];
+
         foreach ($outlineIndexingVisitor->getStructuralElements() as $fqsen => $structuralElement) {
-            $this->indexStructuralElement($structuralElement, $fileId, $fqsen);
+            $indexedSeIds[] = $this->indexStructuralElement($structuralElement, $fileId, $fqsen);
         }
 
         foreach ($outlineIndexingVisitor->getGlobalFunctions() as $function) {
@@ -547,6 +549,9 @@ class Indexer
         foreach ($outlineIndexingVisitor->getGlobalConstants() as $constant) {
             $this->indexConstant($constant, $fileId);
         }
+
+        // Remove structural elements that are no longer in this file.
+        $this->storage->deleteExcludedStructuralElementsByFileId($fileId, $indexedSeIds);
     }
 
     /**
@@ -555,6 +560,8 @@ class Indexer
      * @param array  $rawData
      * @param int    $fileId
      * @param string $fqsen
+     *
+     * @return int The ID of the structural element.
      */
     protected function indexStructuralElement(array $rawData, $fileId, $fqsen)
     {
@@ -690,6 +697,8 @@ class Indexer
 
             $this->indexFunction($data, $fileId, $seId, $amId, true);
         }
+
+        return $seId;
     }
 
     /**

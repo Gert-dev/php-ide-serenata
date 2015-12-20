@@ -97,6 +97,14 @@ interface IndexStorageInterface
     public function deleteTraitLinksFor($seId);
 
     /**
+     * Deletes all structural elements with the specified file ID, except those with the listed ID's.
+     *
+     * @param int   $fileId
+     * @param int[] $excludedIds
+     */
+    public function deleteExcludedStructuralElementsByFileId($fileId, array $excludedIds);
+
+    /**
      * Inserts the specified index item into the storage.
      *
      * @param string $indexStorageItem
