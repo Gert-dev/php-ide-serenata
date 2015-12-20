@@ -7,7 +7,7 @@
     },
 
     "require": {
-        "nikic/php-parser": "2.0.0beta1",
+        "nikic/php-parser": "2.0.0",
         "doctrine/dbal": "2.5"
     }
 }
