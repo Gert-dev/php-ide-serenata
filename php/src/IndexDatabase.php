@@ -315,12 +315,24 @@ class IndexDatabase implements IndexStorageInterface
      */
     public function deleteExcludedStructuralElementsByFileId($fileId, array $excludedIds)
     {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS)
-            ->where('file_id = ? AND id NOT IN (?)')
-            ->setParameter(0, $fileId)
-            ->setParameter(0, $excludedIds, Connection::PARAM_INT_ARRAY)
-            ->execute();
+        if (empty($excludedIds)) {
+            $this->getConnection()->createQueryBuilder()
+                ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS)
+                ->where('file_id = ?')
+                ->setParameter(0, $fileId)
+                ->execute();
+        } else {
+            $queryBuilder = $this->getConnection()->createQueryBuilder();
+
+            $queryBuilder
+                ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS)
+                ->where(
+                    'file_id = ' . $queryBuilder->createNamedParameter($fileId) .
+                    ' AND ' .
+                    'id NOT IN (' . $queryBuilder->createNamedParameter($excludedIds, Connection::PARAM_INT_ARRAY) . ')'
+                )
+                ->execute();
+        }
     }
 
     /**
