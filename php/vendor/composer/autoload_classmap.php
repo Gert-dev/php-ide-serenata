@@ -7,20 +7,13 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'PhpIntegrator\\Application' => $baseDir . '/src/Application.php',
-    'PhpIntegrator\\ClassInfoFetcher' => $baseDir . '/src/InfoFetchers/ClassInfoFetcher.php',
-    'PhpIntegrator\\ConstantInfoFetcher' => $baseDir . '/src/InfoFetchers/ConstantInfoFetcher.php',
     'PhpIntegrator\\DependencyFetchingVisitor' => $baseDir . '/src/DependencyFetchingVisitor.php',
     'PhpIntegrator\\DocParser' => $baseDir . '/src/DocParser.php',
-    'PhpIntegrator\\FetcherInfoTrait' => $baseDir . '/src/InfoFetchers/FetcherInfoTrait.php',
     'PhpIntegrator\\FileParser' => $baseDir . '/src/FileParser.php',
-    'PhpIntegrator\\FunctionInfoFetcher' => $baseDir . '/src/InfoFetchers/FunctionInfoFetcher.php',
+    'PhpIntegrator\\IndexDataAdapter' => $baseDir . '/src/IndexDataAdapter.php',
     'PhpIntegrator\\IndexDatabase' => $baseDir . '/src/IndexDatabase.php',
     'PhpIntegrator\\IndexStorageInterface' => $baseDir . '/src/IndexStorageInterface.php',
     'PhpIntegrator\\IndexStorageItemEnum' => $baseDir . '/src/IndexStorageItemEnum.php',
     'PhpIntegrator\\Indexer' => $baseDir . '/src/Indexer.php',
-    'PhpIntegrator\\InfoFetcherInterface' => $baseDir . '/src/InfoFetchers/InfoFetcherInterface.php',
-    'PhpIntegrator\\MemberInfoFetcherTrait' => $baseDir . '/src/InfoFetchers/MemberInfoFetcherTrait.php',
-    'PhpIntegrator\\MethodInfoFetcher' => $baseDir . '/src/InfoFetchers/MethodInfoFetcher.php',
     'PhpIntegrator\\OutlineIndexingVisitor' => $baseDir . '/src/OutlineIndexingVisitor.php',
-    'PhpIntegrator\\PropertyInfoFetcher' => $baseDir . '/src/InfoFetchers/PropertyInfoFetcher.php',
 );

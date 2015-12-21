@@ -487,6 +487,57 @@ class IndexDatabase implements IndexStorageInterface
     /**
      * {@inheritDoc}
      */
+    public function getFunctionParameters($functionId)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
+            ->where('function_id = ?')
+            ->setParameter(0, $functionId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFunctionThrows($functionId)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::FUNCTIONS_THROWS)
+            ->where('function_id = ?')
+            ->setParameter(0, $functionId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getGlobalConstants()
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::CONSTANTS)
+            ->where('structural_element_id IS NULL')
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getGlobalFunctions()
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('fu.*', 'fi.path')
+            ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
+            ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
+            ->where('structural_element_id IS NULL')
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function insert($indexStorageItem, array $data)
     {
         $this->getConnection()->insert($indexStorageItem, $data);
@@ -500,5 +551,16 @@ class IndexDatabase implements IndexStorageInterface
     public function update($indexStorageItem, $id, array $data)
     {
         $this->getConnection()->update($indexStorageItem, $data, is_array($id) ? $id : ['id' => $id]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAll($indexStorageItem)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from($indexStorageItem)
+            ->execute();
     }
 }

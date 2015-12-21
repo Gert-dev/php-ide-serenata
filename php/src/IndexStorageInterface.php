@@ -168,6 +168,30 @@ interface IndexStorageInterface
     public function getParentFqsens($seId);
 
     /**
+     * @param int $functionId
+     *
+     * @return \Traversable
+     */
+    public function getFunctionParameters($functionId);
+
+    /**
+     * @param int $functionId
+     *
+     * @return \Traversable
+     */
+    public function getFunctionThrows($functionId);
+
+    /**
+     * @return \Traversable
+     */
+    public function getGlobalConstants();
+
+    /**
+     * @return \Traversable
+     */
+    public function getGlobalFunctions();
+
+    /**
      * Inserts the specified index item into the storage.
      *
      * @param string $indexStorageItem
@@ -185,4 +209,13 @@ interface IndexStorageInterface
      * @param array     $data
      */
     public function update($indexStorageItem, $id, array $data);
+
+    /**
+     * Fetches all index items of the specified type.
+     *
+     * @param string $indexStorageItem
+     *
+     * @return \Traversable
+     */
+    public function getAll($indexStorageItem);
 }
