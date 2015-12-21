@@ -90,38 +90,6 @@ class Application
     }
 
     /**
-     * Retrieves a list of parent FQSEN's for the specified structural element.
-     *
-     * @param int $seId
-     *
-     * @return array An associative array mapping structural element ID's to their FQSEN.
-     */
-    protected function getParentFqsens($seId)
-    {
-        $parentFqsens = [];
-
-        while ($seId) {
-            $parentSe = $this->indexDatabase->getConnection()->createQueryBuilder()
-                ->select('se.id', 'se.fqsen')
-                ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-                ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.linked_structural_element_id = se.id')
-                ->where('sepl.structural_element_id = ?')
-                ->setParameter(0, $seId)
-                ->execute()
-                ->fetch();
-
-            if (!$parentSe) {
-                break;
-            }
-
-            $seId = $parentSe['id'];
-            $parentFqsens[$parentSe['id']] = $parentSe['fqsen'];
-        }
-
-        return $parentFqsens;
-    }
-
-    /**
      * @param array $arguments
      *
      * @return array
@@ -166,23 +134,39 @@ class Application
      */
     protected function getStructuralElementInfo($id)
     {
-        $element = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('se.*', 'fi.path', '(setype.name) AS type_name', 'sepl.linked_structural_element_id')
-            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENT_TYPES, 'setype', 'setype.id = se.structural_element_type_id')
-            ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
-            ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id')
-            ->where('se.id = ?')
-            ->setParameter(0, $id)
-            ->execute()
-            ->fetch();
+        return $this->resolveStructuralElement(
+            $this->indexDatabase->getStructuralElementRawInfo($id),
+            $this->indexDatabase->getParentFqsens($id),
+            $this->indexDatabase->getStructuralElementRawInterfaces($id),
+            $this->indexDatabase->getStructuralElementRawTraits($id),
+            $this->indexDatabase->getStructuralElementRawConstants($id),
+            $this->indexDatabase->getStructuralElementRawProperties($id),
+            $this->indexDatabase->getStructuralElementRawMethods($id)
+        );
+    }
 
-        if (!$element) {
-            throw new UnexpectedValueException('The specified structural element was not found!');
-        }
-
-        $parentFqsens = $this->getParentFqsens($element['id']);
-
+    /**
+     * Resolves structural element information from the specified raw data.
+     *
+     * @param array|\Traversable $element
+     * @param array|\Traversable $parentFqsens
+     * @param array|\Traversable $interfaces
+     * @param array|\Traversable $traits
+     * @param array|\Traversable $constants
+     * @param array|\Traversable $properties
+     * @param array|\Traversable $methods
+     *
+     * @return array
+     */
+    protected function resolveStructuralElement(
+        $element,
+        $parentFqsens,
+        $interfaces,
+        $traits,
+        $constants,
+        $properties,
+        $methods
+    ) {
         $result = [
             'class'        => $element['fqsen'],
             'wasFound'     => true,
@@ -214,14 +198,6 @@ class Application
             $result['methods']    = $baseClassInfo['methods'];
         }
 
-        $interfaces = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('se.id')
-            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_INTERFACES_LINKED, 'seil', 'seil.linked_structural_element_id = se.id')
-            ->where('seil.structural_element_id = ?')
-            ->setParameter(0, $element['id'])
-            ->execute();
-
         // Append members from direct interfaces to the pool of members. These only supply additional members, but will
         // never overwrite any existing members as they have a lower priority than inherited members.
         foreach ($interfaces as $interface) {
@@ -245,14 +221,6 @@ class Application
                 }
             }
         }
-
-        $traits = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('se.id')
-            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED, 'setl', 'setl.linked_structural_element_id = se.id')
-            ->where('setl.structural_element_id = ?')
-            ->setParameter(0, $element['id'])
-            ->execute();
 
         foreach ($traits as $trait) {
             $trait = $this->getStructuralElementInfo($trait['id']);
@@ -309,13 +277,6 @@ class Application
             }
         }
 
-        $constants = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('*')
-            ->from(IndexStorageItemEnum::CONSTANTS)
-            ->where('structural_element_id = ?')
-            ->setParameter(0, $element['id'])
-            ->execute();
-
         foreach ($constants as $constant) {
             if (isset($result['constants'][$constant['name']])) {
                 // TODO: Inherit description from existing member if not present.
@@ -342,14 +303,6 @@ class Application
                 ]
             ]);
         }
-
-        $properties = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('p.*', 'am.name AS access_modifier')
-            ->from(IndexStorageItemEnum::PROPERTIES, 'p')
-            ->innerJoin('p', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = p.access_modifier_id')
-            ->where('structural_element_id = ?')
-            ->setParameter(0, $element['id'])
-            ->execute();
 
         foreach ($properties as $property) {
             $overriddenProperty = null;
@@ -396,15 +349,6 @@ class Application
                 ]
             ]);
         }
-
-        $methods = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('fu.*', 'fi.path', 'am.name AS access_modifier')
-            ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
-            ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
-            ->innerJoin('fu', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = fu.access_modifier_id')
-            ->where('structural_element_id = ?')
-            ->setParameter(0, $element['id'])
-            ->execute();
 
         foreach ($methods as $method) {
             $overriddenMethod = null;

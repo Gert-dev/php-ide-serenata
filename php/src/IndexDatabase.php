@@ -372,6 +372,121 @@ class IndexDatabase implements IndexStorageInterface
     /**
      * {@inheritDoc}
      */
+    public function getStructuralElementRawInfo($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('se.*', 'fi.path', '(setype.name) AS type_name', 'sepl.linked_structural_element_id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENT_TYPES, 'setype', 'setype.id = se.structural_element_type_id')
+            ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
+            ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id')
+            ->where('se.id = ?')
+            ->setParameter(0, $id)
+            ->execute()
+            ->fetch();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementRawInterfaces($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('se.id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_INTERFACES_LINKED, 'seil', 'seil.linked_structural_element_id = se.id')
+            ->where('seil.structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementRawTraits($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('se.id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED, 'setl', 'setl.linked_structural_element_id = se.id')
+            ->where('setl.structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementRawConstants($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(IndexStorageItemEnum::CONSTANTS)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementRawProperties($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('p.*', 'am.name AS access_modifier')
+            ->from(IndexStorageItemEnum::PROPERTIES, 'p')
+            ->innerJoin('p', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = p.access_modifier_id')
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementRawMethods($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('fu.*', 'fi.path', 'am.name AS access_modifier')
+            ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
+            ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
+            ->innerJoin('fu', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = fu.access_modifier_id')
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParentFqsens($seId)
+    {
+        $parentFqsens = [];
+
+        while ($seId) {
+            $parentSe = $this->getConnection()->createQueryBuilder()
+                ->select('se.id', 'se.fqsen')
+                ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+                ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.linked_structural_element_id = se.id')
+                ->where('sepl.structural_element_id = ?')
+                ->setParameter(0, $seId)
+                ->execute()
+                ->fetch();
+
+            if (!$parentSe) {
+                break;
+            }
+
+            $seId = $parentSe['id'];
+            $parentFqsens[$parentSe['id']] = $parentSe['fqsen'];
+        }
+
+        return $parentFqsens;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function insert($indexStorageItem, array $data)
     {
         $this->getConnection()->insert($indexStorageItem, $data);
