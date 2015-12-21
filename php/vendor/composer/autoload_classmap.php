@@ -13,6 +13,7 @@ return array(
     'PhpIntegrator\\IndexDataAdapter' => $baseDir . '/src/IndexDataAdapter.php',
     'PhpIntegrator\\IndexDatabase' => $baseDir . '/src/IndexDatabase.php',
     'PhpIntegrator\\IndexStorageInterface' => $baseDir . '/src/IndexStorageInterface.php',
+    'PhpIntegrator\\IndexStorageInterfaceClassListProxy' => $baseDir . '/src/IndexStorageInterfaceClassListProxy.php',
     'PhpIntegrator\\IndexStorageItemEnum' => $baseDir . '/src/IndexStorageItemEnum.php',
     'PhpIntegrator\\Indexer' => $baseDir . '/src/Indexer.php',
     'PhpIntegrator\\OutlineIndexingVisitor' => $baseDir . '/src/OutlineIndexingVisitor.php',

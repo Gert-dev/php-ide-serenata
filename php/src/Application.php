@@ -68,8 +68,11 @@ class Application
     {
         $result = [];
 
+        $storageProxy = new IndexStorageInterfaceClassListProxy($this->indexDatabase);
+        $dataAdapter = new IndexDataAdapter($storageProxy);
+
         foreach ($this->indexDatabase->getAll(IndexStorageItemEnum::STRUCTURAL_ELEMENTS) as $element) {
-            $info = $this->getIndexDataAdapter()->getStructuralElementInfo($element['id']);
+            $info = $dataAdapter->getStructuralElementInfo($element['id']);
 
             $constructor = null;
 
