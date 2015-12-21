@@ -62,11 +62,8 @@ class Application
     protected function getClassList(array $arguments)
     {
         $structuralElements = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('se.*', 'fi.path', '(setype.name) AS type_name', 'sepl.linked_structural_element_id')
-            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENT_TYPES, 'setype', 'setype.id = se.structural_element_type_id')
-            ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
-            ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id')
+            ->select('id', 'fqsen')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS)
             ->execute();
 
         $result = [];
