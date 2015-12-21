@@ -542,37 +542,35 @@ class Application
      */
     protected function getFunctionInfo(array $rawInfo)
     {
-        $parameters = $this->indexDatabase->getConnection()->createQueryBuilder()
+        $rawParameters = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('*')
             ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
-            ->where('is_optional != 1 AND function_id = ?')
+            ->where('function_id = ?')
             ->setParameter(0, $rawInfo['id'])
-            ->execute()
-            ->fetchAll();
+            ->execute();
 
-        $parameterMapper = function (array $parameter) {
+        $optionals = [];
+        $parameters = [];
+
+        foreach ($rawParameters as $rawParameter) {
             $name = '';
 
-            if ($parameter['is_reference']) {
+            if ($rawParameter['is_reference']) {
                 $name .= '&';
             }
 
-            $name .= '$' . $parameter['name'];
+            $name .= '$' . $rawParameter['name'];
 
-            if ($parameter['is_variadic']) {
+            if ($rawParameter['is_variadic']) {
                 $name .= '...';
             }
 
-            return $name;
-        };
-
-        $optionals = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('*')
-            ->from(IndexStorageItemEnum::FUNCTIONS_PARAMETERS)
-            ->where('is_optional = 1 AND function_id = ?')
-            ->setParameter(0, $rawInfo['id'])
-            ->execute()
-            ->fetchAll();
+            if ($rawParameter['is_optional']) {
+                $optionals[] = $name;
+            } else {
+                $parameters[] = $name;
+            }
+        }
 
         $throws = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('*')
@@ -593,8 +591,8 @@ class Application
             'startLine'     => $rawInfo['start_line'],
             'filename'      => $rawInfo['path'],
 
-            'parameters'    => array_map($parameterMapper, $parameters),
-            'optionals'     => array_map($parameterMapper, $optionals),
+            'parameters'    => $parameters,
+            'optionals'     => $optionals,
             'throws'        => $throwsAssoc,
             'deprecated'    => !!$rawInfo['is_deprecated'],
 
