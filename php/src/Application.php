@@ -23,11 +23,6 @@ class Application
     protected $indexDatabase;
 
     /**
-     * @var ConstantInfoFetcher
-     */
-    protected $constantInfoFetcher;
-
-    /**
      * Handles the application process.
      *
      * @param array $arguments The arguments to pass.
@@ -690,18 +685,6 @@ class Application
                 'description'  => $rawInfo['return_description']
             ],
         ];
-    }
-
-    /**
-     * @return ConstantInfoFetcher
-     */
-    protected function getConstantInfoFetcher()
-    {
-        if (!$this->constantInfoFetcher) {
-            $this->constantInfoFetcher = new ConstantInfoFetcher();
-        }
-
-        return $this->constantInfoFetcher;
     }
 
     /**
