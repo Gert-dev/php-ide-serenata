@@ -89,8 +89,14 @@ class IndexDatabase implements IndexStorageInterface
             }
         }
 
-        // Have to be a douche about this as it seems to reset itself, even though the connection is not closed.
-        $statement = $this->connection->executeQuery('PRAGMA foreign_keys=ON');
+        // Have to be a douche about this as these PRAGMA's seem to reset, even though the connection is not closed.
+        $this->connection->executeQuery('PRAGMA foreign_keys=ON');
+
+        // Data could become corrupted if the operating system were to crash during synchronization, but this
+        // matters very little as we will just reindex the project next time. In the meantime, this majorly reduces
+        // hard disk I/O during indexing and increases indexing speed dramatically (dropped from over a minute to a
+        // couple of seconds for a very small (!) project).
+        $this->connection->executeQuery('PRAGMA synchronous=OFF');
 
         return $this->connection;
     }
