@@ -221,6 +221,18 @@ class IndexDatabase implements IndexStorageInterface
     /**
      * {@inheritDoc}
      */
+    public function deleteFile($fileId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::FILES)
+            ->where('id = ?')
+            ->setParameter(0, $fileId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function deletePropertiesByFileId($fileId)
     {
         $this->getConnection()->createQueryBuilder()

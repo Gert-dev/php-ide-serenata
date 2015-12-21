@@ -61,6 +61,11 @@ interface IndexStorageInterface
     /**
      * @param int $fileId
      */
+    public function deleteFile($fileId);
+
+    /**
+     * @param int $fileId
+     */
     public function deletePropertiesByFileId($fileId);
 
     /**

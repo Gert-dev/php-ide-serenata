@@ -68,22 +68,6 @@ class Indexer
     }
 
     /**
-     * Logs a banner for debugging purposes.
-     *
-     * @param string $message
-     */
-    protected function logBanner($message)
-    {
-        if (!$this->showOutput) {
-            return;
-        }
-
-        echo str_repeat('=', 80) . PHP_EOL;
-        echo $message . PHP_EOL;
-        echo str_repeat('=', 80) . PHP_EOL;
-    }
-
-    /**
      * Logs a single message for debugging purposes.
      *
      * @param string $message
@@ -106,7 +90,11 @@ class Indexer
     {
         $this->logMessage('Indexing project ' . $directory);
 
-        $this->logBanner('Pass 1 - Scanning and sorting by dependencies...');
+        $this->logMessage('Pruning removed files...');
+
+        $this->pruneRemovedFiles();
+
+        $this->logMessage('Scanning and sorting by dependencies...');
 
         $fileClassMap = $this->scan($directory);
         $fileClassMap = $this->filterScanResult($fileClassMap);
@@ -115,8 +103,6 @@ class Indexer
         foreach ($fileClassMap as $filename => $fqsens) {
             $this->logMessage('  - ' . $filename);
         }
-
-        $this->logBanner('Pass 2...');
 
         $this->logMessage('Indexing outline...');
         $this->indexFileOutlines(array_keys($fileClassMap));
@@ -261,6 +247,26 @@ class Indexer
         $traverser->traverse($nodes);
 
         return $dependencyFetchingVisitor->getFqsenDependencyMap();
+    }
+
+    /**
+     * Prunes removed files from the index.
+     */
+    protected function pruneRemovedFiles()
+    {
+        $fileModifiedMap = $this->storage->getFileModifiedMap();
+
+        foreach ($this->storage->getFileModifiedMap() as $filename => $indexedTime) {
+            if (!file_exists($filename)) {
+                $this->logMessage('  - ' . $filename);
+
+                $id = $this->storage->getFileId($filename);
+
+                if ($id) {
+                    $this->storage->deleteFile($id);
+                }
+            }
+        }
     }
 
     /**
