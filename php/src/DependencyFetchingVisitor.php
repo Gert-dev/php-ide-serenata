@@ -52,7 +52,13 @@ class DependencyFetchingVisitor extends NameResolver
             $this->fqsenDependencyMap[$fqcn] = [];
 
             if ($node->extends) {
-                $this->fqsenDependencyMap[$fqcn][] = $node->extends->toString();
+                $extends = $node->extends;
+
+                if (is_array($extends)) {
+                    $extends = array_shift($extends);
+                }
+
+                $this->fqsenDependencyMap[$fqcn][] = $extends->toString();
             }
         } elseif ($node instanceof Node\Stmt\Trait_) {
             $this->currentStructuralElement = $node;

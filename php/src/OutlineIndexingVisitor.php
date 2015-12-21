@@ -96,11 +96,17 @@ class OutlineIndexingVisitor extends NameResolver
     {
         $this->currentStructuralElement = $node;
 
+        $extends = $node->extends;
+
+        if (is_array($extends)) {
+            $extends = array_shift($extends);
+        }
+
         $this->structuralElements[$node->namespacedName->toString()] = [
             'name'       => $node->name,
             'type'       => 'interface',
             'startLine'  => $node->getLine(),
-            'parent'     => $node->extends ? $node->extends->toString() : null,
+            'parent'     => $extends ? $extends->toString() : null,
             'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null,
             'traits'     => [],
             'methods'    => [],
