@@ -16,6 +16,13 @@ interface StorageInterface
     public function getFileModifiedMap();
 
     /**
+    * Retrieves a list of access modifiers mapped to their ID.
+    *
+    * @return array
+    */
+    public function getAccessModifierMap();
+
+    /**
      * @param int $id
      *
      * @return string|null
@@ -31,14 +38,6 @@ interface StorageInterface
      */
     public function getFileId($path);
 
-    /**
-     * Retrieves the ID of the access modifier with the specified name.
-     *
-     * @param string $name
-     *
-     * @return int|null
-     */
-    public function getAccessModifierId($name);
 
     /**
      * Retrieves the ID of the structural element type with the specified name.

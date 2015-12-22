@@ -49,6 +49,11 @@ class Indexer
     protected $docParser;
 
     /**
+     * @var array|null
+     */
+    protected $accessModifierMap;
+
+    /**
      * Whether to display (debug) output.
      *
      * @var bool
@@ -669,20 +674,18 @@ class Indexer
             }
         }
 
+        $accessModifierMap = $this->getAccessModifierMap();
+
         foreach ($rawData['properties'] as $property) {
             $accessModifier = $this->parseAccessModifier($property);
 
-            $amId = $this->storage->getAccessModifierId($accessModifier);
-
-            $this->indexProperty($property, $fileId, $seId, $amId, false);
+            $this->indexProperty($property, $fileId, $seId, $accessModifierMap[$accessModifier], false);
         }
 
         foreach ($rawData['methods'] as $method) {
             $accessModifier = $this->parseAccessModifier($method);
 
-            $amId = $this->storage->getAccessModifierId($accessModifier);
-
-            $this->indexFunction($method, $fileId, $seId, $amId, false);
+            $this->indexFunction($method, $fileId, $seId, $accessModifierMap[$accessModifier], false);
         }
 
         foreach ($rawData['constants'] as $constant) {
@@ -696,19 +699,17 @@ class Indexer
             $documentation['propertiesWriteOnly']
         );
 
-        $amId = $this->storage->getAccessModifierId('public');
-
         foreach ($magicProperties as $propertyName => $propertyData) {
             $data = $this->adaptMagicPropertyData($propertyName, $propertyData);
 
-            $this->indexProperty($data, $fileId, $seId, $amId, true);
+            $this->indexProperty($data, $fileId, $seId, $accessModifierMap['public'], true);
         }
 
         // Index magic methods.
         foreach ($documentation['methods'] as $methodName => $methodData) {
             $data = $this->adaptMagicMethodData($methodName, $methodData);
 
-            $this->indexFunction($data, $fileId, $seId, $amId, true);
+            $this->indexFunction($data, $fileId, $seId, $accessModifierMap['public'], true);
         }
 
         return $seId;
@@ -1034,6 +1035,18 @@ class Indexer
         }
 
         return $returnType;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAccessModifierMap()
+    {
+        if (!$this->accessModifierMap) {
+            $this->accessModifierMap = $this->storage->getAccessModifierMap();
+        }
+
+        return $this->accessModifierMap;
     }
 
     /**

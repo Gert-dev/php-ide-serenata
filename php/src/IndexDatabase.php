@@ -174,17 +174,20 @@ class IndexDatabase implements
     /**
      * {@inheritDoc}
      */
-    public function getAccessModifierId($name)
+    public function getAccessModifierMap()
     {
         $result = $this->getConnection()->createQueryBuilder()
-            ->select('id')
+            ->select('name', 'id')
             ->from(IndexStorageItemEnum::ACCESS_MODIFIERS)
-            ->where('name = ?')
-            ->setParameter(0, $name)
-            ->execute()
-            ->fetchColumn();
+            ->execute();
 
-        return $result ? $result : null;
+        $map = [];
+
+        foreach ($result as $row) {
+            $map[$row['name']] = $row['id'];
+        }
+
+        return $map;
     }
 
     /**
