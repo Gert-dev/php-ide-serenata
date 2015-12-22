@@ -8,7 +8,11 @@ use Doctrine\DBAL\Configuration;
 
 use Doctrine\DBAL\Exception\TableNotFoundException;
 
-class IndexDatabase implements IndexStorageInterface
+use PhpIntegrator\IndexDataProvider;
+
+class IndexDatabase implements
+    IndexStorageInterface,
+    IndexDataAdapter\ProviderInterface
 {
     /**
      * @var Connection

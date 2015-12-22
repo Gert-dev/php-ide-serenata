@@ -10,16 +10,16 @@ class IndexDataAdapter
     /**
      * The storage to use for accessing index data.
      *
-     * @var IndexStorageInterface
+     * @var IndexDataAdapter\ProviderInterface
      */
     protected $storage;
 
     /**
      * Constructor.
      *
-     * @param IndexStorageInterface $storage
+     * @param IndexDataAdapter\ProviderInterface $storage
      */
-    public function __construct(IndexStorageInterface $storage)
+    public function __construct(IndexDataAdapter\ProviderInterface $storage)
     {
         $this->storage = $storage;
     }
