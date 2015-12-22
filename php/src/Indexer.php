@@ -637,8 +637,8 @@ class Indexer
                 ]);
             } else {
                 $this->logMessage(
-                    '  - WARNING: Could not find a record for the parent class ' .
-                    $rawData['parent']
+                    '  - WARNING: Could not find a record for parent FQSEN ' .
+                    $rawData['parent'] . ' of FQSEN ' . $fqsen
                 );
             }
         }
@@ -655,7 +655,7 @@ class Indexer
                 } else {
                     $this->logMessage(
                         '  - WARNING: Could not find a record for the interface ' .
-                        $interface
+                        $interface . ' of FQSEN ' . $fqsen
                     );
                 }
             }
@@ -673,7 +673,7 @@ class Indexer
                 } else {
                     $this->logMessage(
                         '  - WARNING: Could not find a record for the trait ' .
-                        $trait
+                        $trait . ' of FQSEN ' . $fqsen
                     );
                 }
             }
