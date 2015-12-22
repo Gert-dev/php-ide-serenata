@@ -54,6 +54,11 @@ class Indexer
     protected $accessModifierMap;
 
     /**
+     * @var array|null
+     */
+    protected $structuralElementTypeMap;
+
+    /**
      * Whether to display (debug) output.
      *
      * @var bool
@@ -582,7 +587,7 @@ class Indexer
      */
     protected function indexStructuralElement(array $rawData, $fileId, $fqsen)
     {
-        $seTypeId = $this->storage->getStructuralElementTypeId($rawData['type']);
+        $structuralElementTypeMap = $this->getStructuralElementTypeMap();
 
         $documentation = $this->getDocParser()->parse($rawData['docComment'], [
             DocParser::DEPRECATED,
@@ -598,7 +603,7 @@ class Indexer
             'fqsen'                      => $fqsen,
             'file_id'                    => $fileId,
             'start_line'                 => $rawData['startLine'],
-            'structural_element_type_id' => $seTypeId,
+            'structural_element_type_id' => $structuralElementTypeMap[$rawData['type']],
             'is_abstract'                => (isset($rawData['is_abstract']) && $rawData['is_abstract']) ? 1 : 0,
             'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
             'has_docblock'               => empty($rawData['docComment']) ? 0 : 1,
@@ -1047,6 +1052,18 @@ class Indexer
         }
 
         return $this->accessModifierMap;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getStructuralElementTypeMap()
+    {
+        if (!$this->structuralElementTypeMap) {
+            $this->structuralElementTypeMap = $this->storage->getStructuralElementTypeMap();
+        }
+
+        return $this->structuralElementTypeMap;
     }
 
     /**

@@ -22,6 +22,13 @@ interface StorageInterface
     */
     public function getAccessModifierMap();
 
+     /**
+     * Retrieves a list of structural element types mapped to their ID.
+     *
+     * @return array
+     */
+    public function getStructuralElementTypeMap();
+
     /**
      * @param int $id
      *
@@ -38,15 +45,6 @@ interface StorageInterface
      */
     public function getFileId($path);
 
-
-    /**
-     * Retrieves the ID of the structural element type with the specified name.
-     *
-     * @param string $name
-     *
-     * @return int|null
-     */
-    public function getStructuralElementTypeId($name);
 
     /**
      * Retrieves the ID of the structural element with the specified FQSEN.

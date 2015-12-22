@@ -177,7 +177,7 @@ class IndexDatabase implements
     public function getAccessModifierMap()
     {
         $result = $this->getConnection()->createQueryBuilder()
-            ->select('name', 'id')
+            ->select('*')
             ->from(IndexStorageItemEnum::ACCESS_MODIFIERS)
             ->execute();
 
@@ -193,17 +193,20 @@ class IndexDatabase implements
     /**
      * {@inheritDoc}
      */
-    public function getStructuralElementTypeId($name)
+    public function getStructuralElementTypeMap()
     {
         $result = $this->getConnection()->createQueryBuilder()
-            ->select('id')
+            ->select('*')
             ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENT_TYPES)
-            ->where('name = ?')
-            ->setParameter(0, $name)
-            ->execute()
-            ->fetchColumn();
+            ->execute();
 
-        return $result ? $result : null;
+        $map = [];
+
+        foreach ($result as $row) {
+            $map[$row['name']] = $row['id'];
+        }
+
+        return $map;
     }
 
     /**
