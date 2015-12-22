@@ -24,12 +24,6 @@ class Config
 
         @data =
             phpCommand                     : null
-            composerCommand                : null
-            autoloadScripts                : []
-            classMapScripts                : []
-            additionalScripts              : []
-            insertNewlinesForUseStatements : false
-
             packagePath                    : null
 
             # See also https://secure.php.net/urlhowto.php .
@@ -74,41 +68,3 @@ class Config
         if name of @listeners
             for listener in @listeners[name]
                 listener(value, name)
-
-    ###*
-     * Synchronizes the active relevant settings to a temporary file that can be used by the PHP side.
-    ###
-    synchronizeToPhpConfig: () ->
-        ###
-        autoloadScripts = @get('autoloadScripts')
-
-        if autoloadScripts?.length > 0
-            autoloadScripts = "'" + autoloadScripts.join("', '") + "'"
-
-        classMapScripts = @get('classMapScripts')
-
-        if classMapScripts?.length > 0
-            classMapScripts = "'" + classMapScripts.join("', '") + "'"
-
-        additionalScripts = @get('additionalScripts')
-
-        if additionalScripts?.length > 0
-            additionalScripts = "'" + additionalScripts.join("', '") + "'"
-
-        phpCommand = @get('phpCommand')
-        composerCommand = @get('composerCommand')
-
-        text = """<?php
-
-               // Automatically generated in CoffeeScript. Any changes made will be lost!
-               return [
-                   'phpCommand'        => '#{phpCommand}',
-                   'composerCommand'   => '#{composerCommand}',
-                   'autoloadScripts'   => [#{autoloadScripts}],
-                   'classMapScripts'   => [#{classMapScripts}],
-                   'additionalScripts' => [#{additionalScripts}]
-               ];\n
-               """
-
-        fs.writeFileSync(@data.packagePath + '/php/generated_config.php', text)
-        ###

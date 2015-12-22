@@ -14,22 +14,14 @@ class ConfigTester
     constructor: (@config) ->
 
     ###*
-     * Tests the user's PHP and Composer configuration.
+     * Tests the user's configuration.
+     *
+     * @return {boolean}
     ###
     test: () ->
         response = child_process.spawnSync(@config.get('phpCommand'), ["-v"])
 
         if response.status = null or response.status != 0
-            return -1
-
-        # Test Composer.
-        response = child_process.spawnSync(@config.get('phpCommand'), [@config.get('composerCommand'), "--version"])
-
-        if response.status = null or response.status != 0
-            response = child_process.spawnSync(@config.get('composerCommand'), ["--version"])
-
-            # Try executing Composer directly.
-            if response.status = null or response.status != 0
-                return -2
+            return false
 
         return true
