@@ -98,20 +98,28 @@ class Indexer
      */
     public function indexDirectory($directory)
     {
-        $this->logMessage('Indexing project ' . $directory);
-
         $this->logMessage('Pruning removed files...');
-
         $this->pruneRemovedFiles();
 
         $this->logMessage('Scanning and sorting by dependencies...');
-
         $fileClassMap = $this->scan($directory);
+
+        $this->logMessage('Filtering out files that need updating...');
         $fileClassMap = $this->filterScanResult($fileClassMap);
+
+        $this->logMessage('Sorting the result by dependencies...');
         $fileClassMap = $this->sortScanResultByDependencies($fileClassMap);
 
         foreach ($fileClassMap as $filename => $fqsens) {
             $this->logMessage('  - ' . $filename);
+
+            foreach ($fqsens as $fqsen => $dependencyFqsens) {
+                $this->logMessage('    - ' . $fqsen);
+
+                foreach ($dependencyFqsens as $dependencyFqsen) {
+                    $this->logMessage('      - ' . $dependencyFqsen);
+                }
+            }
         }
 
         $this->logMessage('Indexing outline...');
