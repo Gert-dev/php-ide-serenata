@@ -117,7 +117,7 @@ class Application
             throw new UnexpectedValueException('The specified structural element was not found!');
         }
 
-        $result = $this->getIndexAdapater()->getStructuralElementInfo($id);
+        $result = $this->getIndexDataAdapter()->getStructuralElementInfo($id);
 
         return $this->outputJson(true, $result);
     }

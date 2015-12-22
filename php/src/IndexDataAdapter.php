@@ -125,10 +125,6 @@ class IndexDataAdapter
             $trait = $this->getStructuralElementInfo($trait['id']);
 
             foreach ($trait['constants'] as $constant) {
-                if (isset($result['constants'][$constant['name']])) {
-                    // TODO: Inherit description from existing member if not present.
-                }
-
                 $result['constants'][$constant['name']] = array_merge($constant, [
                     'declaringClass' => [
                         'name'            => $element['fqsen'],
@@ -142,11 +138,18 @@ class IndexDataAdapter
             }
 
             foreach ($trait['properties'] as $property) {
+                $inheritedData = [];
+                $existingProperty = null;
+
                 if (isset($result['properties'][$property['name']])) {
-                    // TODO: Inherit description from existing member if not present.
+                    $existingProperty = $result['properties'][$property['name']];
+
+                    if ($this->isInheritingDocumentation($property)) {
+                        $inheritedData = $this->extractInheritedPropertyInfo($existingProperty);
+                    }
                 }
 
-                $result['constants'][$property['name']] = array_merge($property, [
+                $resultingProperty = array_merge($property, $inheritedData, [
                     'declaringClass' => [
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
@@ -156,14 +159,30 @@ class IndexDataAdapter
                         'isInterface'     => ($element['type_name'] === 'interface')
                     ]
                 ]);
+
+                if ($existingProperty) {
+                    $resultingProperty['descriptions']['long'] = $this->resolveInheritDoc(
+                        $resultingProperty['descriptions']['long'],
+                        $existingProperty['descriptions']['long']
+                    );
+                }
+
+                $result['properties'][$property['name']] = $resultingProperty;
             }
 
             foreach ($trait['methods'] as $method) {
+                $inheritedData = [];
+                $existingMethod = null;
+
                 if (isset($result['methods'][$method['name']])) {
-                    // TODO: Inherit description from existing member if not present.
+                    $existingMethod = $result['methods'][$method['name']];
+
+                    if ($this->isInheritingDocumentation($method)) {
+                        $inheritedData = $this->extractInheritedMethodInfo($existingMethod);
+                    }
                 }
 
-                $result['constants'][$method['name']] = array_merge($method, [
+                $resultingMethod = array_merge($method, $inheritedData, [
                     'declaringClass' => [
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
@@ -173,15 +192,20 @@ class IndexDataAdapter
                         'isInterface'     => ($element['type_name'] === 'interface')
                     ]
                 ]);
+
+                if ($existingMethod) {
+                    $resultingMethod['descriptions']['long'] = $this->resolveInheritDoc(
+                        $resultingMethod['descriptions']['long'],
+                        $existingMethod['descriptions']['long']
+                    );
+                }
+
+                $result['methods'][$method['name']] = $resultingMethod;
             }
         }
 
-        foreach ($constants as $constant) {
-            if (isset($result['constants'][$constant['name']])) {
-                // TODO: Inherit description from existing member if not present.
-            }
-
-            $result['constants'][$constant['name']] = array_merge($this->getConstantInfo($constant), [
+        foreach ($constants as $rawConstantData) {
+            $result['constants'][$rawConstantData['name']] = array_merge($this->getConstantInfo($rawConstantData), [
                 'declaringClass' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
@@ -198,34 +222,34 @@ class IndexDataAdapter
                     'isTrait'         => ($element['type_name'] === 'trait'),
                     'isClass'         => ($element['type_name'] === 'class'),
                     'isInterface'     => ($element['type_name'] === 'interface'),
-                    'startLineMember' => $constant['start_line']
+                    'startLineMember' => $rawConstantData['start_line']
                 ]
             ]);
         }
 
-        foreach ($properties as $property) {
-            $overriddenProperty = null;
+        foreach ($properties as $rawPropertyData) {
+            $inheritedData = [];
+            $existingProperty = null;
+            $overriddenPropertyData = null;
+
+            $property = $this->getPropertyInfo($rawPropertyData);
 
             if (isset($result['properties'][$property['name']])) {
-                // TODO: Inherit description from existing member if not present.
-
                 $existingProperty = $result['properties'][$property['name']];
 
-                $overriddenProperty = [
+                $overriddenPropertyData = [
                     'declaringClass'     => $existingProperty['declaringClass'],
                     'declaringStructure' => $existingProperty['declaringStructure'],
                     'startLine'          => $existingProperty['startLine']
                 ];
+
+                if ($this->isInheritingDocumentation($property)) {
+                    $inheritedData = $this->extractInheritedPropertyInfo($existingProperty);
+                }
             }
 
-            $propertyInfo = $this->getPropertyInfo($property);
-
-            if ($propertyInfo['return']['type'] === 'self') {
-                $propertyInfo['return']['resolvedType'] = $element['fqsen'];
-            }
-
-            $result['properties'][$property['name']] = array_merge($propertyInfo, [
-                'override'       => $overriddenProperty,
+            $resultingProperty = array_merge($property, $inheritedData, [
+                'override'       => $overriddenPropertyData,
                 'implementation' => null,
 
                 'declaringClass' => [
@@ -244,44 +268,57 @@ class IndexDataAdapter
                     'isTrait'         => ($element['type_name'] === 'trait'),
                     'isClass'         => ($element['type_name'] === 'class'),
                     'isInterface'     => ($element['type_name'] === 'interface'),
-                    'startLineMember' => $property['start_line']
+                    'startLineMember' => $rawPropertyData['start_line']
                 ]
             ]);
+
+            if ($resultingProperty['return']['type'] === 'self') {
+                $resultingProperty['return']['resolvedType'] = $element['fqsen'];
+            }
+
+            if ($existingProperty) {
+                $resultingProperty['descriptions']['long'] = $this->resolveInheritDoc(
+                    $resultingProperty['descriptions']['long'],
+                    $existingProperty['descriptions']['long']
+                );
+            }
+
+            $result['properties'][$property['name']] = $resultingProperty;
         }
 
-        foreach ($methods as $method) {
-            $overriddenMethod = null;
-            $implementedMethod = null;
+        foreach ($methods as $rawMethodData) {
+            $inheritedData = [];
+            $existingMethod = null;
+            $overriddenMethodData = null;
+            $implementedMethodData = null;
+
+            $method = $this->getMethodInfo($rawMethodData);
 
             if (isset($result['methods'][$method['name']])) {
-                // TODO: Inherit description from existing member if not present.
-
                 $existingMethod = $result['methods'][$method['name']];
 
                 if ($existingMethod['declaringStructure']['isInterface']) {
-                    $implementedMethod = [
+                    $implementedMethodData = [
                         'declaringClass'     => $existingMethod['declaringClass'],
                         'declaringStructure' => $existingMethod['declaringStructure'],
                         'startLine'          => $existingMethod['startLine']
                     ];
                 } else {
-                    $overriddenMethod = [
+                    $overriddenMethodData = [
                         'declaringClass'     => $existingMethod['declaringClass'],
                         'declaringStructure' => $existingMethod['declaringStructure'],
                         'startLine'          => $existingMethod['startLine']
                     ];
                 }
+
+                if ($this->isInheritingDocumentation($method)) {
+                    $inheritedData = $this->extractInheritedMethodInfo($existingMethod);
+                }
             }
 
-            $methodInfo = $this->getMethodInfo($method);
-
-            if ($methodInfo['return']['type'] === 'self') {
-                $methodInfo['return']['resolvedType'] = $element['fqsen'];
-            }
-
-            $result['methods'][$method['name']] = array_merge($methodInfo, [
-                'override'       => $overriddenMethod,
-                'implementation' => $implementedMethod,
+            $resultingMethod = array_merge($method, $inheritedData, [
+                'override'       => $overriddenMethodData,
+                'implementation' => $implementedMethodData,
 
                 'declaringClass' => [
                     'name'            => $element['fqsen'],
@@ -299,9 +336,22 @@ class IndexDataAdapter
                     'isTrait'         => ($element['type_name'] === 'trait'),
                     'isClass'         => ($element['type_name'] === 'class'),
                     'isInterface'     => ($element['type_name'] === 'interface'),
-                    'startLineMember' => $method['start_line']
+                    'startLineMember' => $rawMethodData['start_line']
                 ]
             ]);
+
+            if ($resultingMethod['return']['type'] === 'self') {
+                $resultingMethod['return']['resolvedType'] = $element['fqsen'];
+            }
+
+            if ($existingMethod) {
+                $resultingMethod['descriptions']['long'] = $this->resolveInheritDoc(
+                    $resultingMethod['descriptions']['long'],
+                    $existingMethod['descriptions']['long']
+                );
+            }
+
+            $result['methods'][$method['name']] = $resultingMethod;
         }
 
         // Resolve return types.
@@ -397,6 +447,7 @@ class IndexDataAdapter
             'optionals'     => $optionals,
             'throws'        => $throwsAssoc,
             'deprecated'    => !!$rawInfo['is_deprecated'],
+            'hasDocblock'   => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
                 'short' => $rawInfo['short_description'],
@@ -427,6 +478,7 @@ class IndexDataAdapter
             'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
             'isStatic'           => !!$rawInfo['is_static'],
             'deprecated'         => !!$rawInfo['is_deprecated'],
+            'hasDocblock'        => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
                 'short' => $rawInfo['short_description'],
@@ -459,6 +511,7 @@ class IndexDataAdapter
             'isPrivate'   => false,
             'isStatic'    => true,
             'deprecated'  => !!$rawInfo['is_deprecated'],
+            'hasDocblock' => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
                 'short' => $rawInfo['short_description'],
@@ -470,5 +523,80 @@ class IndexDataAdapter
                 'description'  => $rawInfo['return_description']
             ],
         ];
+    }
+
+    /**
+     * Returns a boolean indicating whether the specified item will inherit documentation from a parent item (if
+     * present).
+     *
+     * @param array $processedData
+     *
+     * @return bool
+     */
+    protected function isInheritingDocumentation(array $processedData)
+    {
+        // Ticket #86 - Add support for inheriting the entire docblock from the parent if the current docblock contains
+        // nothing but these tags. Note that, according to draft PSR-5 and phpDocumentor's implementation, this is
+        // incorrect. However, some large frameworks (such as Symfony) use this and it thus makes life easier for many
+        // developers, hence this workaround.
+        return !$processedData['hasDocblock'] || in_array($processedData['descriptions']['short'], [
+            '{@inheritdoc}', '{@inheritDoc}'
+        ]);
+    }
+
+    /**
+     * Resolves the inheritDoc tag for the specified description.
+     *
+     * Note that according to phpDocumentor this only works for the long description (not the so-called 'summary' or
+     * short description).
+     *
+     * @param string $description
+     * @param string $parentDescription
+     *
+     * @return string
+     */
+    protected function resolveInheritDoc($description, $parentDescription)
+    {
+        return str_replace(DocParser::INHERITDOC, $parentDescription, $description);
+    }
+
+    /**
+     * Extracts data from the specified (processed, i.e. already in the output format) property that is inheritable.
+     *
+     * @param array $processedData
+     *
+     * @return array
+     */
+    protected function extractInheritedPropertyInfo(array $processedData)
+    {
+        return array_filter($processedData, function ($key) {
+            return in_array($key, [
+                'deprecated',
+                'descriptions',
+                'return'
+            ]);
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * Extracts data from the specified (processed, i.e. already in the output format) method that is inheritable.
+     *
+     * @param array $processedData
+     *
+     * @return array
+     */
+    protected function extractInheritedMethodInfo(array $processedData)
+    {
+        return array_filter($processedData, function ($key) {
+            return in_array($key, [
+                'deprecated',
+                'descriptions',
+                'return',
+                'parameters',
+                'optionals',
+                'throws',
+                'deprecated'
+            ]);
+        }, ARRAY_FILTER_USE_KEY);
     }
 }
