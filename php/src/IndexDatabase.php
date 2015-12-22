@@ -69,6 +69,10 @@ class IndexDatabase implements
 
             if ($isNewDatabase) {
                 $this->createDatabaseTables($this->connection);
+
+                // NOTE: This causes a database write and will cause locking problems if multiple PHP processes are
+                // spawned and another one is also writing (e.g. indexing).
+                $this->connection->executeQuery('PRAGMA user_version=' . $this->databaseVersion);
             } else {
                 $version = $this->connection->executeQuery('PRAGMA user_version')->fetchColumn();
 
@@ -85,7 +89,6 @@ class IndexDatabase implements
 
         // Have to be a douche about this as these PRAGMA's seem to reset, even though the connection is not closed.
         $this->connection->executeQuery('PRAGMA foreign_keys=ON');
-        $this->connection->executeQuery('PRAGMA user_version=' . $this->databaseVersion);
 
         // Data could become corrupted if the operating system were to crash during synchronization, but this
         // matters very little as we will just reindex the project next time. In the meantime, this majorly reduces
