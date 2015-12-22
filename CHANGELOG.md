@@ -1,5 +1,14 @@
 ## 0.4.0
 ### Features and enhancements
+* The PHP side now no longer uses Reflection, but a php-parser-based incremental indexer. This has the following advantages:
+  * Composer is no longer required.
+  * Autoloading is no longer required.
+  * Multiple structural elements (classes) in a file will correctly end up in the index.
+  * Parsing is inherently more correct, no more misbehaving corner cases or regex-based parsing.
+  * Incremental indexing, no more composer classmap dumping on startup and a long indexing process.
+  * Paves the road for the future more detailed parsing, analyzing and better performance. (As a side-effect, the PHP side can also be used for other editors than Atom.)
+  * The package still requires PHP >= 5.4, but the code you're writing can be anything that php-parser 2 supports, which is currently PHP >= 5.2 up to (and including) PHP 7. Note that the CoffeeScript side has not changed and also does some regex-based parsing, which may still lack some functionality (especially with relation to PHP 7).
+
 * Made it possible to make magic members static. This is not documented in phpDocumentor's documentation, but useful and also used by PHPStorm:
 
 ```php
@@ -23,7 +32,7 @@ class Foo
 ### Changes for developers
 * Changes to the service
   * Constants and class properties will now retrieve their start line as well. These items not being available was previously manually worked around in the php-integrator-navigation package. This manual workaround is now present in the base package as CoffeeScript should not have to bend itself backwars to get this information because PHP Reflection does not offer it.
-  * declaringClass and declaringStructure will now also contain a startLineMember property that indicates the start line of the member in the respective class or structural element.
+  * declaringStructure will now also contain a startLineMember property that indicates the start line of the member in the structural element.
 
 ## 0.3.1
 ### Bugs Fixed
