@@ -52,6 +52,8 @@ class IndexDatabase implements IndexStorageInterface
     public function getConnection()
     {
         if (!$this->connection) {
+            $isNewDatabase = !file_exists($this->databasePath);
+
             $configuration = new Configuration();
 
             $this->connection = DriverManager::getConnection([
@@ -61,36 +63,25 @@ class IndexDatabase implements IndexStorageInterface
 
             $outOfDate = null;
 
-            try {
-                $version = $this->getConnection()->createQueryBuilder()
-                    ->select('value')
-                    ->from(IndexStorageItemEnum::SETTINGS)
-                    ->where('name = ?')
-                    ->setParameter(0, 'version')
-                    ->execute()
-                    ->fetchColumn();
-
-                $outOfDate = ($version < $this->databaseVersion);
-            } catch (TableNotFoundException $exception) {
-
-            }
-
-            $this->connection->close();
-
-            if ($outOfDate === true) {
-                $this->connection->close();
-                $this->connection = null;
-
-                @unlink($this->databasePath);
-
-                return $this->getConnection(); // Do it again.
-            } elseif ($outOfDate === null) {
+            if ($isNewDatabase) {
                 $this->createDatabaseTables($this->connection);
+            } else {
+                $version = $this->connection->executeQuery('PRAGMA user_version')->fetchColumn();
+
+                if ($version < $this->databaseVersion) {
+                    $this->connection->close();
+                    $this->connection = null;
+
+                    @unlink($this->databasePath);
+
+                    return $this->getConnection(); // Do it again.
+                }
             }
         }
 
         // Have to be a douche about this as these PRAGMA's seem to reset, even though the connection is not closed.
         $this->connection->executeQuery('PRAGMA foreign_keys=ON');
+        $this->connection->executeQuery('PRAGMA user_version=' . $this->databaseVersion);
 
         // Data could become corrupted if the operating system were to crash during synchronization, but this
         // matters very little as we will just reindex the project next time. In the meantime, this majorly reduces
