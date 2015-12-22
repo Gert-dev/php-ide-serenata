@@ -39,7 +39,7 @@ class Indexer
     /**
      * The storage to use for index data.
      *
-     * @var IndexStorageInterface
+     * @var Indexer\StorageInterface
      */
     protected $storage;
 
@@ -58,10 +58,10 @@ class Indexer
     /**
      * Constructor.
      *
-     * @param IndexStorageInterface $storage
-     * @param bool                  $showOutput
+     * @param Indexer\StorageInterface $storage
+     * @param bool                     $showOutput
      */
-    public function __construct(IndexStorageInterface $storage, $showOutput = false)
+    public function __construct(Indexer\StorageInterface $storage, $showOutput = false)
     {
         $this->storage = $storage;
         $this->showOutput = $showOutput;

@@ -11,7 +11,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use PhpIntegrator\IndexDataProvider;
 
 class IndexDatabase implements
-    IndexStorageInterface,
+    Indexer\StorageInterface,
     IndexDataAdapter\ProviderInterface
 {
     /**

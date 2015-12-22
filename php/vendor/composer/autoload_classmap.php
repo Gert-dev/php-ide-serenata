@@ -14,8 +14,8 @@ return array(
     'PhpIntegrator\\IndexDataAdapter\\ClassListProxyProvider' => $baseDir . '/src/IndexDataAdapter/ClassListProxyProvider.php',
     'PhpIntegrator\\IndexDataAdapter\\ProviderInterface' => $baseDir . '/src/IndexDataAdapter/ProviderInterface.php',
     'PhpIntegrator\\IndexDatabase' => $baseDir . '/src/IndexDatabase.php',
-    'PhpIntegrator\\IndexStorageInterface' => $baseDir . '/src/IndexStorageInterface.php',
     'PhpIntegrator\\IndexStorageItemEnum' => $baseDir . '/src/IndexStorageItemEnum.php',
     'PhpIntegrator\\Indexer' => $baseDir . '/src/Indexer.php',
+    'PhpIntegrator\\Indexer\\StorageInterface' => $baseDir . '/src/Indexer/StorageInterface.php',
     'PhpIntegrator\\OutlineIndexingVisitor' => $baseDir . '/src/OutlineIndexingVisitor.php',
 );

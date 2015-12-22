@@ -1,12 +1,12 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Indexer;
 
 /**
  * Defines functionality that must be exposed by classes that can interact with a storage medium for persisting data
  * related to the index.
  */
-interface IndexStorageInterface
+interface StorageInterface
 {
     /**
      * Retrieves a list of files mapped to their last indexed date (as DateTime).
@@ -117,16 +117,6 @@ interface IndexStorageInterface
     public function deleteExcludedStructuralElementsByFileId($fileId, array $excludedIds);
 
     /**
-     * @return \Traversable
-     */
-    public function getGlobalConstants();
-
-    /**
-     * @return \Traversable
-     */
-    public function getGlobalFunctions();
-
-    /**
      * Inserts the specified index item into the storage.
      *
      * @param string $indexStorageItem
@@ -144,13 +134,4 @@ interface IndexStorageInterface
      * @param array     $data
      */
     public function update($indexStorageItem, $id, array $data);
-
-    /**
-     * Fetches all index items of the specified type.
-     *
-     * @param string $indexStorageItem
-     *
-     * @return \Traversable
-     */
-    public function getAll($indexStorageItem);
 }
