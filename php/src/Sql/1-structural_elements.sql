@@ -43,10 +43,11 @@ CREATE TABLE structural_elements(
     file_id                    integer,
     start_line                 integer unsigned,
     structural_element_type_id integer NOT NULL,
-    is_abstract                tinyint(1) NOT NULL DEFAULT 0,
-    is_deprecated              tinyint(1) NOT NULL DEFAULT 0,
     short_description          text,
     long_description           text,
+    is_abstract                tinyint(1) NOT NULL DEFAULT 0,
+    is_deprecated              tinyint(1) NOT NULL DEFAULT 0,
+    has_docblock               tinyint(1) NOT NULL DEFAULT 0,
 
     FOREIGN KEY(file_id) REFERENCES files(id)
         ON DELETE CASCADE
@@ -128,6 +129,7 @@ CREATE TABLE functions(
 
     is_magic              tinyint(1),
     is_static             tinyint(1),
+    has_docblock          tinyint(1) NOT NULL DEFAULT 0,
 
     FOREIGN KEY(file_id) REFERENCES files(id)
         ON DELETE CASCADE
@@ -197,6 +199,7 @@ CREATE TABLE properties(
 
     is_magic              tinyint(1) NOT NULL DEFAULT 0,
     is_static             tinyint(1) NOT NULL DEFAULT 0,
+    has_docblock          tinyint(1) NOT NULL DEFAULT 0,
 
     FOREIGN KEY(file_id) REFERENCES files(id)
         ON DELETE CASCADE
@@ -221,6 +224,7 @@ CREATE TABLE constants(
 
     is_builtin            tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
+    has_docblock          tinyint(1) NOT NULL DEFAULT 0,
 
     short_description     text,
     long_description      text,

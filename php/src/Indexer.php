@@ -596,6 +596,7 @@ class Indexer
             'structural_element_type_id' => $seTypeId,
             'is_abstract'                => (isset($rawData['is_abstract']) && $rawData['is_abstract']) ? 1 : 0,
             'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
+            'has_docblock'               => empty($rawData['docComment']) ? 0 : 1,
             'short_description'          => $documentation['descriptions']['short'],
             'long_description'           => $documentation['descriptions']['long']
         ];
@@ -813,7 +814,8 @@ class Indexer
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
             'return_description'    => $documentation['var']['description'],
-            'structural_element_id' => $seId
+            'structural_element_id' => $seId,
+            'has_docblock'          => empty($rawData['docComment']) ? 0 : 1
         ]);
     }
 
@@ -862,6 +864,7 @@ class Indexer
             'return_description'    => $documentation['var']['description'],
             'structural_element_id' => $seId,
             'access_modifier_id'    => $amId,
+            'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'is_magic'              => $isMagic ? 1 : 0,
             'is_static'             => $rawData['isStatic'] ? 1 : 0
         ]);
@@ -907,6 +910,7 @@ class Indexer
             'return_description'    => $documentation['return']['description'],
             'structural_element_id' => $seId,
             'access_modifier_id'    => $amId,
+            'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'is_magic'              => $isMagic ? 1 : 0,
             'is_static'             => isset($rawData['isStatic']) ? ($rawData['isStatic'] ? 1 : 0) : 0
         ]);
