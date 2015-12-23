@@ -44,9 +44,14 @@ class Indexer
     protected $storage;
 
     /**
-     * @var DocParser
+     * @var DocParser|null
      */
     protected $docParser;
+
+    /**
+     * @var PhpParser\Parser|null
+     */
+    protected $parser;
 
     /**
      * @var array|null
@@ -251,8 +256,8 @@ class Indexer
      */
     protected function getFqsenDependenciesForFile($filename)
     {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $nodes = [];
+        $parser = $this->getParser();
 
         try {
             $nodes = $parser->parse(file_get_contents($filename));
@@ -266,7 +271,11 @@ class Indexer
         $traverser->addVisitor($dependencyFetchingVisitor);
         $traverser->traverse($nodes);
 
-        return $dependencyFetchingVisitor->getFqsenDependencyMap();
+        $map = $dependencyFetchingVisitor->getFqsenDependencyMap();
+
+        // unset()
+
+        return $map;
     }
 
     /**
@@ -534,8 +543,8 @@ class Indexer
      */
     protected function indexFileOutline($filename)
     {
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $nodes = [];
+        $parser = $this->getParser();
 
         try {
             $nodes = $parser->parse(file_get_contents($filename));
@@ -1074,6 +1083,19 @@ class Indexer
         }
 
         return $this->structuralElementTypeMap;
+    }
+
+
+    /**
+     * @return PhpParser\Parser
+     */
+    protected function getParser()
+    {
+        if (!$this->parser) {
+            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        }
+
+        return $this->parser;
     }
 
     /**
