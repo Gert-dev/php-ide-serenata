@@ -101,11 +101,8 @@ class Indexer
         $this->logMessage('Pruning removed files...');
         $this->pruneRemovedFiles();
 
-        $this->logMessage('Scanning...');
+        $this->logMessage('Scanning for files that need (re)indexing...');
         $fileClassMap = $this->scan($directory);
-
-        $this->logMessage('Filtering out files that need updating...');
-        $fileClassMap = $this->filterScanResult($fileClassMap);
 
         $this->logMessage('Sorting the result by dependencies...');
         $files = $this->getFilesSortedByDependenciesFromScanResult($fileClassMap);
@@ -167,6 +164,7 @@ class Indexer
     protected function scan($directory, $isIncremental = true)
     {
         $fileClassMap = [];
+        $fileModifiedMap = $this->storage->getFileModifiedMap();
 
         $dirIterator = new RecursiveDirectoryIterator(
             $directory,
@@ -179,36 +177,15 @@ class Indexer
                 continue;
             }
 
-            $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
-        }
-
-        return $fileClassMap;
-    }
-
-    /**
-     * Filters the specified result set from the {@see scan} method to filter out files that are already up-to-date.
-     *
-     * @param array $scanResult
-     *
-     * @return array The input value, after filtering.
-     */
-    protected function filterScanResult(array $scanResult)
-    {
-        $fileModifiedMap = $this->storage->getFileModifiedMap();
-
-        $result = [];
-
-        foreach ($scanResult as $filename => $fqsens) {
-            $fileInfo = new SplFileInfo($filename);
-
-            if (!isset($fileModifiedMap[$filename])
-            || $fileInfo->getMTime() > $fileModifiedMap[$filename]->getTimestamp()
+            if (!$isIncremental
+             || !isset($fileModifiedMap[$filename])
+             || $fileInfo->getMTime() > $fileModifiedMap[$filename]->getTimestamp()
             ) {
-                $result[$filename] = $fqsens;
+                $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
             }
         }
 
-        return $result;
+        return $fileClassMap;
     }
 
     /**
