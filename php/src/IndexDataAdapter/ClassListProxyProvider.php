@@ -2,11 +2,11 @@
 
 namespace PhpIntegrator\IndexDataAdapter;
 
+use ArrayIterator;
+
 /**
- * Proxy for a ProviderInterface that does not return any data (is a "white hole") when it comes to data related to
- * constants and properties and only provides the constructor method when methods are requested.
- *
- * This proxy is specifically used to avoid fetching unnecessary information to improve performance.
+ * Proxy for a ProviderInterface that does not return any data (is a "white hole") for several methods that are
+ * unnecessary when fetching the class list to avoid their cost and to improve performance.
  */
 class ClassListProxyProvider implements ProviderInterface
 {
@@ -14,6 +14,11 @@ class ClassListProxyProvider implements ProviderInterface
      * @var ProviderInterface
      */
     protected $proxiedObject;
+
+    /**
+    * @var array|null
+    */
+    protected $structuralElementRawInfo = null;
 
     /**
      * Constructor.
@@ -26,11 +31,30 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
+     * Sets the data to return for the {@see getStructuralElementRawInfo} call. If set to null (the default), that call
+     * will proxy the method from the proxied object as usual.
+     *
+     * Can be used to avoid performing an additional proxy call to improve performance or just to override the returned
+     * data.
+     *
+     * @param array|null
+     *
+     * @return $this
+     */
+    public function setStructuralElementRawInfo(array $rawInfo = null)
+    {
+        $this->structuralElementRawInfo = $rawInfo;
+        return $this;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getStructuralElementRawInfo($id)
     {
-        return $this->proxiedObject->getStructuralElementRawInfo($id);
+        return ($this->structuralElementRawInfo !== null) ?
+            $this->structuralElementRawInfo :
+            $this->proxiedObject->getStructuralElementRawInfo($id);
     }
 
     /**
@@ -38,7 +62,7 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementRawInterfaces($id)
     {
-        return $this->proxiedObject->getStructuralElementRawInterfaces($id);
+        return new ArrayIterator([]);
     }
 
     /**
@@ -46,7 +70,8 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementRawTraits($id)
     {
-        return $this->proxiedObject->getStructuralElementRawTraits($id);
+        // return $this->proxiedObject->getStructuralElementRawTraits($id);
+        return new ArrayIterator([]);
     }
 
     /**
@@ -54,7 +79,7 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementRawConstants($id)
     {
-        return [];
+        return new ArrayIterator([]);
     }
 
     /**
@@ -62,7 +87,7 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementRawProperties($id)
     {
-        return [];
+        return new ArrayIterator([]);
     }
 
     /**
@@ -70,7 +95,7 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementRawMethods($id)
     {
-        $methods = $this->proxiedObject->getStructuralElementRawMethods($id);
+        /*$methods = $this->proxiedObject->getStructuralElementRawMethods($id);
 
         $filteredMethods = [];
 
@@ -81,7 +106,9 @@ class ClassListProxyProvider implements ProviderInterface
             }
         }
 
-        return new \ArrayIterator($filteredMethods);
+        return new \ArrayIterator($filteredMethods);*/
+
+        return [];
     }
 
     /**
@@ -97,7 +124,7 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getFunctionThrows($functionId)
     {
-        return $this->proxiedObject->getFunctionThrows($functionId);
+        return new ArrayIterator([]);
     }
 
     /**
@@ -105,6 +132,7 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getParentFqsens($seId)
     {
-        return $this->proxiedObject->getParentFqsens($seId);
+        // return $this->proxiedObject->getParentFqsens($seId);
+        return [];
     }
 }

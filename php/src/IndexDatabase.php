@@ -374,16 +374,43 @@ class IndexDatabase implements
     }
 
     /**
+     * Retrieves a query builder that fetches raw information about all structural elements.
+     *
+     * @param int $id
+     *
+     * @return Doctrine\DBAL\Query\QueryBuilder
+     */
+    protected function getStructuralElementRawInfoQueryBuilder()
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select(
+                'se.*',
+                'fi.path',
+                '(setype.name) AS type_name',
+                'sepl.linked_structural_element_id'
+            )
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENT_TYPES, 'setype', 'setype.id = se.structural_element_type_id')
+            ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
+            ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id');
+    }
+
+    /**
+     * Retrieves raw information about all structural elements.
+     *
+     * @return \Traversable
+     */
+    public function getAllStructuralElementsRawInfo()
+    {
+        return $this->getStructuralElementRawInfoQueryBuilder()->execute();
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getStructuralElementRawInfo($id)
     {
-        return $this->getConnection()->createQueryBuilder()
-            ->select('se.*', 'fi.path', '(setype.name) AS type_name', 'sepl.linked_structural_element_id')
-            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENT_TYPES, 'setype', 'setype.id = se.structural_element_type_id')
-            ->leftJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
-            ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id')
+        return $this->getStructuralElementRawInfoQueryBuilder()
             ->where('se.id = ?')
             ->setParameter(0, $id)
             ->execute()

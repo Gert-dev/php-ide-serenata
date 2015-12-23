@@ -71,20 +71,24 @@ class Application
         $storageProxy = new IndexDataAdapter\ClassListProxyProvider($this->indexDatabase);
         $dataAdapter = new IndexDataAdapter($storageProxy);
 
-        foreach ($this->indexDatabase->getAll(IndexStorageItemEnum::STRUCTURAL_ELEMENTS) as $element) {
+        foreach ($this->indexDatabase->getAllStructuralElementsRawInfo() as $element) {
+            // Directly load in the raw information we already have, this avoids performing a database query for each
+            // record.
+            $storageProxy->setStructuralElementRawInfo($element);
+
             $info = $dataAdapter->getStructuralElementInfo($element['id']);
 
-            $constructor = null;
+            // $constructor = null;
 
-            if (isset($info['methods']['__construct'])) {
-                $constructor = $info['methods']['__construct'];
-            }
+            // if (isset($info['methods']['__construct'])) {
+                // $constructor = $info['methods']['__construct'];
+            // }
 
             unset($info['constants'], $info['properties'], $info['methods']);
 
-            if ($constructor) {
-                $info['methods']['__construct'] = $constructor;
-            }
+            // if ($constructor) {
+                // $info['methods']['__construct'] = $constructor;
+            // }
 
             $result[$element['fqsen']] = $info;
         }
