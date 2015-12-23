@@ -110,6 +110,7 @@ class Application
         }
 
         $fqsen = array_shift($arguments);
+        $fqsen = str_replace('\\\\', '\\', $fqsen);
 
         if ($fqsen[0] === '\\') {
             $fqsen = mb_substr($fqsen, 1);
