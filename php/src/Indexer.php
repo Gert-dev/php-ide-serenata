@@ -271,11 +271,7 @@ class Indexer
         $traverser->addVisitor($dependencyFetchingVisitor);
         $traverser->traverse($nodes);
 
-        $map = $dependencyFetchingVisitor->getFqsenDependencyMap();
-
-        // unset()
-
-        return $map;
+        return $dependencyFetchingVisitor->getFqsenDependencyMap();
     }
 
     /**
