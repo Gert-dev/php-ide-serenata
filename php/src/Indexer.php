@@ -101,17 +101,19 @@ class Indexer
         $this->logMessage('Pruning removed files...');
         $this->pruneRemovedFiles();
 
-        $this->logMessage('Scanning and sorting by dependencies...');
+        $this->logMessage('Scanning...');
         $fileClassMap = $this->scan($directory);
 
         $this->logMessage('Filtering out files that need updating...');
         $fileClassMap = $this->filterScanResult($fileClassMap);
 
         $this->logMessage('Sorting the result by dependencies...');
-        $fileClassMap = $this->sortScanResultByDependencies($fileClassMap);
+        $files = $this->getFilesSortedByDependenciesFromScanResult($fileClassMap);
 
-        foreach ($fileClassMap as $filename => $fqsens) {
+        foreach ($files as $filename) {
             $this->logMessage('  - ' . $filename);
+
+            $fqsens = $fileClassMap[$filename];
 
             foreach ($fqsens as $fqsen => $dependencyFqsens) {
                 $this->logMessage('    - ' . $fqsen);
@@ -123,7 +125,7 @@ class Indexer
         }
 
         $this->logMessage('Indexing outline...');
-        $this->indexFileOutlines(array_keys($fileClassMap));
+        $this->indexFileOutlines($files);
     }
 
     /**
@@ -215,31 +217,54 @@ class Indexer
      *
      * @param array $scanResult
      *
-     * @return array The input value, after sorting.
+     * @return array A list of files, sorted in such a way that dependencies are listed before their dependents.
      */
-    protected function sortScanResultByDependencies(array $scanResult)
+    protected function getFilesSortedByDependenciesFromScanResult(array $scanResult)
     {
-        uasort($scanResult, function (array $a, array $b) {
-            foreach ($a as $fqsen => $dependencies) {
-                foreach ($dependencies as $dependencyFqsen) {
-                    if (isset($b[$dependencyFqsen])) {
-                        return 1; // a is dependent on b, b must be indexed first.
-                    }
-                }
+        $result = [];
+
+        // Build a list of all FQSEN's that we received.
+        $fullFqsenList = [];
+
+        foreach ($scanResult as $filename => $fqsens) {
+            foreach ($fqsens as $fqsen => $dependencyFqsens) {
+                $fullFqsenList[$fqsen] = true;
+            }
+        }
+
+        // See also https://github.com/marcj/topsort.php .
+        $topologicalSorter = new \MJS\TopSort\Implementations\GroupedStringSort();
+
+        foreach ($scanResult as $filename => $fqsens) {
+            if (empty($fqsens)) {
+                $result[] = $filename; // This file doesn't need sorting, index it first.
+                continue;
             }
 
-            foreach ($b as $fqsen => $dependencies) {
-                foreach ($dependencies as $dependencyFqsen) {
-                    if (isset($a[$dependencyFqsen])) {
-                        return -1; // b is dependent on a, a must be indexed first.
+            foreach ($fqsens as $fqsen => $dependencyFqsens) {
+                $dependencyList = [];
+
+                foreach ($dependencyFqsens as $dependencyFqsen) {
+                    // The topological sorter requires that, before sorting, all dependencies actually exist. For full
+                    // indexes, this will (should) be the case, but when doing an incremental index, we may only have a
+                    // couple of files that need to be indexed and things such as base classes might not need to be
+                    // reindexed.
+                    if (isset($fullFqsenList[$dependencyFqsen])) {
+                        $dependencyList[] = $dependencyFqsen;
                     }
                 }
+
+                $topologicalSorter->add($fqsen, $filename, $dependencyList);
             }
+        }
 
-            return 0; // Neither are dependent on one another, order is irrelevant.
-        });
+        $sortedDependencies = $topologicalSorter->sort();
 
-        return $scanResult;
+        foreach ($topologicalSorter->getGroups() as $group) {
+            $result[] = $group->type;
+        }
+
+        return $result;
     }
 
     /**
