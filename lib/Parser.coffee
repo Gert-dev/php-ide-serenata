@@ -57,7 +57,7 @@ class Parser
                 if matchInfo.matchText not of matches
                     matches[matchInfo.matchText] =
                         name : matchInfo.matchText
-                        type : @getVariableType(editor, bufferPosition, matchInfo.matchText)
+                        type : null # @getVariableType(editor, bufferPosition, matchInfo.matchText)
 
         if '$this' not of matches
             matches['$this'] =
