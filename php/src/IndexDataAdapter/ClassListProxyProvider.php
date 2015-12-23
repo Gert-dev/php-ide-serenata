@@ -6,7 +6,7 @@ use ArrayIterator;
 
 /**
  * Proxy for a ProviderInterface that does not return any data (is a "white hole") for several methods that are
- * unnecessary when fetching the class list to avoid their cost and to improve performance.
+ * unnecessary when fetching the structural element list to avoid their cost and to improve performance.
  */
 class ClassListProxyProvider implements ProviderInterface
 {
