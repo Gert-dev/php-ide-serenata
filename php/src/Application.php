@@ -118,7 +118,7 @@ class Application
         $id = $this->indexDatabase->getStructuralElementId($fqsen);
 
         if (!$id) {
-            throw new UnexpectedValueException('The specified structural element was not found!');
+            throw new UnexpectedValueException('The structural element "' . $fqsen . '" was not found!');
         }
 
         $result = $this->getIndexDataAdapter()->getStructuralElementInfo($id);
