@@ -1085,6 +1085,6 @@ class Indexer
             $this->docParser = new DocParser();
         }
 
-        return new DocParser();
+        return $this->docParser;
     }
 }
