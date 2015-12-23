@@ -25,7 +25,7 @@ class Foo
 * When testing your configuration, the error message will now try to determine if the problem is with PHP or Composer instead of mentioning "PHP or Composer" in the error message (thanks to @wcatron).
 * There is now a command available in the command palette to forcibly reindex your project (thanks to @wcatron).
 
-### Bugs Fixed
+### Bugs fixed
 * Methods returning `static` were not properly resolving to the current class if they were not overridden (they were resolving to the closest parent class that defined them).
 * Project and file paths that contain spaces should no longer pose a problem (thanks to @wcatron).
 
@@ -33,6 +33,8 @@ class Foo
 * Changes to the service
   * Constants and class properties will now retrieve their start line as well. These items not being available was previously manually worked around in the php-integrator-navigation package. This manual workaround is now present in the base package as CoffeeScript should not have to bend itself backwars to get this information because PHP Reflection does not offer it.
   * declaringStructure will now also contain a startLineMember property that indicates the start line of the member in the structural element.
+  * Retrieving types for the list of local variables has been disabled for now as the performance impact is too large in longer functions. It may be reactivated in a future release.
+  * Constructor information is no longer retrieved when fetching the class list as the performance hit is too large. In fact, this was also the case before the new indexer, but then a cache file was used, which was never properly updated with new classes and was the result of the very long indexing process at start-up.
 
 ## 0.3.1
 ### Bugs Fixed
