@@ -382,7 +382,6 @@ class IndexDataAdapter
     public function getMethodInfo(array $rawInfo)
     {
         return array_merge($this->getFunctionInfo($rawInfo), [
-            'isMethod'           => true,
             'isMagic'            => !!$rawInfo['is_magic'],
             'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
@@ -470,7 +469,6 @@ class IndexDataAdapter
     {
         return [
             'name'               => $rawInfo['name'],
-            'isProperty'         => true,
             'startLine'          => $rawInfo['start_line'],
             'isMagic'            => !!$rawInfo['is_magic'],
             'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
