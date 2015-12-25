@@ -78,7 +78,7 @@ class IndexDataAdapter
             'isInterface'  => ($element['type_name'] === 'interface'),
             'isAbstract'   => !!$element['is_abstract'],
             'parents'      => array_values($parentFqsens),
-            'deprecated'   => !!$element['is_deprecated'],
+            'isDeprecated' => !!$element['is_deprecated'],
             'descriptions' => [
                 'short' => $element['short_description'],
                 'long'  => $element['long_description']
@@ -446,7 +446,7 @@ class IndexDataAdapter
             'parameters'    => $parameters,
             'optionals'     => $optionals,
             'throws'        => $throwsAssoc,
-            'deprecated'    => !!$rawInfo['is_deprecated'],
+            'isDeprecated'  => !!$rawInfo['is_deprecated'],
             'hasDocblock'   => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
@@ -477,7 +477,7 @@ class IndexDataAdapter
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
             'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
             'isStatic'           => !!$rawInfo['is_static'],
-            'deprecated'         => !!$rawInfo['is_deprecated'],
+            'isDeprecated'       => !!$rawInfo['is_deprecated'],
             'hasDocblock'        => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
@@ -504,14 +504,14 @@ class IndexDataAdapter
     public function getConstantInfo(array $rawInfo)
     {
         return [
-            'name'        => $rawInfo['name'],
-            'isBuiltin'   => !!$rawInfo['is_builtin'],
-            'isPublic'    => true,
-            'isProtected' => false,
-            'isPrivate'   => false,
-            'isStatic'    => true,
-            'deprecated'  => !!$rawInfo['is_deprecated'],
-            'hasDocblock' => !!$rawInfo['has_docblock'],
+            'name'         => $rawInfo['name'],
+            'isBuiltin'    => !!$rawInfo['is_builtin'],
+            'isPublic'     => true,
+            'isProtected'  => false,
+            'isPrivate'    => false,
+            'isStatic'     => true,
+            'isDeprecated' => !!$rawInfo['is_deprecated'],
+            'hasDocblock'  => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
                 'short' => $rawInfo['short_description'],
@@ -571,7 +571,7 @@ class IndexDataAdapter
     {
         return array_filter($processedData, function ($key) {
             return in_array($key, [
-                'deprecated',
+                'isDeprecated',
                 'descriptions',
                 'return'
             ]);
@@ -589,13 +589,12 @@ class IndexDataAdapter
     {
         return array_filter($processedData, function ($key) {
             return in_array($key, [
-                'deprecated',
+                'isDeprecated',
                 'descriptions',
                 'return',
                 'parameters',
                 'optionals',
-                'throws',
-                'deprecated'
+                'throws'
             ]);
         }, ARRAY_FILTER_USE_KEY);
     }

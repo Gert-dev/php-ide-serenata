@@ -35,6 +35,7 @@ class Foo
   * declaringStructure will now also contain a startLineMember property that indicates the start line of the member in the structural element.
   * Retrieving types for the list of local variables has been disabled for now as the performance impact is too large in longer functions. It may be reactivated in a future release.
   * Constructor information is no longer retrieved when fetching the class list as the performance hit is too large. In fact, this was also the case before the new indexer, but then a cache file was used, which was never properly updated with new classes and was the result of the very long indexing process at start-up.
+  * The property `deprecated` was renamed to `isDeprecated` for consistency.
 
 ## 0.3.1
 ### Bugs Fixed
