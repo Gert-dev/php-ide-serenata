@@ -187,6 +187,54 @@ class Service
         return null
 
     ###*
+     * Same as {@see getClassMemberAt}, but only returns methods.
+     *
+     * @param {TextEditor} editor         The text editor to use.
+     * @param {Point}      bufferPosition The cursor location of the member.
+     * @param {string}     name           The name of the member to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassMethodAt: (editor, bufferPosition, name) ->
+        if @parser.isUsingProperty(editor, bufferPosition)
+            return null
+
+        className = @getResultingTypeAt(editor, bufferPosition, true)
+
+        return @getClassMethod(className, name)
+
+    ###*
+     * Same as {@see getClassMemberAt}, but only returns properties.
+     *
+     * @param {TextEditor} editor         The text editor to use.
+     * @param {Point}      bufferPosition The cursor location of the member.
+     * @param {string}     name           The name of the member to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassPropertyAt: (editor, bufferPosition, name) ->
+        if not @parser.isUsingProperty(editor, bufferPosition)
+            return null
+
+        className = @getResultingTypeAt(editor, bufferPosition, true)
+
+        return @getClassProperty(className, name)
+
+    ###*
+     * Same as {@see getClassMemberAt}, but only returns constants.
+     *
+     * @param {TextEditor} editor         The text editor to use.
+     * @param {Point}      bufferPosition The cursor location of the member.
+     * @param {string}     name           The name of the member to retrieve information about.
+     *
+     * @return {Object|null}
+    ###
+    getClassConstantAt: (editor, bufferPosition, name) ->
+        className = @getResultingTypeAt(editor, bufferPosition, true)
+
+        return @getClassConstant(className, name)
+
+    ###*
      * Retrieves information about members of the specified class. Note that this always returns an object, as there may
      * be multiple members (e.g. methods and properties) sharing the same name. The object's properties are 'method',
      * 'property' and 'constant'.

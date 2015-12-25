@@ -38,6 +38,7 @@ class Foo
   * `deprecated` was renamed to `isDeprecated` for consistency.
   * `wasFound` was removed when fetching class (structural element) information as a failure status is now returned instead.
   * `isMethod` and `isProperty` were removed as they are no longer necessary since members are now in separate associative arrays.
+  * Added the more specific convenience methods `getClassMethodAt`, `getClassPropertyAt` and `getClassConstantAt`.
 
 ## 0.3.1
 ### Bugs Fixed
