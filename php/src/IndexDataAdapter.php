@@ -67,9 +67,8 @@ class IndexDataAdapter
         $methods
     ) {
         $result = [
-            'class'        => $element['fqsen'],
-            'startLine'    => $element['start_line'],
             'name'         => $element['fqsen'],
+            'startLine'    => $element['start_line'],
             'shortName'    => $element['name'],
             'filename'     => $element['path'],
             'isTrait'      => ($element['type_name'] === 'trait'),

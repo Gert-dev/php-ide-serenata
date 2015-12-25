@@ -37,6 +37,7 @@ class Foo
   * Constructor information is no longer retrieved when fetching the class list as the performance hit is too large. In fact, this was also the case before the new indexer, but then a cache file was used, which was never properly updated with new classes and was the result of the very long indexing process at start-up.
   * `deprecated` was renamed to `isDeprecated` for consistency.
   * `wasFound` was removed when fetching class (structural element) information as a failure status is now returned instead.
+  * `class` was removed when fetching class (structural element) information as this information is already available in the `name` property.
   * `isMethod` and `isProperty` were removed as they are no longer necessary since members are now in separate associative arrays.
   * Added the more specific convenience methods `getClassMethodAt`, `getClassPropertyAt` and `getClassConstantAt`.
 
