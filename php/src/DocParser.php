@@ -143,10 +143,17 @@ class DocParser
         $segments = [];
         $parts = explode(' ', $value);
 
-        $detectedPartCount = count($parts);
+        while ($partCount--) {
+            if (!empty($parts)) {
+                $segments[] = $this->sanitizeText(array_shift($parts));
+            } else {
+                $segments[] = null;
+            }
+        }
 
-        for ($i = 0; $i < $partCount; ++$i) {
-            $segments[$i] = ($i < $detectedPartCount) ? $this->sanitizeText($parts[$i]) : null;
+        // Append the remaining text to the last element.
+        if (!empty($parts)) {
+            $segments[count($segments) - 1] .= ' ' . implode(' ', $parts);
         }
 
         return $segments;
