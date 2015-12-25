@@ -71,9 +71,7 @@ class IndexDataAdapter
             'startLine'    => $element['start_line'],
             'shortName'    => $element['name'],
             'filename'     => $element['path'],
-            'isTrait'      => ($element['type_name'] === 'trait'),
-            'isClass'      => ($element['type_name'] === 'class'),
-            'isInterface'  => ($element['type_name'] === 'interface'),
+            'type'         => $element['type_name'],
             'isAbstract'   => !!$element['is_abstract'],
             'parents'      => array_values($parentFqsens),
             'isDeprecated' => !!$element['is_deprecated'],
@@ -128,9 +126,7 @@ class IndexDataAdapter
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
-                        'isTrait'         => ($element['type_name'] === 'trait'),
-                        'isClass'         => ($element['type_name'] === 'class'),
-                        'isInterface'     => ($element['type_name'] === 'interface')
+                        'type'            => $element['type_name']
                     ]
                 ]);
             }
@@ -152,9 +148,7 @@ class IndexDataAdapter
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
-                        'isTrait'         => ($element['type_name'] === 'trait'),
-                        'isClass'         => ($element['type_name'] === 'class'),
-                        'isInterface'     => ($element['type_name'] === 'interface')
+                        'type'            => $element['type_name'],
                     ]
                 ]);
 
@@ -185,9 +179,7 @@ class IndexDataAdapter
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
-                        'isTrait'         => ($element['type_name'] === 'trait'),
-                        'isClass'         => ($element['type_name'] === 'class'),
-                        'isInterface'     => ($element['type_name'] === 'interface')
+                        'type'            => $element['type_name'],
                     ]
                 ]);
 
@@ -208,18 +200,14 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'isTrait'         => ($element['type_name'] === 'trait'),
-                    'isClass'         => ($element['type_name'] === 'class'),
-                    'isInterface'     => ($element['type_name'] === 'interface')
+                    'type'            => $element['type_name'],
                 ],
 
                 'declaringStructure' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'isTrait'         => ($element['type_name'] === 'trait'),
-                    'isClass'         => ($element['type_name'] === 'class'),
-                    'isInterface'     => ($element['type_name'] === 'interface'),
+                    'type'            => $element['type_name'],
                     'startLineMember' => $rawConstantData['start_line']
                 ]
             ]);
@@ -254,18 +242,14 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'isTrait'         => ($element['type_name'] === 'trait'),
-                    'isClass'         => ($element['type_name'] === 'class'),
-                    'isInterface'     => ($element['type_name'] === 'interface')
+                    'type'            => $element['type_name'],
                 ],
 
                 'declaringStructure' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'isTrait'         => ($element['type_name'] === 'trait'),
-                    'isClass'         => ($element['type_name'] === 'class'),
-                    'isInterface'     => ($element['type_name'] === 'interface'),
+                    'type'            => $element['type_name'],
                     'startLineMember' => $rawPropertyData['start_line']
                 ]
             ]);
@@ -295,7 +279,7 @@ class IndexDataAdapter
             if (isset($result['methods'][$method['name']])) {
                 $existingMethod = $result['methods'][$method['name']];
 
-                if ($existingMethod['declaringStructure']['isInterface']) {
+                if ($existingMethod['declaringStructure']['type'] === 'interface') {
                     $implementedMethodData = [
                         'declaringClass'     => $existingMethod['declaringClass'],
                         'declaringStructure' => $existingMethod['declaringStructure'],
@@ -322,18 +306,14 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'isTrait'         => ($element['type_name'] === 'trait'),
-                    'isClass'         => ($element['type_name'] === 'class'),
-                    'isInterface'     => ($element['type_name'] === 'interface')
+                    'type'            => $element['type_name'],
                 ],
 
                 'declaringStructure' => [
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
-                    'isTrait'         => ($element['type_name'] === 'trait'),
-                    'isClass'         => ($element['type_name'] === 'class'),
-                    'isInterface'     => ($element['type_name'] === 'interface'),
+                    'type'            => $element['type_name'],
                     'startLineMember' => $rawMethodData['start_line']
                 ]
             ]);

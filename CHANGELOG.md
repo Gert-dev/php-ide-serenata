@@ -40,6 +40,7 @@ class Foo
   * `class` was removed when fetching class (structural element) information as this information is already available in the `name` property.
   * `isMethod` and `isProperty` were removed as they are no longer necessary since members are now in separate associative arrays.
   * Added the more specific convenience methods `getClassMethodAt`, `getClassPropertyAt` and `getClassConstantAt`.
+  * `isTrait`, `isInterface` and `isClass` were replaced with a single string `type` property.
 
 ## 0.3.1
 ### Bugs Fixed
