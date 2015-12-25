@@ -68,7 +68,6 @@ class IndexDataAdapter
     ) {
         $result = [
             'class'        => $element['fqsen'],
-            'wasFound'     => true,
             'startLine'    => $element['start_line'],
             'name'         => $element['fqsen'],
             'shortName'    => $element['name'],

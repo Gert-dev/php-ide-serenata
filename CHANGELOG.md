@@ -36,6 +36,7 @@ class Foo
   * Retrieving types for the list of local variables has been disabled for now as the performance impact is too large in longer functions. It may be reactivated in a future release.
   * Constructor information is no longer retrieved when fetching the class list as the performance hit is too large. In fact, this was also the case before the new indexer, but then a cache file was used, which was never properly updated with new classes and was the result of the very long indexing process at start-up.
   * `deprecated` was renamed to `isDeprecated` for consistency.
+  * `wasFound` was removed when fetching class (structural element) information as a failure status is now returned instead.
   * `isMethod` and `isProperty` were removed as they are no longer necessary since members are now in separate associative arrays.
 
 ## 0.3.1
