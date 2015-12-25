@@ -544,31 +544,6 @@ class IndexDatabase implements
     /**
      * {@inheritDoc}
      */
-    public function getGlobalConstants()
-    {
-        return $this->getConnection()->createQueryBuilder()
-            ->select('*')
-            ->from(IndexStorageItemEnum::CONSTANTS)
-            ->where('structural_element_id IS NULL')
-            ->execute();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getGlobalFunctions()
-    {
-        return $this->getConnection()->createQueryBuilder()
-            ->select('fu.*', 'fi.path')
-            ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
-            ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
-            ->where('structural_element_id IS NULL')
-            ->execute();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function insert($indexStorageItem, array $data)
     {
         $this->getConnection()->insert($indexStorageItem, $data);
@@ -585,13 +560,31 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * Fetches a list of global constants.
+     *
+     * @return \Traversable
      */
-    public function getAll($indexStorageItem)
+    public function getGlobalConstants()
     {
         return $this->getConnection()->createQueryBuilder()
             ->select('*')
-            ->from($indexStorageItem)
+            ->from(IndexStorageItemEnum::CONSTANTS)
+            ->where('structural_element_id IS NULL')
+            ->execute();
+    }
+
+    /**
+     * Fetches a list of global functions.
+     *
+     * @return \Traversable
+     */
+    public function getGlobalFunctions()
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('fu.*', 'fi.path')
+            ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
+            ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
+            ->where('structural_element_id IS NULL')
             ->execute();
     }
 }
