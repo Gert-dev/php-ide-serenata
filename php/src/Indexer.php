@@ -265,7 +265,7 @@ class Indexer
             $this->logMessage('  - WARNING: ' . $filename . ' could not be indexed due to parsing errors!');
         }
 
-        $dependencyFetchingVisitor = new DependencyFetchingVisitor();
+        $dependencyFetchingVisitor = new Indexer\DependencyFetchingVisitor();
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor($dependencyFetchingVisitor);
@@ -548,7 +548,7 @@ class Indexer
             $this->logMessage('  - WARNING: ' . $filename . ' could not be indexed due to parsing errors!');
         }
 
-        $outlineIndexingVisitor = new OutlineIndexingVisitor();
+        $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor($outlineIndexingVisitor);

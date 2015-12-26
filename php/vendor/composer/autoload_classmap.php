@@ -7,7 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'PhpIntegrator\\Application' => $baseDir . '/src/Application.php',
-    'PhpIntegrator\\DependencyFetchingVisitor' => $baseDir . '/src/DependencyFetchingVisitor.php',
     'PhpIntegrator\\DocParser' => $baseDir . '/src/DocParser.php',
     'PhpIntegrator\\FileParser' => $baseDir . '/src/FileParser.php',
     'PhpIntegrator\\IndexDataAdapter' => $baseDir . '/src/IndexDataAdapter.php',
@@ -16,6 +15,7 @@ return array(
     'PhpIntegrator\\IndexDatabase' => $baseDir . '/src/IndexDatabase.php',
     'PhpIntegrator\\IndexStorageItemEnum' => $baseDir . '/src/IndexStorageItemEnum.php',
     'PhpIntegrator\\Indexer' => $baseDir . '/src/Indexer.php',
+    'PhpIntegrator\\Indexer\\DependencyFetchingVisitor' => $baseDir . '/src/Indexer/DependencyFetchingVisitor.php',
+    'PhpIntegrator\\Indexer\\OutlineIndexingVisitor' => $baseDir . '/src/Indexer/OutlineIndexingVisitor.php',
     'PhpIntegrator\\Indexer\\StorageInterface' => $baseDir . '/src/Indexer/StorageInterface.php',
-    'PhpIntegrator\\OutlineIndexingVisitor' => $baseDir . '/src/OutlineIndexingVisitor.php',
 );
