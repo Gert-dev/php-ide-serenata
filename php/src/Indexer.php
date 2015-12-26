@@ -525,7 +525,7 @@ class Indexer
             ];
         }
 
-        $this->indexStructuralElement($rawData, null, $element->getName());
+        $this->indexStructuralElement($rawData, null, $element->getName(), true);
     }
 
     /**
@@ -576,7 +576,7 @@ class Indexer
         $indexedSeIds = [];
 
         foreach ($outlineIndexingVisitor->getStructuralElements() as $fqsen => $structuralElement) {
-            $indexedSeIds[] = $this->indexStructuralElement($structuralElement, $fileId, $fqsen);
+            $indexedSeIds[] = $this->indexStructuralElement($structuralElement, $fileId, $fqsen, false);
         }
 
         foreach ($outlineIndexingVisitor->getGlobalFunctions() as $function) {
@@ -594,13 +594,14 @@ class Indexer
     /**
      * Indexes the specified structural element.
      *
-     * @param array  $rawData
-     * @param int    $fileId
-     * @param string $fqsen
+     * @param array   $rawData
+     * @param int     $fileId
+     * @param string  $fqsen
+     * @param boolean $isBuiltin
      *
      * @return int The ID of the structural element.
      */
-    protected function indexStructuralElement(array $rawData, $fileId, $fqsen)
+    protected function indexStructuralElement(array $rawData, $fileId, $fqsen, $isBuiltin)
     {
         $structuralElementTypeMap = $this->getStructuralElementTypeMap();
 
@@ -621,6 +622,7 @@ class Indexer
             'structural_element_type_id' => $structuralElementTypeMap[$rawData['type']],
             'is_abstract'                => (isset($rawData['is_abstract']) && $rawData['is_abstract']) ? 1 : 0,
             'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
+            'is_builtin'                 => $isBuiltin ? 1 : 0,
             'has_docblock'               => empty($rawData['docComment']) ? 0 : 1,
             'short_description'          => $documentation['descriptions']['short'],
             'long_description'           => $documentation['descriptions']['long']

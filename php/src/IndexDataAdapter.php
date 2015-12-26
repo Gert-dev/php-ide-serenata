@@ -73,6 +73,7 @@ class IndexDataAdapter
             'filename'     => $element['path'],
             'type'         => $element['type_name'],
             'isAbstract'   => !!$element['is_abstract'],
+            'isBuiltin'    => !!$element['is_builtin'],
             'parents'      => array_values($parentFqsens),
             'isDeprecated' => !!$element['is_deprecated'],
             'descriptions' => [
