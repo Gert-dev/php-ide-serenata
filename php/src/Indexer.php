@@ -711,7 +711,7 @@ class Indexer
         }
 
         foreach ($rawData['constants'] as $constant) {
-            $this->indexConstant($constant, $fileId);
+            $this->indexConstant($constant, $fileId, $seId);
         }
 
         // Index magic properties.
