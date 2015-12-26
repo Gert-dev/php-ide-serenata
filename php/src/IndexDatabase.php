@@ -567,8 +567,9 @@ class IndexDatabase implements
     public function getGlobalConstants()
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('*')
-            ->from(IndexStorageItemEnum::CONSTANTS)
+            ->select('c.*', 'fi.path')
+            ->from(IndexStorageItemEnum::CONSTANTS, 'c')
+            ->leftJoin('c', IndexStorageItemEnum::FILES, 'fi', 'fi.id = c.file_id')
             ->where('structural_element_id IS NULL')
             ->execute();
     }

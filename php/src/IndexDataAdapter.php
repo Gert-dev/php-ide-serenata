@@ -472,6 +472,9 @@ class IndexDataAdapter
         return [
             'name'         => $rawInfo['name'],
             'isBuiltin'    => !!$rawInfo['is_builtin'],
+            'startLine'    => $rawInfo['start_line'],
+            'filename'     => $rawInfo['path'],
+
             'isPublic'     => true,
             'isProtected'  => false,
             'isPrivate'    => false,
