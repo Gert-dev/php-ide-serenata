@@ -605,19 +605,24 @@ class Parser
                         try
                             currentClass = @determineFullClassName(editor)
 
+                            response = null
                             functionInfo = null
 
                             if currentClass
                                 response = @proxy.getClassInfo(currentClass)
-
-                                if (functionName of response.methods) and (element of response.methods[functionName].docParameters)
-                                    bestMatch = @determineFullClassName(editor, response.methods[functionName].docParameters[element].type)
+                                response = response.methods
 
                             else
                                 response = @proxy.getGlobalFunctions()
 
-                                if (functionName of response) and (element of response[functionName].docParameters)
-                                    bestMatch = @determineFullClassName(editor, response[functionName].docParameters[element].type)
+                            if functionName of response
+                                parameters = response[functionName].parameters
+
+                                for param in parameters
+                                    # NOTE: We compare without dollar sign.
+                                    if param.name == element.substr(1)
+                                        bestMatch = @determineFullClassName(editor, param.type)
+                                        break
 
                         catch error
                             # This data isn't useful.

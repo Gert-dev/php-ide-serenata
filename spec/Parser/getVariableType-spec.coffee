@@ -8,12 +8,16 @@ describe "getVariableType", ->
         getGlobalFunctions: () ->
             return {
                 foo:
-                    docParameters:
-                        '$test1':
+                    parameters: [
+                        {
+                            name: 'test1',
                             type: 'EXPECTED\\TYPE_1'
-
-                        '$test2':
+                        },
+                        {
+                            name: 'test2',
                             type: 'EXPECTED\\TYPE_2'
+                        }
+                    ]
             }
 
         getClassInfo: (className, element) ->
@@ -22,12 +26,16 @@ describe "getVariableType", ->
                     name: 'EXPECTED\\TYPE_1'
                     methods:
                         foo:
-                            docParameters:
-                                '$test1':
+                            parameters: [
+                                {
+                                    name: 'test1',
                                     type: 'TYPE_1'
-
-                                '$test2':
+                                },
+                                {
+                                    name: 'test2',
                                     type: 'TYPE_2'
+                                }
+                            ]
 
                         bar:
                             return:
