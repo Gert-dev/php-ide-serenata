@@ -383,27 +383,17 @@ class IndexDataAdapter
     {
         $rawParameters = $this->storage->getFunctionParameters($rawInfo['id']);
 
-        $optionals = [];
         $parameters = [];
 
         foreach ($rawParameters as $rawParameter) {
-            $name = '';
-
-            if ($rawParameter['is_reference']) {
-                $name .= '&';
-            }
-
-            $name .= '$' . $rawParameter['name'];
-
-            if ($rawParameter['is_variadic']) {
-                $name .= '...';
-            }
-
-            if ($rawParameter['is_optional']) {
-                $optionals[] = $name;
-            } else {
-                $parameters[] = $name;
-            }
+            $parameters[] = [
+                'name'        => $rawParameter['name'],
+                'type'        => $rawParameter['type'],
+                'description' => $rawParameter['description'],
+                'isReference' => !!$rawParameter['is_reference'],
+                'isVariadic'  => !!$rawParameter['is_variadic'],
+                'isOptional'  => !!$rawParameter['is_optional']
+            ];
         }
 
         $throws = $this->storage->getFunctionThrows($rawInfo['id']);
@@ -421,7 +411,6 @@ class IndexDataAdapter
             'filename'      => $rawInfo['path'],
 
             'parameters'    => $parameters,
-            'optionals'     => $optionals,
             'throws'        => $throwsAssoc,
             'isDeprecated'  => !!$rawInfo['is_deprecated'],
             'hasDocblock'   => !!$rawInfo['has_docblock'],
@@ -569,7 +558,6 @@ class IndexDataAdapter
                 'descriptions',
                 'return',
                 'parameters',
-                'optionals',
                 'throws'
             ]);
         }, ARRAY_FILTER_USE_KEY);

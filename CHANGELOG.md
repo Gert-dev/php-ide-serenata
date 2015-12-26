@@ -41,6 +41,7 @@ class Foo
   * `isMethod` and `isProperty` were removed as they are no longer necessary since members are now in separate associative arrays.
   * Added the more specific convenience methods `getClassMethodAt`, `getClassPropertyAt` and `getClassConstantAt`.
   * `isTrait`, `isInterface` and `isClass` were replaced with a single string `type` property.
+  * Functions and methods no longer return a separate `parameters` and `optionals` property. The two have now been merged and provide more information (such as whether the parameters are a reference, variadic, optional, ...).
 
 ## 0.3.1
 ### Bugs Fixed
