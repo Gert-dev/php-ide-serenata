@@ -150,7 +150,7 @@ class OutlineIndexingVisitor extends NameResolver
                 /** @var Node\Stmt\TraitUseAdaptation\Alias $adaptation */
                 $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['traitAliases'][] = [
                     'name'                       => $adaptation->method,
-                    'alias'                      => $adaptation->newName,
+                    'alias'                      => $adaptation->newName ?: $adaptation->method,
                     'trait'                      => $adaptation->trait ? $adaptation->trait->toString() : null,
                     'isPublic'                   => ($adaptation->newModifier === 1),
                     'isPrivate'                  => ($adaptation->newModifier === 4),
