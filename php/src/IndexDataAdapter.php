@@ -128,7 +128,7 @@ class IndexDataAdapter
                 if (isset($traitAliases[$constant['name']])) {
                     $alias = $traitAliases[$constant['name']];
 
-                    $constant['name']        = $alias['name'];
+                    $constant['name']        = $alias['alias'];
                     $constant['isPublic']    = ($alias['access_modifier'] === 'public');
                     $constant['isProtected'] = ($alias['access_modifier'] === 'protected');
                     $constant['isPrivate']   = ($alias['access_modifier'] === 'private');
@@ -139,7 +139,7 @@ class IndexDataAdapter
 
                     if ($existingConstant['declaringStructure']['type'] === 'trait') {
                         if (isset($traitPrecedences[$constant['name']])) {
-                            if ($traitPrecedences[$constant['name']]['trait_fqsen'] !== $constant['declaringStructure']['name']) {
+                            if ($traitPrecedences[$constant['name']]['trait_fqsen'] !== $trait['name']) {
                                 // The constant is present in multiple used traits and precedences indicate that the one
                                 // from this trait should not be imported.
                                 continue;
@@ -162,7 +162,7 @@ class IndexDataAdapter
                 if (isset($traitAliases[$property['name']])) {
                     $alias = $traitAliases[$property['name']];
 
-                    $property['name']        = $alias['name'];
+                    $property['name']        = $alias['alias'];
                     $property['isPublic']    = ($alias['access_modifier'] === 'public');
                     $property['isProtected'] = ($alias['access_modifier'] === 'protected');
                     $property['isPrivate']   = ($alias['access_modifier'] === 'private');
@@ -176,7 +176,7 @@ class IndexDataAdapter
 
                     if ($existingProperty['declaringStructure']['type'] === 'trait') {
                         if (isset($traitPrecedences[$property['name']])) {
-                            if ($traitPrecedences[$property['name']]['trait_fqsen'] !== $property['declaringStructure']['name']) {
+                            if ($traitPrecedences[$property['name']]['trait_fqsen'] !== $trait['name']) {
                                 // The property is present in multiple used traits and precedences indicate that the one
                                 // from this trait should not be imported.
                                 continue;
@@ -212,7 +212,7 @@ class IndexDataAdapter
                 if (isset($traitAliases[$method['name']])) {
                     $alias = $traitAliases[$method['name']];
 
-                    $method['name']        = $alias['name'];
+                    $method['name']        = $alias['alias'];
                     $method['isPublic']    = ($alias['access_modifier'] === 'public');
                     $method['isProtected'] = ($alias['access_modifier'] === 'protected');
                     $method['isPrivate']   = ($alias['access_modifier'] === 'private');
@@ -226,7 +226,7 @@ class IndexDataAdapter
 
                     if ($existingMethod['declaringStructure']['type'] === 'trait') {
                         if (isset($traitPrecedences[$method['name']])) {
-                            if ($traitPrecedences[$method['name']]['trait_fqsen'] !== $method['declaringStructure']['name']) {
+                            if ($traitPrecedences[$method['name']]['trait_fqsen'] !== $trait['name']) {
                                 // The method is present in multiple used traits and precedences indicate that the one
                                 // from this trait should not be imported.
                                 continue;
