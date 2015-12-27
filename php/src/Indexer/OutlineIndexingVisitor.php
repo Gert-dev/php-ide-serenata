@@ -149,18 +149,18 @@ class OutlineIndexingVisitor extends NameResolver
             if ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Alias) {
                 /** @var Node\Stmt\TraitUseAdaptation\Alias $adaptation */
                 $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['traitAliases'][] = [
-                    'name'                       => $node->method,
-                    'alias'                      => $node->newName,
-                    'isPublic'                   => ($node->newModifier === 1),
-                    'isPrivate'                  => ($node->newModifier === 4),
-                    'isProtected'                => ($node->newModifier === 2),
-                    'isInheritingAccessModifier' => ($node->newModifier === null)
+                    'name'                       => $adaptation->method,
+                    'alias'                      => $adaptation->newName,
+                    'isPublic'                   => ($adaptation->newModifier === 1),
+                    'isPrivate'                  => ($adaptation->newModifier === 4),
+                    'isProtected'                => ($adaptation->newModifier === 2),
+                    'isInheritingAccessModifier' => ($adaptation->newModifier === null)
                 ];
             } elseif ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Precedence) {
                 /** @var Node\Stmt\TraitUseAdaptation\Precedence $adaptation */
                 $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['traitPrecedences'][] = [
-                    'name'  => $node->method,
-                    'trait' => $node->trait->toString()
+                    'name'  => $adaptation->method,
+                    'trait' => $adaptation->trait->toString()
                 ];
             }
         }
