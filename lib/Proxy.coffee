@@ -32,6 +32,7 @@ class Proxy
     ###
     performRequest: (args, async) ->
         parameters = [
+            '-d memory_limit=-1',
             Utility.escapePath(__dirname + "/../php/src/Main.php"),
             Utility.escapePath(@config.get('packagePath') + '/indexes/' + @getIndexDatabaseName() + '.sqlite')
         ]
