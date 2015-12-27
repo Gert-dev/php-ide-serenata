@@ -702,11 +702,25 @@ class Indexer
             foreach ($rawData['traitAliases'] as $traitAlias) {
                 $accessModifier = $this->parseAccessModifier($traitAlias, true);
 
+                $traitSeId = null;
+
+                if ($traitAlias['trait']) {
+                    $traitSeId = $this->storage->getStructuralElementId($traitAlias['trait']);
+
+                    if (!$traitSeId) {
+                        $this->logMessage(
+                            '  - WARNING: Could not find a record for the trait ' .
+                            $traitAlias['trait'] . ' of FQSEN ' . $fqsen
+                        );
+                    }
+                }
+
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_ALIASES, [
-                    'structural_element_id' => $seId,
-                    'access_modifier_id'    => $accessModifierMap[$accessModifier],
-                    'name'                  => $traitAlias['name'],
-                    'alias'                 => $traitAlias['alias']
+                    'structural_element_id'       => $seId,
+                    'trait_structural_element_id' => $traitSeId,
+                    'access_modifier_id'          => $accessModifier ? $accessModifierMap[$accessModifier] : null,
+                    'name'                        => $traitAlias['name'],
+                    'alias'                       => $traitAlias['alias']
                 ]);
             }
         }
@@ -724,7 +738,7 @@ class Indexer
                 } else {
                     $this->logMessage(
                         '  - WARNING: Could not find a record for the trait ' .
-                        $trait . ' of FQSEN ' . $fqsen
+                        $traitPrecedence['trait'] . ' of FQSEN ' . $fqsen
                     );
                 }
             }

@@ -113,6 +113,7 @@ CREATE TABLE structural_elements_traits_aliases(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     structural_element_id       integer unsigned NOT NULL,
+    trait_structural_element_id integer unsigned,
     access_modifier_id          integer unsigned,
 
     name                        varchar(255) NOT NULL,
@@ -121,6 +122,10 @@ CREATE TABLE structural_elements_traits_aliases(
     FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
+
+    FOREIGN KEY(trait_structural_element_id) REFERENCES structural_elements(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 
     FOREIGN KEY(access_modifier_id) REFERENCES access_modifiers(id)
         ON DELETE RESTRICT

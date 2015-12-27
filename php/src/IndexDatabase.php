@@ -506,9 +506,10 @@ class IndexDatabase implements
     public function getStructuralElementTraitAliasesAssoc($id)
     {
         $result = $this->getConnection()->createQueryBuilder()
-            ->select('seta.*', 'am.name AS access_modifier')
+            ->select('seta.*', 'se.fqsen AS trait_fqsen', 'am.name AS access_modifier')
             ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_ALIASES, 'seta')
-            ->innerJoin('seta', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = seta.access_modifier_id')
+            ->leftJoin('seta', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = seta.access_modifier_id')
+            ->leftJoin('seta', IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se', 'se.id = seta.trait_structural_element_id')
             ->where('structural_element_id = ?')
             ->setParameter(0, $id)
             ->execute();
