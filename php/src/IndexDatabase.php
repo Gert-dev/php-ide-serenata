@@ -463,8 +463,9 @@ class IndexDatabase implements
     public function getStructuralElementRawConstants($id)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('*')
-            ->from(IndexStorageItemEnum::CONSTANTS)
+            ->select('c.*', 'fi.path')
+            ->from(IndexStorageItemEnum::CONSTANTS, 'c')
+            ->leftJoin('c', IndexStorageItemEnum::FILES, 'fi', 'fi.id = c.file_id')
             ->where('structural_element_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -497,6 +498,50 @@ class IndexDatabase implements
             ->where('structural_element_id = ?')
             ->setParameter(0, $id)
             ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementTraitAliasesAssoc($id)
+    {
+        $result = $this->getConnection()->createQueryBuilder()
+            ->select('seta.*', 'am.name AS access_modifier')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_ALIASES, 'seta')
+            ->innerJoin('seta', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = seta.access_modifier_id')
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+
+        $aliases = [];
+
+        foreach ($result as $row) {
+            $aliases[$row['name']] = $row;
+        }
+
+        return $aliases;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementTraitPrecedencesAssoc($id)
+    {
+        $result = $this->getConnection()->createQueryBuilder()
+            ->select('setp.*', 'se.fqsen AS trait_fqsen')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_PRECEDENCES, 'setp')
+            ->innerJoin('setp', IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se', 'se.id = setp.trait_structural_element_id')
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+
+        $precedences = [];
+
+        foreach ($result as $row) {
+            $precedences[$row['name']] = $row;
+        }
+
+        return $precedences;
     }
 
     /**

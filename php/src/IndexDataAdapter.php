@@ -118,10 +118,36 @@ class IndexDataAdapter
             }
         }
 
+        $traitAliases = $this->storage->getStructuralElementTraitAliasesAssoc($element['id']);
+        $traitPrecedences = $this->storage->getStructuralElementTraitPrecedencesAssoc($element['id']);
+
         foreach ($traits as $trait) {
             $trait = $this->getStructuralElementInfo($trait['id']);
 
             foreach ($trait['constants'] as $constant) {
+                if (isset($traitAliases[$constant['name']])) {
+                    $alias = $traitAliases[$constant['name']];
+
+                    $constant['name']        = $alias['name'];
+                    $constant['isPublic']    = ($alias['access_modifier'] === 'public');
+                    $constant['isProtected'] = ($alias['access_modifier'] === 'protected');
+                    $constant['isPrivate']   = ($alias['access_modifier'] === 'private');
+                }
+
+                if (isset($result['constants'][$constant['name']])) {
+                    $existingConstant = $result['constants'][$constant['name']];
+
+                    if ($existingConstant['declaringStructure']['type'] === 'trait') {
+                        if (isset($traitPrecedences[$constant['name']])) {
+                            if ($traitPrecedences[$constant['name']]['trait_fqsen'] !== $constant['declaringStructure']['name']) {
+                                // The constant is present in multiple used traits and precedences indicate that the one
+                                // from this trait should not be imported.
+                                continue;
+                            }
+                        }
+                    }
+                }
+
                 $result['constants'][$constant['name']] = array_merge($constant, [
                     'declaringClass' => [
                         'name'            => $element['fqsen'],
@@ -133,11 +159,30 @@ class IndexDataAdapter
             }
 
             foreach ($trait['properties'] as $property) {
+                if (isset($traitAliases[$property['name']])) {
+                    $alias = $traitAliases[$property['name']];
+
+                    $property['name']        = $alias['name'];
+                    $property['isPublic']    = ($alias['access_modifier'] === 'public');
+                    $property['isProtected'] = ($alias['access_modifier'] === 'protected');
+                    $property['isPrivate']   = ($alias['access_modifier'] === 'private');
+                }
+
                 $inheritedData = [];
                 $existingProperty = null;
 
                 if (isset($result['properties'][$property['name']])) {
                     $existingProperty = $result['properties'][$property['name']];
+
+                    if ($existingProperty['declaringStructure']['type'] === 'trait') {
+                        if (isset($traitPrecedences[$property['name']])) {
+                            if ($traitPrecedences[$property['name']]['trait_fqsen'] !== $property['declaringStructure']['name']) {
+                                // The property is present in multiple used traits and precedences indicate that the one
+                                // from this trait should not be imported.
+                                continue;
+                            }
+                        }
+                    }
 
                     if ($this->isInheritingDocumentation($property)) {
                         $inheritedData = $this->extractInheritedPropertyInfo($existingProperty);
@@ -164,11 +209,30 @@ class IndexDataAdapter
             }
 
             foreach ($trait['methods'] as $method) {
+                if (isset($traitAliases[$method['name']])) {
+                    $alias = $traitAliases[$method['name']];
+
+                    $method['name']        = $alias['name'];
+                    $method['isPublic']    = ($alias['access_modifier'] === 'public');
+                    $method['isProtected'] = ($alias['access_modifier'] === 'protected');
+                    $method['isPrivate']   = ($alias['access_modifier'] === 'private');
+                }
+
                 $inheritedData = [];
                 $existingMethod = null;
 
                 if (isset($result['methods'][$method['name']])) {
                     $existingMethod = $result['methods'][$method['name']];
+
+                    if ($existingMethod['declaringStructure']['type'] === 'trait') {
+                        if (isset($traitPrecedences[$method['name']])) {
+                            if ($traitPrecedences[$method['name']]['trait_fqsen'] !== $method['declaringStructure']['name']) {
+                                // The method is present in multiple used traits and precedences indicate that the one
+                                // from this trait should not be imported.
+                                continue;
+                            }
+                        }
+                    }
 
                     if ($this->isInheritingDocumentation($method)) {
                         $inheritedData = $this->extractInheritedMethodInfo($existingMethod);

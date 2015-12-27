@@ -50,6 +50,20 @@ interface ProviderInterface
     public function getStructuralElementRawMethods($id);
 
     /**
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getStructuralElementTraitAliasesAssoc($id);
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getStructuralElementTraitPrecedencesAssoc($id);
+
+    /**
      * @param int $functionId
      *
      * @return \Traversable
