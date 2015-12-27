@@ -307,7 +307,6 @@ class IndexDataAdapter
 
             $resultingProperty = array_merge($property, $inheritedData, [
                 'override'       => $overriddenPropertyData,
-                'implementation' => null,
 
                 'declaringClass' => [
                     'name'            => $element['fqsen'],
