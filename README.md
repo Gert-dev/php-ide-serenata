@@ -28,12 +28,9 @@ Things such as type hints will also be checked. Some features may or may not wor
 You can very easily start using the service by simply consuming the service in your package (see also the `package.json` and `Main.coffee` files of the packages listed above for an example). The service is a single exposed class, which is located in the [Service.coffee](https://github.com/Gert-dev/php-integrator-base/blob/master/lib/Service.coffee) file, along with docblocks explaining what they do and what they accept as parameters..
 
 ## What does not work?
-Most of the issue reports indicate things that are missing, but indexing inside the artificial limitations specified above should be working fairly well in general. There are also some things that won't be supported at this time because they are fairly complex to implement (usually for fairly little benefit).
-These limitations may affect other packages using the provided service:
+Most of the issue reports indicate things that are missing, but indexing should be working fairly well in general. There are also some things that won't be supported because they are fairly complex to implement (usually for fairly little benefit). These limitations may also affect other packages using the provided service:
 
 * `static` and `self` behave mostly like `$this` in **non-static** contexts, i.e. they can also access non-static members.
-* Classes can override a method from a direct trait they're using, even if it is not abstract. In this case the class method will take precedence. With Reflection, there currently seems to be no way to detect this. This may lead to things such as code navigation taking you to the trait method instead of the overridding class method.
-  * However, in the new php-parser-based indexer, there may be a way to fix this.
 
 ## Regarding donations
 I do accept donations and am very grateful for any donation you may give, but they were not my primary intention when releasing this project as open source. As such, a link to the (PayPal) donation screen is located [here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ), at the bottom of the readme, hidden from initial sight and not even in the form of a fancy button ;-).
