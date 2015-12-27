@@ -346,6 +346,18 @@ class IndexDatabase implements
             ->where('structural_element_id = ?')
             ->setParameter(0, $seId)
             ->execute();
+
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_ALIASES)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute();
+
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_PRECEDENCES)
+            ->where('structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute();
     }
 
     /**

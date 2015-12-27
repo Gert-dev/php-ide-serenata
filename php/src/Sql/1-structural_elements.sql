@@ -42,7 +42,7 @@ CREATE TABLE structural_elements(
     fqsen                      varchar(255) NOT NULL,
     file_id                    integer,
     start_line                 integer unsigned,
-    
+
     structural_element_type_id integer NOT NULL,
     short_description          text,
     long_description           text,
@@ -104,6 +104,43 @@ CREATE TABLE structural_elements_traits_linked(
         ON UPDATE CASCADE,
 
     FOREIGN KEY(linked_structural_element_id) REFERENCES structural_elements(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- Contains trait aliases used by structural elements.
+CREATE TABLE structural_elements_traits_aliases(
+    id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+
+    structural_element_id       integer unsigned NOT NULL,
+    access_modifier_id          integer unsigned,
+
+    name                        varchar(255) NOT NULL,
+    alias                       varchar(255) NOT NULL,
+
+    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    FOREIGN KEY(access_modifier_id) REFERENCES access_modifiers(id)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT
+);
+
+-- Contains trait precedences used by structural elements.
+CREATE TABLE structural_elements_traits_precedences(
+    id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+
+    structural_element_id       integer unsigned NOT NULL,
+    trait_structural_element_id integer unsigned NOT NULL,
+
+    name                        varchar(255) NOT NULL,
+
+    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    FOREIGN KEY(trait_structural_element_id) REFERENCES structural_elements(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );

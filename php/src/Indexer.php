@@ -644,6 +644,8 @@ class Indexer
             $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, $seData);
         }
 
+        $accessModifierMap = $this->getAccessModifierMap();
+
         if (isset($rawData['parent'])) {
             $parentSeId = $this->storage->getStructuralElementId($rawData['parent']);
 
@@ -696,7 +698,37 @@ class Indexer
             }
         }
 
-        $accessModifierMap = $this->getAccessModifierMap();
+        if (isset($rawData['traitAliases'])) {
+            foreach ($rawData['traitAliases'] as $traitAlias) {
+                $accessModifier = $this->parseAccessModifier($traitAlias, true);
+
+                $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_ALIASES, [
+                    'structural_element_id' => $seId,
+                    'access_modifier_id'    => $accessModifierMap[$accessModifier],
+                    'name'                  => $traitAlias['name'],
+                    'alias'                 => $traitAlias['alias']
+                ]);
+            }
+        }
+
+        if (isset($rawData['traitPrecedences'])) {
+            foreach ($rawData['traitPrecedences'] as $traitPrecedence) {
+                $traitSeId = $this->storage->getStructuralElementId($traitPrecedence['trait']);
+
+                if ($traitSeId) {
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_PRECEDENCES, [
+                        'structural_element_id'       => $seId,
+                        'trait_structural_element_id' => $traitSeId,
+                        'name'                        => $traitPrecedence['name']
+                    ]);
+                } else {
+                    $this->logMessage(
+                        '  - WARNING: Could not find a record for the trait ' .
+                        $trait . ' of FQSEN ' . $fqsen
+                    );
+                }
+            }
+        }
 
         foreach ($rawData['properties'] as $property) {
             $accessModifier = $this->parseAccessModifier($property);
@@ -965,12 +997,13 @@ class Indexer
 
     /**
      * @param array $rawData
+     * @param bool  $returnNull
      *
      * @return string
      *
      * @throws UnexpectedValueException
      */
-    protected function parseAccessModifier(array $rawData)
+    protected function parseAccessModifier(array $rawData, $returnNull = false)
     {
         if ($rawData['isPublic']) {
             return 'public';
@@ -978,6 +1011,8 @@ class Indexer
             return 'protected';
         } elseif ($rawData['isPrivate']) {
             return 'private';
+        } elseif ($returnNull) {
+            return null;
         }
 
         throw new UnexpectedValueException('Unknown access modifier returned!');
