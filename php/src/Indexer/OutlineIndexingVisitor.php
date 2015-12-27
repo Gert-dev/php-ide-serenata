@@ -144,10 +144,8 @@ class OutlineIndexingVisitor extends NameResolver
                 $traitName->toString();
         }
 
-        /** @var Node\Stmt\TraitUseAdaptation $adaptation */
         foreach ($node->adaptations as $adaptation) {
             if ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Alias) {
-                /** @var Node\Stmt\TraitUseAdaptation\Alias $adaptation */
                 $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['traitAliases'][] = [
                     'name'                       => $adaptation->method,
                     'alias'                      => $adaptation->newName,
@@ -158,7 +156,6 @@ class OutlineIndexingVisitor extends NameResolver
                     'isInheritingAccessModifier' => ($adaptation->newModifier === null)
                 ];
             } elseif ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Precedence) {
-                /** @var Node\Stmt\TraitUseAdaptation\Precedence $adaptation */
                 $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['traitPrecedences'][] = [
                     'name'  => $adaptation->method,
                     'trait' => $adaptation->trait->toString()
