@@ -302,6 +302,8 @@ class Indexer
     protected function indexFileOutlines(array $filePaths)
     {
         foreach ($filePaths as $filePath) {
+            echo $this->logMessage('  - Indexing ' . $filePath);
+
             $this->indexFileOutline($filePath);
         }
     }
