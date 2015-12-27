@@ -117,7 +117,7 @@ CREATE TABLE structural_elements_traits_aliases(
     access_modifier_id          integer unsigned,
 
     name                        varchar(255) NOT NULL,
-    alias                       varchar(255) NOT NULL,
+    alias                       varchar(255),
 
     FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
         ON DELETE CASCADE

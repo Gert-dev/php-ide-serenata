@@ -129,7 +129,7 @@ class IndexDataAdapter
                     $alias = $traitAliases[$constant['name']];
 
                     if ($alias['trait_fqsen'] === null || $alias['trait_fqsen'] === $trait['name']) {
-                        $constant['name']        = $alias['alias'];
+                        $constant['name']        = $alias['alias'] ?: $constant['name'];
                         $constant['isPublic']    = ($alias['access_modifier'] === 'public');
                         $constant['isProtected'] = ($alias['access_modifier'] === 'protected');
                         $constant['isPrivate']   = ($alias['access_modifier'] === 'private');
@@ -165,7 +165,7 @@ class IndexDataAdapter
                     $alias = $traitAliases[$property['name']];
 
                     if ($alias['trait_fqsen'] === null || $alias['trait_fqsen'] === $trait['name']) {
-                        $property['name']        = $alias['alias'];
+                        $property['name']        = $alias['alias'] ?: $property['name'];
                         $property['isPublic']    = ($alias['access_modifier'] === 'public');
                         $property['isProtected'] = ($alias['access_modifier'] === 'protected');
                         $property['isPrivate']   = ($alias['access_modifier'] === 'private');
@@ -217,7 +217,7 @@ class IndexDataAdapter
                     $alias = $traitAliases[$method['name']];
 
                     if ($alias['trait_fqsen'] === null || $alias['trait_fqsen'] === $trait['name']) {
-                        $method['name']        = $alias['alias'];
+                        $method['name']        = $alias['alias'] ?: $method['name'];
                         $method['isPublic']    = ($alias['access_modifier'] === 'public');
                         $method['isProtected'] = ($alias['access_modifier'] === 'protected');
                         $method['isPrivate']   = ($alias['access_modifier'] === 'private');
