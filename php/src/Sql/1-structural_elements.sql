@@ -175,6 +175,13 @@ CREATE TABLE functions(
     is_static             tinyint(1),
     has_docblock          tinyint(1) NOT NULL DEFAULT 0,
 
+    -- Holds data that is added to link tables in a serialized format. This allows very fast access
+    -- to them without having to perform JOINs or queries inside a loop. This can save half a second
+    -- on a large class info fetch that normally takes about 750 milliseconds, which can make all
+    -- the difference in snappiness when requesting autocompletion.
+    throws_serialized     text,
+    parameters_serialized text,
+
     FOREIGN KEY(file_id) REFERENCES files(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,

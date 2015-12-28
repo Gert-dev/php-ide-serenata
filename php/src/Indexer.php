@@ -368,6 +368,8 @@ class Indexer
                     'return_description'    => null
                 ]);
 
+                $parameters = [];
+
                 foreach ($function->getParameters() as $parameter) {
                     $isVariadic = false;
 
@@ -384,7 +386,7 @@ class Indexer
                         $type = $function->getType();
                     }
 
-                    $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
+                    $parameterData = [
                         'function_id'  => $functionId,
                         'name'         => $parameter->getName(),
                         'type'         => $type,
@@ -392,8 +394,17 @@ class Indexer
                         'is_reference' => $parameter->isPassedByReference() ? 1 : 0,
                         'is_optional'  => $parameter->isOptional() ? 1 : 0,
                         'is_variadic'  => $isVariadic ? 1 : 0
-                    ]);
+                    ];
+
+                    $parameters[] = $parameterData;
+
+                    $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameterData);
                 }
+
+                $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
+                    'throws_serialized'     => null,
+                    'parameters_serialized' => serialize($parameters)
+                ]);
             }
         }
     }
@@ -986,12 +997,14 @@ class Indexer
             'is_static'             => isset($rawData['isStatic']) ? ($rawData['isStatic'] ? 1 : 0) : 0
         ]);
 
+        $parameters = [];
+
         foreach ($rawData['parameters'] as $parameter) {
             $parameterKey = '$' . $parameter['name'];
             $parameterDoc = isset($documentation['params'][$parameterKey]) ?
                 $documentation['params'][$parameterKey] : null;
 
-            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, [
+            $parameterData = [
                 'function_id'  => $functionId,
                 'name'         => $parameter['name'],
                 'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
@@ -999,16 +1012,31 @@ class Indexer
                 'is_reference' => $parameter['isReference'] ? 1 : 0,
                 'is_optional'  => $parameter['isOptional'] ? 1 : 0,
                 'is_variadic'  => $parameter['isVariadic'] ? 1 : 0
-            ]);
+            ];
+
+            $parameters[] = $parameterData;
+
+            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameterData);
         }
 
+        $throws = [];
+
         foreach ($documentation['throws'] as $type => $description) {
-            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, [
+            $throwsData = [
                 'function_id' => $functionId,
                 'type'        => $type,
                 'description' => $description ?: null
-            ]);
+            ];
+
+            $throws[] = $throwsData;
+
+            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, $throwsData);
         }
+
+        $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
+            'throws_serialized'     => serialize($throws),
+            'parameters_serialized' => serialize($parameters)
+        ]);
     }
 
     /**

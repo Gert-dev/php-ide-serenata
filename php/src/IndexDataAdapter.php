@@ -451,7 +451,7 @@ class IndexDataAdapter
      */
     public function getFunctionInfo(array $rawInfo)
     {
-        $rawParameters = $this->storage->getFunctionParameters($rawInfo['id']);
+        $rawParameters = unserialize($rawInfo['parameters_serialized']);
 
         $parameters = [];
 
@@ -466,7 +466,7 @@ class IndexDataAdapter
             ];
         }
 
-        $throws = $this->storage->getFunctionThrows($rawInfo['id']);
+        $throws = unserialize($rawInfo['throws_serialized']);
 
         $throwsAssoc = [];
 
