@@ -562,9 +562,11 @@ class Indexer
         }
 
         $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
+        $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor($outlineIndexingVisitor);
+        $traverser->addVisitor($useStatementFetchingVisitor);
         $traverser->traverse($nodes);
 
         $fileId = $this->storage->getFileId($filename);
@@ -589,15 +591,21 @@ class Indexer
         $indexedSeIds = [];
 
         foreach ($outlineIndexingVisitor->getStructuralElements() as $fqsen => $structuralElement) {
-            $indexedSeIds[] = $this->indexStructuralElement($structuralElement, $fileId, $fqsen, false);
+            $indexedSeIds[] = $this->indexStructuralElement(
+                $structuralElement,
+                $fileId,
+                $fqsen,
+                false,
+                $useStatementFetchingVisitor
+            );
         }
 
         foreach ($outlineIndexingVisitor->getGlobalFunctions() as $function) {
-            $this->indexFunction($function, $fileId);
+            $this->indexFunction($function, $fileId, null, null, false, $useStatementFetchingVisitor);
         }
 
         foreach ($outlineIndexingVisitor->getGlobalConstants() as $constant) {
-            $this->indexConstant($constant, $fileId);
+            $this->indexConstant($constant, $fileId, null, $useStatementFetchingVisitor);
         }
 
         // Remove structural elements that are no longer in this file.
@@ -607,15 +615,21 @@ class Indexer
     /**
      * Indexes the specified structural element.
      *
-     * @param array   $rawData
-     * @param int     $fileId
-     * @param string  $fqsen
-     * @param boolean $isBuiltin
+     * @param array                                    $rawData
+     * @param int                                      $fileId
+     * @param string                                   $fqsen
+     * @param boolean                                  $isBuiltin
+     * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
      * @return int The ID of the structural element.
      */
-    protected function indexStructuralElement(array $rawData, $fileId, $fqsen, $isBuiltin)
-    {
+    protected function indexStructuralElement(
+        array $rawData,
+        $fileId,
+        $fqsen,
+        $isBuiltin,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+    ) {
         $structuralElementTypeMap = $this->getStructuralElementTypeMap();
 
         $documentation = $this->getDocParser()->parse($rawData['docComment'], [
@@ -760,17 +774,36 @@ class Indexer
         foreach ($rawData['properties'] as $property) {
             $accessModifier = $this->parseAccessModifier($property);
 
-            $this->indexProperty($property, $fileId, $seId, $accessModifierMap[$accessModifier], false);
+            $this->indexProperty(
+                $property,
+                $fileId,
+                $seId,
+                $accessModifierMap[$accessModifier],
+                false,
+                $useStatementFetchingVisitor
+            );
         }
 
         foreach ($rawData['methods'] as $method) {
             $accessModifier = $this->parseAccessModifier($method);
 
-            $this->indexFunction($method, $fileId, $seId, $accessModifierMap[$accessModifier], false);
+            $this->indexFunction(
+                $method,
+                $fileId,
+                $seId,
+                $accessModifierMap[$accessModifier],
+                false,
+                $useStatementFetchingVisitor
+            );
         }
 
         foreach ($rawData['constants'] as $constant) {
-            $this->indexConstant($constant, $fileId, $seId);
+            $this->indexConstant(
+                $constant,
+                $fileId,
+                $seId,
+                $useStatementFetchingVisitor
+            );
         }
 
         // Index magic properties.
@@ -783,14 +816,28 @@ class Indexer
         foreach ($magicProperties as $propertyName => $propertyData) {
             $data = $this->adaptMagicPropertyData($propertyName, $propertyData);
 
-            $this->indexProperty($data, $fileId, $seId, $accessModifierMap['public'], true);
+            $this->indexProperty(
+                $data,
+                $fileId,
+                $seId,
+                $accessModifierMap['public'],
+                true,
+                $useStatementFetchingVisitor
+            );
         }
 
         // Index magic methods.
         foreach ($documentation['methods'] as $methodName => $methodData) {
             $data = $this->adaptMagicMethodData($methodName, $methodData);
 
-            $this->indexFunction($data, $fileId, $seId, $accessModifierMap['public'], true);
+            $this->indexFunction(
+                $data,
+                $fileId,
+                $seId,
+                $accessModifierMap['public'],
+                true,
+                $useStatementFetchingVisitor
+            );
         }
 
         return $seId;
@@ -865,12 +912,17 @@ class Indexer
     /**
      * Indexes the specified constant.
      *
-     * @param array    $rawData
-     * @param int      $fileId
-     * @param int|null $seId
+     * @param array                                    $rawData
+     * @param int                                      $fileId
+     * @param int|null                                 $seId
+     * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
-    protected function indexConstant(array $rawData, $fileId, $seId = null)
-    {
+    protected function indexConstant(
+        array $rawData,
+        $fileId,
+        $seId = null,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+    ) {
         $documentation = $this->getDocParser()->parse($rawData['docComment'], [
             DocParser::VAR_TYPE,
             DocParser::DEPRECATED,
@@ -880,10 +932,8 @@ class Indexer
         $returnType = null;
 
         if ($documentation['var']['type']) {
-            $filename = $this->storage->getFilePathById($fileId);
-
             $returnType = $documentation['var']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $filename);
+            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
@@ -904,14 +954,21 @@ class Indexer
     /**
      * Indexes the specified property.
      *
-     * @param array $rawData
-     * @param int   $fileId
-     * @param int   $seId
-     * @param int   $amId
-     * @param bool  $isMagic
+     * @param array                                    $rawData
+     * @param int                                      $fileId
+     * @param int                                      $seId
+     * @param int                                      $amId
+     * @param bool                                     $isMagic
+     * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
-    protected function indexProperty(array $rawData, $fileId, $seId, $amId, $isMagic = false)
-    {
+    protected function indexProperty(
+        array $rawData,
+        $fileId,
+        $seId,
+        $amId,
+        $isMagic = false,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+    ) {
         $documentation = $this->getDocParser()->parse($rawData['docComment'], [
             DocParser::VAR_TYPE,
             DocParser::DEPRECATED,
@@ -929,10 +986,8 @@ class Indexer
         $returnType = null;
 
         if ($documentation['var']['type']) {
-            $filename = $this->storage->getFilePathById($fileId);
-
             $returnType = $documentation['var']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $filename);
+            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
@@ -955,14 +1010,21 @@ class Indexer
     /**
      * Indexes the specified function.
      *
-     * @param array    $rawData
-     * @param int      $fileId
-     * @param int|null $seId
-     * @param int|null $amId
-     * @param bool     $isMagic
+     * @param array                                    $rawData
+     * @param int                                      $fileId
+     * @param int|null                                 $seId
+     * @param int|null                                 $amId
+     * @param bool                                     $isMagic
+     * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
-    protected function indexFunction(array $rawData, $fileId, $seId = null, $amId = null, $isMagic = false)
-    {
+    protected function indexFunction(
+        array $rawData,
+        $fileId,
+        $seId = null,
+        $amId = null,
+        $isMagic = false,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+    ) {
         $documentation = $this->getDocParser()->parse($rawData['docComment'], [
             DocParser::THROWS,
             DocParser::PARAM_TYPE,
@@ -974,10 +1036,8 @@ class Indexer
         $returnType = $rawData['returnType'];
 
         if (!$returnType) {
-            $filename = $this->storage->getFilePathById($fileId);
-
             $returnType = $documentation['return']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $filename);
+            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
@@ -1110,13 +1170,15 @@ class Indexer
     /**
      * Resolves and determines the FQSEN of the specified return type.
      *
-     * @param string $returnType
-     * @param string $filename
+     * @param string                                   $returnType
+     * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
      * @return string|null
      */
-    protected function getFullReturnTypeForDocblockType($returnType, $filename)
-    {
+    protected function getFullReturnTypeForDocblockType(
+        $returnType,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+    ) {
         if (!isset($returnType) || empty($returnType)) {
             return null;
         }
@@ -1124,12 +1186,38 @@ class Indexer
         $soleClassName = $this->getSoleClassName($returnType);
 
         if (!empty($soleClassName)) {
-            if ($soleClassName[0] !== "\\") {
-                $parser = new FileParser($filename);
+            if ($soleClassName[0] !== "\\" && $useStatementFetchingVisitor) {
 
-                $completedClassName = $parser->getFullClassName($soleClassName, $useStatementFound);
+                $soleClassNameParts = explode('\\', $soleClassName);
 
-                return $completedClassName;
+                foreach ($useStatementFetchingVisitor->getUseStatements() as $use) {
+                    if ($use['alias'] === $soleClassNameParts[0]) {
+                        array_shift($soleClassNameParts);
+
+                        $fullName = $use['fqsen'];
+
+                        if (!empty($soleClassNameParts)) {
+                            /*
+                             * This block is only executed when relative names are used with more than one part, i.e.:
+                             *   use A\B\C;
+                             *
+                             *   C\D::foo();
+                             *
+                             * 'C' will be dropped from 'C\D', and the remaining 'D' will be appended to 'A\B\C',
+                             * becoming 'A\B\C\D'.
+                             */
+                            $fullName .= '\\' . implode('\\', $soleClassNameParts);
+                        }
+
+                        return $fullName;
+                    }
+                }
+
+                // Still here? There must be no explicit use statement, default to the current namespace.
+                $fullName = $useStatementFetchingVisitor->getNamespace() ?: '';
+                $fullName .= '\\' . $soleClassName;
+
+                return $fullName;
             }
 
             return $soleClassName;

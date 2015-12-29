@@ -145,22 +145,6 @@ class IndexDatabase implements
     /**
      * {@inheritDoc}
      */
-    public function getFilePathById($id)
-    {
-        $result = $this->getConnection()->createQueryBuilder()
-            ->select('path')
-            ->from(IndexStorageItemEnum::FILES)
-            ->where('id = ?')
-            ->setParameter(0, $id)
-            ->execute()
-            ->fetchColumn();
-
-        return $result ? $result : null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getFileId($path)
     {
         $result = $this->getConnection()->createQueryBuilder()
