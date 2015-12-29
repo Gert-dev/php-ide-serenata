@@ -1131,7 +1131,7 @@ class Indexer
      */
     protected function isClassType($type)
     {
-        return ucfirst($type) === $type;
+        return ucfirst($type) === $type && $type !== '$this';
     }
 
     /**
