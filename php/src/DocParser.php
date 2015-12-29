@@ -23,7 +23,7 @@ class DocParser
     const INHERITDOC      = '{@inheritDoc}';
 
     const TYPE_SPLITTER   = '|';
-    const TAG_START_REGEX = '/^\s*\*\s*\@[^@]+$/';
+    const TAG_START_REGEX = '/^\s*(?:\/\*)?\*\s+\@[^@]+(\n|\*\/)$/';
 
     /**
      * Parse the comment string to get its elements.
@@ -48,7 +48,7 @@ class DocParser
         $docblock = is_string($docblock) ? $docblock : null;
 
         if ($docblock) {
-            preg_match_all('/\*\s+(@[a-z-]+)([^@]*)\n/', $docblock, $matches, PREG_SET_ORDER);
+            preg_match_all('/\*\s+(@[a-z-]+)([^@]*)(?:\n|\*\/)/', $docblock, $matches, PREG_SET_ORDER);
 
             foreach ($matches as $match) {
                 if (!isset($tags[$match[1]])) {
@@ -207,13 +207,21 @@ class DocParser
         if (isset($tags[static::VAR_TYPE])) {
             list($varType, $varName, $varDescription) = $this->filterParameterTag($tags[static::VAR_TYPE][0], 3);
 
-            // @var contains the name of the property it documents, it must match the property we're fetching
-            // documentation about.
-            if ($varName && mb_substr($varName, 1) == $itemName) {
-                $type = $varType;
-                $description = $varDescription;
+            if ($varName) {
+                if (mb_substr($varName, 0, 1) === '$') {
+                    // Example: "@var DateTime $foo My description". The tag includes the name of the property it
+                    // documents, it must match the property we're fetching documentation about.
+                    if (mb_substr($varName, 1) === $itemName) {
+                        $type = $varType;
+                        $description = $varDescription;
+                    }
+                } else {
+                    // Example: "@var DateTime My description".
+                    $type = $varType;
+                    $description = trim($varName . ' ' . $varDescription);
+                }
             } else if (!$varName && !$varDescription) {
-                // Support the alternative short-hand syntax with only a type: "@var DateTime".
+                // Example: "@var DateTime".
                 $type = $varType;
             }
         }
