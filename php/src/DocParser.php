@@ -26,7 +26,7 @@ class DocParser
     const TAG_START_REGEX = '/^\s*\*\s*\@[^@]+$/';
 
     /**
-     * Parse the comment string to get its elements
+     * Parse the comment string to get its elements.
      *
      * @param string|false|null $docblock The docblock to parse. If null, the return array will be filled up with the
      *                                    correct keys, but they will be empty.
