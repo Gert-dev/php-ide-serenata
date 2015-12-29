@@ -26,37 +26,6 @@ class DocParser
     const TAG_START_REGEX = '/^\s*\*\s*\@[^@]+$/';
 
     /**
-     * Get data for the given class
-     * @param  string|null $className Full class namespace, required for methods and properties
-     * @param  string      $type      Type searched (method, property)
-     * @param  string      $name      Name of the method or property
-     * @param  array       $filters   Fields to get
-     * @return array
-     */
-    public function get($className, $type, $name, $filters)
-    {
-        switch($type) {
-            case 'function':
-                $reflection = new \ReflectionFunction($name);
-                break;
-
-            case 'method':
-                $reflection = new \ReflectionMethod($className, $name);
-                break;
-
-            case 'property':
-                $reflection = new \ReflectionProperty($className, $name);
-                break;
-
-            default:
-                throw new \Exception(sprintf('Unknown type %s', $type));
-        }
-
-        $comment = $reflection->getDocComment();
-        return $this->parse($comment, $filters, $name);
-    }
-
-    /**
      * Parse the comment string to get its elements
      *
      * @param string|false|null $docblock The docblock to parse. If null, the return array will be filled up with the
