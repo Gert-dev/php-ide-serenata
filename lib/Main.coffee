@@ -1,5 +1,6 @@
 {Disposable} = require 'atom'
 
+fs = require 'fs'
 $ = require 'jquery'
 
 Utility          = require './Utility'
@@ -31,6 +32,11 @@ module.exports =
      * The configuration object.
     ###
     configuration: null
+
+    ###*
+     * The proxy object.
+    ###
+    proxy: null
 
     ###*
      * The exposed service.
@@ -69,6 +75,15 @@ module.exports =
     ###
     registerCommands: () ->
         atom.commands.add 'atom-workspace', "php-integrator-base:indexProject": =>
+            return @performIndex()
+
+        atom.commands.add 'atom-workspace', "php-integrator-base:forceIndexProject": =>
+            try
+                fs.unlinkSync(@proxy.getIndexDatabasePath())
+
+            catch error
+                # If the file doesn't exist, just bail out.
+
             return @performIndex()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
@@ -145,11 +160,11 @@ module.exports =
         # return unless @testConfig()
         @testConfig()
 
-        proxy = new CachingProxy(@configuration)
+        @proxy = new CachingProxy(@configuration)
 
-        parser = new CachingParser(proxy)
+        parser = new CachingParser(@proxy)
 
-        @service = new Service(proxy, parser)
+        @service = new Service(@proxy, parser)
 
         @registerCommands()
         @registerConfigListeners()

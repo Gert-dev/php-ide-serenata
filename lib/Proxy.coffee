@@ -34,7 +34,7 @@ class Proxy
         parameters = [
             '-d memory_limit=-1',
             Utility.escapePath(__dirname + "/../php/src/Main.php"),
-            Utility.escapePath(@config.get('packagePath') + '/indexes/' + @getIndexDatabaseName() + '.sqlite')
+            Utility.escapePath(@getIndexDatabasePath())
         ]
 
         for a in args
@@ -153,7 +153,7 @@ class Proxy
         return @performRequest(['--reindex', filename], true)
 
     ###*
-     * Retrieves the name of the database to use.
+     * Retrieves the name of the database file to use.
      *
      * @return {string}
     ###
@@ -164,3 +164,13 @@ class Proxy
             pathStrings += project.path
 
         return md5(pathStrings)
+
+    ###*
+     * Retrieves the full path to the database file to use.
+     *
+     * @return {string}
+    ###
+    getIndexDatabasePath: () ->
+        id = @getIndexDatabaseName()
+
+        return @config.get('packagePath') + '/indexes/' + id + '.sqlite'

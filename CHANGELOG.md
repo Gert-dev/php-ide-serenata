@@ -23,7 +23,8 @@ class Foo
 ```
 
 * When testing your configuration, the error message will now try to determine if the problem is with PHP or Composer instead of mentioning "PHP or Composer" in the error message (thanks to @wcatron).
-* There is now a command available in the command palette to forcibly reindex your project (thanks to @wcatron).
+* There is now a command available in the command palette to reindex your project (thanks to @wcatron).
+* Similarly, there is now also a command available to forcibly reindex the project (i.e. remove the entire database first).
 
 ### Bugs fixed
 * Methods returning `static` were not properly resolving to the current class if they were not overridden (they were resolving to the closest parent class that defined them).
