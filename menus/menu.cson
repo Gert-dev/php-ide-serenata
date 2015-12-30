@@ -1,0 +1,14 @@
+'menu': [
+    {
+        'label': 'Packages'
+        'submenu': [
+            {
+                'label': 'PHP Integrator',
+                'submenu': [
+                    {'label': '(Re)index Project', 'command': 'php-integrator-base:indexProject'},
+                    {'label': 'Forcibly (Re)index Project', 'command': 'php-integrator-base:forceIndexProject'}
+                ]
+            }
+        ]
+    }
+]
