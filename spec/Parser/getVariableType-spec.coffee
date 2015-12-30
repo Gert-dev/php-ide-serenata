@@ -260,7 +260,7 @@ describe "getVariableType", ->
             """
             <?php
 
-            function foo(EXPECTED\\TYPE_1 $test1 = null, EXPECTED\\TYPE_2 $test2)
+            function foo(EXPECTED\\TYPE_1 $test1 = null, EXPECTED\\TYPE_2 ...$test2)
             {
                 //
             }
