@@ -64,20 +64,6 @@ interface ProviderInterface
     public function getStructuralElementTraitPrecedencesAssoc($id);
 
     /**
-     * @param int $functionId
-     *
-     * @return \Traversable
-     */
-    public function getFunctionParameters($functionId);
-
-    /**
-     * @param int $functionId
-     *
-     * @return \Traversable
-     */
-    public function getFunctionThrows($functionId);
-
-    /**
      * Retrieves a list of parent FQSEN's for the specified structural element.
      *
      * @param int $seId

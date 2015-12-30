@@ -114,17 +114,19 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function getFunctionParameters($functionId)
+    public function getStructuralElementTraitAliasesAssoc($id)
     {
-        return $this->proxiedObject->getFunctionParameters($functionId);
+        // return $this->proxiedObject->getStructuralElementTraitAliasesAssoc($id);
+        return [];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getFunctionThrows($functionId)
+    public function getStructuralElementTraitPrecedencesAssoc($id)
     {
-        return new ArrayIterator([]);
+        // return $this->proxiedObject->getStructuralElementTraitPrecedencesAssoc($id);
+        return [];
     }
 
     /**
