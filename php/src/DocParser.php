@@ -23,7 +23,7 @@ class DocParser
     const INHERITDOC      = '{@inheritDoc}';
 
     const TYPE_SPLITTER   = '|';
-    const TAG_START_REGEX = '/^\s*(?:\/\*)?\*\s+\@[^@]+(\n|\*\/)$/';
+    const TAG_START_REGEX = '/^\s*(?:\/\*)?\*\s+\@[^@]+(?:\*\/)?$/';
 
     /**
      * Parse the comment string to get its elements.
