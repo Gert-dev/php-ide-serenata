@@ -66,6 +66,20 @@ class StatusBarManager
         @labelElement.className = ''
 
     ###*
+     * Sets the progress value for the progress bar (between 0 and 100).
+     *
+     * @param {int|null} progress The progress (between 0 and 100) or null for an indeterminate status.
+    ###
+    setProgress: (progress) ->
+        if progress != null
+            @progressBar.value = Math.max(Math.min(progress, 100), 0)
+            @progressBar.max = 100
+
+        else
+            @progressBar.removeAttribute('value')
+            @progressBar.removeAttribute('max')
+
+    ###*
      * Shows the element.
     ###
     show: ->

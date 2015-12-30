@@ -113,6 +113,7 @@ module.exports =
 
         if @statusBarManager and fileName is null
             @statusBarManager.setLabel("Indexing...")
+            @statusBarManager.setProgress(null)
             @statusBarManager.show()
 
         successHandler = () =>
@@ -127,7 +128,13 @@ module.exports =
             if @statusBarManager
                 @statusBarManager.showMessage("Indexing failed!", "highlight-error")
 
-        @service.reindex(fileName).then(successHandler, failureHandler)
+        progressHandler = (progress) =>
+            progress = parseFloat(progress)
+
+            @statusBarManager.setProgress(progress)
+            @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
+
+        @service.reindex(fileName, progressHandler).then(successHandler, failureHandler)
 
     ###*
      * Attaches items to the status bar.

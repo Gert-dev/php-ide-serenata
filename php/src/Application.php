@@ -199,15 +199,22 @@ class Application
         }
 
         $showOutput = false;
+        $streamProgress = false;
         $path = array_shift($arguments);
 
         if (!empty($arguments)) {
-            if (array_shift($arguments) === '--show-output') {
+            $extraArg = array_shift($arguments);
+
+            if ($extraArg === '--show-output') {
                 $showOutput = true;
+            } elseif ($extraArg === '--stream-progress') {
+                $streamProgress = true;
+            } else {
+                throw new UnexpectedValueException('Unknown extra argument passed.');
             }
         }
 
-        $indexer = new Indexer($this->indexDatabase, $showOutput);
+        $indexer = new Indexer($this->indexDatabase, $showOutput, $streamProgress);
 
         $hasIndexedBuiltin = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('id', 'value')

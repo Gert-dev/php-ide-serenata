@@ -71,15 +71,24 @@ class Indexer
     protected $showOutput;
 
     /**
+     * Whether to stream progress.
+     *
+     * @var bool
+     */
+    protected $streamProgress;
+
+    /**
      * Constructor.
      *
      * @param Indexer\StorageInterface $storage
      * @param bool                     $showOutput
+     * @param bool                     $streamProgress
      */
-    public function __construct(Indexer\StorageInterface $storage, $showOutput = false)
+    public function __construct(Indexer\StorageInterface $storage, $showOutput = false, $streamProgress = false)
     {
         $this->storage = $storage;
         $this->showOutput = $showOutput;
+        $this->streamProgress = $streamProgress;
     }
 
     /**
@@ -94,6 +103,27 @@ class Indexer
         }
 
         echo $message . PHP_EOL;
+    }
+
+    /**
+     * Logs progress for streaming progress.
+     *
+     * @param int $itemNumber
+     * @param int $totalItemCount
+     */
+    protected function sendProgress($itemNumber, $totalItemCount)
+    {
+        if (!$this->streamProgress) {
+            return;
+        }
+
+        if ($totalItemCount) {
+            $progress = ($itemNumber / $totalItemCount) * 100;
+        } else {
+            $progress = 100;
+        }
+
+        file_put_contents('php://stderr', $progress . PHP_EOL);
     }
 
     /**
@@ -127,7 +157,18 @@ class Indexer
         }
 
         $this->logMessage('Indexing outline...');
-        $this->indexFileOutlines($files);
+
+        $totalItems = count($files);
+
+        $this->sendProgress(0, $totalItems);
+
+        foreach ($files as $i => $filePath) {
+            echo $this->logMessage('  - Indexing ' . $filePath);
+
+            $this->indexFileOutline($filePath);
+
+            $this->sendProgress($i+1, $totalItems);
+        }
     }
 
     /**
@@ -291,20 +332,6 @@ class Indexer
                     $this->storage->deleteFile($id);
                 }
             }
-        }
-    }
-
-    /**
-     * Indexes the outline of the specified files.
-     *
-     * @param array $filePaths
-     */
-    protected function indexFileOutlines(array $filePaths)
-    {
-        foreach ($filePaths as $filePath) {
-            echo $this->logMessage('  - Indexing ' . $filePath);
-
-            $this->indexFileOutline($filePath);
         }
     }
 

@@ -90,12 +90,13 @@ class Service
      * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
      * projects!). This method is asynchronous and will return immediately.
      *
-     * @param {string} filename The full path to the file to refresh.
+     * @param {string}   filename               The full path to the file to refresh.
+     * @param {Callback} progressStreamCallback A method to invoke each time progress streaming data is received.
      *
      * @return {Promise}
     ###
-    reindex: (filename) ->
-        @proxy.reindex(filename)
+    reindex: (filename, progressStreamCallback) ->
+        @proxy.reindex(filename, progressStreamCallback)
 
     ###*
      * Gets the correct selector for the class or namespace that is part of the specified event.

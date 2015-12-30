@@ -23,14 +23,13 @@ class Proxy
     constructor: (@config) ->
 
     ###*
-     * Performs a request to the PHP side.
+     * Prepares parameters for execution by escaping them.
      *
-     * @param {array}    args      The arguments to pass.
-     * @param {boolean}  async     Whether to execute the method asynchronously or not.
+     * @param {array} parameters
      *
-     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
+     * @return {array}
     ###
-    performRequest: (args, async) ->
+    prepareParameters: (args) ->
         parameters = [
             '-d memory_limit=-1',
             Utility.escapePath(__dirname + "/../php/src/Main.php"),
@@ -40,57 +39,102 @@ class Proxy
         for a in args
             parameters.push(Utility.escapeSeparators(a))
 
-        if not async
-            try
-                response = child_process.spawnSync(@config.get('phpCommand'), parameters)
+        return parameters
 
-                if response.error
-                    throw response.error
+    ###*
+     * Performs a synchronous request to the PHP side.
+     *
+     * @param {string} command    The command to execute.
+     * @param {array}  parameters The arguments to pass.
+     *
+     * @return {Object}
+    ###
+    performRequestSync: (command, parameters) ->
+        try
+            response = child_process.spawnSync(command, parameters)
 
-                response = JSON.parse(response.output[1].toString('ascii'))
+            if response.error
+                throw response.error
 
-                if not response or response.error?
-                    throw response.error
+            response = JSON.parse(response.output[1].toString('ascii'))
+
+            if not response or response.error?
+                throw response.error
+
+            if not response.success
+                throw "An unsuccessful status code was returned by the PHP side!"
+
+        catch error
+            throw (if error.message then error.message else error)
+
+        return response?.result
+
+
+    ###*
+     * Performs an asynchronous request to the PHP side.
+     *
+     * @param {string}   command        The command to execute.
+     * @param {array}    parameters     The arguments to pass.
+     * @param {Callback} streamCallback A method to invoke each time streaming data is received.
+     *
+     * @return {Promise}
+    ###
+    performRequestAsync: (command, parameters, streamCallback = null) ->
+        return new Promise (resolve, reject) =>
+            # We are already above the default of 200 kB for methods such as getGlobalFunctions.
+            options =
+                maxBuffer: 50000 * 1024
+
+            proc = child_process.exec(@config.get('phpCommand') + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
+                if not stdout or stdout.length == 0
+                    reject({message: "No output received from the PHP side!"})
+                    return
+
+                console.log("FINISHED WITH ", stdout)
+
+                try
+                    response = JSON.parse(stdout)
+
+                catch error
+                    #console.error(error)
+                    reject({message: error})
+                    return
+
+                if response?.error
+                    #console.error(message)
+                    message = response.error?.message
+                    reject({message: message})
+                    return
 
                 if not response.success
-                    throw "An unsuccessful status code was returned by the PHP side!"
+                    reject({message: 'An unsuccessful status code was returned by the PHP side!'})
+                    return
 
-            catch error
-                throw (if error.message then error.message else error)
+                resolve(response.result)
+            )
 
-            return response?.result
+            if streamCallback
+                proc.stderr.on 'data', (data) =>
+                    streamCallback(data)
+
+    ###*
+     * Performs a request to the PHP side.
+     *
+     * @param {array}    args           The arguments to pass.
+     * @param {boolean}  async          Whether to execute the method asynchronously or not.
+     * @param {Callback} streamCallback A method to invoke each time streaming data is received.
+     *
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
+    ###
+    performRequest: (args, async, streamCallback) ->
+        php = @config.get('phpCommand')
+        parameters = @prepareParameters(args)
+
+        if not async
+            return @performRequestSync(php, parameters)
 
         else
-            return new Promise (resolve, reject) =>
-                # We are already above the default of 200 kB for methods such as getGlobalFunctions.
-                options =
-                    maxBuffer: 50000 * 1024
-
-                child_process.exec(@config.get('phpCommand') + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
-                    if not stdout or stdout.length == 0
-                        reject({message: "No output received from the PHP side!"})
-                        return
-
-                    try
-                        response = JSON.parse(stdout)
-
-                    catch error
-                        #console.error(error)
-                        reject({message: error})
-                        return
-
-                    if response?.error
-                        #console.error(message)
-                        message = response.error?.message
-                        reject({message: message})
-                        return
-
-                    if not response.success
-                        reject({message: 'An unsuccessful status code was returned by the PHP side!'})
-                        return
-
-                    resolve(response.result)
-                )
+            return @performRequestAsync(php, parameters, streamCallback)
 
     ###*
      * Retrieves a list of available classes.
@@ -138,11 +182,12 @@ class Proxy
      * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
      * projects!). This method is asynchronous and will return immediately.
      *
-     * @param {string}  filename The full file path to the class to refresh.
+     * @param {string}   filename               The full file path to the class to refresh.
+     * @param {Callback} progressStreamCallback A method to invoke each time progress streaming data is received.
      *
      * @return {Promise}
     ###
-    reindex: (filename) ->
+    reindex: (filename, progressStreamCallback) ->
         if not filename
             filename = atom.project.getDirectories()[0]?.path
 
@@ -150,7 +195,15 @@ class Proxy
         filename = Utility.normalizeSeparators(filename)
         filename = Utility.escapePath(filename)
 
-        return @performRequest(['--reindex', filename], true)
+        progressStreamCallbackWrapper = (output) =>
+            # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
+            percentages = output.split("\n")
+            percentages.pop() # Ditch the empty value.
+
+            for percentage in percentages
+                progressStreamCallback(percentage)
+
+        return @performRequest(['--reindex', filename, '--stream-progress'], true, progressStreamCallbackWrapper)
 
     ###*
      * Retrieves the name of the database file to use.

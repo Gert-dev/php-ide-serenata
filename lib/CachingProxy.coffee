@@ -79,8 +79,8 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    reindex: (filename) ->
-        return super(filename).then (output) =>
+    reindex: (filename, progressStreamCallback) ->
+        return super(filename, progressStreamCallback).then (output) =>
             @clearCache()
 
             return output
