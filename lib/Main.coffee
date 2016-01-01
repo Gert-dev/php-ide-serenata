@@ -131,8 +131,9 @@ module.exports =
         progressHandler = (progress) =>
             progress = parseFloat(progress)
 
-            @statusBarManager.setProgress(progress)
-            @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
+            if not isNaN(progress)
+                @statusBarManager.setProgress(progress)
+                @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
         @service.reindex(fileName, progressHandler).then(successHandler, failureHandler)
 
