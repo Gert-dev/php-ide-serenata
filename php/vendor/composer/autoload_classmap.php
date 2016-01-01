@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'IndexingFailedException' => $baseDir . '/src/Indexer/IndexingFailedException.php',
     'PhpIntegrator\\Application' => $baseDir . '/src/Application.php',
     'PhpIntegrator\\DocParser' => $baseDir . '/src/DocParser.php',
     'PhpIntegrator\\IndexDataAdapter' => $baseDir . '/src/IndexDataAdapter.php',

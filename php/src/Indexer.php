@@ -165,7 +165,13 @@ class Indexer
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
 
-            $this->indexFileOutline($filePath);
+            try {
+                $this->indexFileOutline($filePath);
+            } catch (Error $e) {
+                $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
+                
+                throw new Indexer\IndexingFailedException($filePath);
+            }
 
             $this->sendProgress($i+1, $totalItems);
         }
@@ -576,17 +582,15 @@ class Indexer
      * used traits, etc.
      *
      * @param string $filename
+     *
+     * @throws PhpParser\Error When the file could not be parsed.
      */
     protected function indexFileOutline($filename)
     {
         $nodes = [];
         $parser = $this->getParser();
 
-        try {
-            $nodes = $parser->parse(file_get_contents($filename));
-        } catch (Error $e) {
-            $this->logMessage('  - WARNING: ' . $filename . ' could not be indexed due to parsing errors!');
-        }
+        $nodes = $parser->parse(file_get_contents($filename));
 
         $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
         $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();

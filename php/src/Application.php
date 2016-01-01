@@ -242,7 +242,11 @@ class Application
         if (is_dir($path)) {
             $indexer->indexDirectory($path);
         } else {
-            $indexer->indexFile($path);
+            try {
+                $indexer->indexFile($path);
+            } catch (Indexer\IndexingFailedException $e) {
+                throw new UnexpectedValueException('The file could not be indexed because it contains syntax errors!');
+            }
         }
 
         return $this->outputJson(true, null);
