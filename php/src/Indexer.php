@@ -169,8 +169,6 @@ class Indexer
                 $this->indexFileOutline($filePath);
             } catch (Error $e) {
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
-                
-                throw new Indexer\IndexingFailedException($filePath);
             }
 
             $this->sendProgress($i+1, $totalItems);
@@ -184,7 +182,11 @@ class Indexer
      */
     public function indexFile($filePath)
     {
-        $this->indexFileOutline($filePath);
+        try {
+            $this->indexFileOutline($filePath);
+        } catch (Error $e) {
+            throw new Indexer\IndexingFailedException($filePath);
+        }
     }
 
     /**
