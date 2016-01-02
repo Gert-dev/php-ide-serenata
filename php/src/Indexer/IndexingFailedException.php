@@ -1,5 +1,7 @@
 <?php
 
+namespace PhpIntegrator\Indexer;
+
 use RuntimeException;
 
 /**

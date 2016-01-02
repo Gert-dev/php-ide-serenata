@@ -6,7 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'IndexingFailedException' => $baseDir . '/src/Indexer/IndexingFailedException.php',
     'PhpIntegrator\\Application' => $baseDir . '/src/Application.php',
     'PhpIntegrator\\DocParser' => $baseDir . '/src/DocParser.php',
     'PhpIntegrator\\IndexDataAdapter' => $baseDir . '/src/IndexDataAdapter.php',
@@ -16,6 +15,7 @@ return array(
     'PhpIntegrator\\IndexStorageItemEnum' => $baseDir . '/src/IndexStorageItemEnum.php',
     'PhpIntegrator\\Indexer' => $baseDir . '/src/Indexer.php',
     'PhpIntegrator\\Indexer\\DependencyFetchingVisitor' => $baseDir . '/src/Indexer/DependencyFetchingVisitor.php',
+    'PhpIntegrator\\Indexer\\IndexingFailedException' => $baseDir . '/src/Indexer/IndexingFailedException.php',
     'PhpIntegrator\\Indexer\\OutlineIndexingVisitor' => $baseDir . '/src/Indexer/OutlineIndexingVisitor.php',
     'PhpIntegrator\\Indexer\\StorageInterface' => $baseDir . '/src/Indexer/StorageInterface.php',
     'PhpIntegrator\\Indexer\\UseStatementFetchingVisitor' => $baseDir . '/src/Indexer/UseStatementFetchingVisitor.php',
