@@ -36,7 +36,7 @@ class Foo
 ### Changes for developers
 * Changes to the service
   * Constants and class properties will now retrieve their start line as well. These items not being available was previously manually worked around in the php-integrator-navigation package. This manual workaround is now present in the base package as CoffeeScript should not have to bend itself backwars to get this information because PHP Reflection does not offer it.
-  * declaringStructure will now also contain a startLineMember property that indicates the start line of the member in the structural element.
+  * `declaringStructure` will now also contain a `startLineMember` property that indicates the start line of the member in the structural element.
   * Retrieving types for the list of local variables has been disabled for now as the performance impact is too large in longer functions. It may be reactivated in a future release.
   * Constructor information is no longer retrieved when fetching the class list as the performance hit is too large. In fact, this was also the case before the new indexer, but then a cache file was used, which was never properly updated with new classes and was the result of the very long indexing process at start-up.
   * `deprecated` was renamed to `isDeprecated` for consistency.
