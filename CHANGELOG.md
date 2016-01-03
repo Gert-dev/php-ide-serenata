@@ -29,6 +29,7 @@ class Foo
 * Similarly, there is now also a command available to forcibly reindex the project (i.e. remove the entire database first).
 
 ### Bugs fixed
+* A progress bar will no longer be shown for windows opened without a project.
 * Methods returning `static` were not properly resolving to the current class if they were not overridden (they were resolving to the closest parent class that defined them).
 * Project and file paths that contain spaces should no longer pose a problem (thanks to @wcatron).
 
