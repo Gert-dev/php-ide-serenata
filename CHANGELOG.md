@@ -48,7 +48,7 @@ class Foo
 
 ## 0.3.1
 ### Bugs Fixed
-* Fixed methods returning 'static', 'self' or '$this' not properly having their full type deduced.
+* Fixed methods returning `static`, `self` or `$this` not properly having their full type deduced.
 * Fixed inline type override annotations not being able to contain descriptions (e.g. `/** @var Class $foo Some description. */`).
 
 ## 0.3.0
