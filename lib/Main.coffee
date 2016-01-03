@@ -147,7 +147,6 @@ module.exports =
             @statusBarManager = new StatusBarManager()
             @statusBarManager.initialize(statusBarService)
             @statusBarManager.setLabel("Indexing...")
-            # @statusBarManager.hide()
 
     ###*
      * Detaches existing items from the status bar.
@@ -214,6 +213,12 @@ module.exports =
     ###
     setStatusBarService: (service) ->
         @attachStatusBarItems(service)
+
+        # This method is usually invoked after the indexing has already started, hence we can't unconditionally hide it
+        # here or it will never be made visible again. However, we also don't want it to be visible for new Atom windows
+        # that don't contain a project.
+        if atom.project.getDirectories().length == 0
+            @statusBarManager.hide()
 
         return new Disposable => @detachStatusBarItems()
 
