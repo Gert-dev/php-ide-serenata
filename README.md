@@ -24,6 +24,8 @@ Currently the following is required in order to get the package up and running:
     * You can also use inline comment-style type hints to override automatically deduced types or specify the type if the type can't be deduced automatically with...
       * ... IntellJ-style variable annotations `/** @var MyType $var */` as well as `/** @var $var MyType */`.
 
+Note that folders that aren't readable (no permission) will be silently ignored!
+
 Things such as type hints will also be checked. Some features may or may not work outside these restrictions. **Don't forget to open the settings page after installing to set up the package!**
 
 ## I'm a package developer - How do I use this?

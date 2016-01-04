@@ -225,8 +225,14 @@ class Indexer
             FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
         );
 
+        $iterator = new RecursiveIteratorIterator(
+            $dirIterator,
+            RecursiveIteratorIterator::LEAVES_ONLY,
+            RecursiveIteratorIterator::CATCH_GET_CHILD
+        );
+
         /** @var \DirectoryIterator $fileInfo */
-        foreach ((new RecursiveIteratorIterator($dirIterator)) as $filename => $fileInfo) {
+        foreach ($iterator as $filename => $fileInfo) {
             if ($fileInfo->getExtension() !== 'php') {
                 continue;
             }
