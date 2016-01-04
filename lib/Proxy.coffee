@@ -90,8 +90,6 @@ class Proxy
                     reject({message: "No output received from the PHP side!"})
                     return
 
-                console.log("FINISHED WITH ", stdout)
-
                 try
                     response = JSON.parse(stdout)
 
