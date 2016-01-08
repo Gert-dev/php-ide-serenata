@@ -34,4 +34,4 @@ module.exports =
     escapePath: (text) ->
       return '' if not text
 
-      return text.replace(' ', '\\ ')
+      return text.replace(/\ /g, '\\ ')
