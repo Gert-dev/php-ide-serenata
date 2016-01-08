@@ -32,12 +32,15 @@ class Proxy
     prepareParameters: (args) ->
         parameters = [
             '-d memory_limit=-1',
-            Utility.escapePath(__dirname + "/../php/src/Main.php"),
-            Utility.escapePath(@getIndexDatabasePath())
+            Utility.escapeSpaces(__dirname + "/../php/src/Main.php"),
+            Utility.escapeSpaces(@getIndexDatabasePath())
         ]
 
         for a in args
-            parameters.push(Utility.escapeSeparators(a))
+            a = Utility.escapeSeparators(a)
+            a = Utility.escapeSpaces(a)
+
+            parameters.push(a)
 
         return parameters
 
@@ -191,7 +194,6 @@ class Proxy
 
         # For Windows - Replace \ in class namespace to / because composer use / instead of \.
         filename = Utility.normalizeSeparators(filename)
-        filename = Utility.escapePath(filename)
 
         progressStreamCallbackWrapper = (output) =>
             # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.

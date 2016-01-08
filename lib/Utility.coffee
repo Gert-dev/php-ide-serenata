@@ -31,7 +31,7 @@ module.exports =
      *
      * @return {string}
     ###
-    escapePath: (text) ->
+    escapeSpaces: (text) ->
       return '' if not text
 
       return text.replace(/\ /g, '\\ ')
