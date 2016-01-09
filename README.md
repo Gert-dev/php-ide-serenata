@@ -15,16 +15,15 @@ improvements as well as separation of the various components into separate packa
 Currently the following is required in order to get the package up and running:
   * **PHP** - To run this package properly, you need at least PHP 5.4. The code you're actually writing can be anything ranging from PHP 5.2 up to (and including) PHP 7.0.
   * **PSR-compliant code** - Write code that follows the PSR standards, especially regarding namespacing.
-  * **Docblocks** - You must write proper docblocks that follow the draft PSR-5 standard (mostly inspired by phpDocumentor's implementation):
-    * `@var` statements for properties.
-    * `@param` statements for functions and methods.
-    * `@return` statements for functions and methods.
-    * You can also use inline comment-style type hints to override automatically deduced types or specify the type if the type can't be deduced automatically with...
-      * ... IntellJ-style variable annotations `/** @var MyType $var */` as well as `/** @var $var MyType */`.
+  * **Documentation** and **type hinting** - Write proper docblocks that follow the draft PSR-5 standard (inspired by phpDocumentor's implementation) or use type hinting as much as possible:
+    * Docblocks with a `@var` tag for properties.
+    * Docblocks with `@param` tags for functions and methods. Parameter type hints will also work.
+    * Docblocks with a `@return` tag for functions and methods. Return types in PHP 7 will also work.
+    * IntellJ-style variable annotations `/** @var MyType $var */` as well as `/** @var $var MyType */` to override automatically deduced types or specify types in cases where it can't be automtically deduced.
 
 Note that folders that aren't readable (no permission) will be silently ignored!
 
-Things such as type hints will also be checked. Some features may or may not work outside these restrictions. **Don't forget to open the settings page after installing to set up the package!**
+Some features may or may not work outside these restrictions. **Don't forget to open the settings page after installing to set up the package!**
 
 ## I'm a package developer - How do I use this?
 You can very easily start using the service by simply consuming the service in your package (see also the `package.json` and `Main.coffee` files of the packages listed above for an example). The service is a single exposed class, which is located in the [Service.coffee](https://github.com/Gert-dev/php-integrator-base/blob/master/lib/Service.coffee) file, along with docblocks explaining what they do and what they accept as parameters..
