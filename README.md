@@ -12,8 +12,6 @@ The source code was originally based on the php-autocomplete-plus code base and 
 improvements as well as separation of the various components into separate packages.
 
 ## What do I need to do to make it work?
-**NOTE: This already pertains to upcoming version 0.4.0 with the new indexer. If you are using the stable version installed via Atom, you will probably still be using the older version (unless I forgot to remove this message). You can still view the old README [here](https://github.com/Gert-dev/php-integrator-base/blob/66263e35d691bba8cc8572b1144152b131ae48f0/README.md).**
-
 Currently the following is required in order to get the package up and running:
   * **PHP** - To run this package properly, you need at least PHP 5.4. The code you're actually writing can be anything ranging from PHP 5.2 up to (and including) PHP 7.0.
   * **PSR-compliant code** - Write code that follows the PSR standards, especially regarding namespacing.
