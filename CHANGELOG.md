@@ -1,3 +1,7 @@
+## 0.4.3
+### Bugs Fixed
+* Disable the xdebug nesting limit to -1, which was posing problems when resolving names.
+
 ## 0.4.2
 ### Bugs Fixed
 * Fixed the `indexes` folder not automatically being created.
