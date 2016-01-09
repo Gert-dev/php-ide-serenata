@@ -1,3 +1,11 @@
+## 0.4.2
+### Bugs Fixed
+* Fixed the `indexes` folder not automatically being created.
+
+## 0.4.1
+### Bugs Fixed
+* Removed the 'old version' note from the README.
+
 ## 0.4.0
 ### Features and enhancements
 * The PHP side now no longer uses Reflection, but a php-parser-based incremental indexer. This has the following advantages:
