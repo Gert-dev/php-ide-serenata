@@ -344,3 +344,20 @@ class Service
         return null if not callStack or callStack.length == 0
 
         return @parser.getResultingTypeFromCallStack(editor, bufferPosition, callStack)
+
+    ###*
+     * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
+     * used to fetch information about the function or method call the cursor is in.
+     *
+     * @param {TextEditor} editor
+     * @param {Point}      bufferPosition
+     *
+     * @example "$this->test(1, function () {},| 2);" (where the vertical bar denotes the cursor position) will yield
+     *          ['$this', 'test'].
+     *
+     * @return {Object|null} With elements 'callStack' (array) as well as 'argumentIndex' which denotes the argument in
+     *                       the parameter list the position is located at. Returns 'null' if not in a method or
+     *                       function call.
+    ###
+    getInvocationInfoAt: (editor, bufferPosition) ->
+        return @parser.getInvocationInfoAt(editor, bufferPosition)

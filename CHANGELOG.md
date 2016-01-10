@@ -1,3 +1,8 @@
+## 0.5.0
+### Changes for developers
+* Changes to the service
+  * A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
+
 ## 0.4.4
 ### Bugs Fixed
 * Do not try to index structural elements that do not have a namespaced name, which can happen for anonymous PHP 7 classes.

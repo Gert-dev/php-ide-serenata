@@ -686,7 +686,6 @@ class Parser
 
         return bestMatch
 
-
     ###*
      * Parses all elements from the given call stack to return the last type (if any). Returns null if the type of a
      * member could not be deduced (e.g. because it does not exist). This method can also deal with call stacks of one
@@ -798,6 +797,88 @@ class Parser
 
         else if member of info.constants
             return info.constants[member].return.resolvedType
+
+        return null
+
+    ###*
+     * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
+     * used to fetch information about the function or method call the cursor is in.
+     *
+     * @param {TextEditor} editor
+     * @param {Point}      bufferPosition
+     *
+     * @example "$this->test(1, function () {},| 2);" (where the vertical bar denotes the cursor position) will yield
+     *          ['$this', 'test'].
+     *
+     * @return {Object|null} With elements 'callStack' (array), 'argumentIndex', which denotes the argument in the
+     *                       parameter list the position is located at, and bufferPosition which denotes the buffer
+     *                       position the invocation was found at. Returns 'null' if not in a method or function call.
+    ###
+    getInvocationInfoAt: (editor, bufferPosition) ->
+        scopesOpened = 0
+        scopesClosed = 0
+        bracketsOpened = 0
+        bracketsClosed = 0
+        parenthesesOpened = 0
+        parenthesesClosed = 0
+
+        argumentIndex = 0
+
+        for line in [bufferPosition.row .. 0]
+            lineText = editor.lineTextForBufferRow(line)
+            length = lineText.length
+
+            if line == bufferPosition.row
+                length = bufferPosition.column
+
+            for i in [length - 1 .. 0]
+                chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
+
+                if chain.indexOf('.comment') != -1
+                    continue
+
+                else if lineText[i] == '}' and chain.indexOf('.scope.end') != -1
+                    ++scopesClosed
+
+                else if lineText[i] == '{' and chain.indexOf('.scope.begin') != -1
+                    ++scopesOpened
+
+                    if scopesOpened > scopesClosed
+                        return null # We reached the start of a block, we can never be in a method call.
+
+                else if lineText[i] == ']' and chain.indexOf('.array.end') != -1
+                    ++bracketsClosed
+
+                else if lineText[i] == '[' and chain.indexOf('.array.begin') != -1
+                    ++bracketsOpened
+
+                else if lineText[i] == ')' and chain == '.text.html.php .meta.embedded.block.php .source.php'
+                    ++parenthesesClosed
+
+                else if lineText[i] == '(' and chain == '.text.html.php .meta.embedded.block.php .source.php'
+                    ++parenthesesOpened
+
+                else if scopesOpened == scopesClosed and lineText[i] == ';'
+                    return null # We've moved too far and reached another expression, stop here.
+
+                else if scopesOpened == scopesClosed and
+                        bracketsOpened == bracketsClosed and
+                        parenthesesOpened == parenthesesClosed and
+                        lineText[i] == ','
+                    ++argumentIndex
+
+                if scopesOpened == scopesClosed and
+                   parenthesesOpened == (parenthesesClosed + 1) and
+                   (chain.indexOf('.function-call') != -1 or chain.indexOf('.support.function') != -1)
+                    currentBufferPosition = new Point(line, i+1)
+
+                    callStack = @retrieveSanitizedCallStackAt(editor, currentBufferPosition)
+
+                    return {
+                        callStack      : callStack
+                        argumentIndex  : argumentIndex
+                        bufferPosition : currentBufferPosition
+                    }
 
         return null
 
