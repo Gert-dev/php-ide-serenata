@@ -65,6 +65,10 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseClassNode(Node\Stmt\Class_ $node)
     {
+        if (!isset($node->namespacedName)) {
+            return; // Ticket #45 - This could potentially not be set for PHP 7 anonymous classes.
+        }
+
         $this->currentStructuralElement = $node;
 
         $interfaces = [];
@@ -94,6 +98,10 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseInterfaceNode(Node\Stmt\Interface_ $node)
     {
+        if (!isset($node->namespacedName)) {
+            return;
+        }
+
         $this->currentStructuralElement = $node;
 
         $extends = $node->extends;
@@ -120,6 +128,10 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseTraitNode(Node\Stmt\Trait_ $node)
     {
+        if (!isset($node->namespacedName)) {
+            return;
+        }
+
         $this->currentStructuralElement = $node;
 
         $this->structuralElements[$node->namespacedName->toString()] = [

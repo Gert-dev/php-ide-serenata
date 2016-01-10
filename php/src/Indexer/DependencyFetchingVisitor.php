@@ -31,41 +31,48 @@ class DependencyFetchingVisitor extends NameResolver
         parent::enterNode($node);
 
         if ($node instanceof Node\Stmt\Class_) {
-            $this->currentStructuralElement = $node;
+            // Ticket #45 - This could potentially not be set for PHP 7 anonymous classes.
+            if (isset($node->namespacedName)) {
+                $this->currentStructuralElement = $node;
 
-            $fqcn = $node->namespacedName->toString();
+                $fqcn = $node->namespacedName->toString();
 
-            $this->fqsenDependencyMap[$fqcn] = [];
+                $this->fqsenDependencyMap[$fqcn] = [];
 
-            if ($node->extends) {
-                $this->fqsenDependencyMap[$fqcn][] = $node->extends->toString();
-            }
-
-            foreach ($node->implements as $implementedInterface) {
-                $this->fqsenDependencyMap[$fqcn][] = $implementedInterface->toString();
-            }
-        } elseif ($node instanceof Node\Stmt\Interface_) {
-            $this->currentStructuralElement = $node;
-
-            $fqcn = $node->namespacedName->toString();
-
-            $this->fqsenDependencyMap[$fqcn] = [];
-
-            if ($node->extends) {
-                $extends = $node->extends;
-
-                if (is_array($extends)) {
-                    $extends = array_shift($extends);
+                if ($node->extends) {
+                    $this->fqsenDependencyMap[$fqcn][] = $node->extends->toString();
                 }
 
-                $this->fqsenDependencyMap[$fqcn][] = $extends->toString();
+                foreach ($node->implements as $implementedInterface) {
+                    $this->fqsenDependencyMap[$fqcn][] = $implementedInterface->toString();
+                }
+            }
+        } elseif ($node instanceof Node\Stmt\Interface_) {
+            if (isset($node->namespacedName)) {
+                $this->currentStructuralElement = $node;
+
+                $fqcn = $node->namespacedName->toString();
+
+                $this->fqsenDependencyMap[$fqcn] = [];
+
+                if ($node->extends) {
+                    $extends = $node->extends;
+
+                    if (is_array($extends)) {
+                        $extends = array_shift($extends);
+                    }
+
+                    $this->fqsenDependencyMap[$fqcn][] = $extends->toString();
+                }
             }
         } elseif ($node instanceof Node\Stmt\Trait_) {
-            $this->currentStructuralElement = $node;
+            if (isset($node->namespacedName)) {
+                $this->currentStructuralElement = $node;
 
-            $fqcn = $node->namespacedName->toString();
+                $fqcn = $node->namespacedName->toString();
 
-            $this->fqsenDependencyMap[$fqcn] = [];
+                $this->fqsenDependencyMap[$fqcn] = [];
+            }
         } elseif ($node instanceof Node\Stmt\TraitUse) {
             $fqcn = $this->currentStructuralElement->namespacedName->toString();
 

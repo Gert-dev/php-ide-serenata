@@ -1,3 +1,7 @@
+## 0.4.4
+### Bugs Fixed
+* Do not try to index structural elements that do not have a namespaced name, which can happen for anonymous PHP 7 classes.
+
 ## 0.4.3
 ### Bugs Fixed
 * Disable the xdebug nesting limit to -1, which was posing problems when resolving names.
