@@ -1,6 +1,7 @@
 ## 0.5.0
 ### Changes for developers
 * Changes to the service
+  * Popovers will, by default, no longer catch pointer events (making them click-through).
   * A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
 
 ## 0.4.4
