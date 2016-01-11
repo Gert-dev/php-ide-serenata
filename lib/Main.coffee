@@ -1,16 +1,3 @@
-{Disposable} = require 'atom'
-
-fs = require 'fs'
-$ = require 'jquery'
-
-Utility          = require './Utility'
-Service          = require './Service'
-AtomConfig       = require './AtomConfig'
-ConfigTester     = require './ConfigTester'
-CachingProxy     = require './CachingProxy'
-CachingParser    = require './CachingParser'
-StatusBarManager = require "./Widgets/StatusBarManager"
-
 module.exports =
     ###*
      * Configuration settings.
@@ -54,6 +41,8 @@ module.exports =
      * @return {boolean}
     ###
     testConfig: () ->
+        ConfigTester = require './ConfigTester'
+
         configTester = new ConfigTester(@configuration)
 
         result = configTester.test()
@@ -74,6 +63,8 @@ module.exports =
      * Registers any commands that are available to the user.
     ###
     registerCommands: () ->
+        fs = require 'fs'
+
         atom.commands.add 'atom-workspace', "php-integrator-base:indexProject": =>
             return @performIndex()
 
@@ -144,6 +135,8 @@ module.exports =
     ###
     attachStatusBarItems: (statusBarService) ->
         if not @statusBarManager
+            StatusBarManager = require "./Widgets/StatusBarManager"
+
             @statusBarManager = new StatusBarManager()
             @statusBarManager.initialize(statusBarService)
             @statusBarManager.setLabel("Indexing...")
@@ -160,6 +153,11 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
+        Service       = require './Service'
+        AtomConfig    = require './AtomConfig'
+        CachingProxy  = require './CachingProxy'
+        CachingParser = require './CachingParser'
+
         @configuration = new AtomConfig(@packageName)
 
         # See also atom-autocomplete-php pull request #197 - Disabled for now because it does not allow the user to
@@ -219,6 +217,8 @@ module.exports =
         # that don't contain a project.
         if atom.project.getDirectories().length == 0
             @statusBarManager.hide()
+
+        {Disposable} = require 'atom'
 
         return new Disposable => @detachStatusBarItems()
 
