@@ -4,6 +4,10 @@
   * Popovers will, by default, no longer catch pointer events (making them click-through).
   * A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
 
+## 0.4.5
+### Bugs Fixed
+* Fixed magic properties ending up in the index with a dollar sign in their name.
+
 ## 0.4.4
 ### Bugs Fixed
 * Do not try to index structural elements that do not have a namespaced name, which can happen for anonymous PHP 7 classes.

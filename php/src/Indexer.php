@@ -893,7 +893,7 @@ class Indexer
     protected function adaptMagicPropertyData($name, array $data)
     {
         return [
-            'name'        => $name,
+            'name'        => mb_substr($name, 1), // Strip off the dollar sign.
             'startLine'   => null,
             'isPublic'    => true,
             'isPrivate'   => false,
