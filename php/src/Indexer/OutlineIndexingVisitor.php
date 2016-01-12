@@ -205,7 +205,7 @@ class OutlineIndexingVisitor extends NameResolver
         foreach ($node->params as $param) {
             $parameters[] = [
                 'name'        => $param->name,
-                'type'        => $param->type,
+                'type'        => (string) $param->type,
                 'isReference' => $param->byRef,
                 'isVariadic'  => $param->variadic,
                 'isOptional'  => $param->default ? true : false
@@ -232,7 +232,7 @@ class OutlineIndexingVisitor extends NameResolver
         foreach ($node->params as $param) {
             $parameters[] = [
                 'name'        => $param->name,
-                'type'        => $param->type,
+                'type'        => (string) $param->type,
                 'isReference' => $param->byRef,
                 'isVariadic'  => $param->variadic,
                 'isOptional'  => $param->default ? true : false
