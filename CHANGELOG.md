@@ -1,7 +1,7 @@
 ## 0.4.5
 ### Bugs Fixed
 * Fixed magic properties ending up in the index with a dollar sign in their name.
-* Fixed built-in class constants being indexed by value instead of name. This also resulted in a constraint error in the database. (thanks to @tocjent)
+* Fixed built-in class constants being indexed by value instead of name. This also resulted in a constraint error in the database. (thanks to [@tocjent](https://github.com/tocjent))
 
 ## 0.4.4
 ### Bugs Fixed
@@ -45,13 +45,13 @@ class Foo
 
 * Added menu items for some commands.
 * The progress bar will now actually show progress, which is useful for large projects.
-* There is now a command available in the command palette to reindex your project (thanks to @wcatron).
+* There is now a command available in the command palette to reindex your project (thanks to [@wcatron](https://github.com/wcatron)).
 * Similarly, there is now also a command available to forcibly reindex the project (i.e. remove the entire database first).
 
 ### Bugs fixed
 * A progress bar will no longer be shown for windows opened without a project.
 * Methods returning `static` were not properly resolving to the current class if they were not overridden (they were resolving to the closest parent class that defined them).
-* Project and file paths that contain spaces should no longer pose a problem (thanks to @wcatron).
+* Project and file paths that contain spaces should no longer pose a problem (thanks to [@wcatron](https://github.com/wcatron)).
 
 ### Changes for developers
 * Changes to the service
