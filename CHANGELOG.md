@@ -1,6 +1,7 @@
 ## 0.4.5
 ### Bugs Fixed
 * Fixed magic properties ending up in the index with a dollar sign in their name.
+* Fixed built-in class constants being indexed by value instead of name. This also resulted in a constraint error in the database. (thanks to @tocjent)
 
 ## 0.4.4
 ### Bugs Fixed
