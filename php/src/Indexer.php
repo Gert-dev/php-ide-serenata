@@ -571,9 +571,9 @@ class Indexer
             ];
         }
 
-        foreach ($element->getConstants() as $constant) {
-            $rawData['constants'][$constant] = [
-                'name'       => $constant,
+        foreach ($element->getConstants() as $constantName => $constantValue) {
+            $rawData['constants'][$constantName] = [
+                'name'       => $constantName,
                 'startLine'  => null,
                 'docComment' => null
             ];
