@@ -1,3 +1,7 @@
+## 0.4.6
+### Bugs Fixed
+* Fixed types sometimes showing up as [Object object] because the indexer was incorrectly saving an object instead of a string type.
+
 ## 0.4.5
 ### Bugs Fixed
 * Fixed magic properties ending up in the index with a dollar sign in their name.
