@@ -862,7 +862,7 @@ class Parser
                     return null # We've moved too far and reached another expression, stop here.
 
                 else if scopesOpened == scopesClosed and
-                        bracketsOpened == bracketsClosed and
+                        bracketsOpened >= bracketsClosed and
                         parenthesesOpened == parenthesesClosed and
                         lineText[i] == ','
                     ++argumentIndex

@@ -103,6 +103,33 @@ describe "getInvocationInfoAt", ->
         expect(result.callStack).toEqual(['builtin_func'])
         expect(result.argumentIndex).toEqual(2)
 
+    it "correctly deals with more complex nested invocation arguments.", ->
+        source =
+            """
+            <?php
+
+            builtin_func(
+                1,
+                2,
+                ['test'
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        result = parser.getInvocationInfoAt(editor, bufferPosition)
+
+        expect(result.bufferPosition.row).toEqual(2)
+        expect(result.bufferPosition.column).toEqual(12)
+        expect(result.callStack).toEqual(['builtin_func'])
+        expect(result.argumentIndex).toEqual(2)
+
     it "correctly returns null when not in an invocation.", ->
         source =
             """
