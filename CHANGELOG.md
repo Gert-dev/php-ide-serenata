@@ -1,6 +1,7 @@
 ## 0.4.6
 ### Bugs Fixed
 * Fixed types sometimes showing up as [Object object] because the indexer was incorrectly saving an object instead of a string type.
+* Fixed built-in functions not having an empty array serialized to the throws_serialized field, resulting in warnings when iterating over them, which in turn caused problems on the CoffeeScript side.
 
 ## 0.4.5
 ### Bugs Fixed
