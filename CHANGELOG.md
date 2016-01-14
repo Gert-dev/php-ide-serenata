@@ -1,3 +1,7 @@
+## 0.4.7
+### Bugs Fixed
+* Bump the database version.
+
 ## 0.4.6
 ### Bugs Fixed
 * Fixed types sometimes showing up as [Object object] because the indexer was incorrectly saving an object instead of a string type.
