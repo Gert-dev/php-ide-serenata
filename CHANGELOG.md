@@ -4,9 +4,14 @@
   * Popovers will, by default, no longer catch pointer events (making them click-through).
   * A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
 
+## 0.4.7
+### Bugs Fixed
+* Bump the database version.
+
 ## 0.4.6
 ### Bugs Fixed
 * Fixed types sometimes showing up as [Object object] because the indexer was incorrectly saving an object instead of a string type.
+* Fixed built-in functions not having an empty array serialized to the throws_serialized field, resulting in warnings when iterating over them, which in turn caused problems on the CoffeeScript side.
 
 ## 0.4.5
 ### Bugs Fixed

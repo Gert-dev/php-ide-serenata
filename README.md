@@ -20,7 +20,7 @@ Currently the following is required in order to get the package up and running:
     * Docblocks with a `@var` tag for properties.
     * Docblocks with `@param` tags for functions and methods. Parameter type hints will also work.
     * Docblocks with a `@return` tag for functions and methods. Return types in PHP 7 will also work.
-    * IntellJ-style variable annotations `/** @var MyType $var */` as well as `/** @var $var MyType */` to override automatically deduced types or specify types in cases where it can't be automtically deduced.
+    * IntellJ-style variable annotations `/** @var MyType $var */` as well as `/** @var $var MyType */` to override automatically deduced types or specify types in cases where it can't be automatically deduced.
 
 Note that folders that aren't readable (no permission) will be silently ignored!
 

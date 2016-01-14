@@ -443,7 +443,7 @@ class Indexer
                 }
 
                 $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
-                    'throws_serialized'     => null,
+                    'throws_serialized'     => serialize([]),
                     'parameters_serialized' => serialize($parameters)
                 ]);
             }
