@@ -84,7 +84,7 @@ class OutlineIndexingVisitor extends NameResolver
             'startLine'  => $node->getLine(),
             'isAbstract' => $node->isAbstract(),
             'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null,
-            'parent'     => $node->extends ? $node->extends->toString() : null,
+            'parents'    => $node->extends ? [$node->extends->toString()] : [],
             'interfaces' => $interfaces,
             'traits'     => [],
             'methods'    => [],
@@ -104,17 +104,18 @@ class OutlineIndexingVisitor extends NameResolver
 
         $this->currentStructuralElement = $node;
 
-        $extends = $node->extends;
+        $extendedInterfaces = [];
 
-        if (is_array($extends)) {
-            $extends = array_shift($extends);
+        /** @var Node\Name $extends */
+        foreach ($node->extends as $extends) {
+            $extendedInterfaces[] = $extends->toString();
         }
 
         $this->structuralElements[$node->namespacedName->toString()] = [
             'name'       => $node->name,
             'type'       => 'interface',
             'startLine'  => $node->getLine(),
-            'parent'     => $extends ? $extends->toString() : null,
+            'parents'    => $extendedInterfaces,
             'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null,
             'traits'     => [],
             'methods'    => [],

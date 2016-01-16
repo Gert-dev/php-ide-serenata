@@ -1,3 +1,7 @@
+## 0.4.8
+### Bugs Fixed
+* Fixed interfaces extending multiple other interfaces only having the first parent interface examined. This resulted in some class members not being listed if you implemented such an interface and could also result in files being scanned in the incorrect order (i.e. a child interface before a parent interface). This also resulted in a minor performance increase when fetching class information regarding inheritance as less queries are performed.
+
 ## 0.4.7
 ### Bugs Fixed
 * Bump the database version.

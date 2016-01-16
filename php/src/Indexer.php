@@ -488,13 +488,24 @@ class Indexer
     protected function indexBuiltinStructuralElement(ReflectionClass $element)
     {
         $type = null;
+        $parents = [];
+        $interfaces = [];
 
         if ($element->isTrait()) {
             $type = 'trait';
+            $interfaces = [];
+            $parents = [];
         } elseif ($element->isInterface()) {
             $type = 'interface';
+            $interfaces = [];
+
+            // 'getParentClass' only returns one extended interface. If an interface extends multiple interfaces, the
+            // other ones instead show up in 'getInterfaceNames'.
+            $parents = $element->getInterfaceNames();
         } else {
             $type = 'class';
+            $interfaces = $element->getInterfaceNames();
+            $parents = $element->getParentClass() ? [$element->getParentClass()->getName()] : [];
         }
 
         // Adapt the data from the ReflectionClass to the data from the OutlineIndexingVisitor.
@@ -504,8 +515,8 @@ class Indexer
             'startLine'  => null,
             'isAbstract' => $element->isAbstract(),
             'docComment' => null,
-            'parent'     => $element->getParentClass() ? $element->getParentClass()->getName() : null,
-            'interfaces' => $element->getInterfaceNames(),
+            'parents'    => $parents,
+            'interfaces' => $interfaces,
             'traits'     => $element->getTraitNames(),
             'methods'    => [],
             'properties' => [],
@@ -712,19 +723,21 @@ class Indexer
 
         $accessModifierMap = $this->getAccessModifierMap();
 
-        if (isset($rawData['parent'])) {
-            $parentSeId = $this->storage->getStructuralElementId($rawData['parent']);
+        if (isset($rawData['parents'])) {
+            foreach ($rawData['parents'] as $parent) {
+                $parentSeId = $this->storage->getStructuralElementId($parent);
 
-            if ($parentSeId) {
-                $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, [
-                    'structural_element_id'        => $seId,
-                    'linked_structural_element_id' => $parentSeId
-                ]);
-            } else {
-                $this->logMessage(
-                    '  - WARNING: Could not find a record for parent FQSEN ' .
-                    $rawData['parent'] . ' of FQSEN ' . $fqsen
-                );
+                if ($parentSeId) {
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, [
+                        'structural_element_id'        => $seId,
+                        'linked_structural_element_id' => $parentSeId
+                    ]);
+                } else {
+                    $this->logMessage(
+                        '  - WARNING: Could not find a record for parent FQSEN ' .
+                        $parent . ' of FQSEN ' . $fqsen
+                    );
+                }
             }
         }
 
