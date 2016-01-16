@@ -241,12 +241,14 @@ class Application
 
         if (is_dir($path)) {
             $indexer->indexDirectory($path);
-        } else {
+        } elseif (is_file($path)) {
             try {
                 $indexer->indexFile($path);
             } catch (Indexer\IndexingFailedException $e) {
                 throw new UnexpectedValueException('The file could not be indexed because it contains syntax errors!');
             }
+        } else {
+            throw new UnexpectedValueException('The specified file or directoy does not exist!');
         }
 
         return $this->outputJson(true, null);
