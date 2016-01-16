@@ -7,7 +7,7 @@ not provide any user-visible functionality. This is instead covered by various o
   * **[php-integrator-navigation](https://github.com/Gert-dev/php-integrator-navigation)** - Provides code navigation and go to functionality.
   * **[php-integrator-tooltips](https://github.com/Gert-dev/php-integrator-tooltips)** - Shows tooltips with documentation for your code.
   * **[php-integrator-annotations](https://github.com/Gert-dev/php-integrator-annotations)** - Shows annotations in your code, such as for overridden methods and interface implementations.
-  * **[php-integrator-call-tips](https://github.com/Gert-dev/php-integrator-call-tips) ** - Shows call tips containing parameters in your code. (Complements the autocompletion package.)
+  * **[php-integrator-call-tips](https://github.com/Gert-dev/php-integrator-call-tips)** - Shows call tips containing parameters in your code. (Complements the autocompletion package.)
 
 The source code was originally based on the php-autocomplete-plus code base and provides various
 improvements as well as separation of the various components into separate packages.
