@@ -74,10 +74,10 @@ module.exports =
      * Registers any commands that are available to the user.
     ###
     registerCommands: () ->
-        atom.commands.add 'atom-workspace', "php-integrator-base:indexProject": =>
+        atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
             return @performIndex()
 
-        atom.commands.add 'atom-workspace', "php-integrator-base:forceIndexProject": =>
+        atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
             try
                 fs.unlinkSync(@proxy.getIndexDatabasePath())
 
