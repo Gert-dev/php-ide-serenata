@@ -241,7 +241,11 @@ class Indexer
              || !isset($fileModifiedMap[$filename])
              || $fileInfo->getMTime() > $fileModifiedMap[$filename]->getTimestamp()
             ) {
-                $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
+                try {
+                    $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
+                } catch (Error $e) {
+                    $this->logMessage('  - WARNING: ' . $filename . ' could not be scanned due to parsing errors!');
+                }
             }
         }
 
@@ -307,6 +311,8 @@ class Indexer
     /**
      * Retrieves a list of FQSENs in the specified file along with their dependencies.
      *
+     * @throws PhpParser\Error When the file could not be parsed.
+     *
      * @return array
      */
     protected function getFqsenDependenciesForFile($filename)
@@ -314,11 +320,7 @@ class Indexer
         $nodes = [];
         $parser = $this->getParser();
 
-        try {
-            $nodes = $parser->parse(file_get_contents($filename));
-        } catch (Error $e) {
-            $this->logMessage('  - WARNING: ' . $filename . ' could not be indexed due to parsing errors!');
-        }
+        $nodes = $parser->parse(@file_get_contents($filename));
 
         $dependencyFetchingVisitor = new Indexer\DependencyFetchingVisitor();
 
@@ -609,7 +611,7 @@ class Indexer
         $nodes = [];
         $parser = $this->getParser();
 
-        $nodes = $parser->parse(file_get_contents($filename));
+        $nodes = $parser->parse(@file_get_contents($filename));
 
         $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
         $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();
