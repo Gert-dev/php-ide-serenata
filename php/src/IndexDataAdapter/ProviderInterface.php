@@ -64,7 +64,7 @@ interface ProviderInterface
     public function getStructuralElementTraitPrecedencesAssoc($id);
 
     /**
-     * Retrieves a list of parent FQSEN's for the specified structural element.
+     * Retrieves a list of (direct) parent FQSEN's for the specified structural element.
      *
      * @param int $seId
      *

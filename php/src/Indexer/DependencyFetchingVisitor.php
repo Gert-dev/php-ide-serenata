@@ -58,11 +58,10 @@ class DependencyFetchingVisitor extends NameResolver
                 if ($node->extends) {
                     $extends = $node->extends;
 
-                    if (is_array($extends)) {
-                        $extends = array_shift($extends);
+                    /** @var Node\Name $extends */
+                    foreach ($node->extends as $extends) {
+                        $this->fqsenDependencyMap[$fqcn][] = $extends->toString();
                     }
-
-                    $this->fqsenDependencyMap[$fqcn][] = $extends->toString();
                 }
             }
         } elseif ($node instanceof Node\Stmt\Trait_) {

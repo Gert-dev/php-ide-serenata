@@ -85,13 +85,18 @@ class IndexDataAdapter
             'methods'      => []
         ];
 
-        // Take all members from the base class as a starting point.
-        $baseClassInfo = !empty($parentFqsens) ? $this->getStructuralElementInfo(array_keys($parentFqsens)[0]) : null;
+        // Take all members from the base class as a starting point. Note that there can only be multiple base classes
+        // for interfaces.
+        foreach ($parentFqsens as $seId => $fqsen) {
+            $baseClassInfo = $this->getStructuralElementInfo($seId);
 
-        if ($baseClassInfo) {
-            $result['constants']  = $baseClassInfo['constants'];
-            $result['properties'] = $baseClassInfo['properties'];
-            $result['methods']    = $baseClassInfo['methods'];
+            if ($baseClassInfo) {
+                $result['constants']  = array_merge($result['constants'], $baseClassInfo['constants']);
+                $result['properties'] = array_merge($result['properties'], $baseClassInfo['properties']);
+                $result['methods']    = array_merge($result['methods'], $baseClassInfo['methods']);
+
+                $result['parents'] = array_merge($result['parents'], $baseClassInfo['parents']);
+            }
         }
 
         // Append members from direct interfaces to the pool of members. These only supply additional members, but will

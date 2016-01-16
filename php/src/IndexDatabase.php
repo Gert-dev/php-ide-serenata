@@ -534,27 +534,22 @@ class IndexDatabase implements
      */
     public function getParentFqsens($seId)
     {
-        $parentFqsens = [];
+        $result = [];
 
-        while ($seId) {
-            $parentSe = $this->getConnection()->createQueryBuilder()
-                ->select('se.id', 'se.fqsen')
-                ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-                ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.linked_structural_element_id = se.id')
-                ->where('sepl.structural_element_id = ?')
-                ->setParameter(0, $seId)
-                ->execute()
-                ->fetch();
+        $parentSes = $this->getConnection()->createQueryBuilder()
+            ->select('se.id', 'se.fqsen')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.linked_structural_element_id = se.id')
+            ->where('sepl.structural_element_id = ?')
+            ->setParameter(0, $seId)
+            ->execute()
+            ->fetchAll();
 
-            if (!$parentSe) {
-                break;
-            }
-
-            $seId = $parentSe['id'];
-            $parentFqsens[$parentSe['id']] = $parentSe['fqsen'];
+        foreach ($parentSes as $parentSe) {
+            $result[$parentSe['id']] = $parentSe['fqsen'];
         }
 
-        return $parentFqsens;
+        return $result;
     }
 
     /**

@@ -241,7 +241,11 @@ class Indexer
              || !isset($fileModifiedMap[$filename])
              || $fileInfo->getMTime() > $fileModifiedMap[$filename]->getTimestamp()
             ) {
-                $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
+                try {
+                    $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
+                } catch (Error $e) {
+                    $this->logMessage('  - WARNING: ' . $filename . ' could not be scanned due to parsing errors!');
+                }
             }
         }
 
@@ -307,6 +311,8 @@ class Indexer
     /**
      * Retrieves a list of FQSENs in the specified file along with their dependencies.
      *
+     * @throws PhpParser\Error When the file could not be parsed.
+     *
      * @return array
      */
     protected function getFqsenDependenciesForFile($filename)
@@ -314,11 +320,7 @@ class Indexer
         $nodes = [];
         $parser = $this->getParser();
 
-        try {
-            $nodes = $parser->parse(file_get_contents($filename));
-        } catch (Error $e) {
-            $this->logMessage('  - WARNING: ' . $filename . ' could not be indexed due to parsing errors!');
-        }
+        $nodes = $parser->parse(@file_get_contents($filename));
 
         $dependencyFetchingVisitor = new Indexer\DependencyFetchingVisitor();
 
@@ -488,13 +490,24 @@ class Indexer
     protected function indexBuiltinStructuralElement(ReflectionClass $element)
     {
         $type = null;
+        $parents = [];
+        $interfaces = [];
 
         if ($element->isTrait()) {
             $type = 'trait';
+            $interfaces = [];
+            $parents = [];
         } elseif ($element->isInterface()) {
             $type = 'interface';
+            $interfaces = [];
+
+            // 'getParentClass' only returns one extended interface. If an interface extends multiple interfaces, the
+            // other ones instead show up in 'getInterfaceNames'.
+            $parents = $element->getInterfaceNames();
         } else {
             $type = 'class';
+            $interfaces = $element->getInterfaceNames();
+            $parents = $element->getParentClass() ? [$element->getParentClass()->getName()] : [];
         }
 
         // Adapt the data from the ReflectionClass to the data from the OutlineIndexingVisitor.
@@ -504,8 +517,8 @@ class Indexer
             'startLine'  => null,
             'isAbstract' => $element->isAbstract(),
             'docComment' => null,
-            'parent'     => $element->getParentClass() ? $element->getParentClass()->getName() : null,
-            'interfaces' => $element->getInterfaceNames(),
+            'parents'    => $parents,
+            'interfaces' => $interfaces,
             'traits'     => $element->getTraitNames(),
             'methods'    => [],
             'properties' => [],
@@ -598,7 +611,7 @@ class Indexer
         $nodes = [];
         $parser = $this->getParser();
 
-        $nodes = $parser->parse(file_get_contents($filename));
+        $nodes = $parser->parse(@file_get_contents($filename));
 
         $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
         $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();
@@ -712,19 +725,21 @@ class Indexer
 
         $accessModifierMap = $this->getAccessModifierMap();
 
-        if (isset($rawData['parent'])) {
-            $parentSeId = $this->storage->getStructuralElementId($rawData['parent']);
+        if (isset($rawData['parents'])) {
+            foreach ($rawData['parents'] as $parent) {
+                $parentSeId = $this->storage->getStructuralElementId($parent);
 
-            if ($parentSeId) {
-                $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, [
-                    'structural_element_id'        => $seId,
-                    'linked_structural_element_id' => $parentSeId
-                ]);
-            } else {
-                $this->logMessage(
-                    '  - WARNING: Could not find a record for parent FQSEN ' .
-                    $rawData['parent'] . ' of FQSEN ' . $fqsen
-                );
+                if ($parentSeId) {
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, [
+                        'structural_element_id'        => $seId,
+                        'linked_structural_element_id' => $parentSeId
+                    ]);
+                } else {
+                    $this->logMessage(
+                        '  - WARNING: Could not find a record for parent FQSEN ' .
+                        $parent . ' of FQSEN ' . $fqsen
+                    );
+                }
             }
         }
 
