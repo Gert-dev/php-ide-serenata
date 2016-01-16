@@ -5,8 +5,8 @@
             {
                 'label': 'PHP Integrator',
                 'submenu': [
-                    {'label': '(Re)index Project', 'command': 'php-integrator-base:indexProject'},
-                    {'label': 'Forcibly (Re)index Project', 'command': 'php-integrator-base:forceIndexProject'}
+                    {'label': '(Re)index Project', 'command': 'php-integrator-base:index-project'},
+                    {'label': 'Forcibly (Re)index Project', 'command': 'php-integrator-base:force-index-project'}
                 ]
             }
         ]

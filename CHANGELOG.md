@@ -6,6 +6,7 @@
 
 ## 0.4.8
 ### Bugs Fixed
+* The command names in the command palette will now be separated by spaces.
 * The indexer will no longer show warnings when `file_get_contents` fails. This will be caught and a warning will be displayed in verbose mode instead, ensuring that it will no longer cause indexing to fail in its entirety.
 * Fixed interfaces extending multiple other interfaces only having the first parent interface examined. This resulted in some class members not being listed if you implemented such an interface and could also result in files being scanned in the incorrect order (i.e. a child interface before a parent interface). This also resulted in a minor performance increase when fetching class information regarding inheritance as less queries are performed.
 

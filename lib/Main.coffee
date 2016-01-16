@@ -65,10 +65,10 @@ module.exports =
     registerCommands: () ->
         fs = require 'fs'
 
-        atom.commands.add 'atom-workspace', "php-integrator-base:indexProject": =>
+        atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
             return @performIndex()
 
-        atom.commands.add 'atom-workspace', "php-integrator-base:forceIndexProject": =>
+        atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
             try
                 fs.unlinkSync(@proxy.getIndexDatabasePath())
 
