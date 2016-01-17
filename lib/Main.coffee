@@ -126,6 +126,9 @@ module.exports =
                 @statusBarManager.setProgress(progress)
                 @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
+        if not filename
+            filename = atom.project.getDirectories()[0]?.path
+
         @service.reindex(fileName, progressHandler).then(successHandler, failureHandler)
 
     ###*

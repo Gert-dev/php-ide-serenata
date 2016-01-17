@@ -180,18 +180,14 @@ class Proxy
         return @performRequest(['--class-info', className], async)
 
     ###*
-     * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
-     * projects!). This method is asynchronous and will return immediately.
+     * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {string}   filename               The full file path to the class to refresh.
+     * @param {string}   filename               The path to the file or folder to (re)index.
      * @param {Callback} progressStreamCallback A method to invoke each time progress streaming data is received.
      *
      * @return {Promise}
     ###
     reindex: (filename, progressStreamCallback) ->
-        if not filename
-            filename = atom.project.getDirectories()[0]?.path
-
         # For Windows - Replace \ in class namespace to / because composer uses / instead of \.
         filename = Utility.normalizeSeparators(filename)
 
