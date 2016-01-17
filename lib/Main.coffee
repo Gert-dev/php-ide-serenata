@@ -126,10 +126,27 @@ module.exports =
                 @statusBarManager.setProgress(progress)
                 @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        if not filename
-            filename = atom.project.getDirectories()[0]?.path
+        if not fileName?
+            fileName = atom.project.getDirectories()[0]?.path
+
+        @proxy.setIndexDatabaseName(@getIndexDatabaseName())
 
         @service.reindex(fileName, progressHandler).then(successHandler, failureHandler)
+
+    ###*
+     * Retrieves the name of the database file to use.
+     *
+     * @return {string}
+    ###
+    getIndexDatabaseName: () ->
+        pathStrings = ''
+
+        for i,project of atom.project.getDirectories()
+            pathStrings += project.path
+
+        md5 = require 'md5'
+
+        return md5(pathStrings)
 
     ###*
      * Attaches items to the status bar.

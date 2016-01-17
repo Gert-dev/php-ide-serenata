@@ -1,5 +1,4 @@
 fs            = require 'fs'
-md5           = require 'md5'
 child_process = require "child_process"
 
 Utility = require "./Utility"
@@ -14,6 +13,11 @@ class Proxy
      * The config to use.
     ###
     config: null
+
+    ###*
+     * The name (without path or extension) of the database file to use.
+    ###
+    indexDatabaseName: null
 
     ###*
      * Constructor.
@@ -202,17 +206,12 @@ class Proxy
         return @performRequest(['--reindex', filename, '--stream-progress'], true, progressStreamCallbackWrapper)
 
     ###*
-     * Retrieves the name of the database file to use.
+     * Sets the name (without path or extension) of the database file to use.
      *
-     * @return {string}
+     * @param {string} name
     ###
-    getIndexDatabaseName: () ->
-        pathStrings = ''
-
-        for i,project of atom.project.getDirectories()
-            pathStrings += project.path
-
-        return md5(pathStrings)
+    setIndexDatabaseName: (name) ->
+        @indexDatabaseName = name
 
     ###*
      * Retrieves the full path to the database file to use.
@@ -220,6 +219,4 @@ class Proxy
      * @return {string}
     ###
     getIndexDatabasePath: () ->
-        id = @getIndexDatabaseName()
-
-        return @config.get('packagePath') + '/indexes/' + id + '.sqlite'
+        return @config.get('packagePath') + '/indexes/' + @indexDatabaseName + '.sqlite'
