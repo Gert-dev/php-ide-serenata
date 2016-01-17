@@ -92,7 +92,7 @@ class Proxy
             options =
                 maxBuffer: 50000 * 1024
 
-            proc = child_process.exec(@config.get('phpCommand') + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
+            proc = child_process.exec(command + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
                 if not stdout or stdout.length == 0
                     reject({message: "No output received from the PHP side!"})
                     return
