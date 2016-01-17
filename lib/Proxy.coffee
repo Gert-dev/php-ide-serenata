@@ -35,15 +35,20 @@ class Proxy
      * @return {array}
     ###
     prepareParameters: (args) ->
+        win = os.type() == "Windows_NT"
+        escapeFunc = if win then Utility.quote else Utility.escapeSpaces
         parameters = [
             '-d memory_limit=-1',
-            Utility.escapeSpaces(__dirname + "/../php/src/Main.php"),
-            Utility.escapeSpaces(@getIndexDatabasePath())
+            escapeFunc(__dirname + "/../php/src/Main.php"),
+            escapeFunc(@getIndexDatabasePath())
         ]
 
         for a in args
-            a = Utility.escapeSeparators(a)
-            a = Utility.escapeSpaces(a)
+            if win
+              a = Utility.quote(a);
+            else
+              a = Utility.escapeSeparators(a)
+              a = Utility.escapeSpaces(a)
 
             parameters.push(a)
 

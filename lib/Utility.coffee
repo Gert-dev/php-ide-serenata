@@ -35,3 +35,14 @@ module.exports =
       return '' if not text
 
       return text.replace(/\ /g, '\\ ')
+
+    ###*
+     * Quotes text
+     *
+     * @param {string} text
+     *
+     * @return {string}
+    ###
+    quote: (text) ->
+      return '""' if not text || text.length == 0
+      return '"' + text.replace(/"/g, '""') + '"'
