@@ -88,17 +88,20 @@ class Proxy
     ###
     performRequestAsync: (command, parameters, streamCallback = null) ->
         return new Promise (resolve, reject) =>
-            # We are already above the default of 200 kB for methods such as getGlobalFunctions.
-            options =
-                maxBuffer: 50000 * 1024
+            proc = child_process.spawn(command, parameters)
 
-            proc = child_process.exec(command + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
-                if not stdout or stdout.length == 0
+            buffer = ''
+
+            proc.stdout.on 'data', (data) =>
+                buffer += data
+
+            proc.on 'close', (code) =>
+                if not buffer or buffer.length == 0
                     reject({message: "No output received from the PHP side!"})
                     return
 
                 try
-                    response = JSON.parse(stdout)
+                    response = JSON.parse(buffer)
 
                 catch error
                     #console.error(error)
@@ -116,7 +119,6 @@ class Proxy
                     return
 
                 resolve(response.result)
-            )
 
             if streamCallback
                 proc.stderr.on 'data', (data) =>
@@ -197,7 +199,7 @@ class Proxy
 
         progressStreamCallbackWrapper = (output) =>
             # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
-            percentages = output.split("\n")
+            percentages = output.toString('ascii').split("\n")
             percentages.pop() # Ditch the empty value.
 
             for percentage in percentages
