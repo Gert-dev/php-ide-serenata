@@ -17,37 +17,25 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\Common;
+namespace Doctrine\Common\Cache;
 
 /**
- * Class to store and retrieve the version of Doctrine.
+ * Interface for cache drivers that allows to put many items at once.
  *
  * @link   www.doctrine-project.org
- * @since  2.0
- * @author Benjamin Eberlei <kontakt@beberlei.de>
- * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author Jonathan Wage <jonwage@gmail.com>
- * @author Roman Borschel <roman@code-factory.org>
+ * @since  1.6
+ * @author Daniel Gorgan <danut007ro@gmail.com>
  */
-class Version
+interface MultiPutCache
 {
     /**
-     * Current Doctrine Version.
-     */
-    const VERSION = '2.5.3';
-
-    /**
-     * Compares a Doctrine version with the current one.
+     * Returns a boolean value indicating if the operation succeeded.
      *
-     * @param string $version Doctrine version to compare.
+     * @param array $keysAndValues  Array of keys and values to save in cache
+     * @param int   $lifetime       The lifetime. If != 0, sets a specific lifetime for these
+     *                              cache entries (0 => infinite lifeTime).
      *
-     * @return int -1 if older, 0 if it is the same, 1 if version passed as argument is newer.
+     * @return bool TRUE if the operation was successful, FALSE if it wasn't.
      */
-    public static function compare($version)
-    {
-        $currentVersion = str_replace(' ', '', strtolower(self::VERSION));
-        $version = str_replace(' ', '', $version);
-
-        return version_compare($version, $currentVersion);
-    }
+    function saveMultiple(array $keysAndValues, $lifetime = 0);
 }
