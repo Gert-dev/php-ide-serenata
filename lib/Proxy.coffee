@@ -192,7 +192,7 @@ class Proxy
         if not filename
             filename = atom.project.getDirectories()[0]?.path
 
-        # For Windows - Replace \ in class namespace to / because composer use / instead of \.
+        # For Windows - Replace \ in class namespace to / because composer uses / instead of \.
         filename = Utility.normalizeSeparators(filename)
 
         progressStreamCallbackWrapper = (output) =>
