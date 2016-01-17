@@ -166,8 +166,8 @@ class Indexer
             echo $this->logMessage('  - Indexing ' . $filePath);
 
             try {
-                $this->indexFileOutline($filePath);
-            } catch (Error $e) {
+                $this->indexFile($filePath);
+            } catch (Indexer\IndexingFailedException $e) {
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
             }
 
@@ -178,12 +178,19 @@ class Indexer
     /**
      * Indexes the specified file.
      *
-     * @param string $filePath
+     * @param string      $filePath
+     * @param string|null $code     The source code of the file. If null, will be fetched automatically.
      */
-    public function indexFile($filePath)
+    public function indexFile($filePath, $code = null)
     {
         try {
-            $this->indexFileOutline($filePath);
+            $code = $code ?: @file_get_contents($filePath);
+
+            if (!is_string($code)) {
+                throw new Indexer\IndexingFailedException($filePath);
+            }
+
+            $this->indexFileOutline($filePath, $code);
         } catch (Error $e) {
             throw new Indexer\IndexingFailedException($filePath);
         }
@@ -244,7 +251,7 @@ class Indexer
                 try {
                     $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
                 } catch (Error $e) {
-                    $this->logMessage('  - WARNING: ' . $filename . ' could not be scanned due to parsing errors!');
+
                 }
             }
         }
@@ -603,15 +610,13 @@ class Indexer
      * used traits, etc.
      *
      * @param string $filename
+     * @param string $code
      *
      * @throws PhpParser\Error When the file could not be parsed.
      */
-    protected function indexFileOutline($filename)
+    protected function indexFileOutline($filename, $code)
     {
-        $nodes = [];
-        $parser = $this->getParser();
-
-        $nodes = $parser->parse(@file_get_contents($filename));
+        $nodes = $this->getParser()->parse($code);
 
         $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
         $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();

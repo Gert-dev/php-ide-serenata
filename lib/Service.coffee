@@ -87,16 +87,17 @@ class Service
         return @proxy.getClassInfo(className, async)
 
     ###*
-     * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
-     * projects!). This method is asynchronous and will return immediately.
+     * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {string}   filename               The full path to the file to refresh.
-     * @param {Callback} progressStreamCallback A method to invoke each time progress streaming data is received.
+     * @param {string}      path                   The full path to the file  or folder to refresh.
+     * @param {string|null} source                 The source code of the file to index. May be null if a directory is
+     *                                             passed instead.
+     * @param {Callback}    progressStreamCallback A method to invoke each time progress streaming data is received.
      *
      * @return {Promise}
     ###
-    reindex: (filename, progressStreamCallback) ->
-        @proxy.reindex(filename, progressStreamCallback)
+    reindex: (path, source, progressStreamCallback) ->
+        @proxy.reindex(path, source, progressStreamCallback)
 
     ###*
      * Gets the correct selector for the class or namespace that is part of the specified event.

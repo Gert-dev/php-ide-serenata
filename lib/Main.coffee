@@ -95,8 +95,9 @@ module.exports =
      * Indexes a file aynschronously.
      *
      * @param {string|null} fileName The file to index, or null to index the entire project.
+     * @param {string|null} source   The source code of the file to index.
     ###
-    performIndex: (fileName = null) ->
+    performIndex: (fileName = null, source = null) ->
         timerName = @packageName + " - Project indexing"
 
         if not fileName
@@ -131,7 +132,7 @@ module.exports =
 
         @proxy.setIndexDatabaseName(@getIndexDatabaseName())
 
-        @service.reindex(fileName, progressHandler).then(successHandler, failureHandler)
+        @service.reindex(fileName, source, progressHandler).then(successHandler, failureHandler)
 
     ###*
      * Retrieves the name of the database file to use.
@@ -206,20 +207,21 @@ module.exports =
                 @performIndex()
 
         atom.workspace.observeTextEditors (editor) =>
-            editor.onDidSave (event) =>
+            editor.onDidStopChanging () =>
                 return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
+                path = editor.getPath()
                 isContainedInProject = false
 
                 for projectDirectory in atom.project.getDirectories()
-                    if event.path.indexOf(projectDirectory.path) != -1
+                    if path.indexOf(projectDirectory.path) != -1
                         isContainedInProject = true
                         break
 
                 # Do not try to index files outside the project.
                 if isContainedInProject
-                    parser.clearCache(event.path)
-                    @performIndex(event.path)
+                    parser.clearCache(path)
+                    @performIndex(path, editor.getBuffer().getText())
 
     ###*
      * Deactivates the package.

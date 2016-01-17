@@ -1,4 +1,7 @@
 ## 0.5.0
+### Features and enhancements
+* Indexing will now happen continuously (onDidStopChanging of the text buffer) instead of only on save.
+
 ### Changes for developers
 * Changes to the service
   * Popovers will, by default, no longer catch pointer events (making them click-through).

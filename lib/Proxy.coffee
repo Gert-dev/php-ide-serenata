@@ -1,5 +1,6 @@
 fs            = require 'fs'
-child_process = require "child_process"
+stream        = require 'stream'
+child_process = require 'child_process'
 
 Utility = require "./Utility"
 
@@ -83,10 +84,11 @@ class Proxy
      * @param {string}   command        The command to execute.
      * @param {array}    parameters     The arguments to pass.
      * @param {Callback} streamCallback A method to invoke each time streaming data is received.
+     * @param {string}   stdinData      The data to pass to STDIN.
      *
      * @return {Promise}
     ###
-    performRequestAsync: (command, parameters, streamCallback = null) ->
+    performRequestAsync: (command, parameters, streamCallback = null, stdinData = null) ->
         return new Promise (resolve, reject) =>
             proc = child_process.spawn(command, parameters)
 
@@ -124,16 +126,23 @@ class Proxy
                 proc.stderr.on 'data', (data) =>
                     streamCallback(data)
 
+            if stdinData?
+                proc.stdin.write(stdinData, 'utf-8')
+                proc.stdin.end()
+
     ###*
      * Performs a request to the PHP side.
      *
      * @param {array}    args           The arguments to pass.
      * @param {boolean}  async          Whether to execute the method asynchronously or not.
      * @param {Callback} streamCallback A method to invoke each time streaming data is received.
+     * @param {string}   stdinData      The data to pass to STDIN.
+     *
+     * @todo Support stdinData for synchronous requests as well.
      *
      * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    performRequest: (args, async, streamCallback) ->
+    performRequest: (args, async, streamCallback = null, stdinData = null) ->
         php = @config.get('phpCommand')
         parameters = @prepareParameters(args)
 
@@ -141,7 +150,7 @@ class Proxy
             return @performRequestSync(php, parameters)
 
         else
-            return @performRequestAsync(php, parameters, streamCallback)
+            return @performRequestAsync(php, parameters, streamCallback, stdinData)
 
     ###*
      * Retrieves a list of available classes.
@@ -188,14 +197,16 @@ class Proxy
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {string}   filename               The path to the file or folder to (re)index.
-     * @param {Callback} progressStreamCallback A method to invoke each time progress streaming data is received.
+     * @param {string}      path                   The full path to the file  or folder to refresh.
+     * @param {string|null} source                 The source code of the file to index. May be null if a directory is
+     *                                             passed instead.
+     * @param {Callback}    progressStreamCallback A method to invoke each time progress streaming data is received.
      *
      * @return {Promise}
     ###
-    reindex: (filename, progressStreamCallback) ->
+    reindex: (path, source, progressStreamCallback) ->
         # For Windows - Replace \ in class namespace to / because composer uses / instead of \.
-        filename = Utility.normalizeSeparators(filename)
+        path = Utility.normalizeSeparators(path)
 
         progressStreamCallbackWrapper = (output) =>
             # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
@@ -205,7 +216,7 @@ class Proxy
             for percentage in percentages
                 progressStreamCallback(percentage)
 
-        return @performRequest(['--reindex', filename, '--stream-progress'], true, progressStreamCallbackWrapper)
+        return @performRequest(['--reindex', path, '--stream-progress'], true, progressStreamCallbackWrapper, source)
 
     ###*
      * Sets the name (without path or extension) of the database file to use.

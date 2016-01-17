@@ -837,6 +837,9 @@ class Parser
                 if chain.indexOf('.comment') != -1
                     continue
 
+                else if chain.indexOf('.storage.modifier') != -1
+                    return null # Storage modifiers can only exist outside function calls, exit early.
+
                 else if lineText[i] == '}' and chain.indexOf('.scope.end') != -1
                     ++scopesClosed
 

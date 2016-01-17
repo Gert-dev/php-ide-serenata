@@ -195,7 +195,7 @@ class Application
     protected function reindex(array $arguments)
     {
         if (empty($arguments)) {
-            throw new UnexpectedValueException('The path to index is required for this command.');
+            throw new UnexpectedValueException('The file or directory to index (or \'STDIN\') is required for this command.');
         }
 
         $showOutput = false;
@@ -242,8 +242,11 @@ class Application
         if (is_dir($path)) {
             $indexer->indexDirectory($path);
         } elseif (is_file($path)) {
+            // NOTE: This call is blocking if there is no input!
+            $code = file_get_contents('php://stdin');
+
             try {
-                $indexer->indexFile($path);
+                $indexer->indexFile($path, $code ?: null);
             } catch (Indexer\IndexingFailedException $e) {
                 throw new UnexpectedValueException('The file could not be indexed because it contains syntax errors!');
             }
