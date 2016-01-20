@@ -109,8 +109,8 @@ describe "getInvocationInfoAt", ->
             <?php
 
             builtin_func(/* test */
-                1,// a comment
-                2,/*}*/
+                "]",// a comment
+                "}",/*}*/
                 ['test'
             """
 
