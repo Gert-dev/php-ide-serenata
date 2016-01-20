@@ -1,48 +1,21 @@
+os = require 'os'
 
 module.exports =
     ###*
-     * Escapes slashes for the specified text.
+     * Escapes the specified parameter for use on the command line.
      *
-     * @param {string} text
-     *
-     * @return {string}
-    ###
-    escapeSeparators: (text) ->
-        return '' if not text
-
-        return text.replace(/\\/g, '\\\\')
-
-    ###*
-     * Normalizes separators to forward slashes.
-     *
-     * @param {string} text
+     * @param {string} parameter
      *
      * @return {string}
     ###
-    normalizeSeparators: (text) ->
-        return '' if not text
+    escapeShellParameter: (parameter) ->
+        return parameter if not parameter
 
-        return text.replace(/\\/g, '/')
+        if os.type() == "Windows_NT"
+            parameter = '"' + parameter.replace(/"/g, '""') + '"'
 
-    ###*
-     * Escapes the specified path by replacing spaces with a backslash.
-     *
-     * @param {string} text
-     *
-     * @return {string}
-    ###
-    escapeSpaces: (text) ->
-      return '' if not text
+        else
+            parameter = parameter.replace(/\\/g, '\\\\')
+            parameter = parameter.replace(/\ /g, '\\ ')
 
-      return text.replace(/\ /g, '\\ ')
-
-    ###*
-     * Quotes text
-     *
-     * @param {string} text
-     *
-     * @return {string}
-    ###
-    quote: (text) ->
-      return '""' if not text || text.length == 0
-      return '"' + text.replace(/"/g, '""') + '"'
+        return parameter

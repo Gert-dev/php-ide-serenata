@@ -35,22 +35,14 @@ class Proxy
      * @return {array}
     ###
     prepareParameters: (args) ->
-        win = os.type() == "Windows_NT"
-        escapeFunc = if win then Utility.quote else Utility.escapeSpaces
         parameters = [
             '-d memory_limit=-1',
-            escapeFunc(__dirname + "/../php/src/Main.php"),
-            escapeFunc(@getIndexDatabasePath())
+            Utility.escapeShellParameter(__dirname + "/../php/src/Main.php"),
+            Utility.escapeShellParameter(@getIndexDatabasePath())
         ]
 
         for a in args
-            if win
-              a = Utility.quote(a);
-            else
-              a = Utility.escapeSeparators(a)
-              a = Utility.escapeSpaces(a)
-
-            parameters.push(a)
+            parameters.push(Utility.escapeShellParameter(a))
 
         return parameters
 
@@ -210,9 +202,6 @@ class Proxy
      * @return {Promise}
     ###
     reindex: (path, source, progressStreamCallback) ->
-        # For Windows - Replace \ in class namespace to / because composer uses / instead of \.
-        path = Utility.normalizeSeparators(path)
-
         progressStreamCallbackWrapper = (output) =>
             # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
             percentages = output.toString('ascii').split("\n")
