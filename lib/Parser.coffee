@@ -824,6 +824,15 @@ class Parser
 
         argumentIndex = 0
 
+        # This is purely done for optimization. Fetching the scope descriptor for every character index is very
+        # expensive and is what makes this function slow. By keeping this list we can fetch it only when necessary.
+        interestingCharacters = [
+            '{', '}',
+            '[', ']',
+            '(', ')',
+            ';', ','
+        ]
+
         for line in [bufferPosition.row .. 0]
             lineText = editor.lineTextForBufferRow(line)
             length = lineText.length
@@ -832,56 +841,56 @@ class Parser
                 length = bufferPosition.column
 
             for i in [length - 1 .. 0]
-                chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
+                if lineText[i] in interestingCharacters
+                    chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
-                if chain.indexOf('.comment') != -1
-                    continue
+                    if chain.indexOf('.comment') != -1 or chain.indexOf('.string') != -1
+                        continue
 
-                else if chain.indexOf('.storage.modifier') != -1
-                    return null # Storage modifiers can only exist outside function calls, exit early.
+                    else if lineText[i] == '}'
+                        ++scopesClosed
 
-                else if lineText[i] == '}' and chain.indexOf('.scope.end') != -1
-                    ++scopesClosed
+                    else if lineText[i] == '{'
+                        ++scopesOpened
 
-                else if lineText[i] == '{' and chain.indexOf('.scope.begin') != -1
-                    ++scopesOpened
+                        if scopesOpened > scopesClosed
+                            return null # We reached the start of a block, we can never be in a method call.
 
-                    if scopesOpened > scopesClosed
-                        return null # We reached the start of a block, we can never be in a method call.
+                    else if lineText[i] == ']'
+                        ++bracketsClosed
 
-                else if lineText[i] == ']' and chain.indexOf('.array.end') != -1
-                    ++bracketsClosed
+                    else if lineText[i] == '['
+                        ++bracketsOpened
 
-                else if lineText[i] == '[' and chain.indexOf('.array.begin') != -1
-                    ++bracketsOpened
+                    else if lineText[i] == ')'
+                        ++parenthesesClosed
 
-                else if lineText[i] == ')' and chain == '.text.html.php .meta.embedded.block.php .source.php'
-                    ++parenthesesClosed
+                    else if lineText[i] == '('
+                        ++parenthesesOpened
 
-                else if lineText[i] == '(' and chain == '.text.html.php .meta.embedded.block.php .source.php'
-                    ++parenthesesOpened
+                    else if scopesOpened == scopesClosed
+                        if lineText[i] == ';'
+                            return null # We've moved too far and reached another expression, stop here.
 
-                else if scopesOpened == scopesClosed and lineText[i] == ';'
-                    return null # We've moved too far and reached another expression, stop here.
-
-                else if scopesOpened == scopesClosed and
-                        bracketsOpened >= bracketsClosed and
-                        parenthesesOpened == parenthesesClosed and
-                        lineText[i] == ','
-                    ++argumentIndex
+                        else if bracketsOpened >= bracketsClosed and
+                                parenthesesOpened == parenthesesClosed and
+                                lineText[i] == ','
+                            ++argumentIndex
 
                 if scopesOpened == scopesClosed and
-                   parenthesesOpened == (parenthesesClosed + 1) and
-                   (chain.indexOf('.function-call') != -1 or chain.indexOf('.support.function') != -1)
-                    currentBufferPosition = new Point(line, i+1)
+                   parenthesesOpened == (parenthesesClosed + 1)
+                    chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
-                    callStack = @retrieveSanitizedCallStackAt(editor, currentBufferPosition)
+                    if chain.indexOf('.function-call') != -1 or chain.indexOf('.support.function') != -1
+                        currentBufferPosition = new Point(line, i+1)
 
-                    return {
-                        callStack      : callStack
-                        argumentIndex  : argumentIndex
-                        bufferPosition : currentBufferPosition
-                    }
+                        callStack = @retrieveSanitizedCallStackAt(editor, currentBufferPosition)
+
+                        return {
+                            callStack      : callStack
+                            argumentIndex  : argumentIndex
+                            bufferPosition : currentBufferPosition
+                        }
 
         return null
 
