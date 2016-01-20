@@ -67,7 +67,7 @@ class Proxy
                 throw response.error
 
             if not response.success
-                throw "An unsuccessful status code was returned by the PHP side!"
+                throw 'An unsuccessful status code was returned by the PHP side!'
 
         catch error
             throw (if error.message then error.message else error)
@@ -189,6 +189,9 @@ class Proxy
      * @return {Promise|Object}
     ###
     getClassInfo: (className, async = false) ->
+        if not className
+            throw 'No class name passed!'
+
         return @performRequest(['--class-info', className], async)
 
     ###*
@@ -202,6 +205,9 @@ class Proxy
      * @return {Promise}
     ###
     reindex: (path, source, progressStreamCallback) ->
+        if not path
+            throw 'No class name passed!'
+
         progressStreamCallbackWrapper = (output) =>
             # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
             percentages = output.toString('ascii').split("\n")
