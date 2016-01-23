@@ -881,16 +881,24 @@ class Parser
                    parenthesesOpened == (parenthesesClosed + 1)
                     chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
-                    if chain.indexOf('.function-call') != -1 or chain.indexOf('.support.function') != -1
+                    isClassName = (chain.indexOf('.support.class') != -1)
+                    isKeyword = (chain.indexOf('.storage.type') != -1)
+
+                    if chain.indexOf('.function-call') != -1 or
+                       chain.indexOf('.support.function') != -1 or
+                       isClassName or
+                       isKeyword
                         currentBufferPosition = new Point(line, i+1)
 
                         callStack = @retrieveSanitizedCallStackAt(editor, currentBufferPosition)
 
-                        return {
-                            callStack      : callStack
-                            argumentIndex  : argumentIndex
-                            bufferPosition : currentBufferPosition
-                        }
+                        if not isKeyword or (isKeyword and (callStack[0] == 'self' or callStack[0] == 'static'))
+                            return {
+                                callStack      : callStack
+                                type           : if (isClassName or isKeyword) then 'instantiation' else 'function'
+                                argumentIndex  : argumentIndex
+                                bufferPosition : currentBufferPosition
+                            }
 
         return null
 

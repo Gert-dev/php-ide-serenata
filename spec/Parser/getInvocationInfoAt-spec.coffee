@@ -128,6 +128,91 @@ describe "getInvocationInfoAt", ->
         expect(result.bufferPosition.row).toEqual(2)
         expect(result.bufferPosition.column).toEqual(12)
         expect(result.callStack).toEqual(['builtin_func'])
+        expect(result.type).toEqual('function')
+        expect(result.argumentIndex).toEqual(2)
+
+    it "correctly deals with constructor calls (the new keyword).", ->
+        source =
+            """
+            <?php
+
+            new MyObject(
+                1,
+                2,
+                3
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        result = parser.getInvocationInfoAt(editor, bufferPosition)
+
+        expect(result.bufferPosition.row).toEqual(2)
+        expect(result.bufferPosition.column).toEqual(12)
+        expect(result.callStack).toEqual(['MyObject'])
+        expect(result.type).toEqual('instantiation')
+        expect(result.argumentIndex).toEqual(2)
+
+    it "correctly deals with constructor calls (the new keyword).", ->
+        source =
+            """
+            <?php
+
+            new static(
+                1,
+                2,
+                3
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        result = parser.getInvocationInfoAt(editor, bufferPosition)
+
+        expect(result.bufferPosition.row).toEqual(2)
+        expect(result.bufferPosition.column).toEqual(10)
+        expect(result.callStack).toEqual(['static'])
+        expect(result.type).toEqual('instantiation')
+        expect(result.argumentIndex).toEqual(2)
+
+    it "correctly deals with constructor calls (the new keyword).", ->
+        source =
+            """
+            <?php
+
+            new self(
+                1,
+                2,
+                3
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        result = parser.getInvocationInfoAt(editor, bufferPosition)
+
+        expect(result.bufferPosition.row).toEqual(2)
+        expect(result.bufferPosition.column).toEqual(8)
+        expect(result.callStack).toEqual(['self'])
+        expect(result.type).toEqual('instantiation')
         expect(result.argumentIndex).toEqual(2)
 
     it "correctly returns null when not in an invocation.", ->
