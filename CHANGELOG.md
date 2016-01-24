@@ -10,6 +10,10 @@
   * Popovers will, by default, no longer catch pointer events (making them click-through).
   * A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
 
+## 0.4.9
+### Bugs Fixed
+* Fixed the type of function or method parameters that were not documented incorrectly being set to the type of `$this`.
+
 ## 0.4.8
 ### Bugs Fixed
 * The command names in the command palette will now be separated by spaces.
