@@ -26,7 +26,7 @@ describe "getResultingTypeFromCallStack", ->
             """
             <?php
 
-            Bar::testProperty
+            Bar::$testProperty
             """
 
         editor.setText(source)
@@ -35,6 +35,7 @@ describe "getResultingTypeFromCallStack", ->
             getClassInfo: (className) ->
                 if className == 'Bar'
                     return {
+                        constants: {}
                         properties:
                             testProperty:
                                 return:
@@ -56,7 +57,7 @@ describe "getResultingTypeFromCallStack", ->
             row    : row
             column : column
 
-        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['Bar', 'testProperty'])).toEqual('EXPECTED_TYPE')
+        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['Bar', '$testProperty'])).toEqual('EXPECTED_TYPE')
 
     it "correctly deals with self.", ->
         source =
@@ -67,7 +68,7 @@ describe "getResultingTypeFromCallStack", ->
             {
                 public function __construct()
                 {
-                    self::testProperty
+                    self::$testProperty
                 }
             }
             """
@@ -78,6 +79,8 @@ describe "getResultingTypeFromCallStack", ->
             getClassInfo: (className) ->
                 if className == 'Bar'
                     return {
+                        constants: {}
+
                         properties:
                             testProperty:
                                 return:
@@ -99,7 +102,7 @@ describe "getResultingTypeFromCallStack", ->
             row    : row
             column : column
 
-        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['self', 'testProperty'])).toEqual('EXPECTED_TYPE')
+        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['self', '$testProperty'])).toEqual('EXPECTED_TYPE')
 
     it "correctly deals with static.", ->
         source =
@@ -110,7 +113,7 @@ describe "getResultingTypeFromCallStack", ->
             {
                 public function __construct()
                 {
-                    static::testProperty
+                    static::$testProperty
                 }
             }
             """
@@ -121,6 +124,8 @@ describe "getResultingTypeFromCallStack", ->
             getClassInfo: (className) ->
                 if className == 'Bar'
                     return {
+                        constants: {}
+
                         properties:
                             testProperty:
                                 return:
@@ -142,7 +147,7 @@ describe "getResultingTypeFromCallStack", ->
             row    : row
             column : column
 
-        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['static', 'testProperty'])).toEqual('EXPECTED_TYPE')
+        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['static', '$testProperty'])).toEqual('EXPECTED_TYPE')
 
     it "correctly deals with parent.", ->
         source =
@@ -153,7 +158,7 @@ describe "getResultingTypeFromCallStack", ->
             {
                 public function __construct()
                 {
-                    parent::testProperty
+                    parent::$testProperty
                 }
             }
             """
@@ -166,6 +171,8 @@ describe "getResultingTypeFromCallStack", ->
 
                 if className == 'ParentClass'
                     return {
+                        constants: {}
+
                         properties:
                             testProperty:
                                 return:
@@ -191,7 +198,7 @@ describe "getResultingTypeFromCallStack", ->
             row    : row
             column : column
 
-        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['parent', 'testProperty'])).toEqual('EXPECTED_TYPE')
+        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['parent', '$testProperty'])).toEqual('EXPECTED_TYPE')
 
     it "correctly deals with $this.", ->
         source =
@@ -213,6 +220,8 @@ describe "getResultingTypeFromCallStack", ->
             getClassInfo: (className) ->
                 if className == 'Bar'
                     return {
+                        constants: {}
+
                         properties:
                             testProperty:
                                 return:
@@ -254,6 +263,8 @@ describe "getResultingTypeFromCallStack", ->
             getClassInfo: (className) ->
                 if className == 'Bar'
                     return {
+                        constants: {}
+
                         properties:
                             testProperty:
                                 return:
@@ -298,6 +309,8 @@ describe "getResultingTypeFromCallStack", ->
             getClassInfo: (className) ->
                 if className == '\\DateTime'
                     return {
+                        constants: {}
+
                         properties:
                             '':
                                 return:
@@ -379,6 +392,7 @@ describe "getResultingTypeFromCallStack", ->
             getClassInfo: (className) ->
                 if className == 'Bar'
                     return {
+                        constants: {}
                         properties:
                             '':
                                 return:
@@ -429,6 +443,7 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         name: 'Bar'
                         methods: {}
+                        constants: {}
                         properties:
                             testProperty:
                                 return:
@@ -438,6 +453,7 @@ describe "getResultingTypeFromCallStack", ->
                 if className == 'EXPECTED_TYPE_1'
                     return {
                         name: 'EXPECTED_TYPE_1'
+                        constants: {}
                         methods:
                             aMethod:
                                 return:
@@ -448,6 +464,7 @@ describe "getResultingTypeFromCallStack", ->
                     return {
                         name: 'EXPECTED_TYPE_2'
                         methods: {}
+                        constants: {}
 
                         properties:
                             anotherProperty:

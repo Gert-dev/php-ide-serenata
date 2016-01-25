@@ -715,14 +715,19 @@ class Parser
         return null if not callStack or callStack.length == 0
 
         firstElement = callStack.shift()
+        propertyAccessNeedsDollarSign = false
 
         if firstElement[0] == '$'
             className = @getVariableType(editor, bufferPosition, firstElement)
 
         else if firstElement == 'static' or firstElement == 'self'
+            propertyAccessNeedsDollarSign = true
+
             className = @determineFullClassName(editor)
 
         else if firstElement == 'parent'
+            propertyAccessNeedsDollarSign = true
+
             currentClassName = @determineFullClassName(editor)
             currentClassInfo = @proxy.getClassInfo(currentClassName)
 
@@ -764,6 +769,8 @@ class Parser
                 className = functions[matches[1]].return.type
 
         else if ///#{classRegexPart}///.test(firstElement)
+            propertyAccessNeedsDollarSign = true
+
             # Static class name.
             className = @determineFullClassName(editor, firstElement)
 
@@ -776,38 +783,41 @@ class Parser
         # in the call stack.
         for element in callStack
             if not @isBasicType(className)
-                className = @getTypeForMember(className, element)
+                # className = @getTypeForMember(className, element)
+
+                info = @proxy.getClassInfo(className)
+
+                className = null
+
+                if element.indexOf('()') != -1
+                    element = element.replace('()', '')
+
+                    if element of info.methods
+                        className = info.methods[element].return.resolvedType
+
+                else if element of info.constants
+                    className = info.constants[element].return.resolvedType
+
+                else
+                    isValidPropertyAccess = false
+
+                    if not propertyAccessNeedsDollarSign
+                        isValidPropertyAccess = true
+
+                    else if element.length > 0 and element[0] == '$'
+                        element = element.substr(1)
+                        isValidPropertyAccess = true
+
+                    if isValidPropertyAccess and element of info.properties
+                        className = info.properties[element].return.resolvedType
 
             else
                 className = null
                 break
 
+            propertyAccessNeedsDollarSign = false
+
         return className
-
-    ###*
-     * Retrieves the type that is returned by the member with the specified name in the specified class.
-     *
-     * @param {string} className
-     * @param {string} name
-     *
-     * @return {string}
-    ###
-    getTypeForMember: (className, member) ->
-        info = @proxy.getClassInfo(className)
-
-        if member.indexOf('()') != -1
-            member = member.replace('()', '')
-
-            if member of info.methods
-                return info.methods[member].return.resolvedType
-
-        else if member of info.properties
-            return info.properties[member].return.resolvedType
-
-        else if member of info.constants
-            return info.constants[member].return.resolvedType
-
-        return null
 
     ###*
      * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
