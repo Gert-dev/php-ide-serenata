@@ -67,7 +67,7 @@ describe "getResultingTypeFromCallStack", ->
             {
                 public function __construct()
                 {
-                    self::testProperty
+                    self::$testProperty
                 }
             }
             """
@@ -110,7 +110,7 @@ describe "getResultingTypeFromCallStack", ->
             {
                 public function __construct()
                 {
-                    static::testProperty
+                    static::$testProperty
                 }
             }
             """
@@ -153,7 +153,7 @@ describe "getResultingTypeFromCallStack", ->
             {
                 public function __construct()
                 {
-                    parent::testProperty
+                    parent::$testProperty
                 }
             }
             """
