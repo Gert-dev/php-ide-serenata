@@ -3,6 +3,7 @@
 * Indexing will now happen continuously (onDidStopChanging of the text buffer) instead of only on save.
 
 ### Bugs Fixed
+* Fixed issues with retrieving types in call stacks including static access, such as `self::$property->foo`.
 * Fixed paths with spaces not indexing properly on Windows. (thanks to [@dipyalov](https://github.com/dipyalov))
 
 ### Changes for developers
