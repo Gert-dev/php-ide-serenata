@@ -2,7 +2,7 @@
 ### Features and enhancements
 * Indexing will now happen continuously (onDidStopChanging of the text buffer) instead of only on save.
 
-### Bugs Fixed
+### Bugs fixed
 * Fixed issues with retrieving types in call stacks including static access, such as `self::$property->foo`.
 * Fixed paths with spaces not indexing properly on Windows. (thanks to [@dipyalov](https://github.com/dipyalov))
 
@@ -12,43 +12,43 @@
   * A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
 
 ## 0.4.9
-### Bugs Fixed
+### Bugs fixed
 * Fixed the type of function or method parameters that were not documented incorrectly being set to the type of `$this`.
 
 ## 0.4.8
-### Bugs Fixed
+### Bugs fixed
 * The command names in the command palette will now be separated by spaces.
 * The indexer will no longer show warnings when `file_get_contents` fails. This will be caught and a warning will be displayed in verbose mode instead, ensuring that it will no longer cause indexing to fail in its entirety.
 * Fixed interfaces extending multiple other interfaces only having the first parent interface examined. This resulted in some class members not being listed if you implemented such an interface and could also result in files being scanned in the incorrect order (i.e. a child interface before a parent interface). This also resulted in a minor performance increase when fetching class information regarding inheritance as less queries are performed.
 
 ## 0.4.7
-### Bugs Fixed
+### Bugs fixed
 * Bump the database version.
 
 ## 0.4.6
-### Bugs Fixed
+### Bugs fixed
 * Fixed types sometimes showing up as [Object object] because the indexer was incorrectly saving an object instead of a string type.
 * Fixed built-in functions not having an empty array serialized to the throws_serialized field, resulting in warnings when iterating over them, which in turn caused problems on the CoffeeScript side.
 
 ## 0.4.5
-### Bugs Fixed
+### Bugs fixed
 * Fixed magic properties ending up in the index with a dollar sign in their name.
 * Fixed built-in class constants being indexed by value instead of name. This also resulted in a constraint error in the database. (thanks to [@tocjent](https://github.com/tocjent))
 
 ## 0.4.4
-### Bugs Fixed
+### Bugs fixed
 * Do not try to index structural elements that do not have a namespaced name, which can happen for anonymous PHP 7 classes.
 
 ## 0.4.3
-### Bugs Fixed
+### Bugs fixed
 * Disable the xdebug nesting limit by setting it to -1, which was posing problems when resolving names.
 
 ## 0.4.2
-### Bugs Fixed
+### Bugs fixed
 * Fixed the `indexes` folder not automatically being created.
 
 ## 0.4.1
-### Bugs Fixed
+### Bugs fixed
 * Removed the 'old version' note from the README.
 
 ## 0.4.0
@@ -100,7 +100,7 @@ class Foo
   * Functions and methods no longer return a separate `parameters` and `optionals` property. The two have now been merged and provide more information (such as whether the parameters are a reference, variadic, optional, ...).
 
 ## 0.3.1
-### Bugs Fixed
+### Bugs fixed
 * Fixed methods returning `static`, `self` or `$this` not properly having their full type deduced.
 * Fixed inline type override annotations not being able to contain descriptions (e.g. `/** @var Class $foo Some description. */`).
 
