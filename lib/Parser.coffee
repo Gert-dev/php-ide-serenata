@@ -395,11 +395,18 @@ class Parser
                     # Variable name.
                     if lineText[i] == '$'
                         if backwards
+                            # NOTE: We don't break because dollar signs can be taken up in expressions such as
+                            # static::$foo.
                             finishedOn = false
-                            break
 
                     # Reached an operator that can never be part of the current statement.
+                    #else if lineText[i] == ','
                     else if lineText[i] == ','
+                        finishedOn = true
+                        break
+
+                    # Stop on keywords such as 'return' or 'echo'.
+                    else if scopeDescriptor.indexOf('.keyword.control') != -1 or scopeDescriptor.indexOf('.support.function') != -1
                         finishedOn = true
                         break
 
@@ -623,7 +630,7 @@ class Parser
                                     if param.name == element.substr(1)
                                         if param.type?
                                             bestMatch = @determineFullClassName(editor, param.type)
-                                            
+
                                         break
 
                         catch error
