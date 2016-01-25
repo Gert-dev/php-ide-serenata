@@ -11,10 +11,12 @@ module.exports =
     escapeShellParameter: (parameter) ->
         return parameter if not parameter
 
-        if os.type() == "Windows_NT"
-            parameter = '"' + parameter.replace(/"/g, '""') + '"'
+        # See also https://github.com/Gert-dev/php-integrator-base/pull/53.
+        #if os.type() == "Windows_NT"
+            #parameter = '"' + parameter.replace(/"/g, '""') + '"'
 
-        else
+        #else
+        if os.type() != "Windows_NT"
             parameter = parameter.replace(/\\/g, '\\\\')
             parameter = parameter.replace(/\ /g, '\\ ')
 
