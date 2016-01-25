@@ -45,6 +45,19 @@ describe "retrieveSanitizedCallStack", ->
 
         expect(parser.retrieveSanitizedCallStack(source)).toEqual(expectedResult)
 
+    it "correctly sanitizes call stacks that start with a new instance.", ->
+        source =
+            """
+            (new Foo())->myFunc
+            """
+
+        expectedResult = [
+            'new Foo()',
+            'myFunc'
+        ]
+
+        expect(parser.retrieveSanitizedCallStack(source)).toEqual(expectedResult)
+
     it "correctly sanitizes closures.", ->
         source =
             """
