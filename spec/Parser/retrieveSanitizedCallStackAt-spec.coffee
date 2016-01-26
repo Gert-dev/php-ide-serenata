@@ -31,6 +31,26 @@ describe "retrieveSanitizedCallStackAt", ->
         editor.setText(source)
         expect(parser.retrieveSanitizedCallStackAt(editor, {row: 0, column: source.length})).toEqual(['parent', 'foo', 'test'])
 
+    it "correctly stops at basic function calls.", ->
+        source =
+            """
+            <?php
+
+            array_walk()
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            'array_walk'
+        ]
+
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 10
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
     it "correctly stops at static class names.", ->
         source =
             """
