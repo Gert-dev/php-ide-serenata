@@ -4,6 +4,7 @@
 
 ### Bugs fixed
 * Fixed issues with retrieving types in call stacks including static access, such as `self::$property->foo`.
+* Fixed built-in methods and functions having class types as parameters not being properly indexed. Instead, a PHP object would be returned in the parameter list. (Only applies to PHP 7.)
 * Fixed paths with spaces not indexing properly on Windows. (thanks to [@dipyalov](https://github.com/dipyalov))
 
 ### Changes for developers

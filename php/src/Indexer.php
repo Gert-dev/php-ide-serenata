@@ -439,7 +439,7 @@ class Indexer
                     $parameterData = [
                         'function_id'  => $functionId,
                         'name'         => $parameter->getName(),
-                        'type'         => $type,
+                        'type'         => (string) $type,
                         'description'  => null,
                         'is_reference' => $parameter->isPassedByReference() ? 1 : 0,
                         'is_optional'  => $parameter->isOptional() ? 1 : 0,
@@ -552,7 +552,7 @@ class Indexer
 
                 $parameters[] = [
                     'name'        => $param->getName(),
-                    'type'        => $type,
+                    'type'        => (string) $type,
                     'isReference' => $param->isPassedByReference(),
                     'isVariadic'  => $isVariadic,
                     'isOptional'  => $param->isOptional()
