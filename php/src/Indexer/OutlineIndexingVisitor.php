@@ -37,17 +37,7 @@ class OutlineIndexingVisitor extends NameResolver
      */
     public function enterNode(Node $node)
     {
-        parent::enterNode($node);
-
-        if ($node instanceof Node\Stmt\Class_) {
-            $this->parseClassNode($node);
-        } elseif ($node instanceof Node\Stmt\Interface_) {
-            $this->parseInterfaceNode($node);
-        } elseif ($node instanceof Node\Stmt\Trait_) {
-            $this->parseTraitNode($node);
-        } elseif ($node instanceof Node\Stmt\TraitUse) {
-            $this->parseTraitUseNode($node);
-        } elseif ($node instanceof Node\Stmt\Property) {
+        if ($node instanceof Node\Stmt\Property) {
             $this->parseClassPropertyNode($node);
         } elseif ($node instanceof Node\Stmt\ClassMethod) {
             $this->parseClassMethodNode($node);
@@ -57,6 +47,17 @@ class OutlineIndexingVisitor extends NameResolver
             $this->parseFunctionNode($node);
         } elseif ($node instanceof Node\Stmt\Const_) {
             $this->parseConstantNode($node);
+        } elseif ($node instanceof Node\Stmt\Class_) {
+            $this->parseClassNode($node);
+        } elseif ($node instanceof Node\Stmt\Interface_) {
+            $this->parseInterfaceNode($node);
+        } elseif ($node instanceof Node\Stmt\Trait_) {
+            $this->parseTraitNode($node);
+        } elseif ($node instanceof Node\Stmt\TraitUse) {
+            $this->parseTraitUseNode($node);
+        } else {
+            // Resolve the names for other nodes as the nodes we need depend on them being resolved.
+            parent::enterNode($node);
         }
     }
 
@@ -65,6 +66,8 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseClassNode(Node\Stmt\Class_ $node)
     {
+        parent::enterNode($node);
+
         if (!isset($node->namespacedName)) {
             return; // Ticket #45 - This could potentially not be set for PHP 7 anonymous classes.
         }
@@ -98,6 +101,8 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseInterfaceNode(Node\Stmt\Interface_ $node)
     {
+        parent::enterNode($node);
+
         if (!isset($node->namespacedName)) {
             return;
         }
@@ -129,6 +134,8 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseTraitNode(Node\Stmt\Trait_ $node)
     {
+        parent::enterNode($node);
+
         if (!isset($node->namespacedName)) {
             return;
         }
@@ -151,6 +158,8 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseTraitUseNode(Node\Stmt\TraitUse $node)
     {
+        parent::enterNode($node);
+
         /** @var Node\Name $traitName */
         foreach ($node->traits as $traitName) {
             $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['traits'][] =
@@ -204,21 +213,31 @@ class OutlineIndexingVisitor extends NameResolver
 
         /** @var \PhpParser\Node\Param $param */
         foreach ($node->params as $param) {
+            $localType = (string) $param->type;
+
+            parent::enterNode($node);
+
             $parameters[] = [
                 'name'        => $param->name,
-                'type'        => (string) $param->type,
+                'type'        => $localType,
+                'full_type'   => (string) $param->type,
                 'isReference' => $param->byRef,
                 'isVariadic'  => $param->variadic,
                 'isOptional'  => $param->default ? true : false
             ];
         }
 
+        $localReturnType = (string) $node->getReturnType();
+
+        parent::enterNode($node);
+
         $this->globalFunctions[] = [
-            'name'        => $node->name,
-            'startLine'   => $node->getLine(),
-            'returnType'  => $node->getReturnType(),
-            'parameters'  => $parameters,
-            'docComment'  => $node->getDocComment() ? $node->getDocComment()->getText() : null
+            'name'           => $node->name,
+            'startLine'      => $node->getLine(),
+            'returnType'     => $localReturnType,
+            'fullReturnType' => (string) $node->getReturnType(),
+            'parameters'     => $parameters,
+            'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null
         ];
     }
 
@@ -231,25 +250,35 @@ class OutlineIndexingVisitor extends NameResolver
 
         /** @var \PhpParser\Node\Param $param */
         foreach ($node->params as $param) {
+            $localType = (string) $param->type;
+
+            parent::enterNode($node);
+
             $parameters[] = [
                 'name'        => $param->name,
-                'type'        => (string) $param->type,
+                'type'        => $localType,
+                'fullType'    => (string) $param->type,
                 'isReference' => $param->byRef,
                 'isVariadic'  => $param->variadic,
                 'isOptional'  => $param->default ? true : false
             ];
         }
 
+        $localReturnType = (string) $node->getReturnType();
+
+        parent::enterNode($node);
+
         $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['methods'][] = [
-            'name'        => $node->name,
-            'startLine'   => $node->getLine(),
-            'isPublic'    => $node->isPublic(),
-            'isPrivate'   => $node->isPrivate(),
-            'isProtected' => $node->isProtected(),
-            'isStatic'    => $node->isStatic(),
-            'returnType'  => $node->getReturnType(),
-            'parameters'  => $parameters,
-            'docComment'  => $node->getDocComment() ? $node->getDocComment()->getText() : null
+            'name'           => $node->name,
+            'startLine'      => $node->getLine(),
+            'isPublic'       => $node->isPublic(),
+            'isPrivate'      => $node->isPrivate(),
+            'isProtected'    => $node->isProtected(),
+            'isStatic'       => $node->isStatic(),
+            'returnType'     => $localReturnType,
+            'fullReturnType' => (string) $node->getReturnType(),
+            'parameters'     => $parameters,
+            'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null
         ];
     }
 

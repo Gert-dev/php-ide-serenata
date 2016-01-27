@@ -412,7 +412,7 @@ class IndexDataAdapter
             if ($method['return']['type'] === '$this' || $method['return']['type'] === 'static') {
                 $method['return']['resolvedType'] = $element['fqsen'];
             } elseif (!isset($method['return']['resolvedType'])) {
-                $method['return']['resolvedType'] = $method['return']['type'];
+                $method['return']['resolvedType'] = $method['return']['fullType'];
             }
         }
 
@@ -420,7 +420,7 @@ class IndexDataAdapter
             if ($property['return']['type'] === '$this' || $property['return']['type'] === 'static') {
                 $property['return']['resolvedType'] = $element['fqsen'];
             } elseif (!isset($property['return']['resolvedType'])) {
-                $property['return']['resolvedType'] = $property['return']['type'];
+                $property['return']['resolvedType'] = $property['return']['fullType'];
             }
         }
 
@@ -464,6 +464,7 @@ class IndexDataAdapter
             $parameters[] = [
                 'name'        => $rawParameter['name'],
                 'type'        => $rawParameter['type'],
+                'fullType'    => $rawParameter['full_type'],
                 'description' => $rawParameter['description'],
                 'isReference' => !!$rawParameter['is_reference'],
                 'isVariadic'  => !!$rawParameter['is_variadic'],
@@ -497,6 +498,7 @@ class IndexDataAdapter
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['full_return_type'],
                 'description'  => $rawInfo['return_description']
             ]
         ];
@@ -527,6 +529,7 @@ class IndexDataAdapter
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['full_return_type'],
                 'description'  => $rawInfo['return_description']
             ],
 
@@ -563,6 +566,7 @@ class IndexDataAdapter
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['full_return_type'],
                 'description'  => $rawInfo['return_description']
             ],
         ];

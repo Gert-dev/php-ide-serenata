@@ -10,6 +10,7 @@
 ### Changes for developers
 * Changes to the service
   * Popovers will, by default, no longer catch pointer events (making them click-through).
+  * The type for parameters of methods will now return the type as it was found in the file. If you wish to access the full resolved class type, you can use the new `fullType` property instead.
   * A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
 
 ## 0.4.9

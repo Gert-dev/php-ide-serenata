@@ -15,7 +15,7 @@ class Application
      *
      * @var int
      */
-    const DATABASE_VERSION = 4;
+    const DATABASE_VERSION = 5;
 
     /**
      * @var IndexDatabase

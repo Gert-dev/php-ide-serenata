@@ -380,6 +380,7 @@ class Indexer
                     'short_description'     => null,
                     'long_description'      => null,
                     'return_type'           => null,
+                    'full_return_type'      => null,
                     'return_description'    => null
                 ]);
             }
@@ -415,6 +416,7 @@ class Indexer
                     'short_description'     => null,
                     'long_description'      => null,
                     'return_type'           => $returnType,
+                    'full_return_type'      => $returnType,
                     'return_description'    => null
                 ]);
 
@@ -440,6 +442,7 @@ class Indexer
                         'function_id'  => $functionId,
                         'name'         => $parameter->getName(),
                         'type'         => (string) $type,
+                        'full_type'    => (string) $type,
                         'description'  => null,
                         'is_reference' => $parameter->isPassedByReference() ? 1 : 0,
                         'is_optional'  => $parameter->isOptional() ? 1 : 0,
@@ -553,6 +556,7 @@ class Indexer
                 $parameters[] = [
                     'name'        => $param->getName(),
                     'type'        => (string) $type,
+                    'full_type'   => (string) $type,
                     'isReference' => $param->isPassedByReference(),
                     'isVariadic'  => $isVariadic,
                     'isOptional'  => $param->isOptional()
@@ -567,15 +571,16 @@ class Indexer
             }
 
             $rawData['methods'][$method->getName()] = [
-                'name'        => $method->getName(),
-                'startLine'   => null,
-                'isPublic'    => $method->isPublic(),
-                'isPrivate'   => $method->isPrivate(),
-                'isProtected' => $method->isProtected(),
-                'isStatic'    => $method->isStatic(),
-                'returnType'  => $returnType,
-                'parameters'  => $parameters,
-                'docComment'  => null
+                'name'           => $method->getName(),
+                'startLine'      => null,
+                'isPublic'       => $method->isPublic(),
+                'isPrivate'      => $method->isPrivate(),
+                'isProtected'    => $method->isProtected(),
+                'isStatic'       => $method->isStatic(),
+                'returnType'     => $returnType,
+                'fullReturnType' => $returnType,
+                'parameters'     => $parameters,
+                'docComment'     => null
             ];
         }
 
@@ -939,6 +944,7 @@ class Indexer
             $parameters[] = [
                 'name'        => $parameterName,
                 'type'        => $parameter['type'],
+                'fullType'    => $parameter['type'],
                 'isReference' => false,
                 'isVariadic'  => false,
                 'isOptional'  => false
@@ -949,6 +955,7 @@ class Indexer
             $parameters[] = [
                 'name'        => $parameterName,
                 'type'        => $parameter['type'],
+                'fullType'    => $parameter['type'],
                 'isReference' => false,
                 'isVariadic'  => false,
                 'isOptional'  => true
@@ -956,15 +963,16 @@ class Indexer
         }
 
         return [
-            'name'        => $name,
-            'startLine'   => null,
-            'returnType'  => $data['type'],
-            'parameters'  => $parameters,
-            'docComment'  => "/** {$data['description']} */",
-            'isPublic'    => true,
-            'isPrivate'   => false,
-            'isProtected' => false,
-            'isStatic'    => $data['isStatic']
+            'name'           => $name,
+            'startLine'      => null,
+            'returnType'     => $data['type'],
+            'fullReturnType' => $data['type'],
+            'parameters'     => $parameters,
+            'docComment'     => "/** {$data['description']} */",
+            'isPublic'       => true,
+            'isPrivate'      => false,
+            'isProtected'    => false,
+            'isStatic'       => $data['isStatic']
         ];
     }
 
@@ -989,10 +997,11 @@ class Indexer
         ], $rawData['name']);
 
         $returnType = null;
+        $fullReturnType = null;
 
         if ($documentation['var']['type']) {
             $returnType = $documentation['var']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
@@ -1004,6 +1013,7 @@ class Indexer
             'short_description'     => $documentation['descriptions']['short'],
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
+            'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
             'structural_element_id' => $seId,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1
@@ -1043,10 +1053,11 @@ class Indexer
         }
 
         $returnType = null;
+        $fullReturnType = null;
 
         if ($documentation['var']['type']) {
             $returnType = $documentation['var']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
@@ -1057,6 +1068,7 @@ class Indexer
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
+            'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
             'structural_element_id' => $seId,
             'access_modifier_id'    => $amId,
@@ -1093,10 +1105,11 @@ class Indexer
         ], $rawData['name']);
 
         $returnType = $rawData['returnType'];
+        $fullReturnType = $rawData['fullReturnType'];
 
         if (!$returnType) {
             $returnType = $documentation['return']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
@@ -1108,6 +1121,7 @@ class Indexer
             'short_description'     => $documentation['descriptions']['short'],
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
+            'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['return']['description'],
             'structural_element_id' => $seId,
             'access_modifier_id'    => $amId,
@@ -1127,6 +1141,7 @@ class Indexer
                 'function_id'  => $functionId,
                 'name'         => $parameter['name'],
                 'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                'full_type'    => $parameter['fullType'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
                 'description'  => $parameterDoc ? $parameterDoc['description'] : null,
                 'is_reference' => $parameter['isReference'] ? 1 : 0,
                 'is_optional'  => $parameter['isOptional'] ? 1 : 0,
@@ -1144,6 +1159,7 @@ class Indexer
             $throwsData = [
                 'function_id' => $functionId,
                 'type'        => $type,
+                'full_type'   => $type,
                 'description' => $description ?: null
             ];
 
