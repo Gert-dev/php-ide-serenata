@@ -91,6 +91,14 @@ class IndexDataAdapter
             $baseClassInfo = $this->getStructuralElementInfo($seId);
 
             if ($baseClassInfo) {
+                if (!$result['descriptions']['short']) {
+                    $result['descriptions']['short'] = $baseClassInfo['descriptions']['short'];
+                }
+
+                if (!$result['descriptions']['long']) {
+                    $result['descriptions']['long'] = $baseClassInfo['descriptions']['long'];
+                }
+
                 $result['constants']  = array_merge($result['constants'], $baseClassInfo['constants']);
                 $result['properties'] = array_merge($result['properties'], $baseClassInfo['properties']);
                 $result['methods']    = array_merge($result['methods'], $baseClassInfo['methods']);

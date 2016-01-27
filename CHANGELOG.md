@@ -1,6 +1,7 @@
 ## 0.5.0
 ### Features and enhancements
 * Indexing will now happen continuously (onDidStopChanging of the text buffer) instead of only on save.
+* Descriptions from base classes or base interfaces will now be inherited if no description is present for a child class.
 
 ### Bugs fixed
 * Fixed issues with retrieving types in call stacks including static access, such as `self::$property->foo`.
