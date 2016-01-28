@@ -628,8 +628,8 @@ class Parser
                                 for param in parameters
                                     # NOTE: We compare without dollar sign.
                                     if param.name == element.substr(1)
-                                        if param.type?
-                                            bestMatch = @determineFullClassName(editor, param.type)
+                                        if param.fullType
+                                            bestMatch = param.fullType
 
                                         break
 

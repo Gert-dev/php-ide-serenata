@@ -11,11 +11,11 @@ describe "getVariableType", ->
                     parameters: [
                         {
                             name: 'test1',
-                            type: 'EXPECTED\\TYPE_1'
+                            fullType: 'EXPECTED\\TYPE_1'
                         },
                         {
                             name: 'test2',
-                            type: 'EXPECTED\\TYPE_2'
+                            fullType: 'EXPECTED\\TYPE_2'
                         }
                     ]
             }
@@ -30,10 +30,12 @@ describe "getVariableType", ->
                                 {
                                     name: 'test1',
                                     type: 'TYPE_1'
+                                    fullType: 'EXPECTED\\TYPE_1'
                                 },
                                 {
                                     name: 'test2',
                                     type: 'TYPE_2'
+                                    fullType: 'EXPECTED\\TYPE_2'
                                 }
                             ]
 

@@ -1001,7 +1001,7 @@ class Indexer
 
         if ($documentation['var']['type']) {
             $returnType = $documentation['var']['type'];
-            $fullReturnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
@@ -1057,7 +1057,7 @@ class Indexer
 
         if ($documentation['var']['type']) {
             $returnType = $documentation['var']['type'];
-            $fullReturnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
@@ -1109,7 +1109,7 @@ class Indexer
 
         if (!$returnType) {
             $returnType = $documentation['return']['type'];
-            $fullReturnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
@@ -1137,11 +1137,18 @@ class Indexer
             $parameterDoc = isset($documentation['params'][$parameterKey]) ?
                 $documentation['params'][$parameterKey] : null;
 
+            $fullType = $parameter['fullType'];
+
+            if (!$fullType) {
+                $fullType = $parameterDoc ? $parameterDoc['type'] : null;
+                $fullType = $this->getFullTypeForDocblockType($fullType, $useStatementFetchingVisitor);
+            }
+
             $parameterData = [
                 'function_id'  => $functionId,
                 'name'         => $parameter['name'],
                 'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
-                'full_type'    => $parameter['fullType'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                'full_type'    => $fullType,
                 'description'  => $parameterDoc ? $parameterDoc['description'] : null,
                 'is_reference' => $parameter['isReference'] ? 1 : 0,
                 'is_optional'  => $parameter['isOptional'] ? 1 : 0,
@@ -1159,7 +1166,7 @@ class Indexer
             $throwsData = [
                 'function_id' => $functionId,
                 'type'        => $type,
-                'full_type'   => $type,
+                'full_type'   => $this->getFullTypeForDocblockType($type, $useStatementFetchingVisitor),
                 'description' => $description ?: null
             ];
 
@@ -1243,22 +1250,22 @@ class Indexer
     }
 
     /**
-     * Resolves and determines the FQSEN of the specified return type.
+     * Resolves and determines the FQSEN of the specified type.
      *
-     * @param string                                   $returnType
+     * @param string                                   $type
      * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
      * @return string|null
      */
-    protected function getFullReturnTypeForDocblockType(
-        $returnType,
+    protected function getFullTypeForDocblockType(
+        $type,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        if (!isset($returnType) || empty($returnType)) {
+        if (!isset($type) || empty($type)) {
             return null;
         }
 
-        $soleClassName = $this->getSoleClassName($returnType);
+        $soleClassName = $this->getSoleClassName($type);
 
         if (!empty($soleClassName)) {
             if ($soleClassName[0] !== "\\" && $useStatementFetchingVisitor) {
@@ -1298,7 +1305,7 @@ class Indexer
             return $soleClassName;
         }
 
-        return $returnType;
+        return $type;
     }
 
     /**
