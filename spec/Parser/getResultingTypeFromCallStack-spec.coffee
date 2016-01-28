@@ -416,6 +416,41 @@ describe "getResultingTypeFromCallStack", ->
 
         expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['new Bar()', ''])).toEqual('EXPECTED_TYPE')
 
+    it "correctly handles the new keyword with keywords such as static.", ->
+        source =
+            """
+            <?php
+
+            class Bar
+            {
+                public function __construct()
+                {
+                    $test = new static();
+                }
+            }
+            """
+
+        editor.setText(source)
+
+        proxyMock = {
+            getGlobalFunctions: () ->
+                return {}
+
+            getClassInfo: (className) ->
+                return {}
+        }
+
+        parser = new Parser(proxyMock)
+
+        row = editor.getLineCount() - 3
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['new static()'])).toEqual('Bar')
+
     it "correctly handles longer chains.", ->
         source =
             """

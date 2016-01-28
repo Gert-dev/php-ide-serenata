@@ -5,6 +5,7 @@
 * Descriptions from base classes or base interfaces will now be inherited if no description is present for a child class.
 
 ### Bugs fixed
+* Fixed types not being properly inferred with the new keyword in combination with keywords such as `self`, `static` and `parent`, e.g. `$foo = new static();`.
 * Fixed issues with retrieving types in call stacks including static access, such as `self::$property->foo`.
 * Fixed built-in methods and functions having class types as parameters not being properly indexed. Instead, a PHP object would be returned in the parameter list. (Only applies to PHP 7.)
 * Fixed paths with spaces not indexing properly on Windows. (thanks to [@dipyalov](https://github.com/dipyalov))

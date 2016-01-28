@@ -760,7 +760,7 @@ class Parser
             className = '\\Closure'
 
         else if (matches = firstElement.match(///^new\s+(#{classRegexPart})(?:\(\))?///))
-            className = @determineFullClassName(editor, matches[1])
+            className = @getResultingTypeFromCallStack(editor, bufferPosition, [matches[1]])
 
         else if (matches = firstElement.match(/^(.*?)\(\)$/))
             # Global PHP function.
