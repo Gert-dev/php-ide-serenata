@@ -422,3 +422,25 @@ describe "getVariableType", ->
             column : column
 
         expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
+    it "correctly returns the type of a partial expression and doesn't go further than the current position.", ->
+        source =
+            """
+            <?php
+
+            $test = new EXPECTED\\TYPE_1();
+            $test = $test->
+
+            someOtherExpressionThatShouldNotBeUsed();
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 3
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')

@@ -7,6 +7,16 @@
 * Fixed issues with retrieving types in call stacks including static access, such as `self::$property->foo`.
 * Fixed built-in methods and functions having class types as parameters not being properly indexed. Instead, a PHP object would be returned in the parameter list. (Only applies to PHP 7.)
 * Fixed paths with spaces not indexing properly on Windows. (thanks to [@dipyalov](https://github.com/dipyalov))
+* Fixed variables being assigned to an expression on themselves sometimes not having their correct type deduced, for example:
+
+```php
+$foo = new Foo();
+$foo = $foo-> // The cursor is here.
+
+moreCode();
+
+// The type would now be based on "$foo = $foo->moreCode()" instead of on "$foo = new Foo()".
+```
 
 ### Changes for developers
 * Changes to the service

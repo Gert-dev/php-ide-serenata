@@ -646,21 +646,22 @@ class Parser
 
                 boundary = @determineBoundaryOfExpression(editor, matchInfo.range.end, false)
 
-                scanStartPosition = boundary
+                if boundary.row < bufferPosition.row or (boundary.row == bufferPosition.row and boundary.column <= bufferPosition.column)
+                    scanStartPosition = boundary
 
-                textSlice = editor.getTextInBufferRange([matchInfo.range.end, boundary])
+                    textSlice = editor.getTextInBufferRange([matchInfo.range.end, boundary])
 
-                elements = @retrieveSanitizedCallStack(textSlice)
+                    elements = @retrieveSanitizedCallStack(textSlice)
 
-                # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
-                # don't recognize the class name is irrelevant.
-                try
-                    bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.start, elements)
+                    # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
+                    # don't recognize the class name is irrelevant.
+                    try
+                        bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.start, elements)
 
-                catch error
-                    bestMatch = null
+                    catch error
+                        bestMatch = null
 
-                matchInfo.stop()
+                    matchInfo.stop()
 
             # Check if we can find a type hint from a catch statement that is more closely located to the requested
             # position (i.e. one that is a better match).
