@@ -219,7 +219,7 @@ class Proxy
                 progressStreamCallback(percentage)
 
         return @performRequest(
-            ['--reindex', '--database=' + @getIndexDatabasePath(), '--source=' + path, '--stream-progress'],
+            ['--reindex', '--database=' + @getIndexDatabasePath(), '--source=' + path, '--stream-progress', '--stdin'],
             true,
             progressStreamCallbackWrapper,
             source

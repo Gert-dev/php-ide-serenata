@@ -24,6 +24,7 @@ class Reindex extends BaseCommand
     protected function attachOptions(OptionCollection $optionCollection)
     {
         $optionCollection->add('source:', 'The file or directory to index.')->isa('string');
+        $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
         $optionCollection->add('v|verbose?', 'If set, verbose output will be displayed.');
         $optionCollection->add('s|stream-progress?', 'If set, progress will be streamed. Incompatible with verbose mode.');
     }
@@ -70,8 +71,12 @@ class Reindex extends BaseCommand
         if (is_dir($path)) {
             $indexer->indexDirectory($path);
         } elseif (is_file($path)) {
-            // NOTE: This call is blocking if there is no input!
-            $code = file_get_contents('php://stdin');
+            $code = null;
+
+            if (isset($arguments['stdin']) && $arguments['stdin']->value) {
+                // NOTE: This call is blocking if there is no input!
+                $code = file_get_contents('php://stdin');
+            }
 
             try {
                 $indexer->indexFile($path, $code ?: null);
