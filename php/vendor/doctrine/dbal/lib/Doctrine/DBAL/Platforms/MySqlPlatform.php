@@ -106,6 +106,7 @@ class MySqlPlatform extends AbstractPlatform
     public function getConcatExpression()
     {
         $args = func_get_args();
+
         return 'CONCAT(' . join(', ', (array) $args) . ')';
     }
 
@@ -298,7 +299,7 @@ class MySqlPlatform extends AbstractPlatform
      *
      * @deprecated Deprecated since version 2.5, Use {@link self::getColumnCollationDeclarationSQL()} instead.
      *
-     * @param string $collation   name of the collation
+     * @param string $collation name of the collation
      *
      * @return string  DBMS specific SQL code portion needed to set the COLLATION
      *                 of a field declaration.
@@ -624,6 +625,9 @@ class MySqlPlatform extends AbstractPlatform
 
                         $sql[] = 'ALTER TABLE ' . $table . ' MODIFY ' .
                             $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
+
+                        // original autoincrement information might be needed later on by other parts of the table alteration
+                        $column->setAutoincrement(true);
                     }
                 }
             }
@@ -666,7 +670,135 @@ class MySqlPlatform extends AbstractPlatform
             $diff->removedForeignKeys = array();
         }
 
-        $sql = array_merge($sql, parent::getPreAlterTableIndexForeignKeySQL($diff));
+        $sql = array_merge(
+            $sql,
+            $this->getPreAlterTableAlterIndexForeignKeySQL($diff),
+            parent::getPreAlterTableIndexForeignKeySQL($diff),
+            $this->getPreAlterTableRenameIndexForeignKeySQL($diff)
+        );
+
+        return $sql;
+    }
+
+    /**
+     * @param TableDiff $diff The table diff to gather the SQL for.
+     *
+     * @return array
+     */
+    private function getPreAlterTableAlterIndexForeignKeySQL(TableDiff $diff)
+    {
+        $sql = array();
+        $table = $diff->getName($this)->getQuotedName($this);
+
+        foreach ($diff->changedIndexes as $changedIndex) {
+            // Changed primary key
+            if ($changedIndex->isPrimary() && $diff->fromTable instanceof Table) {
+                foreach ($diff->fromTable->getPrimaryKeyColumns() as $columnName) {
+                    $column = $diff->fromTable->getColumn($columnName);
+
+                    // Check if an autoincrement column was dropped from the primary key.
+                    if ($column->getAutoincrement() && ! in_array($columnName, $changedIndex->getColumns())) {
+                        // The autoincrement attribute needs to be removed from the dropped column
+                        // before we can drop and recreate the primary key.
+                        $column->setAutoincrement(false);
+
+                        $sql[] = 'ALTER TABLE ' . $table . ' MODIFY ' .
+                            $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
+
+                        // Restore the autoincrement attribute as it might be needed later on
+                        // by other parts of the table alteration.
+                        $column->setAutoincrement(true);
+                    }
+                }
+            }
+        }
+
+        return $sql;
+    }
+
+    /**
+     * @param TableDiff $diff The table diff to gather the SQL for.
+     *
+     * @return array
+     */
+    protected function getPreAlterTableRenameIndexForeignKeySQL(TableDiff $diff)
+    {
+        $sql = array();
+        $tableName = $diff->getName($this)->getQuotedName($this);
+
+        foreach ($this->getRemainingForeignKeyConstraintsRequiringRenamedIndexes($diff) as $foreignKey) {
+            if (! in_array($foreignKey, $diff->changedForeignKeys, true)) {
+                $sql[] = $this->getDropForeignKeySQL($foreignKey, $tableName);
+            }
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Returns the remaining foreign key constraints that require one of the renamed indexes.
+     *
+     * "Remaining" here refers to the diff between the foreign keys currently defined in the associated
+     * table and the foreign keys to be removed.
+     *
+     * @param TableDiff $diff The table diff to evaluate.
+     *
+     * @return array
+     */
+    private function getRemainingForeignKeyConstraintsRequiringRenamedIndexes(TableDiff $diff)
+    {
+        if (empty($diff->renamedIndexes) || ! $diff->fromTable instanceof Table) {
+            return array();
+        }
+
+        $foreignKeys = array();
+        /** @var \Doctrine\DBAL\Schema\ForeignKeyConstraint[] $remainingForeignKeys */
+        $remainingForeignKeys = array_diff_key(
+            $diff->fromTable->getForeignKeys(),
+            $diff->removedForeignKeys
+        );
+
+        foreach ($remainingForeignKeys as $foreignKey) {
+            foreach ($diff->renamedIndexes as $index) {
+                if ($foreignKey->intersectsIndexColumns($index)) {
+                    $foreignKeys[] = $foreignKey;
+
+                    break;
+                }
+            }
+        }
+
+        return $foreignKeys;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPostAlterTableIndexForeignKeySQL(TableDiff $diff)
+    {
+        return array_merge(
+            parent::getPostAlterTableIndexForeignKeySQL($diff),
+            $this->getPostAlterTableRenameIndexForeignKeySQL($diff)
+        );
+    }
+
+    /**
+     * @param TableDiff $diff The table diff to gather the SQL for.
+     *
+     * @return array
+     */
+    protected function getPostAlterTableRenameIndexForeignKeySQL(TableDiff $diff)
+    {
+        $sql = array();
+        $tableName = (false !== $diff->newName)
+            ? $diff->getNewName()->getQuotedName($this)
+            : $diff->getName($this)->getQuotedName($this);
+
+        foreach ($this->getRemainingForeignKeyConstraintsRequiringRenamedIndexes($diff) as $foreignKey) {
+            if (! in_array($foreignKey, $diff->changedForeignKeys, true)) {
+                $sql[] = $this->getCreateForeignKeySQL($foreignKey, $tableName);
+            }
+        }
 
         return $sql;
     }
@@ -736,6 +868,7 @@ class MySqlPlatform extends AbstractPlatform
             $query .= ' MATCH ' . $foreignKey->getOption('match');
         }
         $query .= parent::getAdvancedForeignKeyOptionsSQL($foreignKey);
+
         return $query;
     }
 

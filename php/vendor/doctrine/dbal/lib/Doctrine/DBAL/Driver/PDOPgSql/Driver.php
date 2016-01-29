@@ -45,12 +45,20 @@ class Driver extends AbstractPostgreSQLDriver
                 $driverOptions
             );
 
-            if (PHP_VERSION_ID >= 50600
+            if (defined('PDO::PGSQL_ATTR_DISABLE_PREPARES')
                 && (! isset($driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES])
                     || true === $driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES]
                 )
             ) {
                 $pdo->setAttribute(PDO::PGSQL_ATTR_DISABLE_PREPARES, true);
+            }
+
+            /* defining client_encoding via SET NAMES to avoid inconsistent DSN support
+             * - the 'client_encoding' connection param only works with postgres >= 9.1
+             * - passing client_encoding via the 'options' param breaks pgbouncer support
+             */
+            if (isset($params['charset'])) {
+              $pdo->query('SET NAMES \''.$params['charset'].'\'');
             }
 
             return $pdo;
@@ -80,10 +88,11 @@ class Driver extends AbstractPostgreSQLDriver
 
         if (isset($params['dbname'])) {
             $dsn .= 'dbname=' . $params['dbname'] . ' ';
-        }
-
-        if (isset($params['charset'])) {
-            $dsn .= "options='--client_encoding=" . $params['charset'] . "'";
+        } else {
+            // Used for temporary connections to allow operations like dropping the database currently connected to.
+            // Connecting without an explicit database does not work, therefore "template1" database is used
+            // as it is certainly present in every server setup.
+            $dsn .= 'dbname=template1' . ' ';
         }
 
         if (isset($params['sslmode'])) {

@@ -76,7 +76,7 @@ class PostgreSqlPlatform extends AbstractPlatform
      */
     public function setUseBooleanTrueFalseStrings($flag)
     {
-        $this->useBooleanTrueFalseStrings = (bool)$flag;
+        $this->useBooleanTrueFalseStrings = (bool) $flag;
     }
 
     /**
@@ -343,7 +343,7 @@ class PostgreSqlPlatform extends AbstractPlatform
     {
         return "SELECT quote_ident(relname) as relname, pg_index.indisunique, pg_index.indisprimary,
                        pg_index.indkey, pg_index.indrelid,
-                       TRIM(BOTH '()' FROM pg_get_expr(indpred, indrelid)) AS where
+                       pg_get_expr(indpred, indrelid) AS where
                  FROM pg_class, pg_index
                  WHERE oid IN (
                     SELECT indexrelid
@@ -418,6 +418,34 @@ class PostgreSqlPlatform extends AbstractPlatform
     public function getCreateDatabaseSQL($name)
     {
         return 'CREATE DATABASE ' . $name;
+    }
+
+    /**
+     * Returns the SQL statement for disallowing new connections on the given database.
+     *
+     * This is useful to force DROP DATABASE operations which could fail because of active connections.
+     *
+     * @param string $database The name of the database to disallow new connections for.
+     *
+     * @return string
+     */
+    public function getDisallowDatabaseConnectionsSQL($database)
+    {
+        return "UPDATE pg_database SET datallowconn = 'false' WHERE datname = '$database'";
+    }
+
+    /**
+     * Returns the SQL statement for closing currently active connections on the given database.
+     *
+     * This is useful to force DROP DATABASE operations which could fail because of active connections.
+     *
+     * @param string $database The name of the database to close currently active connections for.
+     *
+     * @return string
+     */
+    public function getCloseActiveDatabaseConnectionsSQL($database)
+    {
+        return "SELECT pg_terminate_backend(procpid) FROM pg_stat_activity WHERE datname = '$database'";
     }
 
     /**
@@ -500,7 +528,7 @@ class PostgreSqlPlatform extends AbstractPlatform
             $oldColumnName = $columnDiff->getOldColumnName()->getQuotedName($this);
             $column = $columnDiff->column;
 
-            if ($columnDiff->hasChanged('type') || $columnDiff->hasChanged('precision') || $columnDiff->hasChanged('scale')) {
+            if ($columnDiff->hasChanged('type') || $columnDiff->hasChanged('precision') || $columnDiff->hasChanged('scale') || $columnDiff->hasChanged('fixed')) {
                 $type = $column->getType();
 
                 // here was a server version check before, but DBAL API does not support this anymore.
@@ -694,6 +722,7 @@ class PostgreSqlPlatform extends AbstractPlatform
         if ($sequence instanceof Sequence) {
             $sequence = $sequence->getQuotedName($this);
         }
+
         return 'DROP SEQUENCE ' . $sequence . ' CASCADE';
     }
 
@@ -792,7 +821,7 @@ class PostgreSqlPlatform extends AbstractPlatform
      * and passes them to the given callback function to be reconverted
      * into any custom representation.
      *
-     * @param mixed $item        The value(s) to convert.
+     * @param mixed    $item     The value(s) to convert.
      * @param callable $callback The callback function to use for converting the real boolean value(s).
      *
      * @return mixed
@@ -907,6 +936,7 @@ class PostgreSqlPlatform extends AbstractPlatform
         if ( ! empty($field['autoincrement'])) {
             return 'BIGSERIAL';
         }
+
         return 'BIGINT';
     }
 

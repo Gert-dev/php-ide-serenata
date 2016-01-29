@@ -272,6 +272,7 @@ class SQLServerPlatform extends AbstractPlatform
         if ($index->hasFlag('nonclustered')) {
             $flags = ' NONCLUSTERED';
         }
+
         return 'ALTER TABLE ' . $table . ' ADD PRIMARY KEY' . $flags . ' (' . $this->getIndexFieldDeclarationListSQL($index->getQuotedColumns($this)) . ')';
     }
 
@@ -560,8 +561,8 @@ class SQLServerPlatform extends AbstractPlatform
     /**
      * Returns the SQL clause for adding a default constraint in an ALTER TABLE statement.
      *
-     * @param  string $tableName The name of the table to generate the clause for.
-     * @param  Column $column    The column to generate the clause for.
+     * @param string $tableName The name of the table to generate the clause for.
+     * @param Column $column    The column to generate the clause for.
      *
      * @return string
      */
@@ -576,8 +577,8 @@ class SQLServerPlatform extends AbstractPlatform
     /**
      * Returns the SQL clause for dropping an existing default constraint in an ALTER TABLE statement.
      *
-     * @param  string $tableName  The name of the table to generate the clause for.
-     * @param  string $columnName The name of the column to generate the clause for.
+     * @param string $tableName  The name of the table to generate the clause for.
+     * @param string $columnName The name of the column to generate the clause for.
      *
      * @return string
      */
@@ -594,7 +595,7 @@ class SQLServerPlatform extends AbstractPlatform
      * in a column's type require dropping the default constraint first before being to
      * alter the particular column to the new definition.
      *
-     * @param  ColumnDiff $columnDiff The column diff to evaluate.
+     * @param ColumnDiff $columnDiff The column diff to evaluate.
      *
      * @return boolean True if the column alteration requires dropping its default constraint first, false otherwise.
      */
@@ -892,7 +893,7 @@ class SQLServerPlatform extends AbstractPlatform
                 JOIN sys.index_columns AS idxcol ON idx.object_id = idxcol.object_id AND idx.index_id = idxcol.index_id
                 JOIN sys.columns AS col ON idxcol.object_id = col.object_id AND idxcol.column_id = col.column_id
                 WHERE " . $this->getTableWhereClause($table, 'scm.name', 'tbl.name') . "
-                ORDER BY idx.index_id ASC, idxcol.index_column_id ASC";
+                ORDER BY idx.index_id ASC, idxcol.key_ordinal ASC";
     }
 
     /**
@@ -915,8 +916,8 @@ class SQLServerPlatform extends AbstractPlatform
      * Returns the where clause to filter schema and table name in a query.
      *
      * @param string $table        The full qualified name of the table.
-     * @param string $tableColumn  The name of the column to compare the schema to in the where clause.
-     * @param string $schemaColumn The name of the column to compare the table to in the where clause.
+     * @param string $schemaColumn The name of the column to compare the schema to in the where clause.
+     * @param string $tableColumn  The name of the column to compare the table to in the where clause.
      *
      * @return string
      */
@@ -1027,7 +1028,7 @@ class SQLServerPlatform extends AbstractPlatform
      */
     public function getListDatabasesSQL()
     {
-        return 'SELECT * FROM SYS.DATABASES';
+        return 'SELECT * FROM sys.databases';
     }
 
     /**
@@ -1035,7 +1036,7 @@ class SQLServerPlatform extends AbstractPlatform
      */
     public function getListNamespacesSQL()
     {
-        return "SELECT name FROM SYS.SCHEMAS WHERE name NOT IN('guest', 'INFORMATION_SCHEMA', 'sys')";
+        return "SELECT name FROM sys.schemas WHERE name NOT IN('guest', 'INFORMATION_SCHEMA', 'sys')";
     }
 
     /**
@@ -1181,77 +1182,110 @@ class SQLServerPlatform extends AbstractPlatform
 
         $start   = $offset + 1;
         $end     = $offset + $limit;
-        $orderBy = stristr($query, 'ORDER BY');
 
-        //Remove ORDER BY from $query (including nested parentheses in order by list).
-        $query = preg_replace('/\s+ORDER\s+BY\s+([^()]+|\((?:(?:(?>[^()]+)|(?R))*)\))+/i', '', $query);
+        // We'll find a SELECT or SELECT distinct and prepend TOP n to it
+        // Even if the TOP n is very large, the use of a CTE will
+        // allow the SQL Server query planner to optimize it so it doesn't
+        // actually scan the entire range covered by the TOP clause.
+        $selectPattern = '/^(\s*SELECT\s+(?:DISTINCT\s+)?)(.*)$/i';
+        $replacePattern = sprintf('$1%s $2', "TOP $end");
+        $query = preg_replace($selectPattern, $replacePattern, $query);
 
-        $format  = 'SELECT * FROM (%s) AS doctrine_tbl WHERE doctrine_rownum BETWEEN %d AND %d ORDER BY doctrine_rownum';
-
-        // Pattern to match "main" SELECT ... FROM clause (including nested parentheses in select list).
-        $selectFromPattern = '/^(\s*SELECT\s+(?:(.*)(?![^(]*\))))\sFROM\s/i';
-
-        if ( ! $orderBy) {
-            //Replace only "main" FROM with OVER to prevent changing FROM also in subqueries.
-            $query = preg_replace(
-                $selectFromPattern,
-                '$1, ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS doctrine_rownum FROM ',
-                $query,
-                1
-            );
-
-            return sprintf($format, $query, $start, $end);
+        if (stristr($query, "ORDER BY")) {
+            // Inner order by is not valid in SQL Server for our purposes
+            // unless it's in a TOP N subquery.
+            $query = $this->scrubInnerOrderBy($query);
         }
 
-        //Clear ORDER BY
-        $orderBy        = preg_replace('/ORDER\s+BY\s+(.*)/i', '$1', $orderBy);
-        $orderByParts   = explode(',', $orderBy);
-        $orderByColumns = array();
+        // Build a new limited query around the original, using a CTE
+        return sprintf(
+            "WITH dctrn_cte AS (%s) "
+            . "SELECT * FROM ("
+            . "SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT 0)) AS doctrine_rownum FROM dctrn_cte"
+            . ") AS doctrine_tbl "
+            . "WHERE doctrine_rownum BETWEEN %d AND %d ORDER BY doctrine_rownum ASC",
+            $query,
+            $start,
+            $end
+        );
+    }
 
-        //Split ORDER BY into parts
-        foreach ($orderByParts as &$part) {
+    /**
+     * Remove ORDER BY clauses in subqueries - they're not supported by SQL Server.
+     * Caveat: will leave ORDER BY in TOP N subqueries.
+     *
+     * @param $query
+     * @return string
+     */
+    private function scrubInnerOrderBy($query)
+    {
+        $count = substr_count(strtoupper($query), "ORDER BY");
+        $offset = 0;
 
-            if (preg_match('/(([^\s]*)\.)?([^\.\s]*)\s*(ASC|DESC)?/i', trim($part), $matches)) {
-                $orderByColumns[] = array(
-                    'column'    => $matches[3],
-                    'hasTable'  => ( ! empty($matches[2])),
-                    'sort'      => isset($matches[4]) ? $matches[4] : null,
-                    'table'     => empty($matches[2]) ? '[^\.\s]*' : $matches[2]
-                );
-            }
-        }
+        while ($count-- > 0) {
+            $qLen = strlen($query);
+            $orderByPos = stripos($query, " ORDER BY", $offset);
+            $parenCount = 0;
+            $currentPosition = $orderByPos;
 
-        $isWrapped = (preg_match('/SELECT DISTINCT .* FROM \(.*\) dctrn_result/', $query)) ? true : false;
-
-        $overColumns = array();
-
-        //Find alias for each column used in ORDER BY
-        if ( ! empty($orderByColumns)) {
-            foreach ($orderByColumns as $column) {
-                $pattern = sprintf('/%s\.%s\s+(?:AS\s+)?([^,\s)]+)/i', $column['table'], $column['column']);
-
-                if ($isWrapped) {
-                    $overColumn = preg_match($pattern, $query, $matches)
-                        ? $matches[1] : '';
-                } else {
-                    $overColumn = preg_match($pattern, $query, $matches)
-                        ? ($column['hasTable'] ? $column['table']  . '.' : '') . $column['column']
-                        : $column['column'];
+            while ($parenCount >= 0 && $currentPosition < $qLen) {
+                if ($query[$currentPosition] === '(') {
+                    $parenCount++;
+                } elseif ($query[$currentPosition] === ')') {
+                    $parenCount--;
                 }
 
-                if (isset($column['sort'])) {
-                    $overColumn .= ' ' . $column['sort'];
-                }
+                $currentPosition++;
+            }
 
-                $overColumns[] = $overColumn;
+            if ($this->isOrderByInTopNSubquery($query, $orderByPos)) {
+                // If the order by clause is in a TOP N subquery, do not remove
+                // it and continue iteration from the current position.
+                $offset = $currentPosition;
+                continue;
+            }
+
+            if ($currentPosition < $qLen - 1) {
+                $query = substr($query, 0, $orderByPos) . substr($query, $currentPosition - 1);
+                $offset = $orderByPos;
             }
         }
+        return $query;
+    }
 
-        //Replace only first occurrence of FROM with $over to prevent changing FROM also in subqueries.
-        $over  = 'ORDER BY ' . implode(', ', $overColumns);
-        $query = preg_replace($selectFromPattern, "$1, ROW_NUMBER() OVER ($over) AS doctrine_rownum FROM ", $query, 1);
+    /**
+     * Check an ORDER BY clause to see if it is in a TOP N query or subquery.
+     *
+     * @param string $query The query
+     * @param int $currentPosition Start position of ORDER BY clause
+     * @return bool true if ORDER BY is in a TOP N query, false otherwise
+     */
+    private function isOrderByInTopNSubquery($query, $currentPosition)
+    {
+        // Grab query text on the same nesting level as the ORDER BY clause we're examining.
+        $subQueryBuffer = '';
+        $parenCount = 0;
 
-        return sprintf($format, $query, $start, $end);
+        // If $parenCount goes negative, we've exited the subquery we're examining.
+        // If $currentPosition goes negative, we've reached the beginning of the query.
+        while ($parenCount >= 0 && $currentPosition >= 0) {
+            if ($query[$currentPosition] === '(') {
+                $parenCount--;
+            } elseif ($query[$currentPosition] === ')') {
+                $parenCount++;
+            }
+
+            // Only yank query text on the same nesting level as the ORDER BY clause.
+            $subQueryBuffer = ($parenCount === 0 ? $query[$currentPosition] : " ") . $subQueryBuffer;
+
+            $currentPosition--;
+        }
+
+        if (preg_match('/SELECT\s+(DISTINCT\s+)?TOP\s/i', $subQueryBuffer)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
