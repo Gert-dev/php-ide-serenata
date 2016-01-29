@@ -420,7 +420,7 @@ class IndexDataAdapter
             if ($method['return']['type'] === '$this' || $method['return']['type'] === 'static') {
                 $method['return']['resolvedType'] = $element['fqsen'];
             } elseif (!isset($method['return']['resolvedType'])) {
-                $method['return']['resolvedType'] = $method['return']['fullType'];
+                $method['return']['resolvedType'] = $method['return']['type'];
             }
         }
 
@@ -428,7 +428,7 @@ class IndexDataAdapter
             if ($property['return']['type'] === '$this' || $property['return']['type'] === 'static') {
                 $property['return']['resolvedType'] = $element['fqsen'];
             } elseif (!isset($property['return']['resolvedType'])) {
-                $property['return']['resolvedType'] = $property['return']['fullType'];
+                $property['return']['resolvedType'] = $property['return']['type'];
             }
         }
 
