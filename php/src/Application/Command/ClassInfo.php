@@ -2,7 +2,10 @@
 
 namespace PhpIntegrator\Application\Command;
 
+use ArrayAccess;
 use UnexpectedValueException;
+
+use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\IndexDataAdapter;
 
@@ -16,15 +19,23 @@ class ClassInfo extends BaseCommand
     /**
      * {@inheritDoc}
      */
-    protected function process(array $arguments)
+    protected function attachOptions(OptionCollection $optionCollection)
     {
-        if (empty($arguments)) {
+        $optionCollection->add('name:', 'The name of the class, trait or interface to fetch information about.')->isa('string');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function process(ArrayAccess $arguments)
+    {
+        if (!isset($arguments['name'])) {
             throw new UnexpectedValueException(
                 'The fully qualified name of the structural element is required for this command.'
             );
         }
 
-        $fqsen = array_shift($arguments);
+        $fqsen = $arguments['name']->value;
         $fqsen = str_replace('\\\\', '\\', $fqsen);
 
         if ($fqsen[0] === '\\') {

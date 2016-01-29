@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Application\Command;
 
+use ArrayAccess;
+
 use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Application\Command as BaseCommand;
@@ -14,7 +16,7 @@ class GlobalConstants extends BaseCommand
     /**
      * {@inheritDoc}
      */
-    protected function process(array $arguments)
+    protected function process(ArrayAccess $arguments)
     {
         $constants = [];
 

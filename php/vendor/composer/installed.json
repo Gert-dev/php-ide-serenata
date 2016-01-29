@@ -583,5 +583,49 @@
             "persistence",
             "queryobject"
         ]
+    },
+    {
+        "name": "corneltek/getoptionkit",
+        "version": "2.2.4",
+        "version_normalized": "2.2.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/c9s/GetOptionKit.git",
+            "reference": "c7170525314b587019c0b2a7b0354432b64b48e0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/c9s/GetOptionKit/zipball/c7170525314b587019c0b2a7b0354432b64b48e0",
+            "reference": "c7170525314b587019c0b2a7b0354432b64b48e0",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "corneltek/phpunit-testmore": "dev-master",
+            "satooshi/php-coveralls": "dev-master"
+        },
+        "time": "2015-10-02 07:53:43",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "GetOptionKit\\": "src/GetOptionKit/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Yo-An Lin",
+                "email": "cornelius.howl@gmail.com",
+                "homepage": "http://c9s.me"
+            }
+        ],
+        "description": "Powerful command-line option toolkit",
+        "homepage": "http://github.com/c9s/GetOptionKit"
     }
 ]

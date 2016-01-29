@@ -2,7 +2,11 @@
 
 namespace PhpIntegrator\Application;
 
+use ArrayAccess;
 use UnexpectedValueException;
+
+use GetOptionKit\OptionParser;
+use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\IndexDatabase;
 use PhpIntegrator\IndexDataAdapter;
@@ -41,15 +45,43 @@ abstract class Command implements CommandInterface
             );
         }
 
-        $databasePath = array_shift($arguments);
+        $optionCollection = new OptionCollection();
+        $optionCollection->add('database:', 'The index database to use.' )->isa('string');
 
-        $this->indexDatabase = new IndexDatabase($databasePath, static::DATABASE_VERSION);
+        $this->attachOptions($optionCollection);
+
+        $processedArguments = null;
+        $parser = new OptionParser($optionCollection);
 
         try {
-            return $this->process($arguments);
+            $processedArguments = $parser->parse($arguments);
+        } catch(\Exception $e) {
+            return $this->outputJson(false, $e->getMessage());
+        }
+
+        if (!isset($processedArguments['database'])) {
+            return $this->outputJson(false, 'No database path passed!');
+        }
+
+        $this->indexDatabase = new IndexDatabase($processedArguments['database']->value, static::DATABASE_VERSION);
+
+        try {
+            return $this->process($processedArguments);
         } catch (UnexpectedValueException $e) {
             return $this->outputJson(false, $e->getMessage());
         }
+    }
+
+    /**
+     * Sets up command line arguments expected by the command.
+     *
+     * Operates as a(n optional) template method.
+     *
+     * @param OptionCollection $optionCollection
+     */
+    protected function attachOptions(OptionCollection $optionCollection)
+    {
+
     }
 
     /**
@@ -57,11 +89,11 @@ abstract class Command implements CommandInterface
      *
      * Operates as a template method.
      *
-     * @param array $arguments
+     * @param ArrayAccess $arguments
      *
      * @return string Output to pass back.
      */
-    abstract protected function process(array $arguments);
+    abstract protected function process(ArrayAccess $arguments);
 
     /**
      * @return IndexDataAdapter

@@ -2,7 +2,10 @@
 
 namespace PhpIntegrator\Application\Command;
 
+use ArrayAccess;
 use UnexpectedValueException;
+
+use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Indexer;
 use PhpIntegrator\IndexDataAdapter;
@@ -18,27 +21,24 @@ class Reindex extends BaseCommand
     /**
      * {@inheritDoc}
      */
-    protected function process(array $arguments)
+    protected function attachOptions(OptionCollection $optionCollection)
     {
-        if (empty($arguments)) {
-            throw new UnexpectedValueException('The file or directory to index (or \'STDIN\') is required for this command.');
+        $optionCollection->add('source:', 'The file or directory to index.')->isa('string');
+        $optionCollection->add('v|verbose?', 'If set, verbose output will be displayed.');
+        $optionCollection->add('s|stream-progress?', 'If set, progress will be streamed. Incompatible with verbose mode.');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function process(ArrayAccess $arguments)
+    {
+        if (!isset($arguments['source'])) {
+            throw new UnexpectedValueException('The file or directory to index ss required for this command.');
         }
 
-        $showOutput = false;
-        $streamProgress = false;
-        $path = array_shift($arguments);
-
-        if (!empty($arguments)) {
-            $extraArg = array_shift($arguments);
-
-            if ($extraArg === '--show-output') {
-                $showOutput = true;
-            } elseif ($extraArg === '--stream-progress') {
-                $streamProgress = true;
-            } else {
-                throw new UnexpectedValueException('Unknown extra argument passed.');
-            }
-        }
+        $showOutput = isset($arguments['verbose']);
+        $streamProgress = isset($arguments['stream-progress']);
 
         $indexer = new Indexer($this->indexDatabase, $showOutput, $streamProgress);
 
@@ -64,6 +64,8 @@ class Reindex extends BaseCommand
                 ]);
             }
         }
+
+        $path = $arguments['source']->value;
 
         if (is_dir($path)) {
             $indexer->indexDirectory($path);
