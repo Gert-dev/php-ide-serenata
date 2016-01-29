@@ -6,7 +6,15 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'PhpIntegrater\\Application\\Command\\ClassInfo' => $baseDir . '/src/Application/Command/ClassInfo.php',
+    'PhpIntegrater\\Application\\Command\\ClassList' => $baseDir . '/src/Application/Command/ClassList.php',
+    'PhpIntegrater\\Application\\Command\\GlobalConstants' => $baseDir . '/src/Application/Command/GlobalConstants.php',
+    'PhpIntegrater\\Application\\Command\\GlobalFunctions' => $baseDir . '/src/Application/Command/GlobalFunctions.php',
+    'PhpIntegrater\\Application\\Command\\Reindex' => $baseDir . '/src/Application/Command/Reindex.php',
+    'PhpIntegrater\\Application\\Command\\Test' => $baseDir . '/src/Application/Command/Test.php',
     'PhpIntegrator\\Application' => $baseDir . '/src/Application.php',
+    'PhpIntegrator\\Application\\Command' => $baseDir . '/src/Application/Command.php',
+    'PhpIntegrator\\Application\\CommandInterface' => $baseDir . '/src/Application/CommandInterface.php',
     'PhpIntegrator\\DocParser' => $baseDir . '/src/DocParser.php',
     'PhpIntegrator\\IndexDataAdapter' => $baseDir . '/src/IndexDataAdapter.php',
     'PhpIntegrator\\IndexDataAdapter\\ClassListProxyProvider' => $baseDir . '/src/IndexDataAdapter/ClassListProxyProvider.php',
