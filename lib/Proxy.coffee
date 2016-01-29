@@ -37,8 +37,7 @@ class Proxy
     prepareParameters: (args) ->
         parameters = [
             '-d memory_limit=-1',
-            Utility.escapeShellParameter(__dirname + "/../php/src/Main.php"),
-            Utility.escapeShellParameter(@getIndexDatabasePath())
+            Utility.escapeShellParameter(__dirname + "/../php/src/Main.php")
         ]
 
         for a in args
@@ -157,7 +156,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getClassList: (async = false) ->
-        return @performRequest(['--class-list'], async)
+        return @performRequest(['--class-list', @getIndexDatabasePath()], async)
 
     ###*
      * Retrieves a list of available global constants.
@@ -167,7 +166,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getGlobalConstants: (async = false) ->
-        return @performRequest(['--constants'], async)
+        return @performRequest(['--constants', @getIndexDatabasePath()], async)
 
     ###*
      * Retrieves a list of available global functions.
@@ -177,7 +176,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getGlobalFunctions: (async = false) ->
-        return @performRequest(['--functions'], async)
+        return @performRequest(['--functions', @getIndexDatabasePath()], async)
 
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
@@ -192,7 +191,7 @@ class Proxy
         if not className
             throw 'No class name passed!'
 
-        return @performRequest(['--class-info', className], async)
+        return @performRequest(['--class-info', @getIndexDatabasePath(), className], async)
 
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
@@ -216,7 +215,7 @@ class Proxy
             for percentage in percentages
                 progressStreamCallback(percentage)
 
-        return @performRequest(['--reindex', path, '--stream-progress'], true, progressStreamCallbackWrapper, source)
+        return @performRequest(['--reindex', @getIndexDatabasePath(), path, '--stream-progress'], true, progressStreamCallbackWrapper, source)
 
     ###*
      * Sets the name (without path or extension) of the database file to use.
