@@ -76,7 +76,6 @@ class OutlineIndexingVisitor extends NameResolver
 
         $interfaces = [];
 
-        /** @var Node\Name $implementedName */
         foreach ($node->implements as $implementedName) {
             $interfaces[] = $implementedName->toString();
         }
@@ -111,7 +110,6 @@ class OutlineIndexingVisitor extends NameResolver
 
         $extendedInterfaces = [];
 
-        /** @var Node\Name $extends */
         foreach ($node->extends as $extends) {
             $extendedInterfaces[] = $extends->toString();
         }
@@ -160,7 +158,6 @@ class OutlineIndexingVisitor extends NameResolver
     {
         parent::enterNode($node);
 
-        /** @var Node\Name $traitName */
         foreach ($node->traits as $traitName) {
             $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['traits'][] =
                 $traitName->toString();
@@ -211,7 +208,6 @@ class OutlineIndexingVisitor extends NameResolver
     {
         $parameters = [];
 
-        /** @var \PhpParser\Node\Param $param */
         foreach ($node->params as $param) {
             $localType = (string) $param->type;
 
@@ -248,7 +244,6 @@ class OutlineIndexingVisitor extends NameResolver
     {
         $parameters = [];
 
-        /** @var \PhpParser\Node\Param $param */
         foreach ($node->params as $param) {
             $localType = (string) $param->type;
 
