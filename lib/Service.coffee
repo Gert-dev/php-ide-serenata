@@ -18,12 +18,18 @@ class Service
     parser: null
 
     ###*
+     * The emitter to use to emit indexing events.
+    ###
+    indexingEventEmitter: null
+
+    ###*
      * Constructor.
      *
      * @param {CachingProxy} proxy
      * @param {Parser}       parser
+     * @param {Emitter}      indexingEventEmitter
     ###
-    constructor: (@proxy, @parser) ->
+    constructor: (@proxy, @parser, @indexingEventEmitter) ->
 
     ###*
      * Creates a popover with the specified constructor arguments.
@@ -97,7 +103,44 @@ class Service
      * @return {Promise}
     ###
     reindex: (path, source, progressStreamCallback) ->
-        @proxy.reindex(path, source, progressStreamCallback)
+        return new Promise (resolve, reject) =>
+            successHandler = (output) =>
+                @indexingEventEmitter.emit('php-integrator-base:indexing-finished', {
+                    output : output
+                    path   : path
+                })
+
+                resolve(output)
+
+            failureHandler = (error) =>
+                @indexingEventEmitter.emit('php-integrator-base:indexing-failed', {
+                    error : error
+                    path  : path
+                })
+
+                reject(error)
+
+            return @proxy.reindex(path, source, progressStreamCallback).then(successHandler, failureHandler)
+
+    ###*
+     * Attaches a callback to indexing finished event. The returned disposable can be used to detach your event handler.
+     *
+     * @param {Callback} callback
+     *
+     * @return {Disposable}
+    ###
+    onDidFinishIndexing: (callback) ->
+        @indexingEventEmitter.on('php-integrator-base:indexing-finished', callback)
+
+    ###*
+     * Attaches a callback to indexing failed event. The returned disposable can be used to detach your event handler.
+     *
+     * @param {Callback} callback
+     *
+     * @return {Disposable}
+    ###
+    onDidFailIndexing: (callback) ->
+        @indexingEventEmitter.on('php-integrator-base:indexing-failed', callback)
 
     ###*
      * Gets the correct selector for the class or namespace that is part of the specified event.

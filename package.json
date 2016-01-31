@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "fuzzaldrin": "~2.1.0",
+    "event-kit": "~2.0.0",
     "jquery": "~2.1.4",
     "md5": "~2.0.0"
   },

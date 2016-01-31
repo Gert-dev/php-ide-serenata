@@ -178,6 +178,7 @@ module.exports =
         AtomConfig    = require './AtomConfig'
         CachingProxy  = require './CachingProxy'
         CachingParser = require './CachingParser'
+        {Emitter}     = require 'event-kit';
 
         @configuration = new AtomConfig(@packageName)
 
@@ -188,9 +189,10 @@ module.exports =
 
         @proxy = new CachingProxy(@configuration)
 
+        emitter = new Emitter()
         parser = new CachingParser(@proxy)
 
-        @service = new Service(@proxy, parser)
+        @service = new Service(@proxy, parser, emitter)
 
         @registerCommands()
         @registerConfigListeners()
