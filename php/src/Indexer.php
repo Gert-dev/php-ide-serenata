@@ -331,7 +331,7 @@ class Indexer
 
         $dependencyFetchingVisitor = new Indexer\DependencyFetchingVisitor();
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser(false);
         $traverser->addVisitor($dependencyFetchingVisitor);
         $traverser->traverse($nodes);
 
@@ -626,7 +626,7 @@ class Indexer
         $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
         $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser(false);
         $traverser->addVisitor($outlineIndexingVisitor);
         $traverser->addVisitor($useStatementFetchingVisitor);
         $traverser->traverse($nodes);
