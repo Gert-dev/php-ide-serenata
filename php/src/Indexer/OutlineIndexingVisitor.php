@@ -216,7 +216,7 @@ class OutlineIndexingVisitor extends NameResolver
             $parameters[] = [
                 'name'        => $param->name,
                 'type'        => $localType,
-                'full_type'   => (string) $param->type,
+                'fullType'    => (string) $param->type,
                 'isReference' => $param->byRef,
                 'isVariadic'  => $param->variadic,
                 'isOptional'  => $param->default ? true : false
