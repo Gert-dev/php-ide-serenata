@@ -13,6 +13,7 @@ foreach ($list as $item) {
 ```
 
 ### Bugs fixed
+* Fixed docblocks with an empty throws tag causing the indexer to fail (Filter/Encrypt/Mcrypt.php in Zend 1 has one of these, apparently).
 * Fixed types not being properly inferred with the new keyword in combination with keywords such as `self`, `static` and `parent`, e.g. `$foo = new static();`.
 * Fixed issues with retrieving types in call stacks including static access, such as `self::$property->foo`.
 * Fixed built-in methods and functions having class types as parameters not being properly indexed. Instead, a PHP object would be returned in the parameter list. (Only applies to PHP 7.)
