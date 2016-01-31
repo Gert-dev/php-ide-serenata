@@ -124,8 +124,9 @@ module.exports =
             progress = parseFloat(progress)
 
             if not isNaN(progress)
-                @statusBarManager.setProgress(progress)
-                @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
+                if @statusBarManager
+                    @statusBarManager.setProgress(progress)
+                    @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
         if not fileName?
             fileName = atom.project.getDirectories()[0]?.path
