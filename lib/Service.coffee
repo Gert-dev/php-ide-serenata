@@ -344,3 +344,26 @@ class Service
         return null if not callStack or callStack.length == 0
 
         return @parser.getResultingTypeFromCallStack(editor, bufferPosition, callStack)
+
+    ###*
+     * Attaches a callback to indexing finished event.
+     *
+     * @param   {function} callback
+     * @return  {Disposable}
+    ###
+    onnDidFinishIndexing: (callback) ->
+        delayedCallback = () => setTimeout callback, 10
+        @proxy.indexingEventEmitter.on 'php-integrator-base:indexing-finished', delayedCallback
+
+    ###*
+     * Attaches a callback to indexing failed event.
+     *
+     * The callback is deferred because immediate call
+     * results in outdated data in service calls.
+     *
+     * @param   {function} callback
+     * @return  {Disposable}
+    ###
+    onDidFailIndexing: (callback) ->
+        delayedCallback = () => setTimeout callback, 10
+        @proxy.indexingEventEmitter.on 'php-integrator-base:indexing-failed', delayedCallback
