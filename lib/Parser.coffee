@@ -556,7 +556,7 @@ class Parser
     getVariableType: (editor, bufferPosition, name) ->
         element = name
 
-        if element.replace(/[\$][a-zA-Z0-9_]+/g, "").trim().length > 0
+        if element.replace(/\$[a-zA-Z0-9_]+/g, "").trim().length > 0
             return null
 
         if element.trim().length == 0
@@ -676,7 +676,7 @@ class Parser
 
                 matchInfo.stop()
 
-            # Check if we can find an instanceof
+            # Check if we can find an instanceof.
             regexInstanceof = ///if\s*\(\s*#{elementForRegex}\s+instanceof\s+(#{classRegexPart})\s*\)///g
 
             editor.getBuffer().backwardsScanInRange regexInstanceof, [scanStartPosition, bufferPosition], (matchInfo) =>
@@ -688,6 +688,19 @@ class Parser
 
                 matchInfo.stop()
 
+            # Check if we can find a foreach.
+            ###
+            regexInstanceof = ///foreach\s*\(\s*#{elementForRegex}\s+as\s+(#{classRegexPart})\s*\)///g
+
+            editor.getBuffer().backwardsScanInRange regexInstanceof, [scanStartPosition, bufferPosition], (matchInfo) =>
+                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+
+                scanStartPosition = matchInfo.range.end
+
+                bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.start, [matchInfo.match[1]])
+
+                matchInfo.stop()
+            ###
 
             break if bestMatch
 
