@@ -3,6 +3,14 @@
 * Minor performance improvements when resolving local class names from docblocks.
 * Indexing will now happen continuously (onDidStopChanging of the text buffer) instead of only on save.
 * Descriptions from base classes or base interfaces will now be inherited if no description is present for a child class.
+* Type inference has been added for arrays, e.g.:
+
+```php
+/** @var Foo[] $list */
+foreach ($list as $item) {
+    $item-> // Autocompletion will be provided for 'Foo'.
+}
+```
 
 ### Bugs fixed
 * Fixed types not being properly inferred with the new keyword in combination with keywords such as `self`, `static` and `parent`, e.g. `$foo = new static();`.

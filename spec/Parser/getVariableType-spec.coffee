@@ -207,6 +207,50 @@ describe "getVariableType", ->
 
         expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
 
+    it "correctly returns the type of an iterator variable in a foreach that's part of a collection of items.", ->
+        source =
+            """
+            <?php
+
+            /** @var EXPECTED\\TYPE_1[] $list */
+            foreach ($list as $test) {
+
+            }
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 2
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
+    it "correctly returns the type of an iterator variable in a foreach (with key) that's part of a collection of items.", ->
+        source =
+            """
+            <?php
+
+            /** @var EXPECTED\\TYPE_1[] $list */
+            foreach ($list as $index => $test) {
+
+            }
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 2
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
     it "correctly returns the last type of a variable that's checked with instanceof in an if statement.", ->
         source =
             """
