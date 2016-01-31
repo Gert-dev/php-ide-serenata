@@ -1261,7 +1261,7 @@ class Indexer
         $type,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        if (!isset($type) || empty($type)) {
+        if (empty($type)) {
             return null;
         }
 
