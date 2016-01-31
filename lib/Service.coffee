@@ -125,7 +125,7 @@ class Service
     ###*
      * Attaches a callback to indexing finished event. The returned disposable can be used to detach your event handler.
      *
-     * @param {Callback} callback
+     * @param {Callback} callback A callback that takes one parameter which contains an 'output' and a 'path' property.
      *
      * @return {Disposable}
     ###
@@ -135,7 +135,7 @@ class Service
     ###*
      * Attaches a callback to indexing failed event. The returned disposable can be used to detach your event handler.
      *
-     * @param {Callback} callback
+     * @param {Callback} callback A callback that takes one parameter which contains an 'error' and a 'path' property.
      *
      * @return {Disposable}
     ###
