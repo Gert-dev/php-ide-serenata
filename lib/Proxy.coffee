@@ -60,7 +60,11 @@ class Proxy
             if response.error
                 throw response.error
 
-            response = JSON.parse(response.output[1].toString('ascii'))
+            try
+                response = JSON.parse(response.output[1].toString('ascii'))
+
+            catch error
+                throw 'Invalid JSON data was returned by the PHP side!'
 
             if not response or response.error?
                 throw response.error
