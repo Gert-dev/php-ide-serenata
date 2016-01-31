@@ -1,7 +1,7 @@
+{ Emitter }     = require 'event-kit';
 fs            = require 'fs'
 md5           = require 'md5'
 child_process = require "child_process"
-
 Utility = require "./Utility"
 
 module.exports =
@@ -16,11 +16,17 @@ class Proxy
     config: null
 
     ###*
+     * The emitter to use to emit indexing events.
+    ###
+    indexingEventEmitter: null
+
+    ###*
      * Constructor.
      *
      * @param {Config} config
     ###
     constructor: (@config) ->
+        @indexingEventEmitter = new Emitter
 
     ###*
      * Prepares parameters for execution by escaping them.
@@ -68,8 +74,10 @@ class Proxy
                 throw "An unsuccessful status code was returned by the PHP side!"
 
         catch error
+            @indexingEventEmitter.emit 'php-integrator-base:indexing-failed'
             throw (if error.message then error.message else error)
 
+        @indexingEventEmitter.emit 'php-integrator-base:indexing-finished'
         return response?.result
 
 
@@ -90,6 +98,7 @@ class Proxy
 
             proc = child_process.exec(@config.get('phpCommand') + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
                 if not stdout or stdout.length == 0
+                    @indexingEventEmitter.emit 'php-integrator-base:indexing-failed'
                     reject({message: "No output received from the PHP side!"})
                     return
 
@@ -98,19 +107,23 @@ class Proxy
 
                 catch error
                     #console.error(error)
+                    @indexingEventEmitter.emit 'php-integrator-base:indexing-failed'
                     reject({message: error})
                     return
 
                 if response?.error
                     #console.error(message)
+                    @indexingEventEmitter.emit 'php-integrator-base:indexing-failed'
                     message = response.error?.message
                     reject({message: message})
                     return
 
                 if not response.success
+                    @indexingEventEmitter.emit 'php-integrator-base:indexing-failed'
                     reject({message: 'An unsuccessful status code was returned by the PHP side!'})
                     return
 
+                @indexingEventEmitter.emit 'php-integrator-base:indexing-finished'
                 resolve(response.result)
             )
 
