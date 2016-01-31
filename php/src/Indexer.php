@@ -556,7 +556,7 @@ class Indexer
                 $parameters[] = [
                     'name'        => $param->getName(),
                     'type'        => (string) $type,
-                    'full_type'   => (string) $type,
+                    'fullType'    => (string) $type,
                     'isReference' => $param->isPassedByReference(),
                     'isVariadic'  => $isVariadic,
                     'isOptional'  => $param->isOptional()
