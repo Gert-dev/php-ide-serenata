@@ -351,7 +351,7 @@ class Service
      * @param   {function} callback
      * @return  {Disposable}
     ###
-    onIndexingFinished: (callback) ->
+    onnDidFinishIndexing: (callback) ->
         delayedCallback = () => setTimeout callback, 10
         @proxy.indexingEventEmitter.on 'php-integrator-base:indexing-finished', delayedCallback
 
@@ -364,6 +364,6 @@ class Service
      * @param   {function} callback
      * @return  {Disposable}
     ###
-    onIndexingFailed: (callback) ->
+    onDidFailIndexing: (callback) ->
         delayedCallback = () => setTimeout callback, 10
         @proxy.indexingEventEmitter.on 'php-integrator-base:indexing-failed', delayedCallback
