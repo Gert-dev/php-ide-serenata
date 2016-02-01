@@ -216,8 +216,12 @@ module.exports =
                 @performIndex()
 
         atom.workspace.observeTextEditors (editor) =>
-            editor.onDidStopChanging () =>
-                @onEditorDidStopChanging(editor)
+            # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
+            # because the contents are still loading.
+            setTimeout ( =>
+                editor.onDidStopChanging () =>
+                    @onEditorDidStopChanging(editor)
+            ), 1500
 
     ###*
      * Invoked when an editor stops changing.
