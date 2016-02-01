@@ -26,6 +26,11 @@ module.exports =
     proxy: null
 
     ###*
+     * The parser object.
+    ###
+    parser: null
+
+    ###*
      * The exposed service.
     ###
     service: null
@@ -192,9 +197,9 @@ module.exports =
         @proxy = new CachingProxy(@configuration)
 
         emitter = new Emitter()
-        parser = new CachingParser(@proxy)
+        @parser = new CachingParser(@proxy)
 
-        @service = new Service(@proxy, parser, emitter)
+        @service = new Service(@proxy, @parser, emitter)
 
         @registerCommands()
         @registerConfigListeners()
@@ -212,20 +217,28 @@ module.exports =
 
         atom.workspace.observeTextEditors (editor) =>
             editor.onDidStopChanging () =>
-                return unless /text.html.php$/.test(editor.getGrammar().scopeName)
+                @onEditorDidStopChanging(editor)
 
-                path = editor.getPath()
-                isContainedInProject = false
+    ###*
+     * Invoked when an editor stops changing.
+     *
+     * @param {TextEditor} editor
+    ###
+    onEditorDidStopChanging: (editor) ->
+        return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
-                for projectDirectory in atom.project.getDirectories()
-                    if path.indexOf(projectDirectory.path) != -1
-                        isContainedInProject = true
-                        break
+        path = editor.getPath()
+        isContainedInProject = false
 
-                # Do not try to index files outside the project.
-                if isContainedInProject
-                    parser.clearCache(path)
-                    @performIndex(path, editor.getBuffer().getText())
+        for projectDirectory in atom.project.getDirectories()
+            if path.indexOf(projectDirectory.path) != -1
+                isContainedInProject = true
+                break
+
+        # Do not try to index files outside the project.
+        if isContainedInProject
+            @parser.clearCache(path)
+            @performIndex(path, editor.getBuffer().getText())
 
     ###*
      * Deactivates the package.
