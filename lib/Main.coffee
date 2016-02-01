@@ -99,21 +99,24 @@ module.exports =
     ###
     performIndex: (fileName = null, source = null) ->
         timerName = @packageName + " - Project indexing"
+        isProjectIndex = if not fileName? then true else false
 
-        if not fileName
+        if isProjectIndex
             console.time(timerName);
 
-        if @statusBarManager and fileName is null
-            @statusBarManager.setLabel("Indexing...")
-            @statusBarManager.setProgress(null)
-            @statusBarManager.show()
+            fileName = atom.project.getDirectories()[0]?.path
+
+            if @statusBarManager
+                @statusBarManager.setLabel("Indexing...")
+                @statusBarManager.setProgress(null)
+                @statusBarManager.show()
 
         successHandler = () =>
             if @statusBarManager
                 @statusBarManager.setLabel("Indexing completed!")
                 @statusBarManager.hide()
 
-            if not fileName
+            if isProjectIndex
                 console.timeEnd(timerName);
 
         failureHandler = () =>
@@ -128,12 +131,10 @@ module.exports =
                     @statusBarManager.setProgress(progress)
                     @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        if not fileName?
-            fileName = atom.project.getDirectories()[0]?.path
+        if fileName
+            @proxy.setIndexDatabaseName(@getIndexDatabaseName())
 
-        @proxy.setIndexDatabaseName(@getIndexDatabaseName())
-
-        @service.reindex(fileName, source, progressHandler).then(successHandler, failureHandler)
+            @service.reindex(fileName, source, progressHandler).then(successHandler, failureHandler)
 
     ###*
      * Retrieves the name of the database file to use.
@@ -210,6 +211,8 @@ module.exports =
                 @performIndex()
 
         atom.workspace.observeTextEditors (editor) =>
+            me = 5
+            ###
             editor.onDidStopChanging () =>
                 return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
@@ -225,6 +228,7 @@ module.exports =
                 if isContainedInProject
                     parser.clearCache(path)
                     @performIndex(path, editor.getBuffer().getText())
+            ###
 
     ###*
      * Deactivates the package.
