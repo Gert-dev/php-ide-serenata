@@ -211,8 +211,6 @@ module.exports =
                 @performIndex()
 
         atom.workspace.observeTextEditors (editor) =>
-            me = 5
-            ###
             editor.onDidStopChanging () =>
                 return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
@@ -228,7 +226,6 @@ module.exports =
                 if isContainedInProject
                     parser.clearCache(path)
                     @performIndex(path, editor.getBuffer().getText())
-            ###
 
     ###*
      * Deactivates the package.
