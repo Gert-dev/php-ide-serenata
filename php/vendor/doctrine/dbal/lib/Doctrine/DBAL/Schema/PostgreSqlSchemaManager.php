@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Schema;
 
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Types\Type;
 
 /**
@@ -103,6 +104,33 @@ class PostgreSqlSchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
+    public function dropDatabase($database)
+    {
+        try {
+            parent::dropDatabase($database);
+        } catch (DriverException $exception) {
+            // If we have a SQLSTATE 55006, the drop database operation failed
+            // because of active connections on the database.
+            // To force dropping the database, we first have to close all active connections
+            // on that database and issue the drop database operation again.
+            if ($exception->getSQLState() !== '55006') {
+                throw $exception;
+            }
+
+            $this->_execSql(
+                array(
+                    $this->_platform->getDisallowDatabaseConnectionsSQL($database),
+                    $this->_platform->getCloseActiveDatabaseConnectionsSQL($database),
+                )
+            );
+
+            parent::dropDatabase($database);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function _getPortableTableForeignKeyDefinition($tableForeignKey)
     {
         $onUpdate = null;
@@ -124,51 +152,9 @@ class PostgreSqlSchemaManager extends AbstractSchemaManager
         }
 
         return new ForeignKeyConstraint(
-                $localColumns, $foreignTable, $foreignColumns, $tableForeignKey['conname'],
-                array('onUpdate' => $onUpdate, 'onDelete' => $onDelete)
+            $localColumns, $foreignTable, $foreignColumns, $tableForeignKey['conname'],
+            array('onUpdate' => $onUpdate, 'onDelete' => $onDelete)
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropDatabase($database)
-    {
-        $params = $this->_conn->getParams();
-        $params["dbname"] = "postgres";
-        $tmpPlatform = $this->_platform;
-        $tmpConn = $this->_conn;
-
-        $this->_conn = \Doctrine\DBAL\DriverManager::getConnection($params);
-        $this->_platform = $this->_conn->getDatabasePlatform();
-
-        parent::dropDatabase($database);
-
-        $this->_conn->close();
-
-        $this->_platform = $tmpPlatform;
-        $this->_conn = $tmpConn;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createDatabase($database)
-    {
-        $params = $this->_conn->getParams();
-        $params["dbname"] = "postgres";
-        $tmpPlatform = $this->_platform;
-        $tmpConn = $this->_conn;
-
-        $this->_conn = \Doctrine\DBAL\DriverManager::getConnection($params);
-        $this->_platform = $this->_conn->getDatabasePlatform();
-
-        parent::createDatabase($database);
-
-        $this->_conn->close();
-
-        $this->_platform = $tmpPlatform;
-        $this->_conn = $tmpConn;
     }
 
     /**
@@ -315,7 +301,7 @@ class PostgreSqlSchemaManager extends AbstractSchemaManager
     {
         $tableColumn = array_change_key_case($tableColumn, CASE_LOWER);
 
-        if (strtolower($tableColumn['type']) === 'varchar') {
+        if (strtolower($tableColumn['type']) === 'varchar' || strtolower($tableColumn['type']) === 'bpchar') {
             // get length from varchar definition
             $length = preg_replace('~.*\(([0-9]*)\).*~', '$1', $tableColumn['complete_type']);
             $tableColumn['length'] = $length;

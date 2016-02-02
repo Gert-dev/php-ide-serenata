@@ -405,7 +405,9 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getCreateDatabaseSQL($database)
     {
-        return "CREATE DATABASE '$database'";
+        $database = new Identifier($database);
+
+        return "CREATE DATABASE '" . $database->getName() . "'";
     }
 
     /**
@@ -537,7 +539,9 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getDropDatabaseSQL($database)
     {
-        return "DROP DATABASE '$database'";
+        $database = new Identifier($database);
+
+        return "DROP DATABASE '" . $database->getName() . "'";
     }
 
     /**
@@ -891,6 +895,7 @@ class SQLAnywherePlatform extends AbstractPlatform
                 ON       idx.table_id = tbl.table_id
                 WHERE    tbl.table_name = '$table'
                 AND      tbl.creator = USER_ID($user)
+                AND      idx.index_category != 2 -- exclude indexes implicitly created by foreign key constraints
                 ORDER BY idx.index_id ASC, idxcol.sequence ASC";
     }
 
@@ -1024,7 +1029,9 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getStartDatabaseSQL($database)
     {
-        return "START DATABASE '$database' AUTOSTOP OFF";
+        $database = new Identifier($database);
+
+        return "START DATABASE '" . $database->getName() . "' AUTOSTOP OFF";
     }
 
     /**
@@ -1041,7 +1048,9 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getStopDatabaseSQL($database)
     {
-        return 'STOP DATABASE "' . $database . '" UNCONDITIONALLY';
+        $database = new Identifier($database);
+
+        return 'STOP DATABASE "' . $database->getName() . '" UNCONDITIONALLY';
     }
 
     /**
@@ -1358,7 +1367,8 @@ class SQLAnywherePlatform extends AbstractPlatform
         $flags = '';
 
         if ( ! empty($name)) {
-            $sql .= 'CONSTRAINT ' . $name . ' ';
+            $name = new Identifier($name);
+            $sql .= 'CONSTRAINT ' . $name->getQuotedName($this) . ' ';
         }
 
         if ($constraint->hasFlag('clustered')) {

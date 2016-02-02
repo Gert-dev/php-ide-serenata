@@ -101,7 +101,7 @@ class Parser
 
             scopeDescriptor = editor.scopeDescriptorForBufferPosition([i, line.length]).getScopeChain()
 
-            if scopeDescriptor.indexOf('.comment') != -1
+            if scopeDescriptor.indexOf('.comment') != -1 or scopeDescriptor.indexOf('.string') != -1
                 continue
 
             matches = line.match(@namespaceDeclarationRegex)
@@ -330,7 +330,7 @@ class Parser
             for i in lineRange
                 scopeDescriptor = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
-                if scopeDescriptor.indexOf('.comment') != -1
+                if scopeDescriptor.indexOf('.comment') != -1 or scopeDescriptor.indexOf('.string') != -1
                     # Do nothing, we just keep parsing. (Comments can occur inside call stacks.)
 
                 else if lineText[i] == '('
@@ -395,11 +395,18 @@ class Parser
                     # Variable name.
                     if lineText[i] == '$'
                         if backwards
+                            # NOTE: We don't break because dollar signs can be taken up in expressions such as
+                            # static::$foo.
                             finishedOn = false
-                            break
 
                     # Reached an operator that can never be part of the current statement.
+                    #else if lineText[i] == ','
                     else if lineText[i] == ','
+                        finishedOn = true
+                        break
+
+                    # Stop on keywords such as 'return' or 'echo'.
+                    else if scopeDescriptor.indexOf('.keyword.control') != -1 or scopeDescriptor.indexOf('.support.function.construct') != -1
                         finishedOn = true
                         break
 
@@ -549,7 +556,7 @@ class Parser
     getVariableType: (editor, bufferPosition, name) ->
         element = name
 
-        if element.replace(/[\$][a-zA-Z0-9_]+/g, "").trim().length > 0
+        if element.replace(/\$[a-zA-Z0-9_]+/g, "").trim().length > 0
             return null
 
         if element.trim().length == 0
@@ -565,7 +572,7 @@ class Parser
             scanStartPosition = range.start
 
             # Check for a type annotation in the style of /** @var FooType $someVar */.
-            regexTypeAnnotation = ///\/\*\*\s*@var\s+(#{classRegexPart})\s+#{elementForRegex}\s*(\s.*)?\*\////
+            regexTypeAnnotation = ///\/\*\*\s*@var\s+(#{classRegexPart}(?:\[\])?)\s+#{elementForRegex}\s*(\s.*)?\*\////
 
             editor.getBuffer().backwardsScanInRange regexTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
                 bestMatch = @determineFullClassName(editor, matchInfo.match[1])
@@ -575,7 +582,7 @@ class Parser
             return bestMatch if bestMatch # An annotation is definitive.
 
             # Check for a type annotation in the style of /** @var $someVar FooType */.
-            regexReverseTypeAnnotation = ///\/\*\*\s*@var\s+#{elementForRegex}\s+(#{classRegexPart})\s*(\s.*)?\*\////
+            regexReverseTypeAnnotation = ///\/\*\*\s*@var\s+#{elementForRegex}\s+(#{classRegexPart}(?:\[\])?)\s*(\s.*)?\*\////
 
             editor.getBuffer().backwardsScanInRange regexReverseTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
                 bestMatch = @determineFullClassName(editor, matchInfo.match[1])
@@ -621,9 +628,9 @@ class Parser
                                 for param in parameters
                                     # NOTE: We compare without dollar sign.
                                     if param.name == element.substr(1)
-                                        if param.type?
-                                            bestMatch = @determineFullClassName(editor, param.type)
-                                            
+                                        if param.fullType
+                                            bestMatch = param.fullType
+
                                         break
 
                         catch error
@@ -639,21 +646,22 @@ class Parser
 
                 boundary = @determineBoundaryOfExpression(editor, matchInfo.range.end, false)
 
-                scanStartPosition = boundary
+                if boundary.row < bufferPosition.row or (boundary.row == bufferPosition.row and boundary.column <= bufferPosition.column)
+                    scanStartPosition = boundary
 
-                textSlice = editor.getTextInBufferRange([matchInfo.range.end, boundary])
+                    textSlice = editor.getTextInBufferRange([matchInfo.range.end, boundary])
 
-                elements = @retrieveSanitizedCallStack(textSlice)
+                    elements = @retrieveSanitizedCallStack(textSlice)
 
-                # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
-                # don't recognize the class name is irrelevant.
-                try
-                    bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.start, elements)
+                    # NOTE: bestMatch could now be null, but this line is still the closest match. The fact that we
+                    # don't recognize the class name is irrelevant.
+                    try
+                        bestMatch = @getResultingTypeFromCallStack(editor, matchInfo.range.start, elements)
 
-                catch error
-                    bestMatch = null
+                    catch error
+                        bestMatch = null
 
-                matchInfo.stop()
+                    matchInfo.stop()
 
             # Check if we can find a type hint from a catch statement that is more closely located to the requested
             # position (i.e. one that is a better match).
@@ -668,7 +676,7 @@ class Parser
 
                 matchInfo.stop()
 
-            # Check if we can find an instanceof
+            # Check if we can find an instanceof.
             regexInstanceof = ///if\s*\(\s*#{elementForRegex}\s+instanceof\s+(#{classRegexPart})\s*\)///g
 
             editor.getBuffer().backwardsScanInRange regexInstanceof, [scanStartPosition, bufferPosition], (matchInfo) =>
@@ -680,6 +688,25 @@ class Parser
 
                 matchInfo.stop()
 
+            # Check if we can find a foreach.
+            # foreach\s+\((\$[a-zA-Z0-9_]+)\s+as\s+(?:(?:\$[a-zA-Z0-9_]+)\s*=>)?\s*(\$[a-zA-Z0-9_]+)\)
+            regexForeach = ///(foreach\s+\(.+)\s+as\s+(?:(?:\$[a-zA-Z0-9_]+)\s*=>)?\s*(#{elementForRegex})\)///
+
+            editor.getBuffer().backwardsScanInRange regexForeach, [scanStartPosition, bufferPosition], (matchInfo) =>
+                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+
+                scanStartPosition = matchInfo.range.end
+
+                position = matchInfo.range.start
+                position.column += matchInfo.match[1].length
+
+                callStack = @retrieveSanitizedCallStackAt(editor, position)
+                listType = @getResultingTypeFromCallStack(editor, bufferPosition, callStack)
+
+                if listType? and listType.endsWith('[]')
+                    bestMatch = listType.substr(0, listType.length - 2)
+
+                    matchInfo.stop()
 
             break if bestMatch
 
@@ -687,7 +714,6 @@ class Parser
             bestMatch = @determineFullClassName(editor)
 
         return bestMatch
-
 
     ###*
      * Parses all elements from the given call stack to return the last type (if any). Returns null if the type of a
@@ -709,14 +735,19 @@ class Parser
         return null if not callStack or callStack.length == 0
 
         firstElement = callStack.shift()
+        propertyAccessNeedsDollarSign = false
 
         if firstElement[0] == '$'
             className = @getVariableType(editor, bufferPosition, firstElement)
 
         else if firstElement == 'static' or firstElement == 'self'
+            propertyAccessNeedsDollarSign = true
+
             className = @determineFullClassName(editor)
 
         else if firstElement == 'parent'
+            propertyAccessNeedsDollarSign = true
+
             currentClassName = @determineFullClassName(editor)
             currentClassInfo = @proxy.getClassInfo(currentClassName)
 
@@ -748,7 +779,7 @@ class Parser
             className = '\\Closure'
 
         else if (matches = firstElement.match(///^new\s+(#{classRegexPart})(?:\(\))?///))
-            className = @determineFullClassName(editor, matches[1])
+            className = @getResultingTypeFromCallStack(editor, bufferPosition, [matches[1]])
 
         else if (matches = firstElement.match(/^(.*?)\(\)$/))
             # Global PHP function.
@@ -758,6 +789,8 @@ class Parser
                 className = functions[matches[1]].return.type
 
         else if ///#{classRegexPart}///.test(firstElement)
+            propertyAccessNeedsDollarSign = true
+
             # Static class name.
             className = @determineFullClassName(editor, firstElement)
 
@@ -770,36 +803,141 @@ class Parser
         # in the call stack.
         for element in callStack
             if not @isBasicType(className)
-                className = @getTypeForMember(className, element)
+                # className = @getTypeForMember(className, element)
+
+                info = @proxy.getClassInfo(className)
+
+                className = null
+
+                if element.indexOf('()') != -1
+                    element = element.replace('()', '')
+
+                    if element of info.methods
+                        className = info.methods[element].return.resolvedType
+
+                else if element of info.constants
+                    className = info.constants[element].return.resolvedType
+
+                else
+                    isValidPropertyAccess = false
+
+                    if not propertyAccessNeedsDollarSign
+                        isValidPropertyAccess = true
+
+                    else if element.length > 0 and element[0] == '$'
+                        element = element.substr(1)
+                        isValidPropertyAccess = true
+
+                    if isValidPropertyAccess and element of info.properties
+                        className = info.properties[element].return.resolvedType
 
             else
                 className = null
                 break
 
+            propertyAccessNeedsDollarSign = false
+
         return className
 
     ###*
-     * Retrieves the type that is returned by the member with the specified name in the specified class.
+     * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
+     * used to fetch information about the function or method call the cursor is in.
      *
-     * @param {string} className
-     * @param {string} name
+     * @param {TextEditor} editor
+     * @param {Point}      bufferPosition
      *
-     * @return {string}
+     * @example "$this->test(1, function () {},| 2);" (where the vertical bar denotes the cursor position) will yield
+     *          ['$this', 'test'].
+     *
+     * @return {Object|null} With elements 'callStack' (array), 'argumentIndex', which denotes the argument in the
+     *                       parameter list the position is located at, and bufferPosition which denotes the buffer
+     *                       position the invocation was found at. Returns 'null' if not in a method or function call.
     ###
-    getTypeForMember: (className, member) ->
-        info = @proxy.getClassInfo(className)
+    getInvocationInfoAt: (editor, bufferPosition) ->
+        scopesOpened = 0
+        scopesClosed = 0
+        bracketsOpened = 0
+        bracketsClosed = 0
+        parenthesesOpened = 0
+        parenthesesClosed = 0
 
-        if member.indexOf('()') != -1
-            member = member.replace('()', '')
+        argumentIndex = 0
 
-            if member of info.methods
-                return info.methods[member].return.resolvedType
+        # This is purely done for optimization. Fetching the scope descriptor for every character index is very
+        # expensive and is what makes this function slow. By keeping this list we can fetch it only when necessary.
+        interestingCharacters = [
+            '{', '}',
+            '[', ']',
+            '(', ')',
+            ';', ','
+        ]
 
-        else if member of info.properties
-            return info.properties[member].return.resolvedType
+        for line in [bufferPosition.row .. 0]
+            lineText = editor.lineTextForBufferRow(line)
+            length = lineText.length
 
-        else if member of info.constants
-            return info.constants[member].return.resolvedType
+            if line == bufferPosition.row
+                length = bufferPosition.column
+
+            for i in [length - 1 .. 0]
+                if lineText[i] in interestingCharacters
+                    chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
+
+                    if chain.indexOf('.comment') != -1 or chain.indexOf('.string') != -1
+                        continue
+
+                    else if lineText[i] == '}'
+                        ++scopesClosed
+
+                    else if lineText[i] == '{'
+                        ++scopesOpened
+
+                        if scopesOpened > scopesClosed
+                            return null # We reached the start of a block, we can never be in a method call.
+
+                    else if lineText[i] == ']'
+                        ++bracketsClosed
+
+                    else if lineText[i] == '['
+                        ++bracketsOpened
+
+                    else if lineText[i] == ')'
+                        ++parenthesesClosed
+
+                    else if lineText[i] == '('
+                        ++parenthesesOpened
+
+                    else if scopesOpened == scopesClosed
+                        if lineText[i] == ';'
+                            return null # We've moved too far and reached another expression, stop here.
+
+                        else if bracketsOpened >= bracketsClosed and
+                                parenthesesOpened == parenthesesClosed and
+                                lineText[i] == ','
+                            ++argumentIndex
+
+                if scopesOpened == scopesClosed and
+                   parenthesesOpened == (parenthesesClosed + 1)
+                    chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
+
+                    isClassName = (chain.indexOf('.support.class') != -1)
+                    isKeyword = (chain.indexOf('.storage.type') != -1)
+
+                    if chain.indexOf('.function-call') != -1 or
+                       chain.indexOf('.support.function') != -1 or
+                       isClassName or
+                       isKeyword
+                        currentBufferPosition = new Point(line, i+1)
+
+                        callStack = @retrieveSanitizedCallStackAt(editor, currentBufferPosition)
+
+                        if not isKeyword or (isKeyword and (callStack[0] == 'self' or callStack[0] == 'static'))
+                            return {
+                                callStack      : callStack
+                                type           : if (isClassName or isKeyword) then 'instantiation' else 'function'
+                                argumentIndex  : argumentIndex
+                                bufferPosition : currentBufferPosition
+                            }
 
         return null
 

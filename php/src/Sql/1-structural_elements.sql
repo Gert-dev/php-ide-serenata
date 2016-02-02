@@ -165,6 +165,7 @@ CREATE TABLE functions(
     long_description      text,
 
     return_type           varchar(255),
+    full_return_type      varchar(255),
     return_description    text,
 
     -- Specific to members.
@@ -203,6 +204,7 @@ CREATE TABLE functions_parameters(
 
     name         varchar(255) NOT NULL,
     type         varchar(255),
+    full_type    varchar(255),
 
     description  text,
 
@@ -222,6 +224,7 @@ CREATE TABLE functions_throws(
     function_id integer unsigned,
 
     type        varchar(255) NOT NULL,
+    full_type   varchar(255) NOT NULL,
     description text,
 
     FOREIGN KEY(function_id) REFERENCES functions(id)
@@ -243,6 +246,7 @@ CREATE TABLE properties(
     long_description      text,
 
     return_type           varchar(255),
+    full_return_type      varchar(255),
     return_description    text,
 
     structural_element_id integer unsigned NOT NULL,
@@ -281,6 +285,7 @@ CREATE TABLE constants(
     long_description      text,
 
     return_type           varchar(255),
+    full_return_type      varchar(255),
     return_description    text,
 
     -- Specific to member constants.

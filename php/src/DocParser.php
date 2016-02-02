@@ -267,7 +267,9 @@ class DocParser
             foreach ($tags[static::THROWS] as $tag) {
                 list($type, $description) = $this->filterParameterTag($tag, 2);
 
-                $throws[$type] = $description;
+                if ($type && $description) {
+                    $throws[$type] = $description;
+                }
             }
         }
 

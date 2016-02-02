@@ -18,12 +18,18 @@ class Service
     parser: null
 
     ###*
+     * The emitter to use to emit indexing events.
+    ###
+    indexingEventEmitter: null
+
+    ###*
      * Constructor.
      *
      * @param {CachingProxy} proxy
      * @param {Parser}       parser
+     * @param {Emitter}      indexingEventEmitter
     ###
-    constructor: (@proxy, @parser) ->
+    constructor: (@proxy, @parser, @indexingEventEmitter) ->
 
     ###*
      * Creates a popover with the specified constructor arguments.
@@ -87,16 +93,54 @@ class Service
         return @proxy.getClassInfo(className, async)
 
     ###*
-     * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
-     * projects!). This method is asynchronous and will return immediately.
+     * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {string}   filename               The full path to the file to refresh.
-     * @param {Callback} progressStreamCallback A method to invoke each time progress streaming data is received.
+     * @param {string}      path                   The full path to the file  or folder to refresh.
+     * @param {string|null} source                 The source code of the file to index. May be null if a directory is
+     *                                             passed instead.
+     * @param {Callback}    progressStreamCallback A method to invoke each time progress streaming data is received.
      *
      * @return {Promise}
     ###
-    reindex: (filename, progressStreamCallback) ->
-        @proxy.reindex(filename, progressStreamCallback)
+    reindex: (path, source, progressStreamCallback) ->
+        return new Promise (resolve, reject) =>
+            successHandler = (output) =>
+                @indexingEventEmitter.emit('php-integrator-base:indexing-finished', {
+                    output : output
+                    path   : path
+                })
+
+                resolve(output)
+
+            failureHandler = (error) =>
+                @indexingEventEmitter.emit('php-integrator-base:indexing-failed', {
+                    error : error
+                    path  : path
+                })
+
+                reject(error)
+
+            return @proxy.reindex(path, source, progressStreamCallback).then(successHandler, failureHandler)
+
+    ###*
+     * Attaches a callback to indexing finished event. The returned disposable can be used to detach your event handler.
+     *
+     * @param {Callback} callback A callback that takes one parameter which contains an 'output' and a 'path' property.
+     *
+     * @return {Disposable}
+    ###
+    onDidFinishIndexing: (callback) ->
+        @indexingEventEmitter.on('php-integrator-base:indexing-finished', callback)
+
+    ###*
+     * Attaches a callback to indexing failed event. The returned disposable can be used to detach your event handler.
+     *
+     * @param {Callback} callback A callback that takes one parameter which contains an 'error' and a 'path' property.
+     *
+     * @return {Disposable}
+    ###
+    onDidFailIndexing: (callback) ->
+        @indexingEventEmitter.on('php-integrator-base:indexing-failed', callback)
 
     ###*
      * Gets the correct selector for the class or namespace that is part of the specified event.
@@ -344,3 +388,20 @@ class Service
         return null if not callStack or callStack.length == 0
 
         return @parser.getResultingTypeFromCallStack(editor, bufferPosition, callStack)
+
+    ###*
+     * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
+     * used to fetch information about the function or method call the cursor is in.
+     *
+     * @param {TextEditor} editor
+     * @param {Point}      bufferPosition
+     *
+     * @example "$this->test(1, function () {},| 2);" (where the vertical bar denotes the cursor position) will yield
+     *          ['$this', 'test'].
+     *
+     * @return {Object|null} With elements 'callStack' (array) as well as 'argumentIndex' which denotes the argument in
+     *                       the parameter list the position is located at. Returns 'null' if not in a method or
+     *                       function call.
+    ###
+    getInvocationInfoAt: (editor, bufferPosition) ->
+        return @parser.getInvocationInfoAt(editor, bufferPosition)

@@ -1,16 +1,3 @@
-{Disposable} = require 'atom'
-
-fs = require 'fs'
-$ = require 'jquery'
-
-Utility          = require './Utility'
-Service          = require './Service'
-AtomConfig       = require './AtomConfig'
-ConfigTester     = require './ConfigTester'
-CachingProxy     = require './CachingProxy'
-CachingParser    = require './CachingParser'
-StatusBarManager = require "./Widgets/StatusBarManager"
-
 module.exports =
     ###*
      * Configuration settings.
@@ -39,6 +26,11 @@ module.exports =
     proxy: null
 
     ###*
+     * The parser object.
+    ###
+    parser: null
+
+    ###*
      * The exposed service.
     ###
     service: null
@@ -54,6 +46,8 @@ module.exports =
      * @return {boolean}
     ###
     testConfig: () ->
+        ConfigTester = require './ConfigTester'
+
         configTester = new ConfigTester(@configuration)
 
         result = configTester.test()
@@ -74,6 +68,8 @@ module.exports =
      * Registers any commands that are available to the user.
     ###
     registerCommands: () ->
+        fs = require 'fs'
+
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
             return @performIndex()
 
@@ -104,24 +100,28 @@ module.exports =
      * Indexes a file aynschronously.
      *
      * @param {string|null} fileName The file to index, or null to index the entire project.
+     * @param {string|null} source   The source code of the file to index.
     ###
-    performIndex: (fileName = null) ->
+    performIndex: (fileName = null, source = null) ->
         timerName = @packageName + " - Project indexing"
+        isProjectIndex = if not fileName? then true else false
 
-        if not fileName
+        if isProjectIndex
             console.time(timerName);
 
-        if @statusBarManager and fileName is null
-            @statusBarManager.setLabel("Indexing...")
-            @statusBarManager.setProgress(null)
-            @statusBarManager.show()
+            fileName = atom.project.getDirectories()[0]?.path
+
+            if @statusBarManager
+                @statusBarManager.setLabel("Indexing...")
+                @statusBarManager.setProgress(null)
+                @statusBarManager.show()
 
         successHandler = () =>
             if @statusBarManager
                 @statusBarManager.setLabel("Indexing completed!")
                 @statusBarManager.hide()
 
-            if not fileName
+            if isProjectIndex
                 console.timeEnd(timerName);
 
         failureHandler = () =>
@@ -132,10 +132,29 @@ module.exports =
             progress = parseFloat(progress)
 
             if not isNaN(progress)
-                @statusBarManager.setProgress(progress)
-                @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
+                if @statusBarManager
+                    @statusBarManager.setProgress(progress)
+                    @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        @service.reindex(fileName, progressHandler).then(successHandler, failureHandler)
+        if fileName
+            @proxy.setIndexDatabaseName(@getIndexDatabaseName())
+
+            @service.reindex(fileName, source, progressHandler).then(successHandler, failureHandler)
+
+    ###*
+     * Retrieves the name of the database file to use.
+     *
+     * @return {string}
+    ###
+    getIndexDatabaseName: () ->
+        pathStrings = ''
+
+        for i,project of atom.project.getDirectories()
+            pathStrings += project.path
+
+        md5 = require 'md5'
+
+        return md5(pathStrings)
 
     ###*
      * Attaches items to the status bar.
@@ -144,6 +163,8 @@ module.exports =
     ###
     attachStatusBarItems: (statusBarService) ->
         if not @statusBarManager
+            StatusBarManager = require "./Widgets/StatusBarManager"
+
             @statusBarManager = new StatusBarManager()
             @statusBarManager.initialize(statusBarService)
             @statusBarManager.setLabel("Indexing...")
@@ -160,6 +181,12 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
+        Service       = require './Service'
+        AtomConfig    = require './AtomConfig'
+        CachingProxy  = require './CachingProxy'
+        CachingParser = require './CachingParser'
+        {Emitter}     = require 'event-kit';
+
         @configuration = new AtomConfig(@packageName)
 
         # See also atom-autocomplete-php pull request #197 - Disabled for now because it does not allow the user to
@@ -169,9 +196,10 @@ module.exports =
 
         @proxy = new CachingProxy(@configuration)
 
-        parser = new CachingParser(@proxy)
+        emitter = new Emitter()
+        @parser = new CachingParser(@proxy)
 
-        @service = new Service(@proxy, parser)
+        @service = new Service(@proxy, @parser, emitter)
 
         @registerCommands()
         @registerConfigListeners()
@@ -188,20 +216,33 @@ module.exports =
                 @performIndex()
 
         atom.workspace.observeTextEditors (editor) =>
-            editor.onDidSave (event) =>
-                return unless /text.html.php$/.test(editor.getGrammar().scopeName)
+            # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
+            # because the contents are still loading.
+            setTimeout ( =>
+                editor.onDidStopChanging () =>
+                    @onEditorDidStopChanging(editor)
+            ), 1500
 
-                isContainedInProject = false
+    ###*
+     * Invoked when an editor stops changing.
+     *
+     * @param {TextEditor} editor
+    ###
+    onEditorDidStopChanging: (editor) ->
+        return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
-                for projectDirectory in atom.project.getDirectories()
-                    if event.path.indexOf(projectDirectory.path) != -1
-                        isContainedInProject = true
-                        break
+        path = editor.getPath()
+        isContainedInProject = false
 
-                # Do not try to index files outside the project.
-                if isContainedInProject
-                    parser.clearCache(event.path)
-                    @performIndex(event.path)
+        for projectDirectory in atom.project.getDirectories()
+            if path.indexOf(projectDirectory.path) != -1
+                isContainedInProject = true
+                break
+
+        # Do not try to index files outside the project.
+        if isContainedInProject
+            @parser.clearCache(path)
+            @performIndex(path, editor.getBuffer().getText())
 
     ###*
      * Deactivates the package.
@@ -219,6 +260,8 @@ module.exports =
         # that don't contain a project.
         if atom.project.getDirectories().length == 0
             @statusBarManager.hide()
+
+        {Disposable} = require 'atom'
 
         return new Disposable => @detachStatusBarItems()
 

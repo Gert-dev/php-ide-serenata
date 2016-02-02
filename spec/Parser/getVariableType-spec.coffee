@@ -11,11 +11,11 @@ describe "getVariableType", ->
                     parameters: [
                         {
                             name: 'test1',
-                            type: 'EXPECTED\\TYPE_1'
+                            fullType: 'EXPECTED\\TYPE_1'
                         },
                         {
                             name: 'test2',
-                            type: 'EXPECTED\\TYPE_2'
+                            fullType: 'EXPECTED\\TYPE_2'
                         }
                     ]
             }
@@ -30,10 +30,12 @@ describe "getVariableType", ->
                                 {
                                     name: 'test1',
                                     type: 'TYPE_1'
+                                    fullType: 'EXPECTED\\TYPE_1'
                                 },
                                 {
                                     name: 'test2',
                                     type: 'TYPE_2'
+                                    fullType: 'EXPECTED\\TYPE_2'
                                 }
                             ]
 
@@ -191,6 +193,50 @@ describe "getVariableType", ->
 
             } catch (EXPECTED\\TYPE_1 $test) {
                 //
+            }
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 2
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
+    it "correctly returns the type of an iterator variable in a foreach that's part of a collection of items.", ->
+        source =
+            """
+            <?php
+
+            /** @var EXPECTED\\TYPE_1[] $list */
+            foreach ($list as $test) {
+
+            }
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 2
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
+    it "correctly returns the type of an iterator variable in a foreach (with key) that's part of a collection of items.", ->
+        source =
+            """
+            <?php
+
+            /** @var EXPECTED\\TYPE_1[] $list */
+            foreach ($list as $index => $test) {
+
             }
             """
 
@@ -415,6 +461,28 @@ describe "getVariableType", ->
         editor.setText(source)
 
         row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getVariableType(editor, bufferPosition, '$test')).toEqual('EXPECTED\\TYPE_1')
+
+    it "correctly returns the type of a partial expression and doesn't go further than the current position.", ->
+        source =
+            """
+            <?php
+
+            $test = new EXPECTED\\TYPE_1();
+            $test = $test->
+
+            someOtherExpressionThatShouldNotBeUsed();
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 3
         column = editor.getBuffer().lineLengthForRow(row)
 
         bufferPosition =

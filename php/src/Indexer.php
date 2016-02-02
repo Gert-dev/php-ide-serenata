@@ -166,8 +166,8 @@ class Indexer
             echo $this->logMessage('  - Indexing ' . $filePath);
 
             try {
-                $this->indexFileOutline($filePath);
-            } catch (Error $e) {
+                $this->indexFile($filePath);
+            } catch (Indexer\IndexingFailedException $e) {
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
             }
 
@@ -178,12 +178,19 @@ class Indexer
     /**
      * Indexes the specified file.
      *
-     * @param string $filePath
+     * @param string      $filePath
+     * @param string|null $code     The source code of the file. If null, will be fetched automatically.
      */
-    public function indexFile($filePath)
+    public function indexFile($filePath, $code = null)
     {
         try {
-            $this->indexFileOutline($filePath);
+            $code = $code ?: @file_get_contents($filePath);
+
+            if (!is_string($code)) {
+                throw new Indexer\IndexingFailedException($filePath);
+            }
+
+            $this->indexFileOutline($filePath, $code);
         } catch (Error $e) {
             throw new Indexer\IndexingFailedException($filePath);
         }
@@ -244,7 +251,7 @@ class Indexer
                 try {
                     $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
                 } catch (Error $e) {
-                    $this->logMessage('  - WARNING: ' . $filename . ' could not be scanned due to parsing errors!');
+
                 }
             }
         }
@@ -324,7 +331,7 @@ class Indexer
 
         $dependencyFetchingVisitor = new Indexer\DependencyFetchingVisitor();
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser(false);
         $traverser->addVisitor($dependencyFetchingVisitor);
         $traverser->traverse($nodes);
 
@@ -373,6 +380,7 @@ class Indexer
                     'short_description'     => null,
                     'long_description'      => null,
                     'return_type'           => null,
+                    'full_return_type'      => null,
                     'return_description'    => null
                 ]);
             }
@@ -408,6 +416,7 @@ class Indexer
                     'short_description'     => null,
                     'long_description'      => null,
                     'return_type'           => $returnType,
+                    'full_return_type'      => $returnType,
                     'return_description'    => null
                 ]);
 
@@ -432,7 +441,8 @@ class Indexer
                     $parameterData = [
                         'function_id'  => $functionId,
                         'name'         => $parameter->getName(),
-                        'type'         => $type,
+                        'type'         => (string) $type,
+                        'full_type'    => (string) $type,
                         'description'  => null,
                         'is_reference' => $parameter->isPassedByReference() ? 1 : 0,
                         'is_optional'  => $parameter->isOptional() ? 1 : 0,
@@ -545,7 +555,8 @@ class Indexer
 
                 $parameters[] = [
                     'name'        => $param->getName(),
-                    'type'        => $type,
+                    'type'        => (string) $type,
+                    'fullType'    => (string) $type,
                     'isReference' => $param->isPassedByReference(),
                     'isVariadic'  => $isVariadic,
                     'isOptional'  => $param->isOptional()
@@ -560,15 +571,16 @@ class Indexer
             }
 
             $rawData['methods'][$method->getName()] = [
-                'name'        => $method->getName(),
-                'startLine'   => null,
-                'isPublic'    => $method->isPublic(),
-                'isPrivate'   => $method->isPrivate(),
-                'isProtected' => $method->isProtected(),
-                'isStatic'    => $method->isStatic(),
-                'returnType'  => $returnType,
-                'parameters'  => $parameters,
-                'docComment'  => null
+                'name'           => $method->getName(),
+                'startLine'      => null,
+                'isPublic'       => $method->isPublic(),
+                'isPrivate'      => $method->isPrivate(),
+                'isProtected'    => $method->isProtected(),
+                'isStatic'       => $method->isStatic(),
+                'returnType'     => $returnType,
+                'fullReturnType' => $returnType,
+                'parameters'     => $parameters,
+                'docComment'     => null
             ];
         }
 
@@ -603,20 +615,18 @@ class Indexer
      * used traits, etc.
      *
      * @param string $filename
+     * @param string $code
      *
      * @throws PhpParser\Error When the file could not be parsed.
      */
-    protected function indexFileOutline($filename)
+    protected function indexFileOutline($filename, $code)
     {
-        $nodes = [];
-        $parser = $this->getParser();
-
-        $nodes = $parser->parse(@file_get_contents($filename));
+        $nodes = $this->getParser()->parse($code);
 
         $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
         $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();
 
-        $traverser = new NodeTraverser();
+        $traverser = new NodeTraverser(false);
         $traverser->addVisitor($outlineIndexingVisitor);
         $traverser->addVisitor($useStatementFetchingVisitor);
         $traverser->traverse($nodes);
@@ -934,6 +944,7 @@ class Indexer
             $parameters[] = [
                 'name'        => $parameterName,
                 'type'        => $parameter['type'],
+                'fullType'    => $parameter['type'],
                 'isReference' => false,
                 'isVariadic'  => false,
                 'isOptional'  => false
@@ -944,6 +955,7 @@ class Indexer
             $parameters[] = [
                 'name'        => $parameterName,
                 'type'        => $parameter['type'],
+                'fullType'    => $parameter['type'],
                 'isReference' => false,
                 'isVariadic'  => false,
                 'isOptional'  => true
@@ -951,15 +963,16 @@ class Indexer
         }
 
         return [
-            'name'        => $name,
-            'startLine'   => null,
-            'returnType'  => $data['type'],
-            'parameters'  => $parameters,
-            'docComment'  => "/** {$data['description']} */",
-            'isPublic'    => true,
-            'isPrivate'   => false,
-            'isProtected' => false,
-            'isStatic'    => $data['isStatic']
+            'name'           => $name,
+            'startLine'      => null,
+            'returnType'     => $data['type'],
+            'fullReturnType' => $data['type'],
+            'parameters'     => $parameters,
+            'docComment'     => "/** {$data['description']} */",
+            'isPublic'       => true,
+            'isPrivate'      => false,
+            'isProtected'    => false,
+            'isStatic'       => $data['isStatic']
         ];
     }
 
@@ -984,10 +997,11 @@ class Indexer
         ], $rawData['name']);
 
         $returnType = null;
+        $fullReturnType = null;
 
         if ($documentation['var']['type']) {
             $returnType = $documentation['var']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
@@ -999,6 +1013,7 @@ class Indexer
             'short_description'     => $documentation['descriptions']['short'],
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
+            'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
             'structural_element_id' => $seId,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1
@@ -1038,10 +1053,11 @@ class Indexer
         }
 
         $returnType = null;
+        $fullReturnType = null;
 
         if ($documentation['var']['type']) {
             $returnType = $documentation['var']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
@@ -1052,6 +1068,7 @@ class Indexer
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
+            'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
             'structural_element_id' => $seId,
             'access_modifier_id'    => $amId,
@@ -1088,10 +1105,11 @@ class Indexer
         ], $rawData['name']);
 
         $returnType = $rawData['returnType'];
+        $fullReturnType = $rawData['fullReturnType'];
 
         if (!$returnType) {
             $returnType = $documentation['return']['type'];
-            $returnType = $this->getFullReturnTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
         }
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
@@ -1103,6 +1121,7 @@ class Indexer
             'short_description'     => $documentation['descriptions']['short'],
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
+            'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['return']['description'],
             'structural_element_id' => $seId,
             'access_modifier_id'    => $amId,
@@ -1118,10 +1137,18 @@ class Indexer
             $parameterDoc = isset($documentation['params'][$parameterKey]) ?
                 $documentation['params'][$parameterKey] : null;
 
+            $fullType = $parameter['fullType'];
+
+            if (!$fullType) {
+                $fullType = $parameterDoc ? $parameterDoc['type'] : null;
+                $fullType = $this->getFullTypeForDocblockType($fullType, $useStatementFetchingVisitor);
+            }
+
             $parameterData = [
                 'function_id'  => $functionId,
                 'name'         => $parameter['name'],
                 'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                'full_type'    => $fullType,
                 'description'  => $parameterDoc ? $parameterDoc['description'] : null,
                 'is_reference' => $parameter['isReference'] ? 1 : 0,
                 'is_optional'  => $parameter['isOptional'] ? 1 : 0,
@@ -1139,6 +1166,7 @@ class Indexer
             $throwsData = [
                 'function_id' => $functionId,
                 'type'        => $type,
+                'full_type'   => $this->getFullTypeForDocblockType($type, $useStatementFetchingVisitor),
                 'description' => $description ?: null
             ];
 
@@ -1222,22 +1250,22 @@ class Indexer
     }
 
     /**
-     * Resolves and determines the FQSEN of the specified return type.
+     * Resolves and determines the FQSEN of the specified type.
      *
-     * @param string                                   $returnType
+     * @param string                                   $type
      * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
      * @return string|null
      */
-    protected function getFullReturnTypeForDocblockType(
-        $returnType,
+    protected function getFullTypeForDocblockType(
+        $type,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        if (!isset($returnType) || empty($returnType)) {
+        if (empty($type)) {
             return null;
         }
 
-        $soleClassName = $this->getSoleClassName($returnType);
+        $soleClassName = $this->getSoleClassName($type);
 
         if (!empty($soleClassName)) {
             if ($soleClassName[0] !== "\\" && $useStatementFetchingVisitor) {
@@ -1277,7 +1305,7 @@ class Indexer
             return $soleClassName;
         }
 
-        return $returnType;
+        return $type;
     }
 
     /**

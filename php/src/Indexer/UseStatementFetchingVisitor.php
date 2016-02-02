@@ -28,7 +28,6 @@ class UseStatementFetchingVisitor implements NodeVisitor
         if ($node instanceof Node\Stmt\Namespace_) {
             $this->namespace = (string) $node->name;
         } elseif ($node instanceof Node\Stmt\Use_) {
-            /** @var Node\Stmt\UseUse $use */
             foreach ($node->uses as $use) {
                 $this->useStatements[] = [
                     'fqsen' => (string) $use->name,

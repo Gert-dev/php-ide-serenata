@@ -1,6 +1,6 @@
 fs            = require 'fs'
-md5           = require 'md5'
-child_process = require "child_process"
+stream        = require 'stream'
+child_process = require 'child_process'
 
 Utility = require "./Utility"
 
@@ -14,6 +14,11 @@ class Proxy
      * The config to use.
     ###
     config: null
+
+    ###*
+     * The name (without path or extension) of the database file to use.
+    ###
+    indexDatabaseName: null
 
     ###*
      * Constructor.
@@ -32,15 +37,11 @@ class Proxy
     prepareParameters: (args) ->
         parameters = [
             '-d memory_limit=-1',
-            Utility.escapeSpaces(__dirname + "/../php/src/Main.php"),
-            Utility.escapeSpaces(@getIndexDatabasePath())
+            Utility.escapeShellParameter(__dirname + "/../php/src/Main.php")
         ]
 
         for a in args
-            a = Utility.escapeSeparators(a)
-            a = Utility.escapeSpaces(a)
-
-            parameters.push(a)
+            parameters.push(Utility.escapeShellParameter(a))
 
         return parameters
 
@@ -59,13 +60,17 @@ class Proxy
             if response.error
                 throw response.error
 
-            response = JSON.parse(response.output[1].toString('ascii'))
+            try
+                response = JSON.parse(response.output[1].toString('ascii'))
+
+            catch error
+                throw 'Invalid JSON data was returned by the PHP side!'
 
             if not response or response.error?
                 throw response.error
 
             if not response.success
-                throw "An unsuccessful status code was returned by the PHP side!"
+                throw 'An unsuccessful status code was returned by the PHP side!'
 
         catch error
             throw (if error.message then error.message else error)
@@ -79,22 +84,26 @@ class Proxy
      * @param {string}   command        The command to execute.
      * @param {array}    parameters     The arguments to pass.
      * @param {Callback} streamCallback A method to invoke each time streaming data is received.
+     * @param {string}   stdinData      The data to pass to STDIN.
      *
      * @return {Promise}
     ###
-    performRequestAsync: (command, parameters, streamCallback = null) ->
+    performRequestAsync: (command, parameters, streamCallback = null, stdinData = null) ->
         return new Promise (resolve, reject) =>
-            # We are already above the default of 200 kB for methods such as getGlobalFunctions.
-            options =
-                maxBuffer: 50000 * 1024
+            proc = child_process.spawn(command, parameters)
 
-            proc = child_process.exec(@config.get('phpCommand') + ' ' + parameters.join(' '), options, (error, stdout, stderr) =>
-                if not stdout or stdout.length == 0
+            buffer = ''
+
+            proc.stdout.on 'data', (data) =>
+                buffer += data
+
+            proc.on 'close', (code) =>
+                if not buffer or buffer.length == 0
                     reject({message: "No output received from the PHP side!"})
                     return
 
                 try
-                    response = JSON.parse(stdout)
+                    response = JSON.parse(buffer)
 
                 catch error
                     #console.error(error)
@@ -112,11 +121,14 @@ class Proxy
                     return
 
                 resolve(response.result)
-            )
 
             if streamCallback
                 proc.stderr.on 'data', (data) =>
                     streamCallback(data)
+
+            if stdinData?
+                proc.stdin.write(stdinData, 'utf-8')
+                proc.stdin.end()
 
     ###*
      * Performs a request to the PHP side.
@@ -124,10 +136,13 @@ class Proxy
      * @param {array}    args           The arguments to pass.
      * @param {boolean}  async          Whether to execute the method asynchronously or not.
      * @param {Callback} streamCallback A method to invoke each time streaming data is received.
+     * @param {string}   stdinData      The data to pass to STDIN.
+     *
+     * @todo Support stdinData for synchronous requests as well.
      *
      * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    performRequest: (args, async, streamCallback) ->
+    performRequest: (args, async, streamCallback = null, stdinData = null) ->
         php = @config.get('phpCommand')
         parameters = @prepareParameters(args)
 
@@ -135,7 +150,7 @@ class Proxy
             return @performRequestSync(php, parameters)
 
         else
-            return @performRequestAsync(php, parameters, streamCallback)
+            return @performRequestAsync(php, parameters, streamCallback, stdinData)
 
     ###*
      * Retrieves a list of available classes.
@@ -145,7 +160,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getClassList: (async = false) ->
-        return @performRequest(['--class-list'], async)
+        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath()], async)
 
     ###*
      * Retrieves a list of available global constants.
@@ -155,7 +170,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getGlobalConstants: (async = false) ->
-        return @performRequest(['--constants'], async)
+        return @performRequest(['--constants', '--database=' + @getIndexDatabasePath()], async)
 
     ###*
      * Retrieves a list of available global functions.
@@ -165,7 +180,7 @@ class Proxy
      * @return {Promise|Object}
     ###
     getGlobalFunctions: (async = false) ->
-        return @performRequest(['--functions'], async)
+        return @performRequest(['--functions', '--database=' + @getIndexDatabasePath()], async)
 
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
@@ -177,46 +192,50 @@ class Proxy
      * @return {Promise|Object}
     ###
     getClassInfo: (className, async = false) ->
-        return @performRequest(['--class-info', className], async)
+        if not className
+            throw 'No class name passed!'
+
+        return @performRequest(
+            ['--class-info', '--database=' + @getIndexDatabasePath(), '--name=' + className],
+            async
+        )
 
     ###*
-     * Refreshes the specified file. If no file is specified, all files are refreshed (which can take a while for large
-     * projects!). This method is asynchronous and will return immediately.
+     * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {string}   filename               The full file path to the class to refresh.
-     * @param {Callback} progressStreamCallback A method to invoke each time progress streaming data is received.
+     * @param {string}      path                   The full path to the file  or folder to refresh.
+     * @param {string|null} source                 The source code of the file to index. May be null if a directory is
+     *                                             passed instead.
+     * @param {Callback}    progressStreamCallback A method to invoke each time progress streaming data is received.
      *
      * @return {Promise}
     ###
-    reindex: (filename, progressStreamCallback) ->
-        if not filename
-            filename = atom.project.getDirectories()[0]?.path
-
-        # For Windows - Replace \ in class namespace to / because composer use / instead of \.
-        filename = Utility.normalizeSeparators(filename)
+    reindex: (path, source, progressStreamCallback) ->
+        if not path
+            throw 'No class name passed!'
 
         progressStreamCallbackWrapper = (output) =>
             # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
-            percentages = output.split("\n")
+            percentages = output.toString('ascii').split("\n")
             percentages.pop() # Ditch the empty value.
 
             for percentage in percentages
                 progressStreamCallback(percentage)
 
-        return @performRequest(['--reindex', filename, '--stream-progress'], true, progressStreamCallbackWrapper)
+        return @performRequest(
+            ['--reindex', '--database=' + @getIndexDatabasePath(), '--source=' + path, '--stream-progress', '--stdin'],
+            true,
+            progressStreamCallbackWrapper,
+            source
+        )
 
     ###*
-     * Retrieves the name of the database file to use.
+     * Sets the name (without path or extension) of the database file to use.
      *
-     * @return {string}
+     * @param {string} name
     ###
-    getIndexDatabaseName: () ->
-        pathStrings = ''
-
-        for i,project of atom.project.getDirectories()
-            pathStrings += project.path
-
-        return md5(pathStrings)
+    setIndexDatabaseName: (name) ->
+        @indexDatabaseName = name
 
     ###*
      * Retrieves the full path to the database file to use.
@@ -224,6 +243,4 @@ class Proxy
      * @return {string}
     ###
     getIndexDatabasePath: () ->
-        id = @getIndexDatabaseName()
-
-        return @config.get('packagePath') + '/indexes/' + id + '.sqlite'
+        return @config.get('packagePath') + '/indexes/' + @indexDatabaseName + '.sqlite'

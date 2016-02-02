@@ -91,6 +91,14 @@ class IndexDataAdapter
             $baseClassInfo = $this->getStructuralElementInfo($seId);
 
             if ($baseClassInfo) {
+                if (!$result['descriptions']['short']) {
+                    $result['descriptions']['short'] = $baseClassInfo['descriptions']['short'];
+                }
+
+                if (!$result['descriptions']['long']) {
+                    $result['descriptions']['long'] = $baseClassInfo['descriptions']['long'];
+                }
+
                 $result['constants']  = array_merge($result['constants'], $baseClassInfo['constants']);
                 $result['properties'] = array_merge($result['properties'], $baseClassInfo['properties']);
                 $result['methods']    = array_merge($result['methods'], $baseClassInfo['methods']);
@@ -464,6 +472,7 @@ class IndexDataAdapter
             $parameters[] = [
                 'name'        => $rawParameter['name'],
                 'type'        => $rawParameter['type'],
+                'fullType'    => $rawParameter['full_type'],
                 'description' => $rawParameter['description'],
                 'isReference' => !!$rawParameter['is_reference'],
                 'isVariadic'  => !!$rawParameter['is_variadic'],
@@ -497,6 +506,7 @@ class IndexDataAdapter
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['full_return_type'],
                 'description'  => $rawInfo['return_description']
             ]
         ];
@@ -527,6 +537,7 @@ class IndexDataAdapter
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['full_return_type'],
                 'description'  => $rawInfo['return_description']
             ],
 
@@ -563,6 +574,7 @@ class IndexDataAdapter
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
+                'resolvedType' => $rawInfo['full_return_type'],
                 'description'  => $rawInfo['return_description']
             ],
         ];

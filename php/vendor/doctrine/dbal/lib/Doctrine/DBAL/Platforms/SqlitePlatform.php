@@ -45,7 +45,7 @@ class SqlitePlatform extends AbstractPlatform
      */
     public function getRegexpExpression()
     {
-        return 'RLIKE';
+        return 'REGEXP';
     }
 
     /**
@@ -660,6 +660,18 @@ class SqlitePlatform extends AbstractPlatform
     /**
      * {@inheritDoc}
      */
+    protected function doModifyLimitQuery($query, $limit, $offset)
+    {
+        if (null === $limit && null !== $offset) {
+            return $query . ' LIMIT -1 OFFSET ' . $offset;
+        }
+
+        return parent::doModifyLimitQuery($query, $limit, $offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getBlobTypeDeclarationSQL(array $field)
     {
         return 'BLOB';
@@ -986,6 +998,12 @@ class SqlitePlatform extends AbstractPlatform
         $columnNames = $this->getColumnNamesInAlteredTable($diff);
 
         foreach ($indexes as $key => $index) {
+            foreach ($diff->renamedIndexes as $oldIndexName => $renamedIndex) {
+                if (strtolower($key) === strtolower($oldIndexName)) {
+                    unset($indexes[$key]);
+                }
+            }
+
             $changed = false;
             $indexColumns = array();
             foreach ($index->getColumns() as $columnName) {
