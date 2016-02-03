@@ -1,3 +1,7 @@
+## 0.5.1
+### Bugs fixed
+* Fixed classes never being marked as being abstract.
+
 ## 0.5.0
 ### Features and enhancements
 * Minor performance improvements when resolving local class names from docblocks.
