@@ -709,7 +709,7 @@ class Indexer
             'file_id'                    => $fileId,
             'start_line'                 => $rawData['startLine'],
             'structural_element_type_id' => $structuralElementTypeMap[$rawData['type']],
-            'is_abstract'                => (isset($rawData['is_abstract']) && $rawData['is_abstract']) ? 1 : 0,
+            'is_abstract'                => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
             'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
             'is_builtin'                 => $isBuiltin ? 1 : 0,
             'has_docblock'               => empty($rawData['docComment']) ? 0 : 1,
