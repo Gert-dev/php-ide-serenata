@@ -232,6 +232,9 @@ module.exports =
         return unless /text.html.php$/.test(editor.getGrammar().scopeName)
 
         path = editor.getPath()
+
+        return if not path
+
         isContainedInProject = false
 
         for projectDirectory in atom.project.getDirectories()
