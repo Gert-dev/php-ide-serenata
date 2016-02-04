@@ -22,15 +22,6 @@ describe "retrieveSanitizedCallStackAt", ->
         runs ->
             editor.setGrammar(grammar)
 
-    it "correctly stops at keywords such as parent and self.", ->
-        source = "self::foo"
-        editor.setText(source)
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 0, column: source.length})).toEqual(['self', 'foo'])
-
-        source = "parent::foo->test"
-        editor.setText(source)
-        expect(parser.retrieveSanitizedCallStackAt(editor, {row: 0, column: source.length})).toEqual(['parent', 'foo', 'test'])
-
     it "correctly stops at basic function calls.", ->
         source =
             """
