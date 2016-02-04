@@ -749,10 +749,12 @@ class Parser
             propertyAccessNeedsDollarSign = true
 
             currentClassName = @determineFullClassName(editor)
-            currentClassInfo = @proxy.getClassInfo(currentClassName)
 
-            if currentClassInfo.parents.length > 0
-                className = currentClassInfo.parents[0]
+            if currentClassName?
+                currentClassInfo = @proxy.getClassInfo(currentClassName)
+
+                if currentClassInfo.parents.length > 0
+                    className = currentClassInfo.parents[0]
 
         else if firstElement[0] == '['
             className = 'array'
