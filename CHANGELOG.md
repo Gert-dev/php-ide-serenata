@@ -1,3 +1,7 @@
+## 0.5.2
+### Bugs fixed
+* Fixed an error being thrown when writing code in a PHP file that hadn't been saved yet.
+
 ## 0.5.1
 ### Bugs fixed
 * Fixed classes never being marked as being abstract.
