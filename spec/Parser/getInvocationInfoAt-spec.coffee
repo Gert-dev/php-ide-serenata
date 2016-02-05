@@ -155,6 +155,33 @@ describe "getInvocationInfoAt", ->
 
         expect(result.argumentIndex).toEqual(1)
 
+    it "correctly deals with arrays with nested parentheses.", ->
+        source =
+            """
+            <?php
+
+            builtin_func(
+                foo(),
+                ($a + $b
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        result = parser.getInvocationInfoAt(editor, bufferPosition)
+
+        expect(result.bufferPosition.row).toEqual(2)
+        expect(result.bufferPosition.column).toEqual(12)
+        expect(result.callStack).toEqual(['builtin_func'])
+        expect(result.type).toEqual('function')
+        expect(result.argumentIndex).toEqual(1)
+
     it "correctly deals with constructor calls (the new keyword).", ->
         source =
             """

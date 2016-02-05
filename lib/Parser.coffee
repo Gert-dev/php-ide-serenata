@@ -930,10 +930,14 @@ class Parser
                         if lineText[i] == ';'
                             return null # We've moved too far and reached another expression, stop here.
 
-                        else if bracketsOpened >= bracketsClosed and
-                                parenthesesOpened == parenthesesClosed and
-                                lineText[i] == ','
-                            ++argumentIndex
+                        else if lineText[i] == ','
+                            if parenthesesOpened == (parenthesesClosed + 1)
+                                # Pretend the parentheses were closed, the user is probably inside an argument that
+                                # contains parentheses.
+                                ++parenthesesClosed
+
+                            if bracketsOpened >= bracketsClosed and parenthesesOpened == parenthesesClosed
+                                ++argumentIndex
 
                 if scopesOpened == scopesClosed and parenthesesOpened == (parenthesesClosed + 1)
                     chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
