@@ -57,17 +57,13 @@ class Proxy
         try
             response = child_process.spawnSync(command, parameters)
 
-            if response.error
-                throw response.error
+            rawOutput = response.output[1].toString('ascii')
 
             try
-                response = JSON.parse(response.output[1].toString('ascii'))
+                response = JSON.parse(rawOutput)
 
             catch error
-                throw 'Invalid JSON data was returned by the PHP side!'
-
-            if not response or response.error?
-                throw response.error
+                throw 'Invalid JSON data received! Raw output from the PHP side:<br/><br/>' + rawOutput
 
             if not response.success
                 throw 'An unsuccessful status code was returned by the PHP side!'
@@ -99,25 +95,17 @@ class Proxy
 
             proc.on 'close', (code) =>
                 if not buffer or buffer.length == 0
-                    reject({message: "No output received from the PHP side!"})
+                    reject({rawOutput: buffer, message: "No output received from the PHP side!"})
                     return
 
                 try
                     response = JSON.parse(buffer)
 
                 catch error
-                    #console.error(error)
-                    reject({message: error})
-                    return
-
-                if response?.error
-                    #console.error(message)
-                    message = response.error?.message
-                    reject({message: message})
-                    return
+                    throw 'Invalid JSON data received! Raw output from the PHP side:<br/><br/>' + buffer
 
                 if not response.success
-                    reject({message: 'An unsuccessful status code was returned by the PHP side!'})
+                    reject({rawOutput: buffer, message: 'An unsuccessful status code was returned by the PHP side!'})
                     return
 
                 resolve(response.result)

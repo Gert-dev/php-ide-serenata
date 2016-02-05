@@ -1,3 +1,7 @@
+## 0.5.4
+### Features and enhancements
+* Better error reporting. Exceptions thrown by the PHP side will now be displayed in an Atom error.
+
 ## 0.5.3
 ### Bugs fixed
 * Fixed expressions inside ternary operators not correctly being fetched.
