@@ -916,6 +916,10 @@ class Parser
                     else if lineText[i] == '['
                         ++bracketsOpened
 
+                        if bracketsOpened > bracketsClosed
+                            # We must have been inside an array argument, reset.
+                            argumentIndex = 0
+
                     else if lineText[i] == ')'
                         ++parenthesesClosed
 
@@ -931,8 +935,7 @@ class Parser
                                 lineText[i] == ','
                             ++argumentIndex
 
-                if scopesOpened == scopesClosed and
-                   parenthesesOpened == (parenthesesClosed + 1)
+                if scopesOpened == scopesClosed and parenthesesOpened == (parenthesesClosed + 1)
                     chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
                     isClassName = (chain.indexOf('.support.class') != -1)
