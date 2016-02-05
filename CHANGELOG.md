@@ -1,3 +1,7 @@
+## 0.5.3
+### Bugs fixed
+* Fixed expressions inside ternary operators not correctly being fetched.
+
 ## 0.5.2
 ### Bugs fixed
 * Fixed an error being thrown when writing code in a PHP file that hadn't been saved yet.

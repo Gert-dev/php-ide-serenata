@@ -311,6 +311,7 @@ class Parser
         squiggleBracketsOpened = 0
         squiggleBracketsClosed = 0
 
+        lastCharacter = null
         startedKeyword = false
         startedStaticClassName = false
 
@@ -400,10 +401,20 @@ class Parser
                             finishedOn = false
 
                     # Reached an operator that can never be part of the current statement.
-                    #else if lineText[i] == ','
-                    else if lineText[i] == ','
+                    else if lineText[i] == ',' || lineText[i] == '?'
                         finishedOn = true
                         break
+
+                    else if lineText[i] == ':'
+                        # Only double colons can be part of an expression (for static access), but not single colons,
+                        # which are commonly used in ternary operators.
+                        if backwards and lastCharacter != ':' and (i == 0 or (i > 0 and lineText[i - 1] != ':'))
+                            finishedOn = true
+                            break
+
+                        else if not backwards and lastCharacter != ':' and (i == lineText.length or (i < lineText.length and lineText[i + 1] != ':'))
+                            finishedOn = true
+                            break
 
                     # Stop on keywords such as 'return' or 'echo'.
                     else if scopeDescriptor.indexOf('.keyword.control') != -1 or scopeDescriptor.indexOf('.support.function.construct') != -1
@@ -436,6 +447,8 @@ class Parser
                 else if startedKeyword and scopeDescriptor.indexOf('.storage.type') == -1
                     finishedOn = true
                     break
+
+                lastCharacter = lineText[i]
 
             if finishedOn?
                 break
