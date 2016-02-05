@@ -3,8 +3,8 @@
 * Better error reporting. Exceptions thrown by the PHP side will now be displayed in an Atom error.
 
 ### Bugs fixed
-* Fixed getInvocationInfoAt not giving correct results when inside an argument that was wrapped in parentheses.
-* Fixed getInvocationInfoAt not giving a correct argument index when inside an array parameter with square brackets.
+* Fixed `getInvocationInfoAt` not giving correct results when inside an argument that was wrapped in parentheses.
+* Fixed `getInvocationInfoAt` not giving a correct argument index when inside an array parameter with square brackets.
 
 ## 0.5.3
 ### Bugs fixed
