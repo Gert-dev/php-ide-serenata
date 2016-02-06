@@ -1,3 +1,8 @@
+## 0.6.0
+### Changes for developers
+* Changes to the service
+  * Fetching class information will now also return information about implemented interfaces and used traits.
+
 ## 0.5.4
 ### Features and enhancements
 * Better error reporting. Exceptions thrown by the PHP side will now be displayed in an Atom error.
