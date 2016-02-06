@@ -19,6 +19,13 @@ interface ProviderInterface
      *
      * @return array
      */
+    public function getStructuralElementRawParents($id);
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
     public function getStructuralElementRawInterfaces($id);
 
     /**
@@ -62,13 +69,4 @@ interface ProviderInterface
      * @return array
      */
     public function getStructuralElementTraitPrecedencesAssoc($id);
-
-    /**
-     * Retrieves a list of (direct) parent FQSEN's for the specified structural element.
-     *
-     * @param int $seId
-     *
-     * @return array An associative array mapping structural element ID's to their FQSEN.
-     */
-    public function getParentFqsens($seId);
 }

@@ -35,7 +35,7 @@ class IndexDataAdapter
     {
         return $this->resolveStructuralElement(
             $this->storage->getStructuralElementRawInfo($id),
-            $this->storage->getParentFqsens($id),
+            $this->storage->getStructuralElementRawParents($id),
             $this->storage->getStructuralElementRawInterfaces($id),
             $this->storage->getStructuralElementRawTraits($id),
             $this->storage->getStructuralElementRawConstants($id),
@@ -48,7 +48,7 @@ class IndexDataAdapter
      * Resolves structural element information from the specified raw data.
      *
      * @param array|\Traversable $element
-     * @param array|\Traversable $parentFqsens
+     * @param array|\Traversable $parents
      * @param array|\Traversable $interfaces
      * @param array|\Traversable $traits
      * @param array|\Traversable $constants
@@ -59,7 +59,7 @@ class IndexDataAdapter
      */
     public function resolveStructuralElement(
         $element,
-        $parentFqsens,
+        $parents,
         $interfaces,
         $traits,
         $constants,
@@ -81,7 +81,7 @@ class IndexDataAdapter
                 'long'  => $element['long_description']
             ],
 
-            'parents'      => array_values($parentFqsens),
+            'parents'      => [],
             'interfaces'   => [],
             'traits'       => [],
 
@@ -92,25 +92,25 @@ class IndexDataAdapter
 
         // Take all members from the base class as a starting point. Note that there can only be multiple base classes
         // for interfaces.
-        foreach ($parentFqsens as $seId => $fqsen) {
-            $baseClassInfo = $this->getStructuralElementInfo($seId);
+        foreach ($parents as $parent) {
+            $parentInfo = $this->getStructuralElementInfo($parent['id']);
 
-            if ($baseClassInfo) {
+            if ($parentInfo) {
                 if (!$result['descriptions']['short']) {
-                    $result['descriptions']['short'] = $baseClassInfo['descriptions']['short'];
+                    $result['descriptions']['short'] = $parentInfo['descriptions']['short'];
                 }
 
                 if (!$result['descriptions']['long']) {
-                    $result['descriptions']['long'] = $baseClassInfo['descriptions']['long'];
+                    $result['descriptions']['long'] = $parentInfo['descriptions']['long'];
                 }
 
-                $result['constants']  = array_merge($result['constants'], $baseClassInfo['constants']);
-                $result['properties'] = array_merge($result['properties'], $baseClassInfo['properties']);
-                $result['methods']    = array_merge($result['methods'], $baseClassInfo['methods']);
+                $result['constants']  = array_merge($result['constants'], $parentInfo['constants']);
+                $result['properties'] = array_merge($result['properties'], $parentInfo['properties']);
+                $result['methods']    = array_merge($result['methods'], $parentInfo['methods']);
 
-                $result['traits'] = array_merge($result['traits'], $baseClassInfo['traits']);
-                $result['parents'] = array_merge($result['parents'], $baseClassInfo['parents']);
-                $result['interfaces'] = array_merge($result['interfaces'], $baseClassInfo['interfaces']);
+                $result['traits']     = array_merge($result['traits'], $parentInfo['traits']);
+                $result['interfaces'] = array_merge($result['interfaces'], $parentInfo['interfaces']);
+                $result['parents']    = array_merge($result['parents'], [$parentInfo['name']], $parentInfo['parents']);
             }
         }
 

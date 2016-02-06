@@ -416,6 +416,20 @@ class IndexDatabase implements
     /**
      * {@inheritDoc}
      */
+    public function getStructuralElementRawParents($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('se.id')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.linked_structural_element_id = se.id')
+            ->where('sepl.structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStructuralElementRawInterfaces($id)
     {
         return $this->getConnection()->createQueryBuilder()
@@ -527,29 +541,6 @@ class IndexDatabase implements
         }
 
         return $precedences;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getParentFqsens($seId)
-    {
-        $result = [];
-
-        $parentSes = $this->getConnection()->createQueryBuilder()
-            ->select('se.id', 'se.fqsen')
-            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.linked_structural_element_id = se.id')
-            ->where('sepl.structural_element_id = ?')
-            ->setParameter(0, $seId)
-            ->execute()
-            ->fetchAll();
-
-        foreach ($parentSes as $parentSe) {
-            $result[$parentSe['id']] = $parentSe['fqsen'];
-        }
-
-        return $result;
     }
 
     /**

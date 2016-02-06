@@ -60,6 +60,14 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
+    public function getStructuralElementRawParents($id)
+    {
+        return new ArrayIterator([]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStructuralElementRawInterfaces($id)
     {
         return new ArrayIterator([]);
@@ -126,15 +134,6 @@ class ClassListProxyProvider implements ProviderInterface
     public function getStructuralElementTraitPrecedencesAssoc($id)
     {
         // return $this->proxiedObject->getStructuralElementTraitPrecedencesAssoc($id);
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getParentFqsens($seId)
-    {
-        // return $this->proxiedObject->getParentFqsens($seId);
         return [];
     }
 }
