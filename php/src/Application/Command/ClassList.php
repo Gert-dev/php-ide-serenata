@@ -30,17 +30,7 @@ class ClassList extends BaseCommand
 
             $info = $dataAdapter->getStructuralElementInfo($element['id']);
 
-            // $constructor = null;
-
-            // if (isset($info['methods']['__construct'])) {
-                // $constructor = $info['methods']['__construct'];
-            // }
-
             unset($info['constants'], $info['properties'], $info['methods']);
-
-            // if ($constructor) {
-                // $info['methods']['__construct'] = $constructor;
-            // }
 
             $result[$element['fqsen']] = $info;
         }

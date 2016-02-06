@@ -78,7 +78,6 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementRawTraits($id)
     {
-        // return $this->proxiedObject->getStructuralElementRawTraits($id);
         return new ArrayIterator([]);
     }
 
@@ -103,19 +102,6 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementRawMethods($id)
     {
-        /*$methods = $this->proxiedObject->getStructuralElementRawMethods($id);
-
-        $filteredMethods = [];
-
-        foreach ($methods as $method) {
-            if ($method['name'] === '__construct') {
-                $filteredMethods[] = $method;
-                break;
-            }
-        }
-
-        return new \ArrayIterator($filteredMethods);*/
-
         return [];
     }
 
@@ -124,7 +110,6 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementTraitAliasesAssoc($id)
     {
-        // return $this->proxiedObject->getStructuralElementTraitAliasesAssoc($id);
         return [];
     }
 
@@ -133,7 +118,6 @@ class ClassListProxyProvider implements ProviderInterface
      */
     public function getStructuralElementTraitPrecedencesAssoc($id)
     {
-        // return $this->proxiedObject->getStructuralElementTraitPrecedencesAssoc($id);
         return [];
     }
 }
