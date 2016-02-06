@@ -74,12 +74,17 @@ class IndexDataAdapter
             'type'         => $element['type_name'],
             'isAbstract'   => !!$element['is_abstract'],
             'isBuiltin'    => !!$element['is_builtin'],
-            'parents'      => array_values($parentFqsens),
             'isDeprecated' => !!$element['is_deprecated'],
+
             'descriptions' => [
                 'short' => $element['short_description'],
                 'long'  => $element['long_description']
             ],
+
+            'parents'      => array_values($parentFqsens),
+            'interfaces'   => [],
+            'traits'       => [],
+
             'constants'    => [],
             'properties'   => [],
             'methods'      => []
@@ -103,7 +108,9 @@ class IndexDataAdapter
                 $result['properties'] = array_merge($result['properties'], $baseClassInfo['properties']);
                 $result['methods']    = array_merge($result['methods'], $baseClassInfo['methods']);
 
+                $result['traits'] = array_merge($result['traits'], $baseClassInfo['traits']);
                 $result['parents'] = array_merge($result['parents'], $baseClassInfo['parents']);
+                $result['interfaces'] = array_merge($result['interfaces'], $baseClassInfo['interfaces']);
             }
         }
 
@@ -111,6 +118,8 @@ class IndexDataAdapter
         // never overwrite any existing members as they have a lower priority than inherited members.
         foreach ($interfaces as $interface) {
             $interface = $this->getStructuralElementInfo($interface['id']);
+
+            $result['interfaces'][] = $interface['name'];
 
             foreach ($interface['constants'] as $constant) {
                 if (!isset($result['constants'][$constant['name']])) {
@@ -136,6 +145,8 @@ class IndexDataAdapter
 
         foreach ($traits as $trait) {
             $trait = $this->getStructuralElementInfo($trait['id']);
+
+            $result['traits'][] = $trait['name'];
 
             foreach ($trait['constants'] as $constant) {
                 if (isset($traitAliases[$constant['name']])) {
