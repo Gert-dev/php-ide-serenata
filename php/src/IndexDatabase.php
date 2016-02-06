@@ -430,6 +430,20 @@ class IndexDatabase implements
     /**
      * {@inheritDoc}
      */
+    public function getStructuralElementRawChildren($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('se.id', 'se.fqsen')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, 'sepl', 'sepl.structural_element_id = se.id')
+            ->where('sepl.linked_structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStructuralElementRawInterfaces($id)
     {
         return $this->getConnection()->createQueryBuilder()
@@ -444,6 +458,20 @@ class IndexDatabase implements
     /**
      * {@inheritDoc}
      */
+    public function getStructuralElementRawImplementors($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('se.id', 'se.fqsen')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_INTERFACES_LINKED, 'seil', 'seil.structural_element_id = se.id')
+            ->where('seil.linked_structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStructuralElementRawTraits($id)
     {
         return $this->getConnection()->createQueryBuilder()
@@ -451,6 +479,20 @@ class IndexDatabase implements
             ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED, 'setl', 'setl.linked_structural_element_id = se.id')
             ->where('setl.structural_element_id = ?')
+            ->setParameter(0, $id)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementRawTraitUsers($id)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('se.id', 'se.fqsen')
+            ->from(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, 'se')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED, 'setl', 'setl.structural_element_id = se.id')
+            ->where('setl.linked_structural_element_id = ?')
             ->setParameter(0, $id)
             ->execute();
     }

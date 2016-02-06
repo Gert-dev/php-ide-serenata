@@ -36,8 +36,11 @@ class IndexDataAdapter
         return $this->resolveStructuralElement(
             $this->storage->getStructuralElementRawInfo($id),
             $this->storage->getStructuralElementRawParents($id),
+            $this->storage->getStructuralElementRawChildren($id),
             $this->storage->getStructuralElementRawInterfaces($id),
+            $this->storage->getStructuralElementRawImplementors($id),
             $this->storage->getStructuralElementRawTraits($id),
+            $this->storage->getStructuralElementRawTraitUsers($id),
             $this->storage->getStructuralElementRawConstants($id),
             $this->storage->getStructuralElementRawProperties($id),
             $this->storage->getStructuralElementRawMethods($id)
@@ -49,8 +52,11 @@ class IndexDataAdapter
      *
      * @param array|\Traversable $element
      * @param array|\Traversable $parents
+     * @param array|\Traversable $children
      * @param array|\Traversable $interfaces
+     * @param array|\Traversable $implementors
      * @param array|\Traversable $traits
+     * @param array|\Traversable $traitUsers
      * @param array|\Traversable $constants
      * @param array|\Traversable $properties
      * @param array|\Traversable $methods
@@ -60,35 +66,54 @@ class IndexDataAdapter
     public function resolveStructuralElement(
         $element,
         $parents,
+        $children,
         $interfaces,
+        $implementors,
         $traits,
+        $traitUsers,
         $constants,
         $properties,
         $methods
     ) {
         $result = [
-            'name'         => $element['fqsen'],
-            'startLine'    => $element['start_line'],
-            'shortName'    => $element['name'],
-            'filename'     => $element['path'],
-            'type'         => $element['type_name'],
-            'isAbstract'   => !!$element['is_abstract'],
-            'isBuiltin'    => !!$element['is_builtin'],
-            'isDeprecated' => !!$element['is_deprecated'],
+            'name'               => $element['fqsen'],
+            'startLine'          => $element['start_line'],
+            'shortName'          => $element['name'],
+            'filename'           => $element['path'],
+            'type'               => $element['type_name'],
+            'isAbstract'         => !!$element['is_abstract'],
+            'isBuiltin'          => !!$element['is_builtin'],
+            'isDeprecated'       => !!$element['is_deprecated'],
 
-            'descriptions' => [
+            'descriptions'       => [
                 'short' => $element['short_description'],
                 'long'  => $element['long_description']
             ],
 
-            'parents'      => [],
-            'interfaces'   => [],
-            'traits'       => [],
+            'parents'            => [],
+            'interfaces'         => [],
+            'traits'             => [],
 
-            'constants'    => [],
-            'properties'   => [],
-            'methods'      => []
+            'directChildren'     => [],
+            'directImplementors' => [],
+            'directTraitUsers'   => [],
+
+            'constants'          => [],
+            'properties'         => [],
+            'methods'            => []
         ];
+
+        foreach ($children as $child) {
+            $result['directChildren'][] = $child['fqsen'];
+        }
+
+        foreach ($implementors as $implementor) {
+            $result['directImplementors'][] = $implementor['fqsen'];
+        }
+
+        foreach ($traitUsers as $trait) {
+            $result['directTraitUsers'][] = $trait['fqsen'];
+        }
 
         // Take all members from the base class as a starting point. Note that there can only be multiple base classes
         // for interfaces.

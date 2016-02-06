@@ -26,6 +26,13 @@ interface ProviderInterface
      *
      * @return array
      */
+    public function getStructuralElementRawChildren($id);
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
     public function getStructuralElementRawInterfaces($id);
 
     /**
@@ -33,7 +40,21 @@ interface ProviderInterface
      *
      * @return array
      */
+    public function getStructuralElementRawImplementors($id);
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
     public function getStructuralElementRawTraits($id);
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getStructuralElementRawTraitUsers($id);
 
     /**
      * @param int $id
