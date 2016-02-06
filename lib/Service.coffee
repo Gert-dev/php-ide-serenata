@@ -54,12 +54,13 @@ class Service
     ###*
      * Retrieves a list of available classes.
      *
+     * @param {string}  file
      * @param {boolean} async
      *
      * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    getClassList: (async = false) ->
-        return @proxy.getClassList(async)
+    getClassList: (file = null, async = false) ->
+        return @proxy.getClassList(file, async)
 
     ###*
      * Retrieves a list of available global constants.

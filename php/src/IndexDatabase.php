@@ -394,11 +394,21 @@ class IndexDatabase implements
     /**
      * Retrieves raw information about all structural elements.
      *
+     * @param string|null $file
+     *
      * @return \Traversable
      */
-    public function getAllStructuralElementsRawInfo()
+    public function getAllStructuralElementsRawInfo($file)
     {
-        return $this->getStructuralElementRawInfoQueryBuilder()->execute();
+        $queryBuilder = $this->getStructuralElementRawInfoQueryBuilder();
+
+        if ($file) {
+            $queryBuilder
+                ->where('fi.path = ?')
+                ->setParameter(0, $file);
+        }
+
+        return $queryBuilder->execute();
     }
 
     /**

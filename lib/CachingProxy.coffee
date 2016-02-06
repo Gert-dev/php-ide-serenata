@@ -55,8 +55,8 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    getClassList: (async = false) ->
-        return @wrapCachedRequestToParent("getClassList", 'getClassList', arguments, async)
+    getClassList: (file = null, async = false) ->
+        return @wrapCachedRequestToParent("getClassList-#{file}", 'getClassList', arguments, async)
 
     ###*
      * @inherited

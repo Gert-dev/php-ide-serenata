@@ -143,12 +143,18 @@ class Proxy
     ###*
      * Retrieves a list of available classes.
      *
-     * @param {boolean} async
+     * @param {string|null} file
+     * @param {boolean}     async
      *
      * @return {Promise|Object}
     ###
-    getClassList: (async = false) ->
-        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath()], async)
+    getClassList: (file = null, async = false) ->
+        parameters = ['--class-list', '--database=' + @getIndexDatabasePath()]
+
+        if file?
+            parameters.push('--file=' + file)
+
+        return @performRequest(parameters, async)
 
     ###*
      * Retrieves a list of available global constants.
