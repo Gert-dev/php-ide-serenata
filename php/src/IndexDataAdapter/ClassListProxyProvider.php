@@ -68,6 +68,14 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
+    public function getStructuralElementRawChildren($id)
+    {
+        return new ArrayIterator([]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStructuralElementRawInterfaces($id)
     {
         return new ArrayIterator([]);
@@ -76,7 +84,23 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
+    public function getStructuralElementRawImplementors($id)
+    {
+        return new ArrayIterator([]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStructuralElementRawTraits($id)
+    {
+        return new ArrayIterator([]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStructuralElementRawTraitUsers($id)
     {
         return new ArrayIterator([]);
     }
