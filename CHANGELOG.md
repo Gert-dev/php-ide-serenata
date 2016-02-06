@@ -1,7 +1,7 @@
 ## 0.6.0
 ### Changes for developers
 * Changes to the service
-  * Fetching class information will now also return information about implemented interfaces and used traits.
+  * Fetching class information will now also return information about direct and indirect implemented interfaces and used traits via the properties `parents`, `directParents`, `interfaces`, `directInterfaces`, `traits` and `directTraits`.
   * Fetching class information will now also return information about direct children, direct implementors (if it's an interface) and direct users (if it's a trait).
 
 ## 0.5.4

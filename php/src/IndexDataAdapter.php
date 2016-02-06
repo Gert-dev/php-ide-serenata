@@ -94,6 +94,9 @@ class IndexDataAdapter
             'interfaces'         => [],
             'traits'             => [],
 
+            'directParents'      => [],
+            'directInterfaces'   => [],
+            'directTraits'       => [],
             'directChildren'     => [],
             'directImplementors' => [],
             'directTraitUsers'   => [],
@@ -136,6 +139,8 @@ class IndexDataAdapter
                 $result['traits']     = array_merge($result['traits'], $parentInfo['traits']);
                 $result['interfaces'] = array_merge($result['interfaces'], $parentInfo['interfaces']);
                 $result['parents']    = array_merge($result['parents'], [$parentInfo['name']], $parentInfo['parents']);
+
+                $result['directParents'][] = $parentInfo['name'];
             }
         }
 
@@ -145,6 +150,7 @@ class IndexDataAdapter
             $interface = $this->getStructuralElementInfo($interface['id']);
 
             $result['interfaces'][] = $interface['name'];
+            $result['directInterfaces'][] = $interface['name'];
 
             foreach ($interface['constants'] as $constant) {
                 if (!isset($result['constants'][$constant['name']])) {
@@ -172,6 +178,7 @@ class IndexDataAdapter
             $trait = $this->getStructuralElementInfo($trait['id']);
 
             $result['traits'][] = $trait['name'];
+            $result['directTraits'][] = $trait['name'];
 
             foreach ($trait['constants'] as $constant) {
                 if (isset($traitAliases[$constant['name']])) {
