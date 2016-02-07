@@ -4,11 +4,14 @@ describe "getAvailableVariables", ->
     editor = null
     grammar = null
 
-    proxyStub =
+    proxyMock =
+        getClassListForFile: (file) ->
+            return {}
+
         getDocParams: () ->
             return {params: null}
 
-    parser = new Parser(proxyStub)
+    parser = new Parser(proxyMock)
 
     beforeEach ->
         waitsForPromise ->
