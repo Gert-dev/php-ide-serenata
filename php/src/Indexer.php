@@ -676,6 +676,14 @@ class Indexer
             $this->indexConstant($constant, $fileId, null, $useStatementFetchingVisitor);
         }
 
+        foreach ($useStatementFetchingVisitor->getUseStatements() as $useStatement) {
+            $this->storage->insert(IndexStorageItemEnum::FILES_IMPORTS, [
+                'alias'   => $useStatement['alias'] ?: null,
+                'fqsen'   => $useStatement['fqsen'],
+                'file_id' => $fileId
+            ]);
+        }
+
         // Remove structural elements that are no longer in this file.
         $this->storage->deleteExcludedStructuralElementsByFileId($fileId, $indexedSeIds);
     }

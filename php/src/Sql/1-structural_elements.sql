@@ -35,6 +35,19 @@ INSERT INTO access_modifiers (id, name) VALUES
     (NULL, 'private');
 
 --
+CREATE TABLE files_imports(
+    id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+
+    alias                      varchar(255) NOT NULL,
+    fqsen                      varchar(255) NOT NULL,
+    file_id                    integer,
+
+    FOREIGN KEY(file_id) REFERENCES files(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+--
 CREATE TABLE structural_elements(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
