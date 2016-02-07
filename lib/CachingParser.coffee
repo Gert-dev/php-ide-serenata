@@ -61,5 +61,5 @@ class CachingParser extends Parser
     ###*
      * @inherited
     ###
-    determineFullClassName: (editor, className = null) ->
-        return @wrapCachedRequestToParent(editor.getPath(), "determineFullClassName-#{className}", 'determineFullClassName', arguments, false)
+    resolveType: (editor, type) ->
+        return @wrapCachedRequestToParent(editor.getPath(), "resolveType-#{type}", 'resolveType', arguments, false)

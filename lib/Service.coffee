@@ -54,13 +54,23 @@ class Service
     ###*
      * Retrieves a list of available classes.
      *
+     * @param {boolean} async
+     *
+     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
+    ###
+    getClassList: (async = false) ->
+        return @proxy.getClassList(async)
+
+    ###*
+     * Retrieves a list of available classes in the specified file.
+     *
      * @param {string}  file
      * @param {boolean} async
      *
      * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
     ###
-    getClassList: (file = null, async = false) ->
-        return @proxy.getClassList(file, async)
+    getClassListForFile: (file, async = false) ->
+        return @proxy.getClassListForFile(file, async)
 
     ###*
      * Retrieves a list of available global constants.
@@ -154,18 +164,28 @@ class Service
         return @parser.getClassSelectorFromEvent(event)
 
     ###*
-     * Determines the full class name (without leading slash) of the specified class in the specified editor. If no
-     * class name is passed, the full class name of the class defined in the current file is returned instead.
+     * Determines the current class' FQCN based on the specified buffer position.
      *
-     * @param {TextEditor}  editor    The editor that contains the class (needed to resolve relative class names).
-     * @param {String|null} className The (local) name of the class to resolve.
+     * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
+     * @param {Point}      bufferPosition
+     *
+     * @return {string|null}
+    ###
+    determineCurrentClassName: (editor, bufferPosition) ->
+        return @parser.determineCurrentClassName(editor, bufferPosition)
+
+    ###*
+     * Determines the FQCN (without leading slash) of the specified type in the specified editor.
+     *
+     * @param {TextEditor} editor The editor (needed to resolve relative class names).
+     * @param {string}     type   The (local) type to resolve.
      *
      * @return {string|null}
      *
      * @example In a file with namespace A\B, determining C will lead to A\B\C.
     ###
-    determineFullClassName: (editor, className = null) ->
-        return @parser.determineFullClassName(editor, className)
+    resolveType: (editor, type) ->
+        return @parser.resolveType(editor, type)
 
     ###*
      * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).

@@ -1,6 +1,6 @@
 Parser = require '../../lib/Parser'
 
-describe "determineFullClassName", ->
+describe "resolveType", ->
     editor = null
     grammar = null
     parser = new Parser(null)
@@ -22,49 +22,6 @@ describe "determineFullClassName", ->
         runs ->
             editor.setGrammar(grammar)
 
-    it "returns null if there is no namespace.", ->
-        source =
-            """
-            <?php
-            """
-
-        editor.setText(source)
-
-        expect(parser.determineFullClassName(editor, null)).toEqual(null)
-
-
-    it "correctly determines the current class name when there is no namespace.", ->
-        source =
-            """
-            <?php
-
-            class Foo
-            {
-                //
-            }
-            """
-
-        editor.setText(source)
-
-        expect(parser.determineFullClassName(editor, null)).toEqual('Foo')
-
-    it "correctly determines the current class name when there is a namespace.", ->
-        source =
-            """
-            <?php
-
-            namespace My;
-
-            class Foo
-            {
-                //
-            }
-            """
-
-        editor.setText(source)
-
-        expect(parser.determineFullClassName(editor, null)).toEqual('My\\Foo')
-
     it "correctly treats class names that are absolute with a leading slash.", ->
         source =
             """
@@ -75,7 +32,7 @@ describe "determineFullClassName", ->
 
         editor.setText(source)
 
-        expect(parser.determineFullClassName(editor, '\\My\\Foo')).toEqual('My\\Foo')
+        expect(parser.resolveType(editor, '\\My\\Foo')).toEqual('My\\Foo')
 
     it "ignores lines with comments.", ->
         source =
@@ -91,7 +48,7 @@ describe "determineFullClassName", ->
 
         editor.setText(source)
 
-        expect(parser.determineFullClassName(editor, 'Bar')).toEqual('Foo\\Bar')
+        expect(parser.resolveType(editor, 'Bar')).toEqual('Foo\\Bar')
 
     it "parses use simple statements properly.", ->
         source =
@@ -105,7 +62,7 @@ describe "determineFullClassName", ->
 
         editor.setText(source)
 
-        expect(parser.determineFullClassName(editor, 'Bar')).toEqual('Foo\\Bar')
+        expect(parser.resolveType(editor, 'Bar')).toEqual('Foo\\Bar')
 
     it "parses use statements with aliases properly.", ->
         source =
@@ -119,8 +76,8 @@ describe "determineFullClassName", ->
 
         editor.setText(source)
 
-        expect(parser.determineFullClassName(editor, 'Bar')).toEqual('My\\Bar')
-        expect(parser.determineFullClassName(editor, 'Alias')).toEqual('Foo\\Bar')
+        expect(parser.resolveType(editor, 'Bar')).toEqual('My\\Bar')
+        expect(parser.resolveType(editor, 'Alias')).toEqual('Foo\\Bar')
 
     it "correctly deals with class names with multiple segments and use statements.", ->
         source =
@@ -134,7 +91,7 @@ describe "determineFullClassName", ->
 
         editor.setText(source)
 
-        expect(parser.determineFullClassName(editor, 'Bar\\Test')).toEqual('Foo\\Bar\\Test')
+        expect(parser.resolveType(editor, 'Bar\\Test')).toEqual('Foo\\Bar\\Test')
 
     it "correctly deals with class names with multiple segments relative to the current namespace.", ->
         source =
@@ -146,7 +103,7 @@ describe "determineFullClassName", ->
 
         editor.setText(source)
 
-        expect(parser.determineFullClassName(editor, 'Bar\\Test')).toEqual('My\\Bar\\Test')
+        expect(parser.resolveType(editor, 'Bar\\Test')).toEqual('My\\Bar\\Test')
 
     it "does not touch basic types.", ->
         source =
@@ -158,8 +115,8 @@ describe "determineFullClassName", ->
 
         editor.setText(source)
 
-        expect(parser.determineFullClassName(editor, 'int')).toEqual('int')
-        expect(parser.determineFullClassName(editor, 'INT')).toEqual('INT')
-        expect(parser.determineFullClassName(editor, 'bool')).toEqual('bool')
-        expect(parser.determineFullClassName(editor, 'string')).toEqual('string')
-        expect(parser.determineFullClassName(editor, 'STRING')).toEqual('STRING')
+        expect(parser.resolveType(editor, 'int')).toEqual('int')
+        expect(parser.resolveType(editor, 'INT')).toEqual('INT')
+        expect(parser.resolveType(editor, 'bool')).toEqual('bool')
+        expect(parser.resolveType(editor, 'string')).toEqual('string')
+        expect(parser.resolveType(editor, 'STRING')).toEqual('STRING')

@@ -63,10 +63,10 @@ class Proxy
                 response = JSON.parse(rawOutput)
 
             catch error
-                throw 'Invalid JSON data received! Raw output from the PHP side:<br/><br/>' + rawOutput
+                throw new Error('Invalid JSON data received! Raw output from the PHP side:<br/><br/>' + rawOutput)
 
             if not response.success
-                throw 'An unsuccessful status code was returned by the PHP side!'
+                throw new Error('An unsuccessful status code was returned by the PHP side!')
 
         catch error
             throw (if error.message then error.message else error)
@@ -102,7 +102,7 @@ class Proxy
                     response = JSON.parse(buffer)
 
                 catch error
-                    throw 'Invalid JSON data received! Raw output from the PHP side:<br/><br/>' + buffer
+                    throw new Error('Invalid JSON data received! Raw output from the PHP side:<br/><br/>' + buffer)
 
                 if not response.success
                     reject({rawOutput: buffer, message: 'An unsuccessful status code was returned by the PHP side!'})
@@ -143,18 +143,26 @@ class Proxy
     ###*
      * Retrieves a list of available classes.
      *
-     * @param {string|null} file
-     * @param {boolean}     async
+     * @param {boolean} async
      *
      * @return {Promise|Object}
     ###
-    getClassList: (file = null, async = false) ->
-        parameters = ['--class-list', '--database=' + @getIndexDatabasePath()]
+    getClassList: (async = false) ->
+        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath()], async)
 
-        if file?
-            parameters.push('--file=' + file)
+    ###*
+     * Retrieves a list of available classes in the specified file.
+     *
+     * @param {string}  file
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
+    ###
+    getClassListForFile: (file, async = false) ->
+        if not file
+            throw new Error('No file passed!')
 
-        return @performRequest(parameters, async)
+        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath(), '--file=' + file], async)
 
     ###*
      * Retrieves a list of available global constants.
@@ -187,7 +195,7 @@ class Proxy
     ###
     getClassInfo: (className, async = false) ->
         if not className
-            throw 'No class name passed!'
+            throw new Error('No class name passed!')
 
         return @performRequest(
             ['--class-info', '--database=' + @getIndexDatabasePath(), '--name=' + className],
@@ -206,7 +214,7 @@ class Proxy
     ###
     reindex: (path, source, progressStreamCallback) ->
         if not path
-            throw 'No class name passed!'
+            throw new Error('No class name passed!')
 
         progressStreamCallbackWrapper = (output) =>
             # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.

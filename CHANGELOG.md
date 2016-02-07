@@ -1,11 +1,13 @@
 ## 0.6.0
 ### Changes for developers
 * Changes to the service
+  * A new call `getClassListForFile` takes a file path to filter the class list by.
   * Next to `startLine` information, `endLine` information will now also be returned.
-  * The `getClassList` call now takes an optional file path to filter by. Note that a new parameter was inserted at the front of the signature, breaking backwards compatibility!
   * Fetching class information will now also return information about direct and indirect implemented interfaces and used traits via the properties `parents`, `directParents`, `interfaces`, `directInterfaces`, `traits` and `directTraits`.
   * Fetching class information will now also return information about direct children, direct implementors (if it's an interface) and direct users (if it's a trait).
-
+  * `determineFullClassName` was split up into two methods (separation of concerns):
+    * `determineCurrentClassName` - Takes an editor and a buffer position and returns the FQCN of the class the location is in. The buffer position is now required as a file can contain multiple classes, which were not retrievable before.
+    * `resolveType` - Takes an editor and a type name and resolves that type to its FQCN based on use statements.
 
 ## 0.5.4
 ### Features and enhancements

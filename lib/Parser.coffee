@@ -9,7 +9,7 @@ class Parser
     ###*
      * Regular expression that will search for a structure (class, interface, trait, ...).
     ###
-    structureStartRegex : /(?:abstract class|class|trait|interface)\s+(\w+)/
+    #structureStartRegex : /(?:abstract class|class|trait|interface)\s+(\w+)/
 
     ###*
      * Regular expression that will search for a use statement.
@@ -67,31 +67,45 @@ class Parser
         return matches
 
     ###*
-     * Determines the full class name (without leading slash) of the specified class in the specified editor. If no
-     * class name is passed, the full class name of the class defined in the current file is returned instead.
+     * Determines the current class' FQCN based on the specified buffer position.
      *
-     * @param {TextEditor}  editor    The editor that contains the class (needed to resolve relative class names).
-     * @param {String|null} className The (local) name of the class to resolve.
+     * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
+     * @param {Point}      bufferPosition
+     *
+     * @return {string|null}
+    ###
+    determineCurrentClassName: (editor, bufferPosition) ->
+        path = editor.getPath()
+
+        classesInFile = @proxy.getClassListForFile(editor.getPath())
+
+        for name,classInfo of classesInFile
+            if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
+                return name
+
+        return null
+
+    ###*
+     * Determines the FQCN (without leading slash) of the specified type in the specified editor.
+     *
+     * @param {TextEditor} editor The editor (needed to resolve relative class names).
+     * @param {string}     type   The (local) type to resolve.
      *
      * @return {string|null}
      *
      * @example In a file with namespace A\B, determining C will lead to A\B\C.
     ###
-    determineFullClassName: (editor, className = null) ->
-        if className == null
-            className = ''
+    resolveType: (editor, type) ->
+        if not type
+            throw new Error('A class name must be provided!')
 
-        else if not className
-            return null # Nothing we can do here.
+        if type[0] == "\\"
+            return type.substr(1) # FQCN, not subject to any further context.
 
-        if className and className[0] == "\\"
-            return className.substr(1) # FQCN, not subject to any further context.
+        else if @isBasicType(type)
+            return type
 
-        if @isBasicType(className)
-            return className
-
-        found = false
-        fullClass = className
+        fullClass = type
 
         for i in [0 .. editor.getLineCount() - 1]
             line = editor.lineTextForBufferRow(i)
@@ -107,42 +121,41 @@ class Parser
             matches = line.match(@namespaceDeclarationRegex)
 
             if matches
-                fullClass = matches[1] + '\\' + className
+                fullClass = matches[1] + '\\' + type
+                continue
 
-            else if className
-                matches = line.match(@useStatementRegex)
+            matches = line.match(@useStatementRegex)
 
-                if matches
-                    classNameParts = className.split('\\')
-                    importNameParts = matches[1].split('\\')
+            if matches
+                typeParts = type.split('\\')
+                importNameParts = matches[1].split('\\')
 
-                    isAliasedImport = if matches[2] then true else false
+                isAliasedImport = if matches[2] then true else false
 
-                    if className == matches[1]
-                        fullClass = className # Already a complete name.
+                if type == matches[1]
+                    fullClass = type # Already a complete name.
 
-                        break
+                    break
 
-                    else if (isAliasedImport and matches[2] == classNameParts[0]) or (!isAliasedImport and importNameParts[importNameParts.length - 1] == classNameParts[0])
-                        found = true
+                else if (isAliasedImport and matches[2] == typeParts[0]) or (!isAliasedImport and importNameParts[importNameParts.length - 1] == typeParts[0])
+                    fullClass = matches[1]
 
-                        fullClass = matches[1]
+                    typeParts = typeParts[1 .. typeParts.length]
 
-                        classNameParts = classNameParts[1 .. classNameParts.length]
+                    if (typeParts.length > 0)
+                        fullClass += '\\' + typeParts.join('\\')
 
-                        if (classNameParts.length > 0)
-                            fullClass += '\\' + classNameParts.join('\\')
+                    break
 
-                        break
-
+            ###
             matches = line.match(@structureStartRegex)
 
             if matches
-                if not className
-                    found = true
+                if not type
                     fullClass += matches[1]
 
                 break
+            ###
 
         # In the class map, classes never have a leading slash. The leading slash only indicates that import rules of
         # the file don't apply, but it's useless after that.
@@ -588,7 +601,7 @@ class Parser
             regexTypeAnnotation = ///\/\*\*\s*@var\s+(#{classRegexPart}(?:\[\])?)\s+#{elementForRegex}\s*(\s.*)?\*\////
 
             editor.getBuffer().backwardsScanInRange regexTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
-                bestMatch = @determineFullClassName(editor, matchInfo.match[1])
+                bestMatch = @resolveType(editor, matchInfo.match[1])
 
                 matchInfo.stop()
 
@@ -598,7 +611,7 @@ class Parser
             regexReverseTypeAnnotation = ///\/\*\*\s*@var\s+#{elementForRegex}\s+(#{classRegexPart}(?:\[\])?)\s*(\s.*)?\*\////
 
             editor.getBuffer().backwardsScanInRange regexReverseTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
-                bestMatch = @determineFullClassName(editor, matchInfo.match[1])
+                bestMatch = @resolveType(editor, matchInfo.match[1])
 
                 matchInfo.stop()
 
@@ -615,7 +628,7 @@ class Parser
                 typeHint = matchInfo.match[2]
 
                 if typeHint?.length > 0
-                    bestMatch = @determineFullClassName(editor, typeHint)
+                    bestMatch = @resolveType(editor, typeHint)
 
                 else
                     functionName = matchInfo.match[1]
@@ -623,7 +636,7 @@ class Parser
                     # Can be empty for closures.
                     if functionName?.length > 0
                         try
-                            currentClass = @determineFullClassName(editor)
+                            currentClass = @determineCurrentClassName(editor, bufferPosition)
 
                             response = null
                             functionInfo = null
@@ -685,7 +698,7 @@ class Parser
 
                 scanStartPosition = matchInfo.range.end
 
-                bestMatch = @determineFullClassName(editor, matchInfo.match[1])
+                bestMatch = @resolveType(editor, matchInfo.match[1])
 
                 matchInfo.stop()
 
@@ -724,7 +737,7 @@ class Parser
             break if bestMatch
 
         if not bestMatch and name == '$this'
-            bestMatch = @determineFullClassName(editor)
+            bestMatch = @determineCurrentClassName(editor, bufferPosition)
 
         return bestMatch
 
@@ -756,12 +769,12 @@ class Parser
         else if firstElement == 'static' or firstElement == 'self'
             propertyAccessNeedsDollarSign = true
 
-            className = @determineFullClassName(editor)
+            className = @determineCurrentClassName(editor, bufferPosition)
 
         else if firstElement == 'parent'
             propertyAccessNeedsDollarSign = true
 
-            currentClassName = @determineFullClassName(editor)
+            currentClassName = @determineCurrentClassName(editor, bufferPosition)
 
             if currentClassName?
                 currentClassInfo = @proxy.getClassInfo(currentClassName)
@@ -807,7 +820,7 @@ class Parser
             propertyAccessNeedsDollarSign = true
 
             # Static class name.
-            className = @determineFullClassName(editor, firstElement)
+            className = @resolveType(editor, firstElement)
 
         else
             className = null # No idea what this is.
