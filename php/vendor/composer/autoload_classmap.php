@@ -26,4 +26,5 @@ return array(
     'PhpIntegrator\\Indexer\\OutlineIndexingVisitor' => $baseDir . '/src/Indexer/OutlineIndexingVisitor.php',
     'PhpIntegrator\\Indexer\\StorageInterface' => $baseDir . '/src/Indexer/StorageInterface.php',
     'PhpIntegrator\\Indexer\\UseStatementFetchingVisitor' => $baseDir . '/src/Indexer/UseStatementFetchingVisitor.php',
+    'PhpIntegrator\\TypeResolver' => $baseDir . '/src/TypeResolver.php',
 );
