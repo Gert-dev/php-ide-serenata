@@ -84,6 +84,7 @@ class OutlineIndexingVisitor extends NameResolver
             'name'       => $node->name,
             'type'       => 'class',
             'startLine'  => $node->getLine(),
+            'endLine'    => $node->getAttribute('endLine'),
             'isAbstract' => $node->isAbstract(),
             'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null,
             'parents'    => $node->extends ? [$node->extends->toString()] : [],
@@ -118,6 +119,7 @@ class OutlineIndexingVisitor extends NameResolver
             'name'       => $node->name,
             'type'       => 'interface',
             'startLine'  => $node->getLine(),
+            'endLine'    => $node->getAttribute('endLine'),
             'parents'    => $extendedInterfaces,
             'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null,
             'traits'     => [],
@@ -144,6 +146,7 @@ class OutlineIndexingVisitor extends NameResolver
             'name'       => $node->name,
             'type'       => 'trait',
             'startLine'  => $node->getLine(),
+            'endLine'    => $node->getAttribute('endLine'),
             'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null,
             'methods'    => [],
             'properties' => [],
@@ -192,6 +195,7 @@ class OutlineIndexingVisitor extends NameResolver
             $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['properties'][] = [
                 'name'        => $property->name,
                 'startLine'   => $node->getLine(),
+                'endLine'     => $node->getAttribute('endLine'),
                 'isPublic'    => $node->isPublic(),
                 'isPrivate'   => $node->isPrivate(),
                 'isStatic'    => $node->isStatic(),
@@ -230,6 +234,7 @@ class OutlineIndexingVisitor extends NameResolver
         $this->globalFunctions[] = [
             'name'           => $node->name,
             'startLine'      => $node->getLine(),
+            'endLine'        => $node->getAttribute('endLine'),
             'returnType'     => $localReturnType,
             'fullReturnType' => (string) $node->getReturnType(),
             'parameters'     => $parameters,
@@ -266,6 +271,7 @@ class OutlineIndexingVisitor extends NameResolver
         $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['methods'][] = [
             'name'           => $node->name,
             'startLine'      => $node->getLine(),
+            'endLine'        => $node->getAttribute('endLine'),
             'isPublic'       => $node->isPublic(),
             'isPrivate'      => $node->isPrivate(),
             'isProtected'    => $node->isProtected(),
@@ -286,6 +292,7 @@ class OutlineIndexingVisitor extends NameResolver
             $this->structuralElements[$this->currentStructuralElement->namespacedName->toString()]['constants'][] = [
                 'name'       => $const->name,
                 'startLine'  => $node->getLine(),
+                'endLine'    => $node->getAttribute('endLine'),
                 'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null
             ];
         }
@@ -300,6 +307,7 @@ class OutlineIndexingVisitor extends NameResolver
             $this->globalConstants[] = [
                 'name'       => $const->name,
                 'startLine'  => $node->getLine(),
+                'endLine'    => $node->getAttribute('endLine'),
                 'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null
             ];
         }

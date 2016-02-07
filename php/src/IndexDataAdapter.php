@@ -78,6 +78,7 @@ class IndexDataAdapter
         $result = [
             'name'               => $element['fqsen'],
             'startLine'          => $element['start_line'],
+            'endLine'            => $element['end_line'],
             'shortName'          => $element['name'],
             'filename'           => $element['path'],
             'type'               => $element['type_name'],
@@ -211,6 +212,7 @@ class IndexDataAdapter
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
+                        'endLine'         => $element['end_line'],
                         'type'            => $element['type_name']
                     ]
                 ]);
@@ -254,6 +256,7 @@ class IndexDataAdapter
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
+                        'endLine'         => $element['end_line'],
                         'type'            => $element['type_name'],
                     ]
                 ]);
@@ -306,6 +309,7 @@ class IndexDataAdapter
                         'name'            => $element['fqsen'],
                         'filename'        => $element['path'],
                         'startLine'       => $element['start_line'],
+                        'endLine'         => $element['end_line'],
                         'type'            => $element['type_name'],
                     ]
                 ]);
@@ -327,6 +331,7 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'endLine'         => $element['end_line'],
                     'type'            => $element['type_name'],
                 ],
 
@@ -334,8 +339,10 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'endLine'         => $element['end_line'],
                     'type'            => $element['type_name'],
-                    'startLineMember' => $rawConstantData['start_line']
+                    'startLineMember' => $rawConstantData['start_line'],
+                    'endLineMember'   => $rawConstantData['end_line']
                 ]
             ]);
         }
@@ -353,7 +360,8 @@ class IndexDataAdapter
                 $overriddenPropertyData = [
                     'declaringClass'     => $existingProperty['declaringClass'],
                     'declaringStructure' => $existingProperty['declaringStructure'],
-                    'startLine'          => $existingProperty['startLine']
+                    'startLine'          => $existingProperty['startLine'],
+                    'endLine'            => $existingProperty['end_line']
                 ];
 
                 if ($this->isInheritingDocumentation($property)) {
@@ -368,6 +376,7 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'endLine'         => $element['end_line'],
                     'type'            => $element['type_name'],
                 ],
 
@@ -375,8 +384,10 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'endLine'         => $element['end_line'],
                     'type'            => $element['type_name'],
-                    'startLineMember' => $rawPropertyData['start_line']
+                    'startLineMember' => $rawPropertyData['start_line'],
+                    'endLineMember'   => $rawPropertyData['end_line']
                 ]
             ]);
 
@@ -409,13 +420,15 @@ class IndexDataAdapter
                     $implementedMethodData = [
                         'declaringClass'     => $existingMethod['declaringClass'],
                         'declaringStructure' => $existingMethod['declaringStructure'],
-                        'startLine'          => $existingMethod['startLine']
+                        'startLine'          => $existingMethod['startLine'],
+                        'endLine'            => $existingMethod['endLine']
                     ];
                 } else {
                     $overriddenMethodData = [
                         'declaringClass'     => $existingMethod['declaringClass'],
                         'declaringStructure' => $existingMethod['declaringStructure'],
-                        'startLine'          => $existingMethod['startLine']
+                        'startLine'          => $existingMethod['startLine'],
+                        'endLine'            => $existingMethod['endLine']
                     ];
                 }
 
@@ -432,6 +445,7 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'endLine'         => $element['end_line'],
                     'type'            => $element['type_name'],
                 ],
 
@@ -439,8 +453,10 @@ class IndexDataAdapter
                     'name'            => $element['fqsen'],
                     'filename'        => $element['path'],
                     'startLine'       => $element['start_line'],
+                    'endLine'         => $element['end_line'],
                     'type'            => $element['type_name'],
-                    'startLineMember' => $rawMethodData['start_line']
+                    'startLineMember' => $rawMethodData['start_line'],
+                    'endLineMember'   => $rawMethodData['end_line']
                 ]
             ]);
 
@@ -535,6 +551,7 @@ class IndexDataAdapter
             'name'          => $rawInfo['name'],
             'isBuiltin'     => false,
             'startLine'     => $rawInfo['start_line'],
+            'endLine'       => $rawInfo['end_line'],
             'filename'      => $rawInfo['path'],
 
             'parameters'    => $parameters,
@@ -565,6 +582,7 @@ class IndexDataAdapter
         return [
             'name'               => $rawInfo['name'],
             'startLine'          => $rawInfo['start_line'],
+            'endLine'            => $rawInfo['end_line'],
             'isMagic'            => !!$rawInfo['is_magic'],
             'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
@@ -601,6 +619,7 @@ class IndexDataAdapter
             'name'         => $rawInfo['name'],
             'isBuiltin'    => !!$rawInfo['is_builtin'],
             'startLine'    => $rawInfo['start_line'],
+            'endLine'      => $rawInfo['end_line'],
             'filename'     => $rawInfo['path'],
 
             'isPublic'     => true,

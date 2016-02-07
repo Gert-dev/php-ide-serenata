@@ -375,6 +375,7 @@ class Indexer
                     'name'                  => $name,
                     'file_id'               => null,
                     'start_line'            => null,
+                    'end_line'              => null,
                     'is_builtin'            => 1, // ($namespace !== 'user' ? 1 : 0)
                     'is_deprecated'         => false,
                     'short_description'     => null,
@@ -411,6 +412,7 @@ class Indexer
                     'name'                  => $functionName,
                     'file_id'               => null,
                     'start_line'            => null,
+                    'end_line'              => null,
                     'is_builtin'            => 1,
                     'is_deprecated'         => $function->isDeprecated() ? 1 : 0,
                     'short_description'     => null,
@@ -525,6 +527,7 @@ class Indexer
             'name'       => $element->getName(),
             'type'       => $type,
             'startLine'  => null,
+            'endLine'    => null,
             'isAbstract' => $element->isAbstract(),
             'docComment' => null,
             'parents'    => $parents,
@@ -573,6 +576,7 @@ class Indexer
             $rawData['methods'][$method->getName()] = [
                 'name'           => $method->getName(),
                 'startLine'      => null,
+                'endLine'        => null,
                 'isPublic'       => $method->isPublic(),
                 'isPrivate'      => $method->isPrivate(),
                 'isProtected'    => $method->isProtected(),
@@ -588,6 +592,7 @@ class Indexer
             $rawData['properties'][$property->getName()] = [
                 'name'        => $property->getName(),
                 'startLine'   => null,
+                'endLine'     => null,
                 'isPublic'    => $property->isPublic(),
                 'isPrivate'   => $property->isPrivate(),
                 'isStatic'    => $property->isStatic(),
@@ -600,6 +605,7 @@ class Indexer
             $rawData['constants'][$constantName] = [
                 'name'       => $constantName,
                 'startLine'  => null,
+                'endLine'    => null,
                 'docComment' => null
             ];
         }
@@ -708,6 +714,7 @@ class Indexer
             'fqsen'                      => $fqsen,
             'file_id'                    => $fileId,
             'start_line'                 => $rawData['startLine'],
+            'end_line'                   => $rawData['endLine'],
             'structural_element_type_id' => $structuralElementTypeMap[$rawData['type']],
             'is_abstract'                => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
             'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
@@ -920,6 +927,7 @@ class Indexer
         return [
             'name'        => mb_substr($name, 1), // Strip off the dollar sign.
             'startLine'   => null,
+            'endLine'     => null,
             'isPublic'    => true,
             'isPrivate'   => false,
             'isProtected' => false,
@@ -965,6 +973,7 @@ class Indexer
         return [
             'name'           => $name,
             'startLine'      => null,
+            'endLine'        => null,
             'returnType'     => $data['type'],
             'fullReturnType' => $data['type'],
             'parameters'     => $parameters,
@@ -1008,6 +1017,7 @@ class Indexer
             'name'                  => $rawData['name'],
             'file_id'               => $fileId,
             'start_line'            => $rawData['startLine'],
+            'end_line'              => $rawData['endLine'],
             'is_builtin'            => 0,
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
             'short_description'     => $documentation['descriptions']['short'],
@@ -1064,6 +1074,7 @@ class Indexer
             'name'                  => $rawData['name'],
             'file_id'               => $fileId,
             'start_line'            => $rawData['startLine'],
+            'end_line'              => $rawData['endLine'],
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
@@ -1116,6 +1127,7 @@ class Indexer
             'name'                  => $rawData['name'],
             'file_id'               => $fileId,
             'start_line'            => $rawData['startLine'],
+            'end_line'              => $rawData['endLine'],
             'is_builtin'            => 0,
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
             'short_description'     => $documentation['descriptions']['short'],
@@ -1255,7 +1267,13 @@ class Indexer
     protected function getParser()
     {
         if (!$this->parser) {
-            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+            $lexer = new Lexer([
+                'usedAttributes' => [
+                    'comments', 'startLine', 'endLine'
+                ]
+            ]);
+
+            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
         }
 
         return $this->parser;

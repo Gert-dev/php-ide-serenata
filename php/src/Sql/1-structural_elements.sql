@@ -42,6 +42,7 @@ CREATE TABLE structural_elements(
     fqsen                      varchar(255) NOT NULL,
     file_id                    integer,
     start_line                 integer unsigned,
+    end_line                   integer unsigned,
 
     structural_element_type_id integer NOT NULL,
     short_description          text,
@@ -157,6 +158,7 @@ CREATE TABLE functions(
     name                  varchar(255) NOT NULL,
     file_id               integer,
     start_line            integer unsigned,
+    end_line              integer unsigned,
 
     is_builtin            tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
@@ -239,6 +241,7 @@ CREATE TABLE properties(
     name                  varchar(255) NOT NULL,
     file_id               integer,
     start_line            integer unsigned,
+    end_line              integer unsigned,
 
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
 
@@ -276,6 +279,7 @@ CREATE TABLE constants(
     name                  varchar(255) NOT NULL,
     file_id               integer,
     start_line            integer unsigned,
+    end_line              integer unsigned,
 
     is_builtin            tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
