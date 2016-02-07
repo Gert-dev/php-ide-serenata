@@ -35,7 +35,7 @@ class Reindex extends BaseCommand
     protected function process(ArrayAccess $arguments)
     {
         if (!isset($arguments['source'])) {
-            throw new UnexpectedValueException('The file or directory to index ss required for this command.');
+            throw new UnexpectedValueException('The file or directory to index is required for this command.');
         }
 
         $showOutput = isset($arguments['verbose']);
