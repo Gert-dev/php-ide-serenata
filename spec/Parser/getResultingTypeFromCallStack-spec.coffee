@@ -98,9 +98,6 @@ describe "getResultingTypeFromCallStack", ->
             return {name: 'EXPECTED_TYPE_1'} if className == 'ParentClass' and element == 'testProperty'
     }
 
-
-
-
     beforeEach ->
         waitsForPromise ->
             atom.workspace.open().then (result) ->
@@ -362,6 +359,29 @@ describe "getResultingTypeFromCallStack", ->
             column : column
 
         expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['new static()'])).toEqual('Bar')
+
+    it "correctly handles the clone keyword.", ->
+        source =
+            """
+            <?php
+
+            $var = new \DateTime();
+
+            $test = clone $var;
+            """
+
+        editor.setText(source)
+
+        parser = new Parser(proxyMock)
+
+        row = editor.getLineCount() - 3
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        expect(parser.getResultingTypeFromCallStack(editor, bufferPosition, ['clone $var'])).toEqual('\DateTime')
 
     it "correctly handles longer chains.", ->
         source =

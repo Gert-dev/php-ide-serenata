@@ -1,4 +1,13 @@
 ## 0.6.0
+### Features and enhancements
+* Support for type inference when using the `clone` keyword, for example:
+
+```php
+$a = new \DateTime();
+$b = clone $a;
+$b-> // Autocompletion for DateTime.
+```
+
 ### Changes for developers
 * Changes to the service
   * A new call `getClassListForFile` takes a file path to filter the class list by.

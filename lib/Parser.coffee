@@ -794,6 +794,9 @@ class Parser
         else if (matches = firstElement.match(///^new\s+(#{classRegexPart})(?:\(\))?///))
             className = @getResultingTypeFromCallStack(editor, bufferPosition, [matches[1]])
 
+        else if (matches = firstElement.match(///^clone\s+(\$[a-zA-Z0-9_]+)///))
+            className = @getResultingTypeFromCallStack(editor, bufferPosition, [matches[1]])
+
         else if (matches = firstElement.match(/^(.*?)\(\)$/))
             # Global PHP function.
             functions = @proxy.getGlobalFunctions()
