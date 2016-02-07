@@ -7,11 +7,6 @@ module.exports =
 ##
 class Parser
     ###*
-     * Regular expression that will search for a structure (class, interface, trait, ...).
-    ###
-    #structureStartRegex : /(?:abstract class|class|trait|interface)\s+(\w+)/
-
-    ###*
      * Regular expression that will search for a use statement.
     ###
     useStatementRegex : /(?:use)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/
@@ -146,16 +141,6 @@ class Parser
                         fullClass += '\\' + typeParts.join('\\')
 
                     break
-
-            ###
-            matches = line.match(@structureStartRegex)
-
-            if matches
-                if not type
-                    fullClass += matches[1]
-
-                break
-            ###
 
         # In the class map, classes never have a leading slash. The leading slash only indicates that import rules of
         # the file don't apply, but it's useless after that.
