@@ -130,6 +130,8 @@ class Indexer
      * Indexes the specified project.
      *
      * @param string $directory
+     *
+     * @return array A list of errors accumulated during indexing (indexing continues when these happen).
      */
     public function indexDirectory($directory)
     {
@@ -162,17 +164,23 @@ class Indexer
 
         $this->sendProgress(0, $totalItems);
 
+        $errors = [];
+
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
 
             try {
                 $this->indexFile($filePath);
             } catch (Indexer\IndexingFailedException $e) {
+                $errors = array_merge($errors, $e->getErrors());
+
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
             }
 
             $this->sendProgress($i+1, $totalItems);
         }
+
+        return $errors;
     }
 
     /**
@@ -187,12 +195,18 @@ class Indexer
             $code = $code ?: @file_get_contents($filePath);
 
             if (!is_string($code)) {
-                throw new Indexer\IndexingFailedException($filePath);
+                throw new Indexer\IndexingFailedException();
             }
 
             $this->indexFileOutline($filePath, $code);
         } catch (Error $e) {
-            throw new Indexer\IndexingFailedException($filePath);
+            throw new Indexer\IndexingFailedException([
+                [
+                    'file'    => $filePath,
+                    'line'    => $e->getLine(),
+                    'message' => $e->getMessage()
+                ]
+            ]);
         }
     }
 

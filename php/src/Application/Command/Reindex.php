@@ -69,7 +69,9 @@ class Reindex extends BaseCommand
         $path = $arguments['source']->value;
 
         if (is_dir($path)) {
-            $indexer->indexDirectory($path);
+            $errors = $indexer->indexDirectory($path);
+
+            return $this->outputJson(true, ['errors' => $errors]);
         } elseif (is_file($path)) {
             $code = null;
 
@@ -81,12 +83,12 @@ class Reindex extends BaseCommand
             try {
                 $indexer->indexFile($path, $code ?: null);
             } catch (Indexer\IndexingFailedException $e) {
-                throw new UnexpectedValueException('The file could not be indexed because it contains syntax errors!');
+                return $this->outputJson(false, ['errors' => $e->getErrors()]);
             }
-        } else {
-            throw new UnexpectedValueException('The specified file or directoy does not exist!');
+
+            return $this->outputJson(true, ['errors' => []]);
         }
 
-        return $this->outputJson(true, null);
+        throw new UnexpectedValueException('The specified file or directoy does not exist!');
     }
 }
