@@ -248,11 +248,15 @@ class Indexer
              || !isset($fileModifiedMap[$filename])
              || $fileInfo->getMTime() > $fileModifiedMap[$filename]->getTimestamp()
             ) {
-                try {
-                    $fileClassMap[$filename] = $this->getFqsenDependenciesForFile($filename);
-                } catch (Error $e) {
+                $dependencies = [];
 
+                try {
+                    $dependencies = $this->getFqsenDependenciesForFile($filename);
+                } catch (Error $e) {
+                    
                 }
+
+                $fileClassMap[$filename] = $dependencies;
             }
         }
 
