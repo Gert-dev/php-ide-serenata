@@ -1,5 +1,6 @@
 ## 0.6.0
 ### Features and enhancements
+* xdebug will now be disabled in the indexer if it is present, it will only slow down the indexer.
 * Support for type inference when using the `clone` keyword, for example:
 
 ```php
