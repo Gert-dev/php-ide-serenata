@@ -203,10 +203,10 @@ class Indexer
             throw new Indexer\IndexingFailedException([
                 [
                     'file'        => $filePath,
-                    'startLine'   => $e->getStartLine(),
-                    'endLine'     => $e->getEndLine(),
-                    'startColumn' => $e->getStartColumn($code),
-                    'endColumn'   => $e->getEndColumn($code),
+                    'startLine'   => $e->getStartLine() >= 0 ? $e->getStartLine() : null,
+                    'endLine'     => $e->getEndLine() >= 0 ? $e->getEndLine() : null,
+                    'startColumn' => $e->hasColumnInfo() ? $e->getStartColumn($code) : null,
+                    'endColumn'   => $e->hasColumnInfo() ? $e->getEndColumn($code) : null,
                     'message'     => $e->getMessage()
                 ]
             ]);
