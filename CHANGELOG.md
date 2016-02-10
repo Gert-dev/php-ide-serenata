@@ -9,6 +9,9 @@ $b = clone $a;
 $b-> // Autocompletion for DateTime.
 ```
 
+### Bugs fixed
+* Fixed autocompletion not working after the concatenation operator.
+
 ### Changes for developers
 * Changes to the service
   * A new call `getClassListForFile` takes a file path to filter the class list by.

@@ -192,7 +192,7 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
-    it "correctly stops in ternary operators.", ->
+    it "correctly stops at ternary operators.", ->
         source =
             """
             <?php
@@ -234,6 +234,32 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
+    it "correctly stops at concatenation operators.", ->
+        source =
+            """
+            <?php
+
+            $a = $b . $c->bar();
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            '$c',
+            'bar()'
+        ]
+
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 19
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 10
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
     it "correctly stops when when the bracket syntax is used for dynamic access to members.", ->
         source =

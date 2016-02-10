@@ -110,7 +110,7 @@ class Parser
 
             scopeDescriptor = editor.scopeDescriptorForBufferPosition([i, line.length]).getScopeChain()
 
-            if scopeDescriptor.indexOf('.comment') != -1 or scopeDescriptor.indexOf('.string') != -1
+            if scopeDescriptor.indexOf('.comment') != -1 or scopeDescriptor.indexOf('.string-contents') != -1
                 continue
 
             matches = line.match(@namespaceDeclarationRegex)
@@ -329,7 +329,7 @@ class Parser
             for i in lineRange
                 scopeDescriptor = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
-                if scopeDescriptor.indexOf('.comment') != -1 or scopeDescriptor.indexOf('.string') != -1
+                if scopeDescriptor.indexOf('.comment') != -1 or scopeDescriptor.indexOf('.string-contents') != -1
                     # Do nothing, we just keep parsing. (Comments can occur inside call stacks.)
 
                 else if lineText[i] == '('
@@ -899,7 +899,7 @@ class Parser
                 if lineText[i] in interestingCharacters
                     chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
-                    if chain.indexOf('.comment') != -1 or chain.indexOf('.string') != -1
+                    if chain.indexOf('.comment') != -1 or chain.indexOf('.string-contents') != -1
                         continue
 
                     else if lineText[i] == '}'
