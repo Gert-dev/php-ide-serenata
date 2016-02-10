@@ -202,9 +202,12 @@ class Indexer
         } catch (Error $e) {
             throw new Indexer\IndexingFailedException([
                 [
-                    'file'    => $filePath,
-                    'line'    => $e->getLine(),
-                    'message' => $e->getMessage()
+                    'file'        => $filePath,
+                    'startLine'   => $e->getStartLine(),
+                    'endLine'     => $e->getEndLine(),
+                    'startColumn' => $e->getStartColumn($code),
+                    'endColumn'   => $e->getEndColumn($code),
+                    'message'     => $e->getMessage()
                 ]
             ]);
         }
@@ -267,7 +270,7 @@ class Indexer
                 try {
                     $dependencies = $this->getFqsenDependenciesForFile($filename);
                 } catch (Error $e) {
-                    
+
                 }
 
                 $fileClassMap[$filename] = $dependencies;
@@ -1295,7 +1298,7 @@ class Indexer
         if (!$this->parser) {
             $lexer = new Lexer([
                 'usedAttributes' => [
-                    'comments', 'startLine', 'endLine'
+                    'comments', 'startLine', 'endLine', 'startFilePos', 'endFilePos'
                 ]
             ]);
 
