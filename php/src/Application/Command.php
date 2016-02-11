@@ -63,13 +63,25 @@ abstract class Command implements CommandInterface
             return $this->outputJson(false, 'No database path passed!');
         }
 
-        $this->indexDatabase = new IndexDatabase($processedArguments['database']->value, static::DATABASE_VERSION);
+        $this->indexDatabase = $this->createIndexDatabase($processedArguments['database']->value);
 
         try {
             return $this->process($processedArguments);
         } catch (UnexpectedValueException $e) {
             return $this->outputJson(false, $e->getMessage());
         }
+    }
+
+    /**
+     * Creates an index database instance for the database on the specified path.
+     *
+     * @param string $filePath
+     *
+     * @return IndexDatabase
+     */
+    protected function createIndexDatabase($filePath)
+    {
+        return new IndexDatabase($filePath, static::DATABASE_VERSION);
     }
 
     /**
