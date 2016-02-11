@@ -11,6 +11,7 @@ $b-> // Autocompletion for DateTime.
 
 ### Bugs fixed
 * Fixed autocompletion not working after the concatenation operator.
+* Fixed author tags that contained mail addresses (such as used in Symfony) being taken up in extended descriptions.
 
 ### Changes for developers
 * Changes to the service
