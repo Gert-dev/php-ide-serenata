@@ -101,6 +101,7 @@ class Parser
             return type
 
         fullClass = type
+        foundFirstUseStatement = false
 
         for i in [0 .. editor.getLineCount() - 1]
             line = editor.lineTextForBufferRow(i)
@@ -116,12 +117,16 @@ class Parser
             matches = line.match(@namespaceDeclarationRegex)
 
             if matches
+                foundFirstInterestingStatement = true
+
                 fullClass = matches[1] + '\\' + type
                 continue
 
             matches = line.match(@useStatementRegex)
 
             if matches
+                foundFirstInterestingStatement = true
+
                 typeParts = type.split('\\')
                 importNameParts = matches[1].split('\\')
 
@@ -141,6 +146,10 @@ class Parser
                         fullClass += '\\' + typeParts.join('\\')
 
                     break
+
+            else if foundFirstInterestingStatement
+                #debugger
+                break # Actual code started, bail out.
 
         # In the class map, classes never have a leading slash. The leading slash only indicates that import rules of
         # the file don't apply, but it's useless after that.

@@ -50,6 +50,23 @@ describe "resolveType", ->
 
         expect(parser.resolveType(editor, 'Bar')).toEqual('Foo\\Bar')
 
+    it "stops after the use statements.", ->
+        source =
+            """
+            <?php
+
+            namespace My;
+
+            class Test
+            {
+                use Bar;
+            }
+            """
+
+        editor.setText(source)
+
+        expect(parser.resolveType(editor, 'Bar')).toEqual('My\\Bar')
+
     it "parses use simple statements properly.", ->
         source =
             """
