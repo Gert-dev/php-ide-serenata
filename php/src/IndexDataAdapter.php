@@ -61,6 +61,8 @@ class IndexDataAdapter
      * @param array|\Traversable $properties
      * @param array|\Traversable $methods
      *
+     * @todo Could mayhaps benefit from some refactoring...
+     *
      * @return array
      */
     public function resolveStructuralElement(
