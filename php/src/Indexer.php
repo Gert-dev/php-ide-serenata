@@ -666,6 +666,7 @@ class Indexer
             $this->storage->deletePropertiesByFileId($fileId);
             $this->storage->deleteConstantsByFileId($fileId);
             $this->storage->deleteFunctionsByFileId($fileId);
+            $this->storage->deleteNamespacesByFileId($fileId);
 
             $this->storage->update(IndexStorageItemEnum::FILES, $fileId, [
                 'indexed_time' => $time
@@ -697,12 +698,21 @@ class Indexer
             $this->indexConstant($constant, $fileId, null, $useStatementFetchingVisitor);
         }
 
-        foreach ($useStatementFetchingVisitor->getUseStatements() as $useStatement) {
-            $this->storage->insert(IndexStorageItemEnum::FILES_IMPORTS, [
-                'alias'   => $useStatement['alias'] ?: null,
-                'fqsen'   => $useStatement['fqsen'],
-                'file_id' => $fileId
+        foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
+            $namespaceId = $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES, [
+                'start_line'  => $namespace['startLine'],
+                'end_line'    => $namespace['endLine'],
+                'namespace'   => $namespace['name'],
+                'file_id'    => $fileId
             ]);
+
+            foreach ($namespace['useStatements'] as $useStatement) {
+                $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
+                    'alias'              => $useStatement['alias'] ?: null,
+                    'fqsen'              => $useStatement['fqsen'],
+                    'files_namespace_id' => $namespaceId
+                ]);
+            }
         }
 
         // Remove structural elements that are no longer in this file.
@@ -1039,7 +1049,12 @@ class Indexer
 
         if ($documentation['var']['type']) {
             $returnType = $documentation['var']['type'];
-            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+
+            $fullReturnType = $this->getFullTypeForDocblockType(
+                $returnType,
+                $rawData['startLine'],
+                $useStatementFetchingVisitor
+            );
         }
 
         $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
@@ -1096,7 +1111,12 @@ class Indexer
 
         if ($documentation['var']['type']) {
             $returnType = $documentation['var']['type'];
-            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+
+            $fullReturnType = $this->getFullTypeForDocblockType(
+                $returnType,
+                $rawData['startLine'],
+                $useStatementFetchingVisitor
+            );
         }
 
         $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
@@ -1149,7 +1169,12 @@ class Indexer
 
         if (!$returnType) {
             $returnType = $documentation['return']['type'];
-            $fullReturnType = $this->getFullTypeForDocblockType($returnType, $useStatementFetchingVisitor);
+
+            $fullReturnType = $this->getFullTypeForDocblockType(
+                $returnType,
+                $rawData['startLine'],
+                $useStatementFetchingVisitor
+            );
         }
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
@@ -1182,7 +1207,12 @@ class Indexer
 
             if (!$fullType) {
                 $fullType = $parameterDoc ? $parameterDoc['type'] : null;
-                $fullType = $this->getFullTypeForDocblockType($fullType, $useStatementFetchingVisitor);
+
+                $fullType = $this->getFullTypeForDocblockType(
+                    $fullType,
+                    $rawData['startLine'],
+                    $useStatementFetchingVisitor
+                );
             }
 
             $parameterData = [
@@ -1207,7 +1237,7 @@ class Indexer
             $throwsData = [
                 'function_id' => $functionId,
                 'type'        => $type,
-                'full_type'   => $this->getFullTypeForDocblockType($type, $useStatementFetchingVisitor),
+                'full_type'   => $this->getFullTypeForDocblockType($type, $rawData['startLine'], $useStatementFetchingVisitor),
                 'description' => $description ?: null
             ];
 
@@ -1249,18 +1279,37 @@ class Indexer
      * Resolves and determines the FQSEN of the specified type.
      *
      * @param string                                   $type
+     * @param int                                      $line
      * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
      * @return string|null
      */
     protected function getFullTypeForDocblockType(
         $type,
+        $line,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        $typeResolver = new TypeResolver(
-            $useStatementFetchingVisitor ? $useStatementFetchingVisitor->getNamespace() : null,
-            $useStatementFetchingVisitor ? $useStatementFetchingVisitor->getUseStatements() : []
-        );
+        // There can be multiple namespaces in each file, check with namespace is active for the specified line.
+        $useStatements = [];
+        $namespaceName = null;
+
+        if ($useStatementFetchingVisitor) {
+            if (!$line) {
+                throw new UnexpectedValueException('The passed line number must not be null!');
+            }
+
+            foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
+                if ($line >= $namespace['startLine'] &&
+                   ($line <= $namespace['endLine'] || $namespace['endLine'] === null)) {
+                    $namespaceName = $namespace['name'];
+                    $useStatements = $namespace['useStatements'];
+
+                    break;
+                }
+            }
+        }
+
+        $typeResolver = new TypeResolver($namespaceName, $useStatements);
 
         return $typeResolver->getFullTypeForDocblockType($type);
     }

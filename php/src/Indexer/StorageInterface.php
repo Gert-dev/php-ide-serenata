@@ -69,6 +69,11 @@ interface StorageInterface
     public function deleteFunctionsByFileId($fileId);
 
     /**
+     * @param int $fileId
+     */
+    public function deleteNamespacesByFileId($fileId);
+
+    /**
      * @param int $seId
      */
     public function deletePropertiesFor($seId);

@@ -11,7 +11,8 @@ class IndexStorageItemEnum
     const FILES                                  = 'files';
     const STRUCTURAL_ELEMENT_TYPES               = 'structural_element_types';
     const ACCESS_MODIFIERS                       = 'access_modifiers';
-    const FILES_IMPORTS                          = 'files_imports';
+    const FILES_NAMESPACES                       = 'files_namespaces';
+    const FILES_NAMESPACES_IMPORTS               = 'files_namespaces_imports';
     const STRUCTURAL_ELEMENTS                    = 'structural_elements';
     const STRUCTURAL_ELEMENTS_PARENTS_LINKED     = 'structural_elements_parents_linked';
     const STRUCTURAL_ELEMENTS_INTERFACES_LINKED  = 'structural_elements_interfaces_linked';

@@ -263,6 +263,18 @@ class IndexDatabase implements
     /**
      * {@inheritDoc}
      */
+    public function deleteNamespacesByFileId($fileId)
+    {
+        $this->getConnection()->createQueryBuilder()
+            ->delete(IndexStorageItemEnum::FILES_NAMESPACES)
+            ->where('file_id = ?')
+            ->setParameter(0, $fileId)
+            ->execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function deletePropertiesFor($seId)
     {
         $this->getConnection()->createQueryBuilder()

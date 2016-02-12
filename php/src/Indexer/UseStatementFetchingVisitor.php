@@ -13,12 +13,12 @@ class UseStatementFetchingVisitor implements NodeVisitor
     /**
      * @var array
      */
-    protected $useStatements = [];
+    protected $namespaces = [];
 
     /**
      * @var string|null
      */
-    protected $namespace = null;
+    protected $lastNamespace = null;
 
     /**
      * {@inheritDoc}
@@ -26,10 +26,35 @@ class UseStatementFetchingVisitor implements NodeVisitor
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Namespace_) {
-            $this->namespace = (string) $node->name;
+            $namespace = (string) $node->name;
+
+            $this->namespaces[$namespace] = [
+                'name'          => $namespace,
+                'startLine'     => $node->getLine(),
+                'endLine'       => null,
+                'useStatements' => []
+            ];
+
+            if ($this->lastNamespace) {
+                // There is no way to fetch the end of a namespace, so determine it manually (a value of null signifies
+                // the end of the file).
+                $this->namespaces[$this->lastNamespace]['endLine'] = $node->getLine() - 1;
+            }
+
+            $this->lastNamespace = $namespace;
         } elseif ($node instanceof Node\Stmt\Use_) {
+            if (!$this->lastNamespace && !isset($this->namespaces[null])) {
+                $this->namespaces[null] = [
+                    'name'          => null,
+                    'startLine'     => 0,
+                    'endLine'       => null,
+                    'useStatements' => []
+                ];
+            }
+
             foreach ($node->uses as $use) {
-                $this->useStatements[] = [
+                // NOTE: The namespace may be null here (intended behavior).
+                $this->namespaces[$this->lastNamespace]['useStatements'][] = [
                     'fqsen' => (string) $use->name,
                     'alias' => $use->alias
                 ];
@@ -62,22 +87,12 @@ class UseStatementFetchingVisitor implements NodeVisitor
     }
 
     /**
-     * Retrieves the current namespace, if any.
-     *
-     * @return string|null
-     */
-    public function getNamespace()
-    {
-        return $this->namespace;
-    }
-
-    /**
-     * Retrieves the list of use statements.
+     * Retrieves a list of namespaces.
      *
      * @return array
      */
-    public function getUseStatements()
+    public function getNamespaces()
     {
-        return $this->useStatements;
+        return $this->namespaces;
     }
 }
