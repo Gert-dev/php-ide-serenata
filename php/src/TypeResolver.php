@@ -39,7 +39,7 @@ class TypeResolver
      *
      * @return string|null
      */
-    public function getFullTypeForDocblockType($type)
+    public function resolve($type)
     {
         if (empty($type)) {
             return null;

@@ -1311,7 +1311,7 @@ class Indexer
 
         $typeResolver = new TypeResolver($namespaceName, $useStatements);
 
-        return $typeResolver->getFullTypeForDocblockType($type);
+        return $typeResolver->resolve($type);
     }
 
     /**
