@@ -708,6 +708,7 @@ class Indexer
 
             foreach ($namespace['useStatements'] as $useStatement) {
                 $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
+                    'line'               => $useStatement['line'],
                     'alias'              => $useStatement['alias'] ?: null,
                     'fqsen'              => $useStatement['fqsen'],
                     'files_namespace_id' => $namespaceId
@@ -1302,7 +1303,13 @@ class Indexer
                 if ($line >= $namespace['startLine'] &&
                    ($line <= $namespace['endLine'] || $namespace['endLine'] === null)) {
                     $namespaceName = $namespace['name'];
-                    $useStatements = $namespace['useStatements'];
+
+                    // Only use statements before the current line actually apply.
+                    foreach ($namespace['useStatements'] as $useStatement) {
+                        if ($useStatement['line'] <= $line) {
+                            $useStatements[] = $useStatement;
+                        }
+                    }
 
                     break;
                 }

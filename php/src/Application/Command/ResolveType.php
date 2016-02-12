@@ -49,7 +49,11 @@ class ResolveType extends BaseCommand
             );
         }
 
-        $useStatements = $this->indexDatabase->getUseStatementsByNamespaceId($namespace['id']);
+        $useStatements = $this->indexDatabase->getUseStatementsByNamespaceId(
+            $namespace['id'],
+            $arguments['line']->value
+        );
+        
         $useStatements = iterator_to_array($useStatements);
 
         $typeResolver = new TypeResolver($namespace['namespace'], $useStatements);

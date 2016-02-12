@@ -51,6 +51,7 @@ CREATE TABLE files_namespaces(
 CREATE TABLE files_namespaces_imports(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
+    line                       integer unsigned,
     alias                      varchar(255) NOT NULL,
     fqsen                      varchar(255) NOT NULL,
     files_namespace_id         integer,

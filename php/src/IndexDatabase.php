@@ -708,17 +708,23 @@ class IndexDatabase implements
     /**
      * Fetches a list of use statements that apply to the specified namespace.
      *
-     * @param int $namespaceId
+     * @param int      $namespaceId
+     * @param int|null $maxLine
      *
      * @return \Traversable
      */
-    public function getUseStatementsByNamespaceId($namespaceId)
+    public function getUseStatementsByNamespaceId($namespaceId, $maxLine = null)
     {
-        return $this->getConnection()->createQueryBuilder()
+        $queryBuilder = $this->getConnection()->createQueryBuilder()
             ->select('fni.*')
             ->from(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, 'fni')
             ->where('fni.files_namespace_id = ?')
-            ->setParameter(0, $namespaceId)
-            ->execute();
+            ->setParameter(0, $namespaceId);
+
+        if ($maxLine !== null) {
+            $queryBuilder->andWhere('fni.line <= ?')->setParameter(1, $maxLine);
+        }
+
+        return $queryBuilder->execute();
     }
 }
