@@ -680,4 +680,45 @@ class IndexDatabase implements
             ->where('structural_element_id IS NULL')
             ->execute();
     }
+
+    /**
+     * Fetches the namespace that applies to the specified line in the specified file.
+     *
+     * @param string $filePath
+     * @param int    $line
+     *
+     * @return array
+     */
+    public function getRelevantNamespace($filePath, $line)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('fn.*')
+            ->from(IndexStorageItemEnum::FILES_NAMESPACES, 'fn')
+            ->join('fn', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fn.file_id')
+            ->andWhere('fi.path = ?')
+            ->andWhere('? >= fn.start_line')
+            ->andWhere('(? <= fn.end_line OR fn.end_line IS NULL)')
+            ->setParameter(0, $filePath)
+            ->setParameter(1, $line)
+            ->setParameter(2, $line)
+            ->execute()
+            ->fetch();
+    }
+
+    /**
+     * Fetches a list of use statements that apply to the specified namespace.
+     *
+     * @param int $namespaceId
+     *
+     * @return \Traversable
+     */
+    public function getUseStatementsByNamespaceId($namespaceId)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('fni.*')
+            ->from(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, 'fni')
+            ->where('fni.files_namespace_id = ?')
+            ->setParameter(0, $namespaceId)
+            ->execute();
+    }
 }
