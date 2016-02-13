@@ -927,6 +927,10 @@ class Indexer
         foreach ($magicProperties as $propertyName => $propertyData) {
             $data = $this->adaptMagicPropertyData($propertyName, $propertyData);
 
+            // Use the same line as the class definition, it matters for e.g. type resolution.
+            $data['startLine'] = $rawData['startLine'];
+            $data['endLine']   = $rawData['endLine'];
+
             $this->indexProperty(
                 $data,
                 $fileId,
@@ -940,6 +944,10 @@ class Indexer
         // Index magic methods.
         foreach ($documentation['methods'] as $methodName => $methodData) {
             $data = $this->adaptMagicMethodData($methodName, $methodData);
+
+            // Use the same line as the class definition, it matters for e.g. type resolution.
+            $data['startLine'] = $rawData['startLine'];
+            $data['endLine']   = $rawData['endLine'];
 
             $this->indexFunction(
                 $data,
