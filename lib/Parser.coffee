@@ -220,7 +220,7 @@ class Parser
             for i in [lastIndex .. 0]
                 chain = editor.scopeDescriptorForBufferPosition([row, i]).getScopeChain()
 
-                continue if chain.indexOf('comment') != -1
+                continue if chain.indexOf('comment') != -1 or chain.indexOf('.string-contents') != -1
 
                 # }
                 if line[i] == '}'
@@ -273,7 +273,7 @@ class Parser
             for i in [startIndex .. lastIndex]
                 chain = editor.scopeDescriptorForBufferPosition([row, i]).getScopeChain()
 
-                if chain.indexOf('comment') != -1
+                if chain.indexOf('comment') != -1 or chain.indexOf('.string-contents') != -1
                     continue
 
                 else if not isInFunction and chain.indexOf('.storage.type.function') != -1
@@ -615,7 +615,9 @@ class Parser
             regexFunction = ///function(?:\s+([a-zA-Z0-9_]+))?\s*\([^{]*?(?:(#{classRegexPart})\s+)?#{elementForRegex}[^{]*?\)///g
 
             editor.getBuffer().backwardsScanInRange regexFunction, [scanStartPosition, bufferPosition], (matchInfo) =>
-                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+                chain = editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain()
+
+                return if chain.indexOf('comment') != -1 or chain.indexOf('.string-contents') != -1
 
                 scanStartPosition = matchInfo.range.end
 
@@ -662,7 +664,9 @@ class Parser
             regexAssignment = ///#{elementForRegex}\s*=\s*///g
 
             editor.getBuffer().backwardsScanInRange regexAssignment, [scanStartPosition, bufferPosition], (matchInfo) =>
-                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+                chain = editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain()
+
+                return if chain.indexOf('comment') != -1 or chain.indexOf('.string-contents') != -1
 
                 boundary = @determineBoundaryOfExpression(editor, matchInfo.range.end, false)
 
@@ -688,7 +692,9 @@ class Parser
             regexCatch = ///catch\s*\(\s*(#{classRegexPart})\s+#{elementForRegex}\s*\)///g
 
             editor.getBuffer().backwardsScanInRange regexCatch, [scanStartPosition, bufferPosition], (matchInfo) =>
-                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+                chain = editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain()
+
+                return if chain.indexOf('comment') != -1 or chain.indexOf('.string-contents') != -1
 
                 scanStartPosition = matchInfo.range.end
 
@@ -700,7 +706,9 @@ class Parser
             regexInstanceof = ///if\s*\(\s*#{elementForRegex}\s+instanceof\s+(#{classRegexPart})\s*\)///g
 
             editor.getBuffer().backwardsScanInRange regexInstanceof, [scanStartPosition, bufferPosition], (matchInfo) =>
-                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+                chain = editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain()
+
+                return if chain.indexOf('comment') != -1 or chain.indexOf('.string-contents') != -1
 
                 scanStartPosition = matchInfo.range.end
 
@@ -713,7 +721,9 @@ class Parser
             regexForeach = ///(foreach\s+\(.+)\s+as\s+(?:(?:\$[a-zA-Z0-9_]+)\s*=>)?\s*(#{elementForRegex})\)///
 
             editor.getBuffer().backwardsScanInRange regexForeach, [scanStartPosition, bufferPosition], (matchInfo) =>
-                return if editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain().indexOf('comment') != -1
+                chain = editor.scopeDescriptorForBufferPosition(matchInfo.range.start).getScopeChain()
+
+                return if chain.indexOf('comment') != -1 or chain.indexOf('.string-contents') != -1
 
                 scanStartPosition = matchInfo.range.end
 
