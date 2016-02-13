@@ -94,6 +94,9 @@ describe "getResultingTypeFromCallStack", ->
                     name: 'EXPECTED_TYPE_3'
                 }
 
+        resolveType: (file, line, type) ->
+            return type
+
         autocomplete: (className, element) ->
             return {name: 'EXPECTED_TYPE_1'} if className == 'ParentClass' and element == 'testProperty'
     }

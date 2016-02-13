@@ -10,6 +10,9 @@ describe "getVariableType", ->
                 'EXPECTED\\TYPE_1' : @getClassInfo('EXPECTED\\TYPE_1')
             }
 
+        resolveType: (file, line, type) ->
+            return type
+
         getGlobalFunctions: () ->
             return {
                 foo:
