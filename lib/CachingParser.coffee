@@ -61,5 +61,7 @@ class CachingParser extends Parser
     ###*
      * @inherited
     ###
+    ###
     resolveType: (editor, type) ->
         return @wrapCachedRequestToParent(editor.getPath(), "resolveType-#{type}", 'resolveType', arguments, false)
+    ###

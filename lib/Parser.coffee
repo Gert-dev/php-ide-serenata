@@ -81,87 +81,6 @@ class Parser
         return null
 
     ###*
-     * Determines the FQCN (without leading slash) of the specified type in the specified editor.
-     *
-     * @param {TextEditor} editor The editor (needed to resolve relative class names).
-     * @param {string}     type   The (local) type to resolve.
-     *
-     * @return {string|null}
-     *
-     * @example In a file with namespace A\B, determining C will lead to A\B\C.
-    ###
-    resolveType: (editor, type) ->
-        if not type
-            throw new Error('A class name must be provided!')
-
-        if type[0] == "\\"
-            return type.substr(1) # FQCN, not subject to any further context.
-
-        else if @isBasicType(type)
-            return type
-
-        fullClass = type
-        foundFirstUseStatement = false
-
-        for i in [0 .. editor.getLineCount() - 1]
-            line = editor.lineTextForBufferRow(i)
-
-            if not line
-                continue
-
-            scopeDescriptor = editor.scopeDescriptorForBufferPosition([i, line.length]).getScopeChain()
-
-            if scopeDescriptor.indexOf('.comment') != -1 or scopeDescriptor.indexOf('.string-contents') != -1
-                continue
-
-            matches = line.match(@namespaceDeclarationRegex)
-
-            if matches
-                foundFirstInterestingStatement = true
-
-                fullClass = matches[1] + '\\' + type
-                continue
-
-            matches = line.match(@useStatementRegex)
-
-            if matches
-                foundFirstInterestingStatement = true
-
-                typeParts = type.split('\\')
-                importNameParts = matches[1].split('\\')
-
-                isAliasedImport = if matches[2] then true else false
-
-                if type == matches[1]
-                    fullClass = type # Already a complete name.
-
-                    break
-
-                else if (isAliasedImport and matches[2] == typeParts[0]) or (!isAliasedImport and importNameParts[importNameParts.length - 1] == typeParts[0])
-                    fullClass = matches[1]
-
-                    typeParts = typeParts[1 .. typeParts.length]
-
-                    if (typeParts.length > 0)
-                        fullClass += '\\' + typeParts.join('\\')
-
-                    break
-
-            else if foundFirstInterestingStatement
-                #debugger
-                break # Actual code started, bail out.
-
-        # In the class map, classes never have a leading slash. The leading slash only indicates that import rules of
-        # the file don't apply, but it's useless after that.
-        if fullClass and fullClass[0] == '\\'
-            fullClass = fullClass.substr(1)
-
-        if fullClass.length == 0
-            return null
-
-        return fullClass
-
-    ###*
      * Indicates if the specifiec location is a property usage or not. If it is not, it is most likely a method call.
      * This is useful to distinguish between properties and methods with the same name.
      *
@@ -595,7 +514,7 @@ class Parser
             regexTypeAnnotation = ///\/\*\*\s*@var\s+(#{classRegexPart}(?:\[\])?)\s+#{elementForRegex}\s*(\s.*)?\*\////
 
             editor.getBuffer().backwardsScanInRange regexTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
-                bestMatch = @resolveType(editor, matchInfo.match[1])
+                bestMatch = @resolveTypeAt(editor, matchInfo.range.start, matchInfo.match[1])
 
                 matchInfo.stop()
 
@@ -605,7 +524,7 @@ class Parser
             regexReverseTypeAnnotation = ///\/\*\*\s*@var\s+#{elementForRegex}\s+(#{classRegexPart}(?:\[\])?)\s*(\s.*)?\*\////
 
             editor.getBuffer().backwardsScanInRange regexReverseTypeAnnotation, [scanStartPosition, bufferPosition], (matchInfo) =>
-                bestMatch = @resolveType(editor, matchInfo.match[1])
+                bestMatch = @resolveTypeAt(editor, matchInfo.range.start, matchInfo.match[1])
 
                 matchInfo.stop()
 
@@ -624,7 +543,7 @@ class Parser
                 typeHint = matchInfo.match[2]
 
                 if typeHint?.length > 0
-                    bestMatch = @resolveType(editor, typeHint)
+                    bestMatch = @resolveTypeAt(editor, matchInfo.range.start, typeHint)
 
                 else
                     functionName = matchInfo.match[1]
@@ -698,7 +617,7 @@ class Parser
 
                 scanStartPosition = matchInfo.range.end
 
-                bestMatch = @resolveType(editor, matchInfo.match[1])
+                bestMatch = @resolveTypeAt(editor, matchInfo.range.start, matchInfo.match[1])
 
                 matchInfo.stop()
 
@@ -827,7 +746,7 @@ class Parser
             propertyAccessNeedsDollarSign = true
 
             # Static class name.
-            className = @resolveType(editor, firstElement)
+            bestMatch = @resolveTypeAt(editor, bufferPosition, firstElement)
 
         else
             className = null # No idea what this is.
@@ -982,6 +901,21 @@ class Parser
                             }
 
         return null
+
+    ###*
+     * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
+     * parameters for the editor and buffer position.
+     *
+     * @param {TextEditor} editor         The editor.
+     * @param {Point}      bufferPosition The location of the type.
+     * @param {string}     type           The (local) type to resolve.
+     *
+     * @return {string|null}
+     *
+     * @example In a file with namespace A\B, determining C could lead to A\B\C.
+    ###
+    resolveTypeAt: (editor, bufferPosition, type) ->
+        return @proxy.resolveType(editor.getPath(), bufferPosition.row + 1, type)
 
     ###*
      * Gets the correct selector when a class or namespace is clicked.

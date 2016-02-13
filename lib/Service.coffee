@@ -108,7 +108,7 @@ class Service
      *
      * @param {string}  file
      * @param {number}  line  The line the type is located at. The first line is 1, not 0.
-     * @param {string}  type 
+     * @param {string}  type
      * @param {boolean} async
      *
      * @return {Promise|Object}
@@ -200,7 +200,7 @@ class Service
      * @example In a file with namespace A\B, determining C could lead to A\B\C.
     ###
     resolveTypeAt: (editor, bufferPosition, type) ->
-        return @resolveType(editor.getPath(), bufferPosition.row + 1. type)
+        return @parser.resolveTypeAt(editor, bufferPosition, type)
 
     ###*
      * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
