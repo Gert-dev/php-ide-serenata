@@ -1,5 +1,9 @@
 # php-integrator-base
 
+<center>
+:coffee: [Send me some coffee beans](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ)
+</center>
+
 PHP Integrator analyzes PHP projects and exposes a service that other packages can use to provide additional functionality, such as autocompletion, code navigation and tooltips. In itself it does
 not provide any user-visible functionality. This is instead covered by various other packages which
 'plug in' to the service:
@@ -48,8 +52,5 @@ As the service allows fetching information about the code base, other packages c
 Most of the issue reports indicate things that are missing, but indexing should be working fairly well in general. There are also some things that won't be supported because they are fairly complex to implement (usually for fairly little benefit). These limitations may also affect other packages using the provided service:
 
 * `static` and `self` behave mostly like `$this` in **non-static** contexts, i.e. they can also access non-static members.
-
-## Regarding donations
-Donations were not my primary intention when releasing this project as open source, but I do accept them and am very grateful for any donation you may give. As such, a link to the (PayPal) donation screen is located [here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ), at the bottom of the readme, hidden from initial sight and not even in the form of a fancy button ;-).
 
 ![GPLv3 Logo](http://gplv3.fsf.org/gplv3-127x51.png)
