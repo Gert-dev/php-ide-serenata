@@ -746,7 +746,7 @@ class Parser
             propertyAccessNeedsDollarSign = true
 
             # Static class name.
-            bestMatch = @resolveTypeAt(editor, bufferPosition, firstElement)
+            className = @resolveTypeAt(editor, bufferPosition, firstElement)
 
         else
             className = null # No idea what this is.
