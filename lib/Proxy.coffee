@@ -188,7 +188,6 @@ class Proxy
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
      *
      * @param {string} className
-     *
      * @param {boolean} async
      *
      * @return {Promise|Object}
@@ -199,6 +198,26 @@ class Proxy
 
         return @performRequest(
             ['--class-info', '--database=' + @getIndexDatabasePath(), '--name=' + className],
+            async
+        )
+
+    ###*
+     * Resolves a local type in the specified file, based on use statements and the namespace.
+     *
+     * @param {string}  file
+     * @param {number}  line   The line the type is located at. The first line is 1, not 0.
+     * @param {string}  type
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
+    ###
+    resolveType: (file, line, type, async = false) ->
+        throw new Error('No file passed!') if not file
+        throw new Error('No line passed!') if not line
+        throw new Error('No type passed!') if not type
+
+        return @performRequest(
+            ['--resolve-type', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--line=' + line, '--type=' + type],
             async
         )
 

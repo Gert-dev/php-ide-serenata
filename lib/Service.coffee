@@ -104,6 +104,19 @@ class Service
         return @proxy.getClassInfo(className, async)
 
     ###*
+     * Resolves a local type in the specified file, based on use statements and the namespace.
+     *
+     * @param {string}  file
+     * @param {number}  line  The line the type is located at. The first line is 1, not 0.
+     * @param {string}  type 
+     * @param {boolean} async
+     *
+     * @return {Promise|Object}
+    ###
+    resolveType: (file, line, type, async = false) ->
+        return @proxy.resolveType(file, line, type, async)
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {string}      path                   The full path to the file  or folder to refresh.
@@ -175,17 +188,19 @@ class Service
         return @parser.determineCurrentClassName(editor, bufferPosition)
 
     ###*
-     * Determines the FQCN (without leading slash) of the specified type in the specified editor.
+     * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
+     * parameters for the editor and buffer position.
      *
-     * @param {TextEditor} editor The editor (needed to resolve relative class names).
-     * @param {string}     type   The (local) type to resolve.
+     * @param {TextEditor} editor         The editor.
+     * @param {Point}      bufferPosition The location of the type.
+     * @param {string}     type           The (local) type to resolve.
      *
      * @return {string|null}
      *
-     * @example In a file with namespace A\B, determining C will lead to A\B\C.
+     * @example In a file with namespace A\B, determining C could lead to A\B\C.
     ###
-    resolveType: (editor, type) ->
-        return @parser.resolveType(editor, type)
+    resolveTypeAt: (editor, bufferPosition, type) ->
+        return @resolveType(editor.getPath(), bufferPosition.row + 1. type)
 
     ###*
      * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).

@@ -85,6 +85,12 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    resolveType: (file, line, type, async = false) ->
+        return @wrapCachedRequestToParent("resolveType-#{file}-#{line}-#{type}", 'resolveType', arguments, async)
+
+    ###*
+     * @inherited
+    ###
     reindex: (path, source, progressStreamCallback) ->
         return super(path, source, progressStreamCallback).then (output) =>
             @clearCache()

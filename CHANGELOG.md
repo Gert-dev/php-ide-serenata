@@ -21,7 +21,7 @@ $b-> // Autocompletion for DateTime.
   * Fetching class information will now also return information about direct children, direct implementors (if it's an interface) and direct users (if it's a trait).
   * `determineFullClassName` was split up into two methods (separation of concerns):
     * `determineCurrentClassName` - Takes an editor and a buffer position and returns the FQCN of the class the location is in. The buffer position is now required as a file can contain multiple classes, which were not retrievable before.
-    * `resolveType` - Takes an editor and a type name and resolves that type to its FQCN based on use statements.
+    * `resolveType` (with accompanying convenience method `resolveTypeAt`) - Takes an editor, a line, and a type name and resolves that type to its FQCN based on local use statements and namespace rules.
 
 ## 0.5.4
 ### Features and enhancements
