@@ -14,7 +14,7 @@ use PhpIntegrator\IndexDataAdapter;
 use PhpIntegrator\Application\Command as BaseCommand;
 
 /**
- * Command that shows information about a class, interface or trait.
+ * Command that resolves local types in a file.
  */
 class ResolveType extends BaseCommand
 {
@@ -53,7 +53,7 @@ class ResolveType extends BaseCommand
             $namespace['id'],
             $arguments['line']->value
         );
-        
+
         $useStatements = iterator_to_array($useStatements);
 
         $typeResolver = new TypeResolver($namespace['namespace'], $useStatements);
