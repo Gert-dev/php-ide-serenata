@@ -1,8 +1,7 @@
 # php-integrator-base
-
-<center>
+<p align="right">
 :coffee: [Send me some coffee beans](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ)
-</center>
+</p>
 
 PHP Integrator analyzes PHP projects and exposes a service that other packages can use to provide additional functionality, such as autocompletion, code navigation and tooltips. In itself it does
 not provide any user-visible functionality. This is instead covered by various other packages which
