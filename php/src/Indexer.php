@@ -1326,7 +1326,54 @@ class Indexer
 
         $typeResolver = new TypeResolver($namespaceName, $useStatements);
 
+        $type = $this->getSoleClassNameForTypeSpecification($type);
+
         return $typeResolver->resolve($type);
+    }
+
+    /**
+     * Retrieves the sole class name for the specified type specification.
+     *
+     * @example "null" returns null.
+     * @example "FooClass" returns "FooClass".
+     * @example "FooClass|null" returns "FooClass".
+     * @example "FooClass|BarClass|null" returns null (there is no single type).
+     *
+     * @param string $typeSpecification
+     *
+     * @return string|null
+     */
+    public function getSoleClassNameForTypeSpecification($typeSpecification)
+    {
+        if ($typeSpecification) {
+            $types = explode(DocParser::TYPE_SPLITTER, $typeSpecification);
+
+            $classTypes = [];
+
+            foreach ($types as $type) {
+                if ($this->isClassType($type)) {
+                    $classTypes[] = $type;
+                }
+            }
+
+            if (count($classTypes) === 1) {
+                return $classTypes[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns a boolean indicating if the specified value is a class type or not.
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    protected function isClassType($type)
+    {
+        return ucfirst($type) === $type && $type !== '$this';
     }
 
     /**
