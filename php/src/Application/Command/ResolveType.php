@@ -41,6 +41,12 @@ class ResolveType extends BaseCommand
             throw new UnexpectedValueException('A line number is required for this command.');
         }
 
+        $fileId = $this->indexDatabase->getFileId($arguments['file']->value);
+
+        if (!$fileId) {
+            throw new UnexpectedValueException('The specified file is not present in the index!');
+        }
+
         $namespace = $this->indexDatabase->getRelevantNamespace($arguments['file']->value, $arguments['line']->value);
 
         if (!$namespace) {
