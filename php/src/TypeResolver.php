@@ -43,9 +43,7 @@ class TypeResolver
     {
         if (empty($type)) {
             return null;
-        }
-
-        if ($type[0] === '\\') {
+        } elseif ($type[0] === '\\') {
             return $type;
         }
 
