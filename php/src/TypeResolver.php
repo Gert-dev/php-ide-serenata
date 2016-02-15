@@ -45,39 +45,39 @@ class TypeResolver
             return null;
         }
 
-        if ($type[0] !== "\\") {
-            $typeParts = explode('\\', $type);
-
-            foreach ($this->imports as $import) {
-                if ($import['alias'] === $typeParts[0]) {
-                    array_shift($typeParts);
-
-                    $fullName = $import['fqsen'];
-
-                    if (!empty($typeParts)) {
-                        /*
-                         * This block is only executed when relative names are used with more than one part, i.e.:
-                         *   use A\B\C;
-                         *
-                         *   C\D::foo();
-                         *
-                         * 'C' will be dropped from 'C\D', and the remaining 'D' will be appended to 'A\B\C',
-                         * becoming 'A\B\C\D'.
-                         */
-                        $fullName .= '\\' . implode('\\', $typeParts);
-                    }
-
-                    return $fullName;
-                }
-            }
-
-            // Still here? There must be no explicit use statement, default to the current namespace.
-            $fullName = $this->namespace ?: '';
-            $fullName .= '\\' . $type;
-
-            return $fullName;
+        if ($type[0] === '\\') {
+            return $type;
         }
 
-        return $type;
+        $typeParts = explode('\\', $type);
+
+        foreach ($this->imports as $import) {
+            if ($import['alias'] === $typeParts[0]) {
+                array_shift($typeParts);
+
+                $fullName = $import['fqsen'];
+
+                if (!empty($typeParts)) {
+                    /*
+                     * This block is only executed when relative names are used with more than one part, i.e.:
+                     *   use A\B\C;
+                     *
+                     *   C\D::foo();
+                     *
+                     * 'C' will be dropped from 'C\D', and the remaining 'D' will be appended to 'A\B\C',
+                     * becoming 'A\B\C\D'.
+                     */
+                    $fullName .= '\\' . implode('\\', $typeParts);
+                }
+
+                return $fullName;
+            }
+        }
+
+        // Still here? There must be no explicit use statement, default to the current namespace.
+        $fullName = $this->namespace ?: '';
+        $fullName .= '\\' . $type;
+
+        return $fullName;
     }
 }
