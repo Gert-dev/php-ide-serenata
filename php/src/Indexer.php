@@ -1326,9 +1326,13 @@ class Indexer
 
         $typeResolver = new TypeResolver($namespaceName, $useStatements);
 
-        $type = $this->getSoleClassNameForTypeSpecification($type);
+        $soleType = $this->getSoleClassNameForTypeSpecification($type);
 
-        return $typeResolver->resolve($type);
+        if (!$soleType) {
+            return $type;
+        }
+
+        return $typeResolver->resolve($soleType);
     }
 
     /**
