@@ -654,13 +654,18 @@ class IndexDataAdapter
      */
     protected function isInheritingDocumentation(array $processedData)
     {
-        // Ticket #86 - Add support for inheriting the entire docblock from the parent if the current docblock contains
-        // nothing but these tags. Note that, according to draft PSR-5 and phpDocumentor's implementation, this is
-        // incorrect. However, some large frameworks (such as Symfony) use this and it thus makes life easier for many
-        // developers, hence this workaround.
-        return !$processedData['hasDocblock'] || in_array($processedData['descriptions']['short'], [
-            '{@inheritdoc}', '{@inheritDoc}'
-        ]);
+        $specialTags = [
+            // Ticket #86 - Inherit the entire parent docblock if the docblock contains nothing but these tags.
+            // According to draft PSR-5 and phpDocumentor's implementation, these are incorrect. However, some large
+            // frameworks (such as Symfony 2) use these and it thus makes life easier for many  developers.
+            '{@inheritdoc}', '{@inheritDoc}',
+
+            // This tag (without curly braces) is, according to draft PSR-5, a valid way to indicate an entire docblock
+            // should be inherited and to implicitly indicate that documentation was not forgotten.
+            '@inheritDoc'
+        ];
+
+        return !$processedData['hasDocblock'] || in_array($processedData['descriptions']['short'], $specialTags);
     }
 
     /**
