@@ -36,7 +36,6 @@ class ClassInfo extends BaseCommand
         }
 
         $fqsen = $arguments['name']->value;
-        $fqsen = str_replace('\\\\', '\\', $fqsen);
 
         if ($fqsen[0] === '\\') {
             $fqsen = mb_substr($fqsen, 1);
