@@ -472,6 +472,13 @@ class Indexer
                         'is_variadic'  => $isVariadic ? 1 : 0
                     ];
 
+                    if (!isset($parameterData['name'])) {
+                        // Some PHP extensions somehow contain parameters that have no name. An example of this is
+                        // ssh2_poll (from the ssh2 extension). Strangely enough this mystery function also can't be
+                        // found in the documentation. (Perhaps a bug in the extension?) Ignore these.
+                        continue;
+                    }
+
                     $parameters[] = $parameterData;
 
                     $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameterData);
