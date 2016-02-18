@@ -39,6 +39,7 @@ public function incorrectInheritanceButCommonlyUsed()
 ### Changes for developers
 * Changes to the service
   * A new call `getClassListForFile` takes a file path to filter the class list by.
+  * `getClassSelectorFromEvent` will no longer return null for built-in classes (you can still easily check this yourself).
   * Next to `startLine` information, `endLine` information will now also be returned.
   * Fetching class information will now also return information about direct and indirect implemented interfaces and used traits via the properties `parents`, `directParents`, `interfaces`, `directInterfaces`, `traits` and `directTraits`.
   * Fetching class information will now also return information about direct children, direct implementors (if it's an interface) and direct users (if it's a trait).

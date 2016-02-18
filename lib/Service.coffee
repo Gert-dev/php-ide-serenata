@@ -178,9 +178,6 @@ class Service
 
         $ = require 'jquery'
 
-        if $(selector).hasClass('builtin') or $(selector).children('.builtin').length > 0
-            return null
-
         if $(selector).parent().hasClass('function argument')
             return $(selector).parent().children('.namespace, .class:not(.operator):not(.constant)')
 
