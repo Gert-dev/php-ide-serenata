@@ -858,6 +858,7 @@ class Parser
                         if bracketsOpened > bracketsClosed
                             # We must have been inside an array argument, reset.
                             argumentIndex = 0
+                            --bracketsOpened
 
                     else if lineText[i] == ')'
                         ++parenthesesClosed

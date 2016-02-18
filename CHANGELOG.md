@@ -32,6 +32,7 @@ public function incorrectInheritanceButCommonlyUsed()
 ### Bugs fixed
 * Fixed autocompletion not working after the concatenation operator.
 * Fixed author tags that contained mail addresses (such as used in Symfony) being taken up in extended descriptions.
+* Fixed an incorrect parameter index being returned in cases where you had array access via keys in function or method invocations.
 * Fixed a database constraint error when indexing parameters, which can happen if you have certain PHP extensions enabled (I'm looking at you, ssh2).
 * Resolving types is now more correct, taking multiple namespaces per file into account as well as only utilizing use statements that actually apply for a specific line.
 
