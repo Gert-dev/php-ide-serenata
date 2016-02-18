@@ -174,7 +174,26 @@ class Service
      * @return {object|null} A selector to be used with jQuery.
     ###
     getClassSelectorFromEvent: (event) ->
-        return @parser.getClassSelectorFromEvent(event)
+        selector = event.currentTarget
+
+        $ = require 'jquery'
+
+        if $(selector).hasClass('builtin') or $(selector).children('.builtin').length > 0
+            return null
+
+        if $(selector).parent().hasClass('function argument')
+            return $(selector).parent().children('.namespace, .class:not(.operator):not(.constant)')
+
+        if $(selector).prev().hasClass('namespace') && $(selector).hasClass('class')
+            return $([$(selector).prev()[0], selector])
+
+        if $(selector).next().hasClass('class') && $(selector).hasClass('namespace')
+           return $([selector, $(selector).next()[0]])
+
+        if $(selector).prev().hasClass('namespace') || $(selector).next().hasClass('inherited-class')
+            return $(selector).parent().children('.namespace, .inherited-class')
+
+        return selector
 
     ###*
      * Determines the current class' FQCN based on the specified buffer position.

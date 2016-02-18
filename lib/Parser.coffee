@@ -917,32 +917,3 @@ class Parser
     ###
     resolveTypeAt: (editor, bufferPosition, type) ->
         return @proxy.resolveType(editor.getPath(), bufferPosition.row + 1, type)
-
-    ###*
-     * Gets the correct selector when a class or namespace is clicked.
-     *
-     * @param {jQuery.Event} event
-     *
-     * @return {object|null} A selector to be used with jQuery.
-    ###
-    getClassSelectorFromEvent: (event) ->
-        selector = event.currentTarget
-
-        $ = require 'jquery'
-
-        if $(selector).hasClass('builtin') or $(selector).children('.builtin').length > 0
-            return null
-
-        if $(selector).parent().hasClass('function argument')
-            return $(selector).parent().children('.namespace, .class:not(.operator):not(.constant)')
-
-        if $(selector).prev().hasClass('namespace') && $(selector).hasClass('class')
-            return $([$(selector).prev()[0], selector])
-
-        if $(selector).next().hasClass('class') && $(selector).hasClass('namespace')
-           return $([selector, $(selector).next()[0]])
-
-        if $(selector).prev().hasClass('namespace') || $(selector).next().hasClass('inherited-class')
-            return $(selector).parent().children('.namespace, .inherited-class')
-
-        return selector
