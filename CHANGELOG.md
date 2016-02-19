@@ -1,3 +1,7 @@
+## 0.6.2
+### Bugs fixed
+* The "Indexing failed!" message has disappeared. If you wish to know when the indexer is having problems, consider using the new linter package (see also the README).
+
 ## 0.6.1
 ### Bugs fixed
 * Removed the dependency on fuzzaldrin.

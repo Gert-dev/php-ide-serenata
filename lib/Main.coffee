@@ -127,6 +127,7 @@ module.exports =
         failureHandler = () =>
             if @statusBarManager
                 @statusBarManager.showMessage("Indexing failed!", "highlight-error")
+                @statusBarManager.hide()
 
         progressHandler = (progress) =>
             progress = parseFloat(progress)
