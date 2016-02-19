@@ -13,6 +13,7 @@ not provide any user-visible functionality. This is instead covered by various o
   * **[php-integrator-annotations](https://github.com/Gert-dev/php-integrator-annotations)** - Shows annotations, such as for overridden methods and interface implementations.
   * **[php-integrator-call-tips](https://github.com/Gert-dev/php-integrator-call-tips)** - Shows call tips containing parameters in your code. (Complements the autocompletion package.)
   * **[php-integrator-refactoring](https://github.com/Gert-dev/php-integrator-refactoring)** - Provides basic refactoring capabilities.
+  * **[php-integrator-linter](https://github.com/Gert-dev/php-integrator-linter)** - Shows indexing errors and problems with your code.
   * **[php-integrator-symbol-viewer](https://github.com/tocjent/php-integrator-symbol-viewer)** - Provides a side panel listing class symbols with search and filter features.
 
 The source code was originally based on the php-autocomplete-plus code base and provides various
