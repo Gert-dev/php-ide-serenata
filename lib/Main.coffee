@@ -109,7 +109,7 @@ module.exports =
         if isProjectIndex
             console.time(timerName);
 
-            fileName = atom.project.getDirectories()[0]?.path
+            fileName = atom.project.getDirectories()[0]?.realPath
 
             if @statusBarManager
                 @statusBarManager.setLabel("Indexing...")
