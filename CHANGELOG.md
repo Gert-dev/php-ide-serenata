@@ -1,6 +1,17 @@
 ## 0.6.1
 ### Bugs fixed
 * Removed the dependency on fuzzaldrin.
+* Fixed the type of new instances, wrapped in parentheses and spread over several lines, not being properly recognized:
+
+```php
+// Works:
+(new \IteratorIterator)->
+
+// Fails (fixed):
+(new \IteratorIterator(
+
+))->
+```
 
 ## 0.6.0
 ### Features and enhancements

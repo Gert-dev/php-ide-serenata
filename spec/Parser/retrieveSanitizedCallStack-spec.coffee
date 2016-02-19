@@ -45,10 +45,12 @@ describe "retrieveSanitizedCallStack", ->
 
         expect(parser.retrieveSanitizedCallStack(source)).toEqual(expectedResult)
 
-    it "correctly sanitizes call stacks that start with a new instance.", ->
+    it "correctly sanitizes call stacks that start with a new instance, spread over several lines.", ->
         source =
             """
-            (new Foo())->myFunc
+            (new Foo(
+
+            ))->myFunc
             """
 
         expectedResult = [

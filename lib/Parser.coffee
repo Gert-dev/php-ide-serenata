@@ -463,7 +463,7 @@ class Parser
 
         # The start of the call stack may be wrapped in parentheses, e.g. ""(new Foo())->test", unwrap them. Note that
         # "($this)->" is invalid (at least in PHP 5.6).
-        regex = /^\(new\s+.+?\)/g
+        regex = /^\(new\s+(.|\n)+?\)/g
         text = text.replace regex, (match) =>
             return match.substr(1, match.length - 2)
 
