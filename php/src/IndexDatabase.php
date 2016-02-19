@@ -124,7 +124,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getFileModifiedMap()
     {
@@ -143,7 +143,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getFileId($path)
     {
@@ -159,7 +159,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getAccessModifierMap()
     {
@@ -178,7 +178,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementTypeMap()
     {
@@ -197,7 +197,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementId($fqsen)
     {
@@ -213,7 +213,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteFile($fileId)
     {
@@ -225,7 +225,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deletePropertiesByFileId($fileId)
     {
@@ -237,7 +237,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteConstantsByFileId($fileId)
     {
@@ -249,7 +249,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteFunctionsByFileId($fileId)
     {
@@ -261,7 +261,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteNamespacesByFileId($fileId)
     {
@@ -273,7 +273,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deletePropertiesFor($seId)
     {
@@ -285,7 +285,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteMethodsFor($seId)
     {
@@ -297,7 +297,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteConstantsFor($seId)
     {
@@ -309,7 +309,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteParentLinksFor($seId)
     {
@@ -321,7 +321,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteInterfaceLinksFor($seId)
     {
@@ -333,7 +333,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteTraitLinksFor($seId)
     {
@@ -357,7 +357,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteExcludedStructuralElementsByFileId($fileId, array $excludedIds)
     {
@@ -424,7 +424,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawInfo($id)
     {
@@ -436,7 +436,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawParents($id)
     {
@@ -450,7 +450,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawChildren($id)
     {
@@ -464,7 +464,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawInterfaces($id)
     {
@@ -478,7 +478,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawImplementors($id)
     {
@@ -492,7 +492,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawTraits($id)
     {
@@ -506,7 +506,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawTraitUsers($id)
     {
@@ -520,7 +520,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawConstants($id)
     {
@@ -534,7 +534,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawProperties($id)
     {
@@ -548,7 +548,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawMethods($id)
     {
@@ -563,7 +563,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementTraitAliasesAssoc($id)
     {
@@ -586,7 +586,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementTraitPrecedencesAssoc($id)
     {
@@ -608,7 +608,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getFunctionParameters($functionId)
     {
@@ -621,7 +621,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getFunctionThrows($functionId)
     {
@@ -634,7 +634,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function insert($indexStorageItem, array $data)
     {
@@ -644,7 +644,7 @@ class IndexDatabase implements
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function update($indexStorageItem, $id, array $data)
     {

@@ -48,7 +48,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawInfo($id)
     {
@@ -58,7 +58,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawParents($id)
     {
@@ -66,7 +66,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawChildren($id)
     {
@@ -74,7 +74,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawInterfaces($id)
     {
@@ -82,7 +82,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawImplementors($id)
     {
@@ -90,7 +90,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawTraits($id)
     {
@@ -98,7 +98,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawTraitUsers($id)
     {
@@ -106,7 +106,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawConstants($id)
     {
@@ -114,7 +114,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawProperties($id)
     {
@@ -122,7 +122,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementRawMethods($id)
     {
@@ -130,7 +130,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementTraitAliasesAssoc($id)
     {
@@ -138,7 +138,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getStructuralElementTraitPrecedencesAssoc($id)
     {

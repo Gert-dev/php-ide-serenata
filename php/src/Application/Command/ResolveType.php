@@ -19,7 +19,7 @@ use PhpIntegrator\Application\Command as BaseCommand;
 class ResolveType extends BaseCommand
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
     {
@@ -29,7 +29,7 @@ class ResolveType extends BaseCommand
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function process(ArrayAccess $arguments)
     {

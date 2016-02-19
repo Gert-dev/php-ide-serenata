@@ -14,7 +14,7 @@ use PhpIntegrator\Application\Command as BaseCommand;
 class GlobalFunctions extends BaseCommand
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function process(ArrayAccess $arguments)
     {

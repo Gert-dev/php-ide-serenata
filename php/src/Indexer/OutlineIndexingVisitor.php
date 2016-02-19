@@ -33,7 +33,7 @@ class OutlineIndexingVisitor extends NameResolver
     protected $currentStructuralElement;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function enterNode(Node $node)
     {
@@ -314,7 +314,7 @@ class OutlineIndexingVisitor extends NameResolver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function leaveNode(Node $node)
     {

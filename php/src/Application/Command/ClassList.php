@@ -16,7 +16,7 @@ use PhpIntegrator\Application\Command as BaseCommand;
 class ClassList extends BaseCommand
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
     {
@@ -24,7 +24,7 @@ class ClassList extends BaseCommand
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function process(ArrayAccess $arguments)
     {

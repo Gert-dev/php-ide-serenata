@@ -35,7 +35,7 @@ abstract class Command implements CommandInterface
     protected $indexDataAdapter;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function execute(array $arguments)
     {

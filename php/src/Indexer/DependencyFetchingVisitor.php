@@ -24,7 +24,7 @@ class DependencyFetchingVisitor extends NameResolver
     protected $currentStructuralElement;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function enterNode(Node $node)
     {
@@ -82,7 +82,7 @@ class DependencyFetchingVisitor extends NameResolver
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function leaveNode(Node $node)
     {
