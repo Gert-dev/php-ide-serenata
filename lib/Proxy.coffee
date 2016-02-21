@@ -222,6 +222,25 @@ class Proxy
         )
 
     ###*
+     * Performs a semantic lint of the specified file.
+     *
+     * @param {string}      file
+     * @param {string|null} source The source code of the file to index. May be null if a directory is passed instead.
+     * @param {boolean}     async
+     *
+     * @return {Promise|Object}
+    ###
+    semanticLint: (file, source, async = false) ->
+        throw new Error('No file passed!') if not file
+
+        return @performRequest(
+            ['--semantic-lint', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--stdin'],
+            async,
+            null,
+            source
+        )
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {string}      path                   The full path to the file  or folder to refresh.

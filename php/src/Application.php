@@ -22,12 +22,13 @@ class Application
         $command = array_shift($arguments);
 
         $commands = [
-            '--class-list'   => 'ClassList',
-            '--class-info'   => 'ClassInfo',
-            '--functions'    => 'GlobalFunctions',
-            '--constants'    => 'GlobalConstants',
-            '--reindex'      => 'Reindex',
-            '--resolve-type' => 'ResolveType'
+            '--class-list'    => 'ClassList',
+            '--class-info'    => 'ClassInfo',
+            '--functions'     => 'GlobalFunctions',
+            '--constants'     => 'GlobalConstants',
+            '--reindex'       => 'Reindex',
+            '--resolve-type'  => 'ResolveType',
+            '--semantic-lint' => 'SemanticLint'
         ];
 
         if (isset($commands[$command])) {

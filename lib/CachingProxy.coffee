@@ -91,6 +91,16 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    semanticLint: (file, source, async = false) ->
+        if source?
+            # Don't cache when analyzing STDIN data.
+            return super(file, source, async)
+
+        return @wrapCachedRequestToParent("semanticLint-#{file}", 'semanticLint', arguments, async)
+
+    ###*
+     * @inherited
+    ###
     reindex: (path, source, progressStreamCallback) ->
         return super(path, source, progressStreamCallback).then (output) =>
             @clearCache()

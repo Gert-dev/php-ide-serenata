@@ -1,3 +1,8 @@
+## 0.7.0
+### Changes for developers
+* Changes to the service
+  * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
+
 ## 0.6.2
 ### Bugs fixed
 * The "Indexing failed!" message has disappeared. If you wish to know when the indexer is having problems, consider using the new linter package (see also the README).

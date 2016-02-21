@@ -41,13 +41,27 @@ class ResolveType extends BaseCommand
             throw new UnexpectedValueException('A line number is required for this command.');
         }
 
-        $fileId = $this->indexDatabase->getFileId($arguments['file']->value);
+        $type = $this->resolveType($arguments['type']->value, $arguments['file']->value, $arguments['line']->value);
+
+        return $this->outputJson(true, $type);
+    }
+
+    /**
+     * Resolves the type.
+     *
+     * @param string $type
+     * @param string $file
+     * @param int    $line
+     */
+    public function resolveType($type, $file, $line)
+    {
+        $fileId = $this->indexDatabase->getFileId($file);
 
         if (!$fileId) {
             throw new UnexpectedValueException('The specified file is not present in the index!');
         }
 
-        $namespace = $this->indexDatabase->getRelevantNamespace($arguments['file']->value, $arguments['line']->value);
+        $namespace = $this->indexDatabase->getRelevantNamespace($file, $line);
 
         if (!$namespace) {
             throw new LogicException(
@@ -57,15 +71,13 @@ class ResolveType extends BaseCommand
 
         $useStatements = $this->indexDatabase->getUseStatementsByNamespaceId(
             $namespace['id'],
-            $arguments['line']->value
+            $line
         );
 
         $useStatements = iterator_to_array($useStatements);
 
         $typeResolver = new TypeResolver($namespace['namespace'], $useStatements);
 
-        $type = $typeResolver->resolve($arguments['type']->value);
-
-        return $this->outputJson(true, $type);
+        return $typeResolver->resolve($type);
     }
 }
