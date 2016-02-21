@@ -61,11 +61,12 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
                 $unresolvedFirstPart = $node->getFirst();
 
                 $this->classUsageList[] = [
-                    'name'      => $unresolvedName,
-                    'firstPart' => $unresolvedFirstPart,
-                    'line'      => $node->getAttribute('startLine')       ? $node->getAttribute('startLine')      : null,
-                    'start'     => $node->getAttribute('startFilePos')    ? $node->getAttribute('startFilePos')   : null,
-                    'end'       => $node->getAttribute('endFilePos')      ? $node->getAttribute('endFilePos') + 1 : null
+                    'name'             => $unresolvedName,
+                    'firstPart'        => $unresolvedFirstPart,
+                    'isFullyQualified' => $node->isFullyQualified(),
+                    'line'             => $node->getAttribute('startLine')       ? $node->getAttribute('startLine')      : null,
+                    'start'            => $node->getAttribute('startFilePos')    ? $node->getAttribute('startFilePos')   : null,
+                    'end'              => $node->getAttribute('endFilePos')      ? $node->getAttribute('endFilePos') + 1 : null
                 ];
             }
         }
@@ -80,7 +81,7 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
      */
     protected function isValidType($type)
     {
-        return !in_array($type, ['self', 'static', 'parent']) && $type[0] !== '\\';
+        return !in_array($type, ['self', 'static', 'parent']);
     }
 
     /**

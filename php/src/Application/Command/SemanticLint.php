@@ -89,19 +89,25 @@ class SemanticLint extends BaseCommand
         $resolveTypeCommand->setIndexDatabase($this->indexDatabase);
 
         foreach ($classUsageFetchingVisitor->getClassUsageList() as $classUsage) {
-            if (isset($useStatementMap[$classUsage['firstPart']])) {
+            $relevantAlias = $classUsage['firstPart'];
+
+            if (!$classUsage['isFullyQualified'] && isset($useStatementMap[$relevantAlias])) {
                 // Mark the accompanying used statement, if any, as used.
-                $useStatementMap[$classUsage['firstPart']]['used'] = true;
+                $useStatementMap[$relevantAlias]['used'] = true;
             }
 
-            $fqsen = $resolveTypeCommand->resolveType(
-                $classUsage['name'],
-                $arguments['file']->value,
-                $classUsage['line']
-            );
+            if ($classUsage['isFullyQualified']) {
+                $fqsen = $classUsage['name'];
+            } else {
+                $fqsen = $resolveTypeCommand->resolveType(
+                    $classUsage['name'],
+                    $arguments['file']->value,
+                    $classUsage['line']
+                );
+            }
 
             if (!isset($classMap[$fqsen])) {
-                unset($classUsage['line'], $classUsage['firstPart']);
+                unset($classUsage['line'], $classUsage['firstPart'], $classUsage['isFullyQualified']);
 
                 $unknownClasses[] = $classUsage;
             }
