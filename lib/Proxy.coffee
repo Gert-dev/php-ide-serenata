@@ -105,7 +105,7 @@ class Proxy
                 catch error
                     @showUnexpectedOutputError(buffer)
 
-                if not response or response.success
+                if not response or not response.success
                     reject({rawOutput: buffer, message: 'An unsuccessful status code was returned by the PHP side!'})
                     return
 
