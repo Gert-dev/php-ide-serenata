@@ -63,9 +63,9 @@ class Proxy
                 response = JSON.parse(rawOutput)
 
             catch error
-                throw new Error('Invalid JSON data received! Raw output from the PHP side:<br/><br/>' + rawOutput)
+                @showUnexpectedOutputError(rawOutput)
 
-            if not response.success
+            if not response or response.success
                 throw new Error('An unsuccessful status code was returned by the PHP side!')
 
         catch error
@@ -102,9 +102,9 @@ class Proxy
                     response = JSON.parse(buffer)
 
                 catch error
-                    throw new Error('Invalid JSON data received! Raw output from the PHP side:<br/><br/>' + buffer)
+                    @showUnexpectedOutputError(buffer)
 
-                if not response.success
+                if not response or response.success
                     reject({rawOutput: buffer, message: 'An unsuccessful status code was returned by the PHP side!'})
                     return
 
@@ -117,6 +117,17 @@ class Proxy
             if stdinData?
                 proc.stdin.write(stdinData, 'utf-8')
                 proc.stdin.end()
+
+    ###*
+     * @param {string} rawOutput
+    ###
+    showUnexpectedOutputError: (rawOutput) ->
+        atom.notifications.addError('php-integrator - Oops, something went wrong!', {
+            dismissable : true
+            detail      :
+                "PHP sent back something unexpected. This is most likely an issue with your setup. If you're sure " +
+                "this is a bug, feel free to report it on the bug tracker.\n \n→ " + rawOutput
+        })
 
     ###*
      * Performs a request to the PHP side.
