@@ -1,3 +1,7 @@
+## 0.6.4
+### Bugs fixed
+* Fixed a minor logic error.
+
 ## 0.6.3
 ### Bugs fixed
 * Don't treat invalid JSON output as a JavaScript error, as it's usually not a bug in our package. Just display an error to the user instead.
