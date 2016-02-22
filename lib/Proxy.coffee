@@ -64,6 +64,7 @@ class Proxy
 
             catch error
                 @showUnexpectedOutputError(rawOutput)
+                throw new Error('Unexpected JSON output encountered!')
 
             if not response or response.success
                 throw new Error('An unsuccessful status code was returned by the PHP side!')
