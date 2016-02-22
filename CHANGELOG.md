@@ -3,6 +3,10 @@
 * Changes to the service
   * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
 
+## 0.6.3
+### Bugs fixed
+* Don't treat invalid JSON output as a JavaScript error, as it's usually not a bug in our package. Just display an error to the user instead.
+
 ## 0.6.2
 ### Bugs fixed
 * The "Indexing failed!" message has disappeared. If you wish to know when the indexer is having problems, consider using the new linter package (see also the README).
