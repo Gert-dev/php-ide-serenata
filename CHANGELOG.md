@@ -1,3 +1,7 @@
+## 0.6.5
+### Bugs fixed
+* Reintroduced the xdebug max nesting level, but this time set it to a ridiculously large number for compatibility.
+
 ## 0.6.4
 ### Bugs fixed
 * Fixed a minor logic error.
