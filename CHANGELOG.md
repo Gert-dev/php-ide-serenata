@@ -1,6 +1,7 @@
 ## 0.6.7
 ### Bugs fixed
 * Fixed incorrect array key being used (`Undefined index: end_line`).
+* Notices and warnings from the PHP side will now be shown in the error notification.
 * Error reporting is now enabled explicitly in case you have it disabled on a global scale so you can see what is going wrong in the Atom error notification (without having to manually debug it).
 
 ## 0.6.6

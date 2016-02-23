@@ -58,6 +58,11 @@ class Proxy
             response = child_process.spawnSync(command, parameters)
 
             rawOutput = response.output[1].toString('ascii')
+            rawOutputStderr = response.output[2].toString('ascii')
+
+            if rawOutputStderr
+                @showUnexpectedOutputError(rawOutputStderr)
+                throw new Error('The PHP side is producing error messages or notices!')
 
             try
                 response = JSON.parse(rawOutput)
@@ -90,12 +95,14 @@ class Proxy
             proc = child_process.spawn(command, parameters)
 
             buffer = ''
+            errorBuffer = ''
 
             proc.stdout.on 'data', (data) =>
                 buffer += data
 
             proc.on 'close', (code) =>
-                if not buffer or buffer.length == 0
+                if errorBuffer or not buffer or buffer.length == 0
+                    @showUnexpectedOutputError(errorBuffer)
                     reject({rawOutput: buffer, message: "No output received from the PHP side!"})
                     return
 
@@ -114,6 +121,10 @@ class Proxy
             if streamCallback
                 proc.stderr.on 'data', (data) =>
                     streamCallback(data)
+
+            else
+                proc.stderr.on 'data', (data) =>
+                    errorBuffer += data
 
             if stdinData?
                 proc.stdin.write(stdinData, 'utf-8')
