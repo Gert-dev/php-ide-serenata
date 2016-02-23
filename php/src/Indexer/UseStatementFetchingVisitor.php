@@ -21,6 +21,21 @@ class UseStatementFetchingVisitor implements NodeVisitor
     protected $lastNamespace = null;
 
     /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->namespaces[null] = [
+            'name'          => null,
+            'startLine'     => 0,
+            'endLine'       => null,
+            'useStatements' => []
+        ];
+
+        $this->lastNamespace = null;
+    }
+
+    /**
      * @inheritDoc
      */
     public function enterNode(Node $node)
@@ -35,23 +50,11 @@ class UseStatementFetchingVisitor implements NodeVisitor
                 'useStatements' => []
             ];
 
-            if ($this->lastNamespace) {
-                // There is no way to fetch the end of a namespace, so determine it manually (a value of null signifies
-                // the end of the file).
-                $this->namespaces[$this->lastNamespace]['endLine'] = $node->getLine() - 1;
-            }
-
+            // There is no way to fetch the end of a namespace, so determine it manually (a value of null signifies the
+            // end of the file).
+            $this->namespaces[$this->lastNamespace]['endLine'] = $node->getLine() - 1;
             $this->lastNamespace = $namespace;
         } elseif ($node instanceof Node\Stmt\Use_) {
-            if (!$this->lastNamespace && !isset($this->namespaces[null])) {
-                $this->namespaces[null] = [
-                    'name'          => null,
-                    'startLine'     => 0,
-                    'endLine'       => null,
-                    'useStatements' => []
-                ];
-            }
-
             foreach ($node->uses as $use) {
                 // NOTE: The namespace may be null here (intended behavior).
                 $this->namespaces[$this->lastNamespace]['useStatements'][] = [
