@@ -3,6 +3,11 @@
 * Changes to the service
   * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
 
+## 0.6.7
+### Bugs fixed
+* Fixed incorrect array key being used (`Undefined index: end_line`).
+* Error reporting is now enabled explicitly in case you have it disabled on a global scale so you can see what is going wrong in the Atom error notification (without having to manually debug it).
+
 ## 0.6.6
 ### Bugs fixed
 * Fixed compatibility with PHP < 5.6 by avoiding use of ARRAY_FILTER_USE_KEY.
