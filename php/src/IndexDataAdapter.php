@@ -363,7 +363,7 @@ class IndexDataAdapter
                     'declaringClass'     => $existingProperty['declaringClass'],
                     'declaringStructure' => $existingProperty['declaringStructure'],
                     'startLine'          => (int) $existingProperty['startLine'],
-                    'endLine'            => (int) $existingProperty['end_line']
+                    'endLine'            => (int) $existingProperty['endLine']
                 ];
 
                 if ($this->isInheritingDocumentation($property)) {
