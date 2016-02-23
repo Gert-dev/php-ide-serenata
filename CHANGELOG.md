@@ -3,6 +3,10 @@
 * Changes to the service
   * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
 
+## 0.6.9
+### Bugs fixed
+* Fixed built-in functions not being marked as being built-in.
+
 ## 0.6.8
 ### Bugs fixed
 * Fixed no namespace being generated internally, resulting in notifications being shown relating to no namespace being found.

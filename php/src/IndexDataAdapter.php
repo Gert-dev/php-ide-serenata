@@ -551,7 +551,7 @@ class IndexDataAdapter
 
         return [
             'name'          => $rawInfo['name'],
-            'isBuiltin'     => false,
+            'isBuiltin'     => !!$rawInfo['is_builtin'],
             'startLine'     => (int) $rawInfo['start_line'],
             'endLine'       => (int) $rawInfo['end_line'],
             'filename'      => $rawInfo['path'],
