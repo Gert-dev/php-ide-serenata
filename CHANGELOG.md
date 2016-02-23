@@ -1,3 +1,7 @@
+## 0.6.6
+### Bugs fixed
+* Fixed compatibility with PHP < 5.6 by avoiding use of ARRAY_FILTER_USE_KEY.
+
 ## 0.6.5
 ### Bugs fixed
 * Reintroduced the xdebug max nesting level, but this time set it to a ridiculously large number for compatibility.
