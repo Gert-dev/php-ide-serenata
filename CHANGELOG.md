@@ -1,3 +1,7 @@
+## 0.6.8
+### Bugs fixed
+* Fixed no namespace being generated internally, resulting in notifications being shown relating to no namespace being found.
+
 ## 0.6.7
 ### Bugs fixed
 * Fixed incorrect array key being used (`Undefined index: end_line`).
