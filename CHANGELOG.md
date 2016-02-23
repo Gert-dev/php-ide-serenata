@@ -1,3 +1,7 @@
+## 0.6.7
+### Bugs fixed
+* Error reporting is now enabled explicitly in case you have it disabled on a global scale so you can see what is going wrong in the Atom error notification (without having to manually debug it).
+
 ## 0.6.6
 ### Bugs fixed
 * Fixed compatibility with PHP < 5.6 by avoiding use of ARRAY_FILTER_USE_KEY.
