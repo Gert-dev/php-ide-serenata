@@ -73,8 +73,8 @@ class TypeResolver
         }
 
         // Still here? There must be no explicit use statement, default to the current namespace.
-        $fullName = $this->namespace ?: '';
-        $fullName .= '\\' . $type;
+        $fullName = $this->namespace ? ($this->namespace . '\\') : '';
+        $fullName .= $type;
 
         return $fullName;
     }
