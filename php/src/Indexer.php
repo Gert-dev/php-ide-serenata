@@ -3,25 +3,16 @@
 namespace PhpIntegrator;
 
 use DateTime;
-use SplFileInfo;
 use ReflectionClass;
 use FilesystemIterator;
 use UnexpectedValueException;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Configuration;
-
-use Doctrine\DBAL\Exception\TableNotFoundException;
-
 use PhpParser\Lexer;
 use PhpParser\Error;
 use PhpParser\ParserFactory;
 use PhpParser\NodeTraverser;
-
-use PhpParser\NodeVisitor\NameResolver;
 
 /**
  * Handles indexation of PHP code.
@@ -339,7 +330,7 @@ class Indexer
     /**
      * Retrieves a list of FQSENs in the specified file along with their dependencies.
      *
-     * @throws PhpParser\Error When the file could not be parsed.
+     * @throws Error When the file could not be parsed.
      *
      * @return array
      */
@@ -349,6 +340,10 @@ class Indexer
         $parser = $this->getParser();
 
         $nodes = $parser->parse(@file_get_contents($filename));
+
+        if ($nodes === null) {
+            throw new Error('Unknown syntax error encountered');
+        }
 
         $dependencyFetchingVisitor = new Indexer\DependencyFetchingVisitor();
 
@@ -655,11 +650,15 @@ class Indexer
      * @param string $filename
      * @param string $code
      *
-     * @throws PhpParser\Error When the file could not be parsed.
+     * @throws Error When the file could not be parsed.
      */
     protected function indexFileOutline($filename, $code)
     {
         $nodes = $this->getParser()->parse($code);
+
+        if ($nodes === null) {
+            throw new Error('Unknown syntax error encountered');
+        }
 
         $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
         $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();

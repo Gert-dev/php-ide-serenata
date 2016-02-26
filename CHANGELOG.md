@@ -6,6 +6,7 @@
 ## 0.6.9
 ### Bugs fixed
 * Fixed built-in functions not being marked as being built-in.
+* Fixed the "Oops, something went wrong!" message when opening a comment that encompassed the rest of the file.
 
 ## 0.6.8
 ### Bugs fixed
