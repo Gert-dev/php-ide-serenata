@@ -5,7 +5,7 @@
 
 ## 0.6.8
 ### Bugs fixed
-* Fixed no namespace being generated internally, resulting in notifications being shown relating to no namespace being found.
+* Fixed no internal namespace record being generated when there were no use statements nor a namespace in a file (resulting in notifications being shown relating to no namespace being found).
 
 ## 0.6.7
 ### Bugs fixed
