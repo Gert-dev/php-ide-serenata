@@ -3,6 +3,10 @@
 * Changes to the service
   * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
 
+## 0.6.10
+### Bugs fixed
+* Fixed the type resolver (--resolve-type) returning types prefixed with a leading slash when a file had no namespace, which is unnecessary and confusing as this slash isn't prepended anywhere else.
+
 ## 0.6.9
 ### Bugs fixed
 * Fixed built-in functions not being marked as being built-in.
