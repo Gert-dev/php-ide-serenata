@@ -6,9 +6,9 @@ use ReflectionClass;
 
 use PhpIntegrator\Application\Command;
 
-class ProjectTest extends IndexedTest
+class ClassListTest extends IndexedTest
 {
-    public function testClassInheritance()
+    public function testClassList()
     {
         $path = __DIR__ . '/ProjectTest/' . 'ClassList.php';
 

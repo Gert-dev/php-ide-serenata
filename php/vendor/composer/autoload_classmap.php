@@ -6,8 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'A\\ChildClass' => $baseDir . '/tests/ProjectTest/ClassInheritance.php',
-    'A\\ParentClass' => $baseDir . '/tests/ProjectTest/ClassInheritance.php',
+    'A\\FirstClass' => $baseDir . '/tests/ProjectTest/ClassList.php',
+    'A\\SecondClass' => $baseDir . '/tests/ProjectTest/ClassList.php',
     'PhpIntegrator\\Application' => $baseDir . '/src/Application.php',
     'PhpIntegrator\\Application\\Command' => $baseDir . '/src/Application/Command.php',
     'PhpIntegrator\\Application\\CommandInterface' => $baseDir . '/src/Application/CommandInterface.php',
@@ -19,6 +19,7 @@ return array(
     'PhpIntegrator\\Application\\Command\\ResolveType' => $baseDir . '/src/Application/Command/ResolveType.php',
     'PhpIntegrator\\Application\\Command\\SemanticLint' => $baseDir . '/src/Application/Command/SemanticLint.php',
     'PhpIntegrator\\Application\\Command\\SemanticLint\\ClassUsageFetchingVisitor' => $baseDir . '/src/Application/Command/SemanticLint/ClassUsageFetchingVisitor.php',
+    'PhpIntegrator\\ClassListTest' => $baseDir . '/tests/ClassListTest.php',
     'PhpIntegrator\\DocParser' => $baseDir . '/src/DocParser.php',
     'PhpIntegrator\\IndexDataAdapter' => $baseDir . '/src/IndexDataAdapter.php',
     'PhpIntegrator\\IndexDataAdapter\\ClassListProxyProvider' => $baseDir . '/src/IndexDataAdapter/ClassListProxyProvider.php',
@@ -32,7 +33,6 @@ return array(
     'PhpIntegrator\\Indexer\\OutlineIndexingVisitor' => $baseDir . '/src/Indexer/OutlineIndexingVisitor.php',
     'PhpIntegrator\\Indexer\\StorageInterface' => $baseDir . '/src/Indexer/StorageInterface.php',
     'PhpIntegrator\\Indexer\\UseStatementFetchingVisitor' => $baseDir . '/src/Indexer/UseStatementFetchingVisitor.php',
-    'PhpIntegrator\\ProjectTest' => $baseDir . '/tests/ClassListTest.php',
     'PhpIntegrator\\TypeResolver' => $baseDir . '/src/TypeResolver.php',
     'PhpIntegrator\\TypeResolverTest' => $baseDir . '/tests/TypeResolverTest.php',
 );
