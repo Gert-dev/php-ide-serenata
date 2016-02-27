@@ -1,20 +1,20 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Application\Command;
 
 use ReflectionClass;
 
-use PhpIntegrator\Application\Command;
+use PhpIntegrator\IndexedTest;
 
 class ClassListTest extends IndexedTest
 {
     public function testClassList()
     {
-        $path = __DIR__ . '/ProjectTest/' . 'ClassList.php';
+        $path = __DIR__ . '/TestFiles/' . 'ClassList.php';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new Command\ClassList();
+        $command = new ClassList();
         $command->setIndexDatabase($indexDatabase);
 
         $reflectionClass = new ReflectionClass(get_class($command));

@@ -1,20 +1,20 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Application\Command;
 
 use ReflectionClass;
 
-use PhpIntegrator\Application\Command;
+use PhpIntegrator\IndexedTest;
 
 class ResolveTypeTest extends IndexedTest
 {
     public function testResolveType()
     {
-        $path = __DIR__ . '/ProjectTest/' . 'ResolveType.php';
+        $path = __DIR__ . '/TestFiles/' . 'ResolveType.php';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new Command\ResolveType();
+        $command = new ResolveType();
         $command->setIndexDatabase($indexDatabase);
 
         $this->assertEquals($command->resolveType('C', $path, 1), 'C');

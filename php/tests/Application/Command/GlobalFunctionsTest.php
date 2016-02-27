@@ -1,20 +1,20 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Application\Command;
 
 use ReflectionClass;
 
-use PhpIntegrator\Application\Command;
+use PhpIntegrator\IndexedTest;
 
 class GlobalFunctionsTest extends IndexedTest
 {
     public function testGlobalFunctions()
     {
-        $path = __DIR__ . '/ProjectTest/' . 'GlobalFunctions.php';
+        $path = __DIR__ . '/TestFiles/' . 'GlobalFunctions.php';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new Command\GlobalFunctions();
+        $command = new GlobalFunctions();
         $command->setIndexDatabase($indexDatabase);
 
         $reflectionClass = new ReflectionClass(get_class($command));

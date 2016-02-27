@@ -1,20 +1,20 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Application\Command;
 
 use ReflectionClass;
 
-use PhpIntegrator\Application\Command;
+use PhpIntegrator\IndexedTest;
 
 class GlobalConstantsTest extends IndexedTest
 {
     public function testGlobalConstants()
     {
-        $path = __DIR__ . '/ProjectTest/' . 'GlobalConstants.php';
+        $path = __DIR__ . '/TestFiles/' . 'GlobalConstants.php';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new Command\GlobalConstants();
+        $command = new GlobalConstants();
         $command->setIndexDatabase($indexDatabase);
 
         $reflectionClass = new ReflectionClass(get_class($command));

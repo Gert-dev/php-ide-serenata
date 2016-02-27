@@ -1,10 +1,10 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Application\Command;
 
 use ReflectionClass;
 
-use PhpIntegrator\Application\Command;
+use PhpIntegrator\IndexedTest;
 
 class ClassInfoTest extends IndexedTest
 {
