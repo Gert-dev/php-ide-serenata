@@ -25,5 +25,6 @@ class GlobalConstantsTest extends IndexedTest
 
         $this->assertThat($output, $this->arrayHasKey('FIRST_CONSTANT'));
         $this->assertThat($output, $this->arrayHasKey('SECOND_CONSTANT'));
+        $this->assertThat($output, $this->logicalNot($this->arrayHasKey('SHOULD_NOT_SHOW_UP')));
     }
 }
