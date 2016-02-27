@@ -38,10 +38,23 @@ class Reindex extends BaseCommand
             throw new UnexpectedValueException('The file or directory to index is required for this command.');
         }
 
-        $showOutput = isset($arguments['verbose']);
-        $streamProgress = isset($arguments['stream-progress']);
+        return $this->reindex(
+            $arguments['source']->value,
+            isset($arguments['stdin']),
+            isset($arguments['verbose']),
+            isset($arguments['stream-progress'])
+        );
+    }
 
-        $indexer = new Indexer($this->indexDatabase, $showOutput, $streamProgress);
+    /**
+     * @param string $path
+     * @param bool   $useStdin
+     * @param bool   $showOutput
+     * @param bool   $doStreamProgress
+     */
+    protected function reindex($path, $useStdin, $showOutput, $doStreamProgress)
+    {
+        $indexer = new Indexer($this->indexDatabase, $showOutput, $doStreamProgress);
 
         $hasIndexedBuiltin = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('id', 'value')
@@ -66,8 +79,6 @@ class Reindex extends BaseCommand
             }
         }
 
-        $path = $arguments['source']->value;
-
         if (is_dir($path)) {
             $errors = $indexer->indexDirectory($path);
 
@@ -75,7 +86,7 @@ class Reindex extends BaseCommand
         } elseif (is_file($path)) {
             $code = null;
 
-            if (isset($arguments['stdin']) && $arguments['stdin']->value) {
+            if ($useStdin) {
                 // NOTE: This call is blocking if there is no input!
                 $code = file_get_contents('php://stdin');
             }
