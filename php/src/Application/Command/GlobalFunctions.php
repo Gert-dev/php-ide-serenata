@@ -4,8 +4,6 @@ namespace PhpIntegrator\Application\Command;
 
 use ArrayAccess;
 
-use PhpIntegrator\IndexDataAdapter;
-
 use PhpIntegrator\Application\Command as BaseCommand;
 
 /**
