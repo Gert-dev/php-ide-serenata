@@ -43,7 +43,20 @@ class SemanticLint extends BaseCommand
             throw new UnexpectedValueException('A file name is required for this command.');
         }
 
-        $fileId = $this->indexDatabase->getFileId($arguments['file']->value);
+        $output = $this->semanticLint($arguments['file']->value, isset($arguments['stdin']))
+
+        return $this->outputJson(true, $output);
+    }
+
+    /**
+     * @param string $file
+     * @param bool   $useStdin
+     *
+     * @return array
+     */
+    public function semanticLint($file, $useStdin)
+    {
+        $fileId = $this->indexDatabase->getFileId($file);
 
         if (!$fileId) {
             throw new UnexpectedValueException('The specified file is not present in the index!');
@@ -51,11 +64,11 @@ class SemanticLint extends BaseCommand
 
         $code = null;
 
-        if (isset($arguments['stdin']) && $arguments['stdin']->value) {
+        if ($useStdin) {
             // NOTE: This call is blocking if there is no input!
             $code = file_get_contents('php://stdin');
         } else {
-            $code = @file_get_contents($arguments['file']->value);
+            $code = @file_get_contents($file);
         }
 
         // Parse the file to fetch the information we need.
@@ -101,7 +114,7 @@ class SemanticLint extends BaseCommand
             } else {
                 $fqsen = $resolveTypeCommand->resolveType(
                     $classUsage['name'],
-                    $arguments['file']->value,
+                    $file,
                     $classUsage['line']
                 );
             }
@@ -121,7 +134,7 @@ class SemanticLint extends BaseCommand
             }
         }
 
-        return $this->outputJson(true, [
+        return [
             'errors' => [
                 'unknownClasses' => $unknownClasses
             ],
@@ -129,7 +142,7 @@ class SemanticLint extends BaseCommand
             'warnings' => [
                 'unusedUseStatements' => $unusedUseStatements
             ]
-        ]);
+        ];
     }
 
     /**
