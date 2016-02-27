@@ -18,12 +18,22 @@ class GlobalConstants extends BaseCommand
      */
     protected function process(ArrayAccess $arguments)
     {
+        $constants = $this->getGlobalConstants();
+
+        return $this->outputJson(true, $constants);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getGlobalConstants()
+    {
         $constants = [];
 
         foreach ($this->indexDatabase->getGlobalConstants() as $constant) {
             $constants[$constant['name']] = $this->getIndexDataAdapter()->getConstantInfo($constant);
         }
 
-        return $this->outputJson(true, $constants);
+        return $constants;
     }
 }
