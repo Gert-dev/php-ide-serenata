@@ -1,6 +1,6 @@
 {
     "autoload": {
-        "classmap": ["src/"],
+        "classmap": ["src/", "tests/"],
         "psr-4": {
             "PhpIntegrator\\": "src/"
         }
