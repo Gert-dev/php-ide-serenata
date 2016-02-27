@@ -24,7 +24,7 @@ class GlobalFunctions extends BaseCommand
      /**
       * @return array
       */
-     protected function getGlobalFunctions()
+     public function getGlobalFunctions()
      {
          $result = [];
 

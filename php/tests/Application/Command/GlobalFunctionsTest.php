@@ -2,8 +2,6 @@
 
 namespace PhpIntegrator\Application\Command;
 
-use ReflectionClass;
-
 use PhpIntegrator\IndexedTest;
 
 class GlobalFunctionsTest extends IndexedTest
@@ -17,11 +15,7 @@ class GlobalFunctionsTest extends IndexedTest
         $command = new GlobalFunctions();
         $command->setIndexDatabase($indexDatabase);
 
-        $reflectionClass = new ReflectionClass(get_class($command));
-        $method = $reflectionClass->getMethod('getGlobalFunctions');
-        $method->setAccessible(true);
-
-        $output = $method->invoke($command, $path);
+        $output = $command->getGlobalFunctions();
 
         $this->assertThat($output, $this->arrayHasKey('firstFunction'));
         $this->assertThat($output, $this->arrayHasKey('secondFunction'));

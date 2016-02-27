@@ -52,7 +52,7 @@ class Reindex extends BaseCommand
      * @param bool   $showOutput
      * @param bool   $doStreamProgress
      */
-    protected function reindex($path, $useStdin, $showOutput, $doStreamProgress)
+    public function reindex($path, $useStdin, $showOutput, $doStreamProgress)
     {
         $indexer = new Indexer($this->indexDatabase, $showOutput, $doStreamProgress);
 

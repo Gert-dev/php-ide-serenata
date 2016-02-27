@@ -40,7 +40,7 @@ class ClassList extends BaseCommand
       *
       * @return array
       */
-     protected function getClassList($file)
+     public function getClassList($file)
      {
          $result = [];
 

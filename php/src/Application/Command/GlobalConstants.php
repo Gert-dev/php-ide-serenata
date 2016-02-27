@@ -26,7 +26,7 @@ class GlobalConstants extends BaseCommand
     /**
      * @return array
      */
-    protected function getGlobalConstants()
+    public function getGlobalConstants()
     {
         $constants = [];
 
