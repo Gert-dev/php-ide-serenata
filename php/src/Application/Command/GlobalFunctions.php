@@ -18,7 +18,7 @@ class GlobalFunctions extends BaseCommand
      */
      protected function process(ArrayAccess $arguments)
      {
-         $result = $this->getGlobalConstants();
+         $result = $this->getGlobalFunctions();
 
          return $this->outputJson(true, $result);
      }
@@ -26,7 +26,7 @@ class GlobalFunctions extends BaseCommand
      /**
       * @return array
       */
-     protected function getGlobalConstants()
+     protected function getGlobalFunctions()
      {
          $result = [];
 
