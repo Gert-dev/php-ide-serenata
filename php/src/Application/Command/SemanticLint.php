@@ -43,7 +43,7 @@ class SemanticLint extends BaseCommand
             throw new UnexpectedValueException('A file name is required for this command.');
         }
 
-        $output = $this->semanticLint($arguments['file']->value, isset($arguments['stdin']))
+        $output = $this->semanticLint($arguments['file']->value, isset($arguments['stdin']));
 
         return $this->outputJson(true, $output);
     }
