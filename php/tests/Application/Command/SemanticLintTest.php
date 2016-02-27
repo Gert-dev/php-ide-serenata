@@ -6,9 +6,9 @@ use ReflectionClass;
 
 use PhpIntegrator\IndexedTest;
 
-class ClassInfoTest extends IndexedTest
+class SemanticLintTest extends IndexedTest
 {
-    public function testClassInfo()
+    public function testSemanticLint()
     {
         // TODO
     }
