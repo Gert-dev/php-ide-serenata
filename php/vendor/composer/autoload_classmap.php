@@ -21,6 +21,7 @@ return array(
     'PhpIntegrator\\Application\\Command\\SemanticLint\\ClassUsageFetchingVisitor' => $baseDir . '/src/Application/Command/SemanticLint/ClassUsageFetchingVisitor.php',
     'PhpIntegrator\\ClassListTest' => $baseDir . '/tests/ClassListTest.php',
     'PhpIntegrator\\DocParser' => $baseDir . '/src/DocParser.php',
+    'PhpIntegrator\\GlobalConstantsTest' => $baseDir . '/tests/GlobalConstantsTest.php',
     'PhpIntegrator\\IndexDataAdapter' => $baseDir . '/src/IndexDataAdapter.php',
     'PhpIntegrator\\IndexDataAdapter\\ClassListProxyProvider' => $baseDir . '/src/IndexDataAdapter/ClassListProxyProvider.php',
     'PhpIntegrator\\IndexDataAdapter\\ProviderInterface' => $baseDir . '/src/IndexDataAdapter/ProviderInterface.php',
