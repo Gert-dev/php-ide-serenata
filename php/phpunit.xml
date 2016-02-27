@@ -1,4 +1,4 @@
-<phpunit colors="true" bootstrap="vendor/autoload.php">
+<phpunit colors="true" stopOnError="true" stopOnFailure="true" bootstrap="vendor/autoload.php">
   <testsuites>
     <testsuite name="php-integrator">
       <directory>tests</directory>
