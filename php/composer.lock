@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6fcf0db820b5dea59aeb9deb19d40793",
+    "hash": "c1111d109da1c947d1e0d96d47354e39",
     "content-hash": "63225dcef2fc88952a861f7e4adf22da",
     "packages": [
         {
             "name": "corneltek/getoptionkit",
-            "version": "2.2.4",
+            "version": "2.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/c9s/GetOptionKit.git",
-                "reference": "c7170525314b587019c0b2a7b0354432b64b48e0"
+                "reference": "977b11bf1f44a02398ecfc96cf2fc913cb9f017b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/c9s/GetOptionKit/zipball/c7170525314b587019c0b2a7b0354432b64b48e0",
-                "reference": "c7170525314b587019c0b2a7b0354432b64b48e0",
+                "url": "https://api.github.com/repos/c9s/GetOptionKit/zipball/977b11bf1f44a02398ecfc96cf2fc913cb9f017b",
+                "reference": "977b11bf1f44a02398ecfc96cf2fc913cb9f017b",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
             ],
             "description": "Powerful command-line option toolkit",
             "homepage": "http://github.com/c9s/GetOptionKit",
-            "time": "2015-10-02 07:53:43"
+            "time": "2016-02-16 10:41:32"
         },
         {
             "name": "doctrine/annotations",
