@@ -8,7 +8,7 @@ class GlobalFunctionsTest extends IndexedTest
 {
     public function testGlobalFunctions()
     {
-        $path = __DIR__ . '/TestFiles/' . 'GlobalFunctions.php';
+        $path = __DIR__ . '/GlobalFunctionsTest/' . 'GlobalFunctions.php';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
