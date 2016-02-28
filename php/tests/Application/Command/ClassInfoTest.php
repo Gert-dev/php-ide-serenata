@@ -39,8 +39,8 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($output, [
             'name'               => 'A\SimpleClass',
-            'startLine'          => 5,
-            'endLine'            => 8,
+            'startLine'          => 10,
+            'endLine'            => 13,
             'shortName'          => 'SimpleClass',
             'filename'           => $this->getPathFor($fileName),
             'type'               => 'class',
@@ -49,8 +49,8 @@ class ClassInfoTest extends IndexedTest
             'isDeprecated'       => false,
 
             'descriptions'       => [
-                'short' => null,
-                'long'  => null
+                'short' => 'This is the summary.',
+                'long'  => 'This is a long description.'
             ],
 
             'parents'            => [],
