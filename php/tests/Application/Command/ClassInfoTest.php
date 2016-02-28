@@ -121,7 +121,94 @@ class ClassInfoTest extends IndexedTest
 
     public function testDataIsCorrectForClassMethods()
     {
-        // TODO: ClassMethod.php
+        $fileName = 'ClassMethod.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertEquals($output['methods']['testMethod'], [
+            'name'               => 'testMethod',
+            'isBuiltin'          => false,
+            'startLine'          => 19,
+            'endLine'            => 22,
+            'filename'           => $this->getPathFor($fileName),
+
+            'parameters'         => [
+                [
+                    'name'        => 'firstParameter',
+                    'type'        => 'DateTime',
+                    'fullType'    => 'DateTime',
+                    'description' => 'First parameter description.',
+                    'isReference' => false,
+                    'isVariadic'  => false,
+                    'isOptional'  => false
+                ],
+
+                [
+                    'name'        => 'secondParameter',
+                    'type'        => null,
+                    'fullType'    => null,
+                    'description' => null,
+                    'isReference' => true,
+                    'isVariadic'  => false,
+                    'isOptional'  => true
+                ],
+
+                [
+                    'name'        => 'thirdParameter',
+                    'type'        => null,
+                    'fullType'    => null,
+                    'description' => null,
+                    'isReference' => false,
+                    'isVariadic'  => true,
+                    'isOptional'  => false
+                ]
+            ],
+
+            'throws'             => [
+                '\UnexpectedValueException' => 'when something goes wrong.',
+                '\LogicException'           => 'when something is wrong.'
+            ],
+
+            'isDeprecated'       => false,
+            'hasDocblock'        => true,
+
+            'descriptions'       => [
+                'short' => 'This is the summary.',
+                'long'  => 'This is a long description.'
+            ],
+
+            'return'             => [
+                'type'         => 'mixed',
+                'resolvedType' => 'mixed',
+                'description'  => null
+            ],
+
+            'isMagic'            => false,
+            'isPublic'           => true,
+            'isProtected'        => false,
+            'isPrivate'          => false,
+            'isStatic'           => false,
+            'override'           => null,
+            'implementation'     => null,
+
+            'declaringClass'     => [
+                'name'      => 'A\TestClass',
+                'filename'  => $this->getPathFor($fileName),
+                'startLine' => 5,
+                'endLine'   => 23,
+                'type'      => 'class'
+            ],
+
+            'declaringStructure' => [
+                'name'            => 'A\TestClass',
+                'filename'        => $this->getPathFor($fileName),
+                'startLine'       => 5,
+                'endLine'         => 23,
+                'type'            => 'class',
+                'startLineMember' => 19,
+                'endLineMember'   => 22
+            ]
+        ]);
     }
 
     public function testDataIsCorrectForClassConstants()
@@ -179,6 +266,21 @@ class ClassInfoTest extends IndexedTest
         // TODO: Test declaringClass and declaringStructure.
         // TODO: Implement interface method.
         // TODO: Implement base class interface method.
+    }
+
+    public function testMethodParameterTypesFallBackToDocblock()
+    {
+        // TODO
+    }
+
+    public function testMagicClassPropertiesArePickedUpCorrectly()
+    {
+        // TODO
+    }
+
+    public function testMagicClassMethodsArePickedUpCorrectly()
+    {
+        // TODO
     }
 
     public function testDataIsCorrectForClassInheritance()
