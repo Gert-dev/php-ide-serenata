@@ -4,5 +4,12 @@ namespace A;
 
 class TestClass
 {
-    // TODO
+    /**
+     * This is the summary.
+     *
+     * This is a long description.
+     *
+     * @var MyType
+     */
+    protected $testProperty;
 }

@@ -4,5 +4,8 @@ namespace A;
 
 class TestClass
 {
-    // TODO
+    public function testMethod(\DateTime $firstParameter, $secondParameter = true)
+    {
+
+    }
 }

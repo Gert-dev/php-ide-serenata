@@ -68,6 +68,119 @@ class ClassInfoTest extends IndexedTest
         ]);
     }
 
+    public function testDataIsCorrectForClassProperties()
+    {
+        $fileName = 'ClassProperty.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertEquals($output['properties']['testProperty'], [
+            'name'               => 'testProperty',
+            'startLine'          => 14,
+            'endLine'            => 14,
+            'isMagic'            => false,
+            'isPublic'           => false,
+            'isProtected'        => true,
+            'isPrivate'          => false,
+            'isStatic'           => false,
+            'isDeprecated'       => false,
+            'hasDocblock'        => true,
+
+            'descriptions'       => [
+                'short' => 'This is the summary.',
+                'long'  => 'This is a long description.'
+            ],
+
+            'return'             => [
+                'type'         => 'MyType',
+                'resolvedType' => 'A\MyType',
+                'description'  => null
+            ],
+
+            'override'           => null,
+
+            'declaringClass'     => [
+                'name'      => 'A\TestClass',
+                'filename'  => $this->getPathFor($fileName),
+                'startLine' => 5,
+                'endLine'   => 15,
+                'type'      => 'class'
+            ],
+
+            'declaringStructure' => [
+                'name'            => 'A\TestClass',
+                'filename'        => $this->getPathFor($fileName),
+                'startLine'       => 5,
+                'endLine'         => 15,
+                'type'            => 'class',
+                'startLineMember' => 14,
+                'endLineMember'   => 14
+            ]
+        ]);
+    }
+
+    public function testDataIsCorrectForClassMethods()
+    {
+        // TODO: ClassMethod.php
+    }
+
+    public function testDataIsCorrectForClassConstants()
+    {
+        // TODO: ClassConstants.php
+    }
+
+    public function testDataIsCorrectForGlobalFunctions()
+    {
+        // TODO
+    }
+
+    public function testDataIsCorrectForGlobalConstants()
+    {
+        // TODO
+    }
+
+    public function testDocblockInheritanceWorksProperlyForClasses()
+    {
+        // TODO: ClassDocblockInheritance.php
+    }
+
+    public function testDocblockInheritanceWorksProperlyForMethods()
+    {
+        // TODO: MethodDocblockInheritance.php
+        // TODO: Test inheritance with trait, interface, and base class methods as well.
+    }
+
+    public function testDocblockInheritanceWorksProperlyForProperties()
+    {
+        // TODO: PropertyDocblockInheritance.php
+        // TODO: Test inheritance with trait properties and base class properties as well.
+    }
+
+    public function testMethodOverridingIsAnalyzedCorrectly()
+    {
+        // TODO
+        // TODO: Test declaringClass and declaringStructure.
+        // TODO: Override base class method.
+        // TODO: Override base class trait method.
+        // TODO: Override own trait method.
+    }
+
+    public function testPropertyOverridingIsAnalyzedCorrectly()
+    {
+        // TODO
+        // TODO: Test declaringClass and declaringStructure.
+        // TODO: Override base class property.
+        // TODO: Override base class trait property.
+    }
+
+    public function testMethodImplementationIsAnalyzedCorrectly()
+    {
+        // TODO
+        // TODO: Test declaringClass and declaringStructure.
+        // TODO: Implement interface method.
+        // TODO: Implement base class interface method.
+    }
+
     public function testDataIsCorrectForClassInheritance()
     {
         $fileName = 'ClassInheritance.php';
