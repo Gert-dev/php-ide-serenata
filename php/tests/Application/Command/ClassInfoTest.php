@@ -213,17 +213,52 @@ class ClassInfoTest extends IndexedTest
 
     public function testDataIsCorrectForClassConstants()
     {
-        // TODO: ClassConstants.php
-    }
+        $fileName = 'ClassConstant.php';
 
-    public function testDataIsCorrectForGlobalFunctions()
-    {
-        // TODO
-    }
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
 
-    public function testDataIsCorrectForGlobalConstants()
-    {
-        // TODO
+        $this->assertEquals($output['constants']['TEST_CONSTANT'], [
+            'name'               => 'TEST_CONSTANT',
+            'isBuiltin'          => false,
+            'startLine'          => 14,
+            'endLine'            => 14,
+            'filename'           => $this->getPathFor($fileName),
+            'isPublic'           => true,
+            'isProtected'        => false,
+            'isPrivate'          => false,
+            'isStatic'           => true,
+            'isDeprecated'       => false,
+            'hasDocblock'        => true,
+
+            'descriptions'       => [
+                'short' => 'This is the summary.',
+                'long'  => 'This is a long description.'
+            ],
+
+            'return'             => [
+                'type'         => 'MyType',
+                'resolvedType' => 'A\MyType',
+                'description'  => null
+            ],
+
+            'declaringClass'     => [
+                'name'      => 'A\TestClass',
+                'filename'  => $this->getPathFor($fileName),
+                'startLine' => 5,
+                'endLine'   => 15,
+                'type'      => 'class'
+            ],
+
+            'declaringStructure' => [
+                'name'            => 'A\TestClass',
+                'filename'        => $this->getPathFor($fileName),
+                'startLine'       => 5,
+                'endLine'         => 15,
+                'type'            => 'class',
+                'startLineMember' => 14,
+                'endLineMember'   => 14
+            ]
+        ]);
     }
 
     public function testDocblockInheritanceWorksProperlyForClasses()
