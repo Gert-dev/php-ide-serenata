@@ -275,8 +275,52 @@ class ClassInfoTest extends IndexedTest
 
     public function testDocblockInheritanceWorksProperlyForMethods()
     {
-        // TODO: MethodDocblockInheritance.php
-        // TODO: Test inheritance with trait, interface, and base class methods as well.
+        $fileName = 'MethodDocblockInheritance.php';
+
+        $traitOutput       = $this->getClassInfo($fileName, 'A\TestTrait');
+        $interfaceOutput   = $this->getClassInfo($fileName, 'A\TestInterface');
+        $childClassOutput  = $this->getClassInfo($fileName, 'A\ChildClass');
+        $parentClassOutput = $this->getClassInfo($fileName, 'A\ParentClass');
+
+        $keysToTestForEquality = [
+            'isDeprecated',
+            'descriptions',
+            'return',
+            'parameters',
+            'throws'
+        ];
+
+        foreach ($keysToTestForEquality as $key) {
+            $this->assertEquals(
+                $childClassOutput['methods']['basicDocblockInheritanceTraitTest'][$key],
+                $traitOutput['methods']['basicDocblockInheritanceTraitTest'][$key]
+            );
+
+            $this->assertEquals(
+                $childClassOutput['methods']['basicDocblockInheritanceInterfaceTest'][$key],
+                $interfaceOutput['methods']['basicDocblockInheritanceInterfaceTest'][$key]
+            );
+
+            $this->assertEquals(
+                $childClassOutput['methods']['basicDocblockInheritanceBaseClassTest'][$key],
+                $parentClassOutput['methods']['basicDocblockInheritanceBaseClassTest'][$key]
+            );
+        }
+
+        $this->assertEquals(
+            $childClassOutput['methods']['inheritDocBaseClassTest']['descriptions']['long'],
+            'Pre. ' . $parentClassOutput['methods']['inheritDocBaseClassTest']['descriptions']['long'] . ' Post.'
+        );
+
+        $this->assertEquals(
+            $childClassOutput['methods']['inheritDocInterfaceTest']['descriptions']['long'],
+            'Pre. ' . $interfaceOutput['methods']['inheritDocInterfaceTest']['descriptions']['long'] . ' Post.'
+        );
+
+        $this->assertEquals(
+            $childClassOutput['methods']['inheritDocTraitTest']['descriptions']['long'],
+            'Pre. ' . $traitOutput['methods']['inheritDocTraitTest']['descriptions']['long'] . ' Post.'
+        );
     }
 
     public function testDocblockInheritanceWorksProperlyForProperties()
