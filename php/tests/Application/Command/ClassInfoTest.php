@@ -263,7 +263,14 @@ class ClassInfoTest extends IndexedTest
 
     public function testDocblockInheritanceWorksProperlyForClasses()
     {
-        // TODO: ClassDocblockInheritance.php
+        $fileName = 'ClassDocblockInheritance.php';
+
+        $output = $this->getClassInfo($fileName, 'A\ChildClass');
+
+        $this->assertEquals($output['descriptions'], [
+            'short' => 'This is the summary.',
+            'long'  => 'This is a long description.'
+        ]);
     }
 
     public function testDocblockInheritanceWorksProperlyForMethods()

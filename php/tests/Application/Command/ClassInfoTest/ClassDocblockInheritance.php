@@ -2,7 +2,17 @@
 
 namespace A;
 
-class TestClass
+/**
+ * This is the summary.
+ *
+ * This is a long description.
+ */
+class ParentClass
 {
-    // TODO
+
+}
+
+class ChildClass extends ParentClass
+{
+
 }
