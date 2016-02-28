@@ -104,7 +104,6 @@ class SemanticLint extends BaseCommand
         foreach ($classUsageFetchingVisitor->getClassUsageList() as $classUsage) {
             $relevantAlias = $classUsage['firstPart'];
 
-            // die(var_dump($namespaces, $classUsage['namespace'], $relevantAlias));
             if (!$classUsage['isFullyQualified'] && isset($namespaces[$classUsage['namespace']]['useStatements'][$relevantAlias])) {
                 // Mark the accompanying used statement, if any, as used.
                 $namespaces[$classUsage['namespace']]['useStatements'][$relevantAlias]['used'] = true;
