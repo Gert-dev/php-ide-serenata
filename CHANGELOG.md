@@ -1,4 +1,7 @@
 ## 0.7.0
+### Bugs fixed
+* The use of `{@inheritDoc}` to extend long descriptions will now also work for child classes and extending interfaces.
+
 ### Changes for developers
 * Changes to the service
   * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.

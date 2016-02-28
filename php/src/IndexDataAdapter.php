@@ -133,6 +133,11 @@ class IndexDataAdapter
 
                 if (!$result['descriptions']['long']) {
                     $result['descriptions']['long'] = $parentInfo['descriptions']['long'];
+                } else {
+                    $result['descriptions']['long'] = $this->resolveInheritDoc(
+                        $result['descriptions']['long'],
+                        $parentInfo['descriptions']['long']
+                    );
                 }
 
                 $result['constants']  = array_merge($result['constants'], $parentInfo['constants']);
