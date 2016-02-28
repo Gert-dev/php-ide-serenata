@@ -16,3 +16,13 @@ class ChildClass extends ParentClass
 {
 
 }
+
+/**
+ * This is the summary.
+ *
+ * Pre. {@inheritDoc} Post.
+ */
+class AnotherChildClass extends ParentClass
+{
+
+}
