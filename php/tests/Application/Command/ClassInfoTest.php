@@ -332,8 +332,39 @@ class ClassInfoTest extends IndexedTest
 
     public function testDocblockInheritanceWorksProperlyForProperties()
     {
-        // TODO: PropertyDocblockInheritance.php
-        // TODO: Test inheritance with trait properties and base class properties as well.
+        $fileName = 'PropertyDocblockInheritance.php';
+
+        $traitOutput       = $this->getClassInfo($fileName, 'A\TestTrait');
+        $childClassOutput  = $this->getClassInfo($fileName, 'A\ChildClass');
+        $parentClassOutput = $this->getClassInfo($fileName, 'A\ParentClass');
+
+        $keysToTestForEquality = [
+            'isDeprecated',
+            'descriptions',
+            'return'
+        ];
+
+        foreach ($keysToTestForEquality as $key) {
+            $this->assertEquals(
+                $childClassOutput['properties']['basicDocblockInheritanceTraitTest'][$key],
+                $traitOutput['properties']['basicDocblockInheritanceTraitTest'][$key]
+            );
+
+            $this->assertEquals(
+                $childClassOutput['properties']['basicDocblockInheritanceBaseClassTest'][$key],
+                $parentClassOutput['properties']['basicDocblockInheritanceBaseClassTest'][$key]
+            );
+        }
+
+        $this->assertEquals(
+            $childClassOutput['properties']['inheritDocBaseClassTest']['descriptions']['long'],
+            'Pre. ' . $parentClassOutput['properties']['inheritDocBaseClassTest']['descriptions']['long'] . ' Post.'
+        );
+
+        $this->assertEquals(
+            $childClassOutput['properties']['inheritDocTraitTest']['descriptions']['long'],
+            'Pre. ' . $traitOutput['properties']['inheritDocTraitTest']['descriptions']['long'] . ' Post.'
+        );
     }
 
     public function testMethodOverridingIsAnalyzedCorrectly()
