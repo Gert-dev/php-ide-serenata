@@ -24,9 +24,10 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals($output['errors']['unknownClasses'], [
             [
-                'name'  => 'A\B',
-                'start' => 16,
-                'end'   => 19
+                'name'      => 'A\B',
+                'namespace' => null,
+                'start'     => 16,
+                'end'       => 19
             ]
         ]);
     }
@@ -37,9 +38,10 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals($output['errors']['unknownClasses'], [
             [
-                'name'  => 'DateTime',
-                'start' => 64,
-                'end'   => 72
+                'name'      => 'DateTime',
+                'namespace' => 'A',
+                'start'     => 64,
+                'end'       => 72
             ]
         ]);
     }
@@ -50,15 +52,17 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals($output['errors']['unknownClasses'], [
             [
-                'name'  => 'DateTime',
-                'start' => 56,
-                'end'   => 64
+                'name'      => 'DateTime',
+                'namespace' => 'A',
+                'start'     => 56,
+                'end'       => 64
             ],
 
             [
-                'name'  => 'SplFileInfo',
-                'start' => 117,
-                'end'   => 128
+                'name'      => 'SplFileInfo',
+                'namespace' => 'B',
+                'start'     => 117,
+                'end'       => 128
             ]
         ]);
     }
@@ -77,7 +81,6 @@ class SemanticLintTest extends IndexedTest
         ]);
     }
 
-    /* TODO: Multiple namespaces are not handled properly.
     public function testReportsUnusedUseStatementsWithMultipleNamespaces()
     {
         $output = $this->lintFile('UnusedUseStatementsMultipleNamespaces.php');
@@ -86,16 +89,16 @@ class SemanticLintTest extends IndexedTest
             [
                 'name'  => 'SplFileInfo',
                 'alias' => 'SplFileInfo',
-                'start' => 'TODO',
-                'end'   => 'TODO'
+                'start' => 47,
+                'end'   => 58
             ],
 
             [
                 'name'  => 'DateTime',
                 'alias' => 'DateTime',
-                'start' => 'TODO',
-                'end'   => 'TODO'
+                'start' => 111,
+                'end'   => 119
             ]
         ]);
-    }*/
+    }
 }

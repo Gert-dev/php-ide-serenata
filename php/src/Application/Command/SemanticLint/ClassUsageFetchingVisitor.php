@@ -19,7 +19,7 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
     /**
      * @var array
      */
-    protected $useStatementMap = [];
+    protected $namespaces = [];
 
     /**
      * @var Node|null
@@ -27,18 +27,52 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
     protected $lastNode;
 
     /**
+     * @var string|null
+     */
+    protected $lastNamespace = null;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->namespaces[null] = [
+            'name'          => null,
+            'startLine'     => 0,
+            'endLine'       => null,
+            'useStatements' => []
+        ];
+
+        $this->lastNamespace = null;
+    }
+
+    /**
      * @inheritDoc
      */
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\Use_) {
+        if ($node instanceof Node\Stmt\Namespace_) {
+            $namespace = (string) $node->name;
+
+            $this->namespaces[$namespace] = [
+                'name'          => $namespace,
+                'startLine'     => $node->getLine(),
+                'endLine'       => null,
+                'useStatements' => []
+            ];
+
+            // There is no way to fetch the end of a namespace, so determine it manually (a value of null signifies the
+            // end of the file).
+            $this->namespaces[$this->lastNamespace]['endLine'] = $node->getLine() - 1;
+            $this->lastNamespace = $namespace;
+        } elseif ($node instanceof Node\Stmt\Use_) {
             foreach ($node->uses as $use) {
                 // NOTE: The namespace may be null here (intended behavior).
-                $this->useStatementMap[(string) $use->alias] = [
-                    'name'      => (string) $use->name,
-                    'alias'     => (string) $use->alias,
-                    'start'     => $use->getAttribute('startFilePos') ? $use->getAttribute('startFilePos')   : null,
-                    'end'       => $use->getAttribute('endFilePos')   ? $use->getAttribute('endFilePos') + 1 : null
+                $this->namespaces[$this->lastNamespace]['useStatements'][(string) $use->alias] = [
+                    'name'  => (string) $use->name,
+                    'alias' => $use->alias,
+                    'start' => $use->getAttribute('startFilePos') ? $use->getAttribute('startFilePos')   : null,
+                    'end'   => $use->getAttribute('endFilePos')   ? $use->getAttribute('endFilePos') + 1 : null
                 ];
             }
         }
@@ -57,16 +91,14 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
 
         if ($node instanceof Node\Name) {
             if ($this->isValidType((string) $node)) {
-                $unresolvedName = (string) $node;
-                $unresolvedFirstPart = $node->getFirst();
-
                 $this->classUsageList[] = [
-                    'name'             => $unresolvedName,
-                    'firstPart'        => $unresolvedFirstPart,
+                    'name'             => (string) $node,
+                    'firstPart'        => $node->getFirst(),
                     'isFullyQualified' => $node->isFullyQualified(),
-                    'line'             => $node->getAttribute('startLine')       ? $node->getAttribute('startLine')      : null,
-                    'start'            => $node->getAttribute('startFilePos')    ? $node->getAttribute('startFilePos')   : null,
-                    'end'              => $node->getAttribute('endFilePos')      ? $node->getAttribute('endFilePos') + 1 : null
+                    'namespace'        => $this->lastNamespace,
+                    'line'             => $node->getAttribute('startLine')    ? $node->getAttribute('startLine')      : null,
+                    'start'            => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
+                    'end'              => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
                 ];
             }
         }
@@ -95,12 +127,12 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * Retrieves the use statement map.
+     * Retrieves a list of namespaces.
      *
      * @return array
      */
-    public function getUseStatementMap()
+    public function getNamespaces()
     {
-        return $this->useStatementMap;
+        return $this->namespaces;
     }
 }

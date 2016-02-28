@@ -96,7 +96,7 @@ class SemanticLint extends BaseCommand
 
         // Cross-reference the found class names against the class map.
         $unknownClasses = [];
-        $useStatementMap = $classUsageFetchingVisitor->getUseStatementMap();
+        $namespaces = $classUsageFetchingVisitor->getNamespaces();
 
         $resolveTypeCommand = new ResolveType();
         $resolveTypeCommand->setIndexDatabase($this->indexDatabase);
@@ -104,9 +104,10 @@ class SemanticLint extends BaseCommand
         foreach ($classUsageFetchingVisitor->getClassUsageList() as $classUsage) {
             $relevantAlias = $classUsage['firstPart'];
 
-            if (!$classUsage['isFullyQualified'] && isset($useStatementMap[$relevantAlias])) {
+            // die(var_dump($namespaces, $classUsage['namespace'], $relevantAlias));
+            if (!$classUsage['isFullyQualified'] && isset($namespaces[$classUsage['namespace']]['useStatements'][$relevantAlias])) {
                 // Mark the accompanying used statement, if any, as used.
-                $useStatementMap[$relevantAlias]['used'] = true;
+                $namespaces[$classUsage['namespace']]['useStatements'][$relevantAlias]['used'] = true;
             }
 
             if ($classUsage['isFullyQualified']) {
@@ -128,9 +129,13 @@ class SemanticLint extends BaseCommand
 
         $unusedUseStatements = [];
 
-        foreach ($useStatementMap as $alias => $data) {
-            if (!array_key_exists('used', $data) || !$data['used']) {
-                $unusedUseStatements[] = $data;
+        foreach ($namespaces as $namespace => $namespaceData) {
+            $useStatementMap = $namespaceData['useStatements'];
+
+            foreach ($useStatementMap as $alias => $data) {
+                if (!array_key_exists('used', $data) || !$data['used']) {
+                    $unusedUseStatements[] = $data;
+                }
             }
         }
 
