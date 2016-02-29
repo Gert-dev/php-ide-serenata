@@ -9,6 +9,6 @@ namespace B
 {
 
 use DateTime;
-use A;
+use C\D;
 
 }
