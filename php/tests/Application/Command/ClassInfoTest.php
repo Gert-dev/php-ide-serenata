@@ -473,10 +473,55 @@ class ClassInfoTest extends IndexedTest
 
     public function testMethodImplementationIsAnalyzedCorrectly()
     {
-        // TODO
-        // TODO: Test declaringClass and declaringStructure.
-        // TODO: Implement interface method.
-        // TODO: Implement base class interface method.
+        $fileName = 'MethodImplementation.php';
+
+        $output = $this->getClassInfo($fileName, 'A\ChildClass');
+
+        $this->assertEquals($output['methods']['parentInterfaceMethod']['implementation'], [
+            'startLine' => 7,
+            'endLine'   => 7,
+
+            'declaringClass' => [
+                'name'      => 'A\ParentInterface',
+                'filename'  => $this->getPathFor($fileName),
+                'startLine' => 5,
+                'endLine'   => 8,
+                'type'      => 'interface'
+            ],
+
+            'declaringStructure' => [
+                'name'            => 'A\ParentInterface',
+                'filename'        => $this->getPathFor($fileName),
+                'startLine'       => 5,
+                'endLine'         => 8,
+                'type'            => 'interface',
+                'startLineMember' => 7,
+                'endLineMember'   => 7
+            ]
+        ]);
+
+        $this->assertEquals($output['methods']['interfaceMethod']['implementation'], [
+            'startLine' => 17,
+            'endLine'   => 17,
+
+            'declaringClass' => [
+                'name'      => 'A\TestInterface',
+                'filename'  => $this->getPathFor($fileName),
+                'startLine' => 15,
+                'endLine'   => 18,
+                'type'      => 'interface'
+            ],
+
+            'declaringStructure' => [
+                'name'            => 'A\TestInterface',
+                'filename'        => $this->getPathFor($fileName),
+                'startLine'       => 15,
+                'endLine'         => 18,
+                'type'            => 'interface',
+                'startLineMember' => 17,
+                'endLineMember'   => 17
+            ]
+        ]);
     }
 
     public function testMethodParameterTypesFallBackToDocblock()
