@@ -369,11 +369,63 @@ class ClassInfoTest extends IndexedTest
 
     public function testMethodOverridingIsAnalyzedCorrectly()
     {
-        // TODO
-        // TODO: Test declaringClass and declaringStructure.
-        // TODO: Override base class method.
-        // TODO: Override base class trait method.
-        // TODO: Override own trait method.
+        $fileName = 'MethodOverride.php';
+
+        $output = $this->getClassInfo($fileName, 'A\ChildClass');
+
+        $this->assertEquals($output['methods']['parentTraitMethod']['override']['declaringClass'], [
+            'name'      => 'A\ParentClass',
+            'filename'  => $this->getPathFor($fileName),
+            'startLine' => 13,
+            'endLine'   => 21,
+            'type'      => 'class'
+        ]);
+
+        $this->assertEquals($output['methods']['parentTraitMethod']['override']['declaringStructure'], [
+            'name'            => 'A\ParentTrait',
+            'filename'        => $this->getPathFor($fileName),
+            'startLine'       => 5,
+            'endLine'         => 11,
+            'type'            => 'trait',
+            'startLineMember' => 7,
+            'endLineMember'   => 10
+        ]);
+
+        $this->assertEquals($output['methods']['parentMethod']['override']['declaringClass'], [
+            'name'      => 'A\ParentClass',
+            'filename'  => $this->getPathFor($fileName),
+            'startLine' => 13,
+            'endLine'   => 21,
+            'type'      => 'class',
+        ]);
+
+        $this->assertEquals($output['methods']['parentMethod']['override']['declaringStructure'], [
+            'name'            => 'A\ParentClass',
+            'filename'        => $this->getPathFor($fileName),
+            'startLine'       => 13,
+            'endLine'         => 21,
+            'type'            => 'class',
+            'startLineMember' => 17,
+            'endLineMember'   => 20
+        ]);
+
+        $this->assertEquals($output['methods']['traitMethod']['override']['declaringClass'], [
+            'name'      => 'A\ChildClass',
+            'filename'  =>  $this->getPathFor($fileName),
+            'startLine' => 31,
+            'endLine'   => 49,
+            'type'      => 'class'
+        ]);
+
+        $this->assertEquals($output['methods']['traitMethod']['override']['declaringStructure'], [
+            'name'            => 'A\TestTrait',
+            'filename'        => $this->getPathFor($fileName),
+            'startLine'       => 23,
+            'endLine'         => 29,
+            'type'            => 'trait',
+            'startLineMember' => 25,
+            'endLineMember'   => 28
+        ]);
     }
 
     public function testPropertyOverridingIsAnalyzedCorrectly()
