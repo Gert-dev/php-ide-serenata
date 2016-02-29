@@ -551,12 +551,132 @@ class ClassInfoTest extends IndexedTest
 
     public function testMethodParameterTypesFallBackToDocblock()
     {
-        // TODO
+        $fileName = 'MethodParameterDocblockFallBack.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+        $parameters = $output['methods']['testMethod']['parameters'];
+
+        $this->assertEquals($parameters[0]['type'], '\DateTime');
+        $this->assertEquals($parameters[1]['type'], 'boolean');
+        $this->assertEquals($parameters[2]['type'], 'mixed');
+        $this->assertEquals($parameters[3]['type'], '\Traversable[]');
     }
 
     public function testMagicClassPropertiesArePickedUpCorrectly()
     {
-        // TODO
+        $fileName = 'MagicClassMethods.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $data = $output['methods']['magicFoo'];
+
+        $this->assertEquals($data['name'], 'magicFoo');
+        $this->assertEquals($data['isMagic'], true);
+        $this->assertEquals($data['startLine'], 11);
+        $this->assertEquals($data['endLine'], 14);
+        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['isStatic'], false);
+
+        $this->assertEquals($data['parameters'], []);
+
+        $this->assertEquals($data['descriptions'], [
+            'short' => null,
+            'long'  => null
+        ]);
+
+        $this->assertEquals($data['return'], [
+            'type'         => 'void',
+            'resolvedType' => 'void',
+            'description'  => null
+        ]);
+
+        $data = $output['methods']['someMethod'];
+
+        $this->assertEquals($data['name'], 'someMethod');
+        $this->assertEquals($data['isMagic'], true);
+        $this->assertEquals($data['startLine'], 11);
+        $this->assertEquals($data['endLine'], 14);
+        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['isStatic'], false);
+
+        $this->assertEquals($data['parameters'], [
+            [
+                'name'        => '$a,',
+                'type'        => null,
+                'fullType'    => null,
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true
+            ],
+
+            // [
+            //     'name'        => '$b,',
+            //     'type'        => null,
+            //     'fullType'    => null,
+            //     'description' => null,
+            //     'isReference' => false,
+            //     'isVariadic'  => false,
+            //     'isOptional'  => true
+            // ],
+
+            [
+                'name'        => '$c',
+                'type'        => 'array',
+                'fullType'    => 'array',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true
+            ],
+
+            [
+                'name'        => '$d',
+                'type'        => '\DateTime',
+                'fullType'    => '\DateTime',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true
+            ],
+
+            // [
+            //
+            // ]
+        ]);
+
+        $this->assertEquals($data['descriptions'], [
+            'short' => "Description of method Test second line.",
+            'long'  => ''
+        ]);
+
+        $this->assertEquals($data['return'], [
+            'type'         => 'int',
+            'resolvedType' => 'int',
+            'description'  => null
+        ]);
+
+        $data = $output['methods']['magicFooStatic'];
+
+        $this->assertEquals($data['name'], 'magicFooStatic');
+        $this->assertEquals($data['isMagic'], true);
+        $this->assertEquals($data['startLine'], 11);
+        $this->assertEquals($data['endLine'], 14);
+        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['isStatic'], true);
+
+        $this->assertEquals($data['parameters'], []);
+
+        $this->assertEquals($data['descriptions'], [
+            'short' => null,
+            'long'  => null
+        ]);
+
+        $this->assertEquals($data['return'], [
+            'type'         => 'void',
+            'resolvedType' => 'void',
+            'description'  => null
+        ]);
     }
 
     public function testMagicClassMethodsArePickedUpCorrectly()
