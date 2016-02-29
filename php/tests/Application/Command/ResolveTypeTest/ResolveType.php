@@ -9,5 +9,6 @@ namespace B
 {
 
 use DateTime;
+use A;
 
 }

@@ -2,8 +2,6 @@
 
 namespace PhpIntegrator\Application\Command;
 
-use ReflectionClass;
-
 use PhpIntegrator\IndexedTest;
 
 class ResolveTypeTest extends IndexedTest
@@ -23,5 +21,6 @@ class ResolveTypeTest extends IndexedTest
         $this->assertEquals($command->resolveType('DateTime', $path, 10), 'B\DateTime');
         $this->assertEquals($command->resolveType('DateTime', $path, 11), 'DateTime');
         $this->assertEquals($command->resolveType('DateTime', $path, 12), 'DateTime');
+        $this->assertEquals($command->resolveType('A\Test', $path, 13), 'A\Test');
     }
 }
