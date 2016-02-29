@@ -564,6 +564,93 @@ class ClassInfoTest extends IndexedTest
 
     public function testMagicClassPropertiesArePickedUpCorrectly()
     {
+        $fileName = 'MagicClassProperties.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $data = $output['properties']['prop1'];
+
+        $this->assertEquals($data['name'], 'prop1');
+        $this->assertEquals($data['isMagic'], true);
+        $this->assertEquals($data['startLine'], 11);
+        $this->assertEquals($data['endLine'], 14);
+        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['isStatic'], false);
+
+        $this->assertEquals($data['descriptions'], [
+            'short' => 'Description 1.',
+            'long'  => ''
+        ]);
+
+        $this->assertEquals($data['return'], [
+            'type'         => null,
+            'resolvedType' => null,
+            'description'  => null
+        ]);
+
+        $data = $output['properties']['prop2'];
+
+        $this->assertEquals($data['name'], 'prop2');
+        $this->assertEquals($data['isMagic'], true);
+        $this->assertEquals($data['startLine'], 11);
+        $this->assertEquals($data['endLine'], 14);
+        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['isStatic'], false);
+
+        $this->assertEquals($data['descriptions'], [
+            'short' => 'Description 2.',
+            'long'  => ''
+        ]);
+
+        $this->assertEquals($data['return'], [
+            'type'         => null,
+            'resolvedType' => null,
+            'description'  => null
+        ]);
+
+        $data = $output['properties']['prop3'];
+
+        $this->assertEquals($data['name'], 'prop3');
+        $this->assertEquals($data['isMagic'], true);
+        $this->assertEquals($data['startLine'], 11);
+        $this->assertEquals($data['endLine'], 14);
+        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['isStatic'], false);
+
+        $this->assertEquals($data['descriptions'], [
+            'short' => 'Description 3.',
+            'long'  => ''
+        ]);
+
+        $this->assertEquals($data['return'], [
+            'type'         => null,
+            'resolvedType' => null,
+            'description'  => null
+        ]);
+
+        $data = $output['properties']['prop4'];
+
+        $this->assertEquals($data['name'], 'prop4');
+        $this->assertEquals($data['isMagic'], true);
+        $this->assertEquals($data['startLine'], 11);
+        $this->assertEquals($data['endLine'], 14);
+        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['isStatic'], true);
+
+        $this->assertEquals($data['descriptions'], [
+            'short' => 'Description 4.',
+            'long'  => ''
+        ]);
+
+        $this->assertEquals($data['return'], [
+            'type'         => null,
+            'resolvedType' => null,
+            'description'  => null
+        ]);
+    }
+
+    public function testMagicClassMethodsArePickedUpCorrectly()
+    {
         $fileName = 'MagicClassMethods.php';
 
         $output = $this->getClassInfo($fileName, 'A\TestClass');
@@ -638,11 +725,7 @@ class ClassInfoTest extends IndexedTest
                 'isReference' => false,
                 'isVariadic'  => false,
                 'isOptional'  => true
-            ],
-
-            // [
-            //
-            // ]
+            ]
         ]);
 
         $this->assertEquals($data['descriptions'], [
@@ -677,11 +760,6 @@ class ClassInfoTest extends IndexedTest
             'resolvedType' => 'void',
             'description'  => null
         ]);
-    }
-
-    public function testMagicClassMethodsArePickedUpCorrectly()
-    {
-        // TODO
     }
 
     public function testDataIsCorrectForClassInheritance()
