@@ -183,17 +183,6 @@ class IndexDataAdapter
             $result['directTraits'][] = $trait['name'];
 
             foreach ($trait['properties'] as $property) {
-                if (isset($traitAliases[$property['name']])) {
-                    $alias = $traitAliases[$property['name']];
-
-                    if ($alias['trait_fqsen'] === null || $alias['trait_fqsen'] === $trait['name']) {
-                        $property['name']        = $alias['alias'] ?: $property['name'];
-                        $property['isPublic']    = ($alias['access_modifier'] === 'public');
-                        $property['isProtected'] = ($alias['access_modifier'] === 'protected');
-                        $property['isPrivate']   = ($alias['access_modifier'] === 'private');
-                    }
-                }
-
                 $inheritedData = [];
                 $existingProperty = null;
 
