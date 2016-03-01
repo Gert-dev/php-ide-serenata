@@ -31,10 +31,8 @@ class ResolveTypeTest extends IndexedTest
     public function testThrowsExceptionOnUnknownFile()
     {
         $command = new ResolveType();
-
-        $command = new ResolveType();
         $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
 
-        $this->assertEquals($command->resolveType('C', 'MissingFile.php', 1), 'C');
+        $command->resolveType('C', 'MissingFile.php', 1);
     }
 }
