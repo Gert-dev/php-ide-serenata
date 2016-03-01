@@ -182,43 +182,6 @@ class IndexDataAdapter
             $result['traits'][] = $trait['name'];
             $result['directTraits'][] = $trait['name'];
 
-            foreach ($trait['constants'] as $constant) {
-                if (isset($traitAliases[$constant['name']])) {
-                    $alias = $traitAliases[$constant['name']];
-
-                    if ($alias['trait_fqsen'] === null || $alias['trait_fqsen'] === $trait['name']) {
-                        $constant['name']        = $alias['alias'] ?: $constant['name'];
-                        $constant['isPublic']    = ($alias['access_modifier'] === 'public');
-                        $constant['isProtected'] = ($alias['access_modifier'] === 'protected');
-                        $constant['isPrivate']   = ($alias['access_modifier'] === 'private');
-                    }
-                }
-
-                if (isset($result['constants'][$constant['name']])) {
-                    $existingConstant = $result['constants'][$constant['name']];
-
-                    if ($existingConstant['declaringStructure']['type'] === 'trait') {
-                        if (isset($traitPrecedences[$constant['name']])) {
-                            if ($traitPrecedences[$constant['name']]['trait_fqsen'] !== $trait['name']) {
-                                // The constant is present in multiple used traits and precedences indicate that the one
-                                // from this trait should not be imported.
-                                continue;
-                            }
-                        }
-                    }
-                }
-
-                $result['constants'][$constant['name']] = array_merge($constant, [
-                    'declaringClass' => [
-                        'name'            => $element['fqsen'],
-                        'filename'        => $element['path'],
-                        'startLine'       => (int) $element['start_line'],
-                        'endLine'         => (int) $element['end_line'],
-                        'type'            => $element['type_name']
-                    ]
-                ]);
-            }
-
             foreach ($trait['properties'] as $property) {
                 if (isset($traitAliases[$property['name']])) {
                     $alias = $traitAliases[$property['name']];

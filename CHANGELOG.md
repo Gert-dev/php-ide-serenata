@@ -3,6 +3,7 @@
 * The use of `{@inheritDoc}` to extend long descriptions will now also work for child classes and extending interfaces.
 * Some internal clean ups have been performed that may or may not be noticable to users:
   * Properties inside interfaces will not be "inherited" anymore (this is an error in PHP, but the indexer was still checking for them).
+  * Constants in traits will no longer be picked up (also a PHP error).
 
 ### Changes for developers
 * Changes to the service
