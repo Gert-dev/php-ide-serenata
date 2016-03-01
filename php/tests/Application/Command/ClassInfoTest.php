@@ -825,6 +825,10 @@ class ClassInfoTest extends IndexedTest
         $this->assertThat($output['properties'], $this->arrayHasKey('firstTraitProperty'));
         $this->assertThat($output['properties'], $this->arrayHasKey('secondTraitProperty'));
 
+        $this->assertThat($output['constants'], $this->arrayHasKey('FIRST_TRAIT_CONSTANT'));
+        $this->assertThat($output['constants'], $this->arrayHasKey('SECOND_TRAIT_CONSTANT'));
+        $this->assertThat($output['constants'], $this->arrayHasKey('BASE_TRAIT_CONSTANT'));
+
         $this->assertThat($output['methods'], $this->arrayHasKey('testAmbiguous'));
         $this->assertThat($output['methods'], $this->arrayHasKey('baseTraitMethod'));
 
