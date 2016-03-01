@@ -3,6 +3,7 @@
 namespace PhpIntegrator\Application\Command;
 
 use PhpIntegrator\IndexedTest;
+use PhpIntegrator\IndexDatabase;
 
 class SemanticLintTest extends IndexedTest
 {
@@ -100,5 +101,16 @@ class SemanticLintTest extends IndexedTest
                 'end'   => 119
             ]
         ]);
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testThrowsExceptionOnUnknownFile()
+    {
+        $command = new SemanticLint();
+        $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
+
+        $output = $this->lintFile('MissingFile.php');
     }
 }
