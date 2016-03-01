@@ -188,8 +188,8 @@ class ClassInfoTest extends IndexedTest
             ],
 
             'return'             => [
-                'type'         => 'mixed',
-                'resolvedType' => 'mixed',
+                'type'         => 'self',
+                'resolvedType' => 'A\TestClass',
                 'description'  => null
             ],
 

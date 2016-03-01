@@ -14,7 +14,7 @@ class TestClass
      * @throws \UnexpectedValueException when something goes wrong.
      * @throws \LogicException           when something is wrong.
      *
-     * @return mixed
+     * @return self
      */
     public function testMethod(\DateTime $firstParameter, &$secondParameter = true, ...$thirdParameter)
     {
