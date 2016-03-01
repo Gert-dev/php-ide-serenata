@@ -188,8 +188,8 @@ class ClassInfoTest extends IndexedTest
             ],
 
             'return'             => [
-                'type'         => 'self',
-                'resolvedType' => 'A\TestClass',
+                'type'         => 'mixed',
+                'resolvedType' => 'mixed',
                 'description'  => null
             ],
 
@@ -838,5 +838,122 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertTrue($output['methods']['test1']['isPrivate']);
         $this->assertEquals($output['methods']['testAmbiguous']['declaringStructure']['name'], 'A\SecondTrait');
+    }
+
+    public function testSpecialTypesAreCorrectlyResolved()
+    {
+        $fileName = 'ResolveSpecialTypes.php';
+
+        $output = $this->getClassInfo($fileName, 'A\ChildClass');
+
+        $this->assertEquals($output['properties']['basePropSelf']['return'], [
+            'type'         => 'self',
+            'resolvedType' => 'A\ParentClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['properties']['basePropStatic']['return'], [
+            'type'         => 'static',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['properties']['basePropThis']['return'], [
+            'type'         => '$this',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['properties']['propSelf']['return'], [
+            'type'         => 'self',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['properties']['propStatic']['return'], [
+            'type'         => 'static',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['properties']['propThis']['return'], [
+            'type'         => '$this',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['baseMethodSelf']['return'], [
+            'type'         => 'self',
+            'resolvedType' => 'A\ParentClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['baseMethodStatic']['return'], [
+            'type'         => 'static',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['baseMethodThis']['return'], [
+            'type'         => '$this',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['methodSelf']['return'], [
+            'type'         => 'self',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['methodStatic']['return'], [
+            'type'         => 'static',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['methodThis']['return'], [
+            'type'         => '$this',
+            'resolvedType' => 'A\ChildClass',
+            'description'  => null
+        ]);
+
+        $output = $this->getClassInfo($fileName, 'A\ParentClass');
+
+        $this->assertEquals($output['properties']['basePropSelf']['return'], [
+            'type'         => 'self',
+            'resolvedType' => 'A\ParentClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['properties']['basePropStatic']['return'], [
+            'type'         => 'static',
+            'resolvedType' => 'A\ParentClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['properties']['basePropThis']['return'], [
+            'type'         => '$this',
+            'resolvedType' => 'A\ParentClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['baseMethodSelf']['return'], [
+            'type'         => 'self',
+            'resolvedType' => 'A\ParentClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['baseMethodStatic']['return'], [
+            'type'         => 'static',
+            'resolvedType' => 'A\ParentClass',
+            'description'  => null
+        ]);
+
+        $this->assertEquals($output['methods']['baseMethodThis']['return'], [
+            'type'         => '$this',
+            'resolvedType' => 'A\ParentClass',
+            'description'  => null
+        ]);
     }
 }
