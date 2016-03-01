@@ -31,6 +31,16 @@ class ClassInfoTest extends IndexedTest
         $output = $this->getClassInfo('SimpleClass.php', 'DoesNotExist');
     }
 
+    public function testLeadingSlashIsResolvedCorrectly()
+    {
+        $fileName = 'SimpleClass.php';
+
+        $this->assertEquals(
+            $this->getClassInfo($fileName, 'A\SimpleClass'),
+            $this->getClassInfo($fileName, '\A\SimpleClass')
+        );
+    }
+
     public function testDataIsCorrectForASimpleClass()
     {
         $fileName = 'SimpleClass.php';
