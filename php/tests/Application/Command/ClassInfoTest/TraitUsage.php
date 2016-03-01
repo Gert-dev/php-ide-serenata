@@ -4,8 +4,6 @@ namespace A;
 
 trait FirstTrait
 {
-    const FIRST_TRAIT_CONSTANT = 1;
-
     protected $firstTraitProperty;
 
     protected function testAmbiguous()
@@ -21,8 +19,6 @@ trait FirstTrait
 
 trait SecondTrait
 {
-    const SECOND_TRAIT_CONSTANT = 1;
-
     protected $secondTraitProperty;
 
     protected function testAmbiguous()
@@ -33,8 +29,6 @@ trait SecondTrait
 
 trait BaseTrait
 {
-    const BASE_TRAIT_CONSTANT = 3;
-
     protected $baseTraitProperty;
 
     public function baseTraitMethod()
