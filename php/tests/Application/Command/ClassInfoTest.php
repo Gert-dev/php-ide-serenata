@@ -805,6 +805,9 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($output['interfaces'], ['A\BaseInterface', 'A\FirstInterface', 'A\SecondInterface']);
         $this->assertEquals($output['directInterfaces'], ['A\FirstInterface', 'A\SecondInterface']);
 
+        $this->assertThat($output['constants'], $this->arrayHasKey('FIRST_INTERFACE_CONSTANT'));
+        $this->assertThat($output['constants'], $this->arrayHasKey('SECOND_INTERFACE_CONSTANT'));
+
         $this->assertThat($output['methods'], $this->arrayHasKey('methodFromFirstInterface'));
         $this->assertThat($output['methods'], $this->arrayHasKey('methodFromSecondInterface'));
     }
