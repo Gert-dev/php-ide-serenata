@@ -166,12 +166,6 @@ class IndexDataAdapter
                 }
             }
 
-            foreach ($interface['properties'] as $property) {
-                if (!isset($result['properties'][$property['name']])) {
-                    $result['properties'][$property['name']] = $property;
-                }
-            }
-
             foreach ($interface['methods'] as $method) {
                 if (!isset($result['methods'][$method['name']])) {
                     $result['methods'][$method['name']] = $method;
