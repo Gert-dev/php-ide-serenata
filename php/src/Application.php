@@ -3,7 +3,6 @@
 namespace PhpIntegrator;
 
 use Exception;
-use UnexpectedValueException;
 
 use Doctrine\DBAL\Exception\DriverException;
 
