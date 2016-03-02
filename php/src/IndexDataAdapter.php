@@ -189,16 +189,6 @@ class IndexDataAdapter
                 if (isset($result['properties'][$property['name']])) {
                     $existingProperty = $result['properties'][$property['name']];
 
-                    if ($existingProperty['declaringStructure']['type'] === 'trait') {
-                        if (isset($traitPrecedences[$property['name']])) {
-                            if ($traitPrecedences[$property['name']]['trait_fqsen'] !== $trait['name']) {
-                                // The property is present in multiple used traits and precedences indicate that the one
-                                // from this trait should not be imported.
-                                continue;
-                            }
-                        }
-                    }
-
                     if ($this->isInheritingDocumentation($property)) {
                         $inheritedData = $this->extractInheritedPropertyInfo($existingProperty);
                     }
