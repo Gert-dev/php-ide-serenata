@@ -6,6 +6,13 @@ trait FirstTrait
 {
     protected $firstTraitProperty;
 
+    /**
+     * This is the summary.
+     *
+     * Pre. {@inheritDoc} Post.
+     */
+    protected $inheritDocTest;
+
     protected function testAmbiguous()
     {
 
@@ -40,6 +47,13 @@ trait BaseTrait
 class BaseClass
 {
     use BaseTrait;
+
+    /**
+     * This is the summary.
+     *
+     * This is a long description.
+     */
+    protected $inheritDocTest;
 }
 
 class TestClass extends BaseClass

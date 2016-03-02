@@ -817,6 +817,7 @@ class ClassInfoTest extends IndexedTest
         $fileName = 'TraitUsage.php';
 
         $output = $this->getClassInfo($fileName, 'A\TestClass');
+        $baseClassOutput = $this->getClassInfo($fileName, 'A\BaseClass');
 
         $this->assertEquals($output['traits'], ['A\BaseTrait', 'A\FirstTrait', 'A\SecondTrait']);
         $this->assertEquals($output['directTraits'], ['A\FirstTrait', 'A\SecondTrait']);
@@ -827,6 +828,11 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertThat($output['methods'], $this->arrayHasKey('testAmbiguous'));
         $this->assertThat($output['methods'], $this->arrayHasKey('baseTraitMethod'));
+
+        $this->assertEquals(
+            $output['properties']['inheritDocTest']['descriptions']['long'],
+            'Pre. ' . $baseClassOutput['properties']['inheritDocTest']['descriptions']['long'] . ' Post.'
+        );
 
         // Test the 'as' keyword for renaming trait method.
         $this->assertThat($output['methods'], $this->arrayHasKey('test1'));
