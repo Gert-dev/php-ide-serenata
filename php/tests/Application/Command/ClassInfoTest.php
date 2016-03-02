@@ -834,6 +834,11 @@ class ClassInfoTest extends IndexedTest
             'Pre. ' . $baseClassOutput['properties']['inheritDocTest']['descriptions']['long'] . ' Post.'
         );
 
+        $this->assertEquals(
+            $output['properties']['inheritEntireDocblockTest']['descriptions']['long'],
+            $baseClassOutput['properties']['inheritEntireDocblockTest']['descriptions']['long']
+        );
+
         // Test the 'as' keyword for renaming trait method.
         $this->assertThat($output['methods'], $this->arrayHasKey('test1'));
         $this->assertThat($output['methods'], $this->logicalNot($this->arrayHasKey('test')));

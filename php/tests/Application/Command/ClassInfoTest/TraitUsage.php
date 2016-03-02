@@ -13,6 +13,8 @@ trait FirstTrait
      */
     protected $inheritDocTest;
 
+    protected $inheritEntireDocblockTest;
+
     protected function testAmbiguous()
     {
 
@@ -54,6 +56,13 @@ class BaseClass
      * This is a long description.
      */
     protected $inheritDocTest;
+
+    /**
+     * This is the summary.
+     *
+     * This is a long description.
+     */
+    protected $inheritEntireDocblockTest;
 }
 
 class TestClass extends BaseClass
