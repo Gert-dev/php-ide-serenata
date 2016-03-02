@@ -827,6 +827,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertThat($output['properties'], $this->arrayHasKey('secondTraitProperty'));
 
         $this->assertThat($output['methods'], $this->arrayHasKey('testAmbiguous'));
+        $this->assertThat($output['methods'], $this->arrayHasKey('testAmbiguousAsWell'));
         $this->assertThat($output['methods'], $this->arrayHasKey('baseTraitMethod'));
 
         $this->assertEquals(
@@ -845,6 +846,7 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertTrue($output['methods']['test1']['isPrivate']);
         $this->assertEquals($output['methods']['testAmbiguous']['declaringStructure']['name'], 'A\SecondTrait');
+        $this->assertEquals($output['methods']['testAmbiguousAsWell']['declaringStructure']['name'], 'A\FirstTrait');
     }
 
     public function testSpecialTypesAreCorrectlyResolved()

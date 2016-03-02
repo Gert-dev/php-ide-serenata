@@ -20,6 +20,11 @@ trait FirstTrait
 
     }
 
+    protected function testAmbiguousAsWell()
+    {
+
+    }
+
     protected function test()
     {
 
@@ -31,6 +36,11 @@ trait SecondTrait
     protected $secondTraitProperty;
 
     protected function testAmbiguous()
+    {
+
+    }
+
+    protected function testAmbiguousAsWell()
     {
 
     }
@@ -70,5 +80,6 @@ class TestClass extends BaseClass
     use FirstTrait, SecondTrait {
         test as private test1;
         SecondTrait::testAmbiguous insteadof testAmbiguous;
+        FirstTrait::testAmbiguousAsWell insteadof testAmbiguousAsWell;
     }
 }
