@@ -729,8 +729,8 @@ class ClassInfoTest extends IndexedTest
 
             [
                 'name'        => 'd',
-                'type'        => '\DateTime',
-                'fullType'    => '\DateTime',
+                'type'        => 'Type',
+                'fullType'    => 'A\Type',
                 'description' => null,
                 'isReference' => false,
                 'isVariadic'  => false,
@@ -744,8 +744,8 @@ class ClassInfoTest extends IndexedTest
         ]);
 
         $this->assertEquals($data['return'], [
-            'type'         => 'int',
-            'resolvedType' => 'int',
+            'type'         => 'TestClass',
+            'resolvedType' => 'A\TestClass',
             'description'  => null
         ]);
 

@@ -1010,7 +1010,7 @@ class Indexer
             $parameters[] = [
                 'name'        => mb_substr($parameterName, 1), // Strip off the dollar sign.
                 'type'        => $parameter['type'],
-                'fullType'    => $parameter['type'],
+                'fullType'    => null,                         // Determine automatically.
                 'isReference' => false,
                 'isVariadic'  => false,
                 'isOptional'  => false
@@ -1021,7 +1021,7 @@ class Indexer
             $parameters[] = [
                 'name'        => mb_substr($parameterName, 1), // Strip off the dollar sign.
                 'type'        => $parameter['type'],
-                'fullType'    => $parameter['type'],
+                'fullType'    => null,                         // Determine automatically.
                 'isReference' => false,
                 'isVariadic'  => false,
                 'isOptional'  => true
@@ -1033,7 +1033,7 @@ class Indexer
             'startLine'      => null,
             'endLine'        => null,
             'returnType'     => $data['type'],
-            'fullReturnType' => $data['type'],
+            'fullReturnType' => null,                         // Determine automatically.
             'parameters'     => $parameters,
             'docComment'     => "/** {$data['description']} */",
             'isPublic'       => true,
@@ -1183,12 +1183,10 @@ class Indexer
             DocParser::RETURN_VALUE
         ], $rawData['name']);
 
-        $returnType = $rawData['returnType'];
+        $returnType = $rawData['returnType'] ?: ($documentation ? $documentation['return']['type'] : null);
         $fullReturnType = $rawData['fullReturnType'];
 
-        if (!$returnType) {
-            $returnType = $documentation['return']['type'];
-
+        if (!$fullReturnType) {
             $fullReturnType = $this->getFullTypeForDocblockType(
                 $returnType,
                 $rawData['startLine'],
@@ -1222,13 +1220,12 @@ class Indexer
             $parameterDoc = isset($documentation['params'][$parameterKey]) ?
                 $documentation['params'][$parameterKey] : null;
 
+            $type = $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null);
             $fullType = $parameter['fullType'];
 
             if (!$fullType) {
-                $fullType = $parameterDoc ? $parameterDoc['type'] : null;
-
                 $fullType = $this->getFullTypeForDocblockType(
-                    $fullType,
+                    $type,
                     $rawData['startLine'],
                     $useStatementFetchingVisitor
                 );
@@ -1237,7 +1234,7 @@ class Indexer
             $parameterData = [
                 'function_id'  => $functionId,
                 'name'         => $parameter['name'],
-                'type'         => $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null),
+                'type'         => $type,
                 'full_type'    => $fullType,
                 'description'  => $parameterDoc ? $parameterDoc['description'] : null,
                 'is_reference' => $parameter['isReference'] ? 1 : 0,

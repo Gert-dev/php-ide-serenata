@@ -4,7 +4,7 @@ namespace A;
 
 /**
  * @method magicFoo()
- * @method int someMethod($a, $b, array $c = array(), \DateTime $d = null) Description of method
+ * @method TestClass someMethod($a, $b, array $c = array(), Type $d = null) Description of method
  *                                                                      Test second line.
  * @method static magicFooStatic()
  */
