@@ -584,7 +584,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['isMagic'], true);
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
-        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['descriptions'], [
@@ -604,7 +604,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['isMagic'], true);
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
-        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['descriptions'], [
@@ -624,7 +624,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['isMagic'], true);
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
-        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['descriptions'], [
@@ -644,7 +644,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['isMagic'], true);
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
-        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['isStatic'], true);
 
         $this->assertEquals($data['descriptions'], [
@@ -671,7 +671,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['isMagic'], true);
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
-        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['parameters'], []);
@@ -693,7 +693,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['isMagic'], true);
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
-        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['parameters'], [
@@ -755,7 +755,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['isMagic'], true);
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
-        $this->assertEquals($data['hasDocblock'], true);
+        $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['isStatic'], true);
 
         $this->assertEquals($data['parameters'], []);

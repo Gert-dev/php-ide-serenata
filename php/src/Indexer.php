@@ -981,16 +981,17 @@ class Indexer
     protected function adaptMagicPropertyData($name, array $data)
     {
         return [
-            'name'           => mb_substr($name, 1), // Strip off the dollar sign.
-            'startLine'      => null,
-            'endLine'        => null,
-            'isPublic'       => true,
-            'isPrivate'      => false,
-            'isProtected'    => false,
-            'isStatic'       => $data['isStatic'],
-            'returnType'     => $data['type'],
-            'fullReturnType' => null,                // Determine automatically.
-            'docComment'     => "/** {$data['description']} */"
+            'name'             => mb_substr($name, 1), // Strip off the dollar sign.
+            'startLine'        => null,
+            'endLine'          => null,
+            'isPublic'         => true,
+            'isPrivate'        => false,
+            'isProtected'      => false,
+            'isStatic'         => $data['isStatic'],
+            'returnType'       => $data['type'],
+            'fullReturnType'   => null,                // Determine automatically.
+            'shortDescription' => $data['description'],
+            'docComment'       => null
         ];
     }
 
@@ -1029,17 +1030,18 @@ class Indexer
         }
 
         return [
-            'name'           => $name,
-            'startLine'      => null,
-            'endLine'        => null,
-            'returnType'     => $data['type'],
-            'fullReturnType' => null,                         // Determine automatically.
-            'parameters'     => $parameters,
-            'docComment'     => "/** {$data['description']} */",
-            'isPublic'       => true,
-            'isPrivate'      => false,
-            'isProtected'    => false,
-            'isStatic'       => $data['isStatic']
+            'name'             => $name,
+            'startLine'        => null,
+            'endLine'          => null,
+            'returnType'       => $data['type'],
+            'fullReturnType'   => null,                       // Determine automatically.
+            'parameters'       => $parameters,
+            'shortDescription' => $data['description'],
+            'docComment'       => null,
+            'isPublic'         => true,
+            'isPrivate'        => false,
+            'isProtected'      => false,
+            'isStatic'         => $data['isStatic']
         ];
     }
 
@@ -1117,12 +1119,16 @@ class Indexer
             DocParser::DESCRIPTION
         ], $rawData['name']);
 
-        $shortDescription = $documentation['descriptions']['short'];
+        $shortDescription = isset($rawData['shortDescription']) ? $rawData['shortDescription'] : null;
 
-        // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
-        // from the latter to the former.
-        if (empty($shortDescription)) {
-            $shortDescription = $documentation['var']['description'];
+        if ($shortDescription === null) {
+            $shortDescription = $documentation['descriptions']['short'];
+
+            // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
+            // from the latter to the former.
+            if (empty($shortDescription)) {
+                $shortDescription = $documentation['var']['description'];
+            }
         }
 
         $returnType = isset($rawData['returnType']) ? $rawData['returnType'] : null;
@@ -1194,6 +1200,12 @@ class Indexer
             );
         }
 
+        $shortDescription = isset($rawData['shortDescription']) ? $rawData['shortDescription'] : null;
+
+        if ($shortDescription === null) {
+            $shortDescription = $documentation['descriptions']['short'];
+        }
+
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
             'name'                  => $rawData['name'],
             'file_id'               => $fileId,
@@ -1201,7 +1213,7 @@ class Indexer
             'end_line'              => $rawData['endLine'],
             'is_builtin'            => 0,
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-            'short_description'     => $documentation['descriptions']['short'],
+            'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
             'full_return_type'      => $fullReturnType,

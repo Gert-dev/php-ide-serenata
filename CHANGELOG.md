@@ -13,6 +13,7 @@
 * Changes to the service
   * Magic methods now return the class start line as their end line.
   * Magic properties now return the class start line as their end line.
+  * Magic properties and methods will no longer return true for `hasDocblock`.
   * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
 
 ## 0.6.10
