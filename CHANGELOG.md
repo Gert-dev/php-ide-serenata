@@ -1,5 +1,8 @@
 ## 0.7.0
 ### Bugs fixed
+* Fixed some parameters of magic methods not showing up at all.
+* Fixed parameter names for magic methods containing a comma in some cases.
+* Fixed parameters for magic methods being incorrectly marked as being optional.
 * Return types for magic properties were not being fetched at all.
 * Return types for magic methods were not being resolved relative to use statements or the namespace.
 * Parameter names for magic methods no longer contain a dollar sign (consistent with everything else).

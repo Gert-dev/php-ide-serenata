@@ -698,24 +698,24 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['parameters'], [
             [
-                'name'        => 'a,',
+                'name'        => 'a',
                 'type'        => null,
                 'fullType'    => null,
                 'description' => null,
                 'isReference' => false,
                 'isVariadic'  => false,
-                'isOptional'  => true
+                'isOptional'  => false
             ],
 
-            // [
-            //     'name'        => 'b,',
-            //     'type'        => null,
-            //     'fullType'    => null,
-            //     'description' => null,
-            //     'isReference' => false,
-            //     'isVariadic'  => false,
-            //     'isOptional'  => true
-            // ],
+            [
+                'name'        => 'b',
+                'type'        => null,
+                'fullType'    => null,
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => false
+            ],
 
             [
                 'name'        => 'c',
