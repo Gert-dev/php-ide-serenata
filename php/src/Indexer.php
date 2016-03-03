@@ -983,14 +983,16 @@ class Indexer
     protected function adaptMagicPropertyData($name, array $data)
     {
         return [
-            'name'        => mb_substr($name, 1), // Strip off the dollar sign.
-            'startLine'   => null,
-            'endLine'     => null,
-            'isPublic'    => true,
-            'isPrivate'   => false,
-            'isProtected' => false,
-            'isStatic'    => $data['isStatic'],
-            'docComment'  => "/** {$data['description']} */"
+            'name'           => mb_substr($name, 1), // Strip off the dollar sign.
+            'startLine'      => null,
+            'endLine'        => null,
+            'isPublic'       => true,
+            'isPrivate'      => false,
+            'isProtected'    => false,
+            'isStatic'       => $data['isStatic'],
+            'returnType'     => $data['type'],
+            'fullReturnType' => null,                // Determine automatically.
+            'docComment'     => "/** {$data['description']} */"
         ];
     }
 
@@ -1125,12 +1127,12 @@ class Indexer
             $shortDescription = $documentation['var']['description'];
         }
 
-        $returnType = null;
-        $fullReturnType = null;
+        $returnType = isset($rawData['returnType']) ? $rawData['returnType'] : null;
+        $returnType = $returnType ?: ($documentation ? $documentation['var']['type'] : null);
 
-        if ($documentation['var']['type']) {
-            $returnType = $documentation['var']['type'];
+        $fullReturnType = isset($rawData['fullReturnType']) ? $rawData['fullReturnType'] : null;
 
+        if (!$fullReturnType) {
             $fullReturnType = $this->getFullTypeForDocblockType(
                 $returnType,
                 $rawData['startLine'],

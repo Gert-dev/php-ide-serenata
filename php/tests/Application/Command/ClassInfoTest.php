@@ -593,8 +593,8 @@ class ClassInfoTest extends IndexedTest
         ]);
 
         $this->assertEquals($data['return'], [
-            'type'         => null,
-            'resolvedType' => null,
+            'type'         => 'Type1',
+            'resolvedType' => 'A\Type1',
             'description'  => null
         ]);
 
@@ -613,8 +613,8 @@ class ClassInfoTest extends IndexedTest
         ]);
 
         $this->assertEquals($data['return'], [
-            'type'         => null,
-            'resolvedType' => null,
+            'type'         => 'Type2',
+            'resolvedType' => 'A\Type2',
             'description'  => null
         ]);
 
@@ -633,8 +633,8 @@ class ClassInfoTest extends IndexedTest
         ]);
 
         $this->assertEquals($data['return'], [
-            'type'         => null,
-            'resolvedType' => null,
+            'type'         => 'Type3',
+            'resolvedType' => 'A\Type3',
             'description'  => null
         ]);
 
@@ -653,8 +653,8 @@ class ClassInfoTest extends IndexedTest
         ]);
 
         $this->assertEquals($data['return'], [
-            'type'         => null,
-            'resolvedType' => null,
+            'type'         => 'Type4',
+            'resolvedType' => 'A\Type4',
             'description'  => null
         ]);
     }
