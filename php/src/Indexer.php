@@ -1008,7 +1008,7 @@ class Indexer
 
         foreach ($data['requiredParameters'] as $parameterName => $parameter) {
             $parameters[] = [
-                'name'        => $parameterName,
+                'name'        => mb_substr($parameterName, 1), // Strip off the dollar sign.
                 'type'        => $parameter['type'],
                 'fullType'    => $parameter['type'],
                 'isReference' => false,
@@ -1019,7 +1019,7 @@ class Indexer
 
         foreach ($data['optionalParameters'] as $parameterName => $parameter) {
             $parameters[] = [
-                'name'        => $parameterName,
+                'name'        => mb_substr($parameterName, 1), // Strip off the dollar sign.
                 'type'        => $parameter['type'],
                 'fullType'    => $parameter['type'],
                 'isReference' => false,

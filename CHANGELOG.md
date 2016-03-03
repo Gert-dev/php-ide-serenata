@@ -1,5 +1,6 @@
 ## 0.7.0
 ### Bugs fixed
+* Parameter names for magic methods no longer contain a dollar sign (consistent with everything else).
 * The use of `{@inheritDoc}` to extend long descriptions will now also work for child classes and extending interfaces.
 * Some non-standard behavior has been removed that may or may not be noticable to users:
   * Constants in traits will no longer be picked up (PHP error).

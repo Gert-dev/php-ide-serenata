@@ -698,7 +698,7 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['parameters'], [
             [
-                'name'        => '$a,',
+                'name'        => 'a,',
                 'type'        => null,
                 'fullType'    => null,
                 'description' => null,
@@ -708,7 +708,7 @@ class ClassInfoTest extends IndexedTest
             ],
 
             // [
-            //     'name'        => '$b,',
+            //     'name'        => 'b,',
             //     'type'        => null,
             //     'fullType'    => null,
             //     'description' => null,
@@ -718,7 +718,7 @@ class ClassInfoTest extends IndexedTest
             // ],
 
             [
-                'name'        => '$c',
+                'name'        => 'c',
                 'type'        => 'array',
                 'fullType'    => 'array',
                 'description' => null,
@@ -728,7 +728,7 @@ class ClassInfoTest extends IndexedTest
             ],
 
             [
-                'name'        => '$d',
+                'name'        => 'd',
                 'type'        => '\DateTime',
                 'fullType'    => '\DateTime',
                 'description' => null,
