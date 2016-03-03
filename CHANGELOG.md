@@ -1,7 +1,7 @@
 ## 0.7.0
 ### Bugs fixed
+* Return types for magic properties were not being fetched at all.
 * Return types for magic methods were not being resolved relative to use statements or the namespace.
-* Return types for magic properties were not being resolved relative to use statements or the namespace.
 * Parameter names for magic methods no longer contain a dollar sign (consistent with everything else).
 * The use of `{@inheritDoc}` to extend long descriptions will now also work for child classes and extending interfaces.
 * Some non-standard behavior has been removed that may or may not be noticable to users:
