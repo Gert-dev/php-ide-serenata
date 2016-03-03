@@ -938,8 +938,7 @@ class Indexer
             $data = $this->adaptMagicPropertyData($propertyName, $propertyData);
 
             // Use the same line as the class definition, it matters for e.g. type resolution.
-            $data['startLine'] = $rawData['startLine'];
-            $data['endLine']   = $rawData['endLine'];
+            $data['startLine'] = $data['endLine'] = $rawData['startLine'];
 
             $this->indexProperty(
                 $data,
@@ -956,8 +955,7 @@ class Indexer
             $data = $this->adaptMagicMethodData($methodName, $methodData);
 
             // Use the same line as the class definition, it matters for e.g. type resolution.
-            $data['startLine'] = $rawData['startLine'];
-            $data['endLine']   = $rawData['endLine'];
+            $data['startLine'] = $data['endLine'] = $rawData['startLine'];
 
             $this->indexFunction(
                 $data,
