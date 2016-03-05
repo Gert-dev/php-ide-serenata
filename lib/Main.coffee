@@ -31,6 +31,11 @@ module.exports =
     parser: null
 
     ###*
+     * Keeps track of files that are being indexed.
+    ###
+    indexMap: {}
+
+    ###*
      * The exposed service.
     ###
     service: null
@@ -160,6 +165,25 @@ module.exports =
         @service.reindex(fileName, source).then(successHandler, failureHandler)
 
     ###*
+     * Performs a file index, but only if the file is not currently already being indexed (otherwise silently returns).
+     *
+     * @param {string}      fileName The file to index.
+     * @param {string|null} source   The source code of the file to index.
+    ###
+    attemptFileIndex: (fileName, source = null) ->
+        return if fileName of @indexMap
+
+        @indexMap[fileName] = true
+
+        successHandler = () =>
+            delete @indexMap[fileName]
+
+        failureHandler = () =>
+            delete @indexMap[fileName]
+
+        @performFileIndex(fileName, source).then(successHandler, failureHandler)
+
+    ###*
      * Attaches items to the status bar.
      *
      * @param {mixed} statusBarService
@@ -248,7 +272,7 @@ module.exports =
         # Do not try to index files outside the project.
         if isContainedInProject
             @parser.clearCache(path)
-            @performFileIndex(path, editor.getBuffer().getText())
+            @attemptFileIndex(path, editor.getBuffer().getText())
 
     ###*
      * Deactivates the package.
