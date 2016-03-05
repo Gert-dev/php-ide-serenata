@@ -7,6 +7,7 @@
 * Fixed parameter names for magic methods containing a comma in some cases.
 * Fixed parameters for magic methods being incorrectly marked as being optional.
 * Return types for magic properties were not being fetched at all.
+* Fixed the indexing progress bar disappearing sometimes if you edited a file while it was busy.
 * Return types for magic methods were not being resolved relative to use statements or the namespace.
 * Parameter names for magic methods no longer contain a dollar sign (consistent with everything else).
 * Some non-standard behavior has been removed that may or may not be noticable to users:

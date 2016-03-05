@@ -71,7 +71,7 @@ module.exports =
         fs = require 'fs'
 
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
-            return @performIndex()
+            return @performProjectIndex()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
             try
@@ -80,7 +80,7 @@ module.exports =
             catch error
                 # If the file doesn't exist, just bail out.
 
-            return @performIndex()
+            return @performProjectIndex()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
             return unless @testConfig()
@@ -94,35 +94,29 @@ module.exports =
     ###
     registerConfigListeners: () ->
         @configuration.onDidChange 'phpCommand', () =>
-            @performIndex()
+            @performProjectIndex()
 
     ###*
-     * Indexes a file aynschronously.
-     *
-     * @param {string|null} fileName The file to index, or null to index the entire project.
-     * @param {string|null} source   The source code of the file to index.
+     * Indexes the project aynschronously.
     ###
-    performIndex: (fileName = null, source = null) ->
+    performProjectIndex: () ->
         timerName = @packageName + " - Project indexing"
-        isProjectIndex = if not fileName? then true else false
 
-        if isProjectIndex
-            console.time(timerName);
+        console.time(timerName);
 
-            fileName = atom.project.getDirectories()[0]?.path
+        projectPath = atom.project.getDirectories()[0]?.path
 
-            if @statusBarManager
-                @statusBarManager.setLabel("Indexing...")
-                @statusBarManager.setProgress(null)
-                @statusBarManager.show()
+        if @statusBarManager
+            @statusBarManager.setLabel("Indexing...")
+            @statusBarManager.setProgress(null)
+            @statusBarManager.show()
 
         successHandler = () =>
             if @statusBarManager
                 @statusBarManager.setLabel("Indexing completed!")
                 @statusBarManager.hide()
 
-            if isProjectIndex
-                console.timeEnd(timerName);
+            console.timeEnd(timerName);
 
         failureHandler = () =>
             if @statusBarManager
@@ -137,17 +131,6 @@ module.exports =
                     @statusBarManager.setProgress(progress)
                     @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        if fileName
-            @proxy.setIndexDatabaseName(@getIndexDatabaseName())
-
-            @service.reindex(fileName, source, progressHandler).then(successHandler, failureHandler)
-
-    ###*
-     * Retrieves the name of the database file to use.
-     *
-     * @return {string}
-    ###
-    getIndexDatabaseName: () ->
         pathStrings = ''
 
         for i,project of atom.project.getDirectories()
@@ -155,7 +138,26 @@ module.exports =
 
         md5 = require 'md5'
 
-        return md5(pathStrings)
+        indexDatabaseName = md5(pathStrings)
+
+        @proxy.setIndexDatabaseName(indexDatabaseName)
+
+        @service.reindex(projectPath, null, progressHandler).then(successHandler, failureHandler)
+
+    ###*
+     * Indexes a file aynschronously.
+     *
+     * @param {string}      fileName The file to index.
+     * @param {string|null} source   The source code of the file to index.
+    ###
+    performFileIndex: (fileName, source = null) ->
+        successHandler = () =>
+            return
+
+        failureHandler = () =>
+            return
+
+        @service.reindex(fileName, source).then(successHandler, failureHandler)
 
     ###*
      * Attaches items to the status bar.
@@ -208,13 +210,13 @@ module.exports =
         # In rare cases, the package is loaded faster than the project gets a chance to load. At that point, no project
         # directory is returned. The onDidChangePaths listener below will also catch that case.
         if atom.project.getDirectories().length > 0
-            @performIndex()
+            @performProjectIndex()
 
         atom.project.onDidChangePaths (projectPaths) =>
             # NOTE: This listener is also invoked at shutdown with an empty array as argument, this makes sure we don't
             # try to reindex then.
             if projectPaths.length > 0
-                @performIndex()
+                @performProjectIndex()
 
         atom.workspace.observeTextEditors (editor) =>
             # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
@@ -246,7 +248,7 @@ module.exports =
         # Do not try to index files outside the project.
         if isContainedInProject
             @parser.clearCache(path)
-            @performIndex(path, editor.getBuffer().getText())
+            @performFileIndex(path, editor.getBuffer().getText())
 
     ###*
      * Deactivates the package.
