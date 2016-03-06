@@ -2,6 +2,10 @@
 
 namespace PhpIntegrator;
 
+use ArrayAccess;
+use ArrayObject;
+use Traversable;
+
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
  */
@@ -50,18 +54,16 @@ class IndexDataAdapter
     /**
      * Resolves structural element information from the specified raw data.
      *
-     * @param array|\Traversable $element
-     * @param array|\Traversable $parents
-     * @param array|\Traversable $children
-     * @param array|\Traversable $interfaces
-     * @param array|\Traversable $implementors
-     * @param array|\Traversable $traits
-     * @param array|\Traversable $traitUsers
-     * @param array|\Traversable $constants
-     * @param array|\Traversable $properties
-     * @param array|\Traversable $methods
-     *
-     * @todo Could mayhaps benefit from some refactoring...
+     * @param array|ArrayAccess $element
+     * @param array|Traversable $parents
+     * @param array|Traversable $children
+     * @param array|Traversable $interfaces
+     * @param array|Traversable $implementors
+     * @param array|Traversable $traits
+     * @param array|Traversable $traitUsers
+     * @param array|Traversable $constants
+     * @param array|Traversable $properties
+     * @param array|Traversable $methods
      *
      * @return array
      */
@@ -77,7 +79,7 @@ class IndexDataAdapter
         $properties,
         $methods
     ) {
-        $result = [
+        $result = new ArrayObject([
             'name'               => $element['fqsen'],
             'startLine'          => (int) $element['start_line'],
             'endLine'            => (int) $element['end_line'],
@@ -107,22 +109,240 @@ class IndexDataAdapter
             'constants'          => [],
             'properties'         => [],
             'methods'            => []
-        ];
+        ]);
 
+        $this->parseChildrenData($result, $children);
+        $this->parseImplementorsData($result, $implementors);
+        $this->parseTraitUsersData($result, $traitUsers);
+
+        $this->parseParentData($result, $parents);
+        $this->parseInterfaceData($result, $interfaces);
+        $this->parseTraitData($result, $traits, $element);
+
+        $this->parseConstantData($result, $constants, $element);
+        $this->parsePropertyData($result, $properties, $element);
+        $this->parseMethodData($result, $methods, $element);
+
+        $this->resolveReturnTypes($result, $element['fqsen']);
+
+        return $result->getArrayCopy();
+    }
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $constants
+     * @param array|ArrayAccess $element
+     */
+    protected function parseConstantData(ArrayObject $result, $constants, $element)
+    {
+        foreach ($constants as $rawConstantData) {
+            $result['constants'][$rawConstantData['name']] = array_merge($this->getConstantInfo($rawConstantData), [
+                'declaringClass' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => (int) $element['start_line'],
+                    'endLine'         => (int) $element['end_line'],
+                    'type'            => $element['type_name'],
+                ],
+
+                'declaringStructure' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => (int) $element['start_line'],
+                    'endLine'         => (int) $element['end_line'],
+                    'type'            => $element['type_name'],
+                    'startLineMember' => (int) $rawConstantData['start_line'],
+                    'endLineMember'   => (int) $rawConstantData['end_line']
+                ]
+            ]);
+        }
+    }
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $properties
+     * @param array|ArrayAccess $element
+     */
+    protected function parsePropertyData(ArrayObject $result, $properties, $element)
+    {
+        foreach ($properties as $rawPropertyData) {
+            $inheritedData = [];
+            $existingProperty = null;
+            $overriddenPropertyData = null;
+
+            $property = $this->getPropertyInfo($rawPropertyData);
+
+            if (isset($result['properties'][$property['name']])) {
+                $existingProperty = $result['properties'][$property['name']];
+
+                $overriddenPropertyData = [
+                    'declaringClass'     => $existingProperty['declaringClass'],
+                    'declaringStructure' => $existingProperty['declaringStructure'],
+                    'startLine'          => (int) $existingProperty['startLine'],
+                    'endLine'            => (int) $existingProperty['endLine']
+                ];
+
+                if ($this->isInheritingDocumentation($property)) {
+                    $inheritedData = $this->extractInheritedPropertyInfo($existingProperty);
+                }
+            }
+
+            $resultingProperty = array_merge($property, $inheritedData, [
+                'override'       => $overriddenPropertyData,
+
+                'declaringClass' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => (int) $element['start_line'],
+                    'endLine'         => (int) $element['end_line'],
+                    'type'            => $element['type_name'],
+                ],
+
+                'declaringStructure' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => (int) $element['start_line'],
+                    'endLine'         => (int) $element['end_line'],
+                    'type'            => $element['type_name'],
+                    'startLineMember' => (int) $rawPropertyData['start_line'],
+                    'endLineMember'   => (int) $rawPropertyData['end_line']
+                ]
+            ]);
+
+            if ($resultingProperty['return']['type'] === 'self') {
+                $resultingProperty['return']['resolvedType'] = $element['fqsen'];
+            }
+
+            if ($existingProperty) {
+                $resultingProperty['descriptions']['long'] = $this->resolveInheritDoc(
+                    $resultingProperty['descriptions']['long'],
+                    $existingProperty['descriptions']['long']
+                );
+            }
+
+            $result['properties'][$property['name']] = $resultingProperty;
+        }
+    }
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $methods
+     * @param array|ArrayAccess $element
+     */
+    protected function parseMethodData(ArrayObject $result, $methods, $element)
+    {
+        foreach ($methods as $rawMethodData) {
+            $inheritedData = [];
+            $existingMethod = null;
+            $overriddenMethodData = null;
+            $implementedMethodData = null;
+
+            $method = $this->getMethodInfo($rawMethodData);
+
+            if (isset($result['methods'][$method['name']])) {
+                $existingMethod = $result['methods'][$method['name']];
+
+                if ($existingMethod['declaringStructure']['type'] === 'interface') {
+                    $implementedMethodData = [
+                        'declaringClass'     => $existingMethod['declaringClass'],
+                        'declaringStructure' => $existingMethod['declaringStructure'],
+                        'startLine'          => (int) $existingMethod['startLine'],
+                        'endLine'            => (int) $existingMethod['endLine']
+                    ];
+                } else {
+                    $overriddenMethodData = [
+                        'declaringClass'     => $existingMethod['declaringClass'],
+                        'declaringStructure' => $existingMethod['declaringStructure'],
+                        'startLine'          => (int) $existingMethod['startLine'],
+                        'endLine'            => (int) $existingMethod['endLine']
+                    ];
+                }
+
+                if ($this->isInheritingDocumentation($method)) {
+                    $inheritedData = $this->extractInheritedMethodInfo($existingMethod);
+                }
+            }
+
+            $resultingMethod = array_merge($method, $inheritedData, [
+                'override'       => $overriddenMethodData,
+                'implementation' => $implementedMethodData,
+
+                'declaringClass' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => (int) $element['start_line'],
+                    'endLine'         => (int) $element['end_line'],
+                    'type'            => $element['type_name'],
+                ],
+
+                'declaringStructure' => [
+                    'name'            => $element['fqsen'],
+                    'filename'        => $element['path'],
+                    'startLine'       => (int) $element['start_line'],
+                    'endLine'         => (int) $element['end_line'],
+                    'type'            => $element['type_name'],
+                    'startLineMember' => (int) $rawMethodData['start_line'],
+                    'endLineMember'   => (int) $rawMethodData['end_line']
+                ]
+            ]);
+
+            if ($resultingMethod['return']['type'] === 'self') {
+                $resultingMethod['return']['resolvedType'] = $element['fqsen'];
+            }
+
+            if ($existingMethod) {
+                $resultingMethod['descriptions']['long'] = $this->resolveInheritDoc(
+                    $resultingMethod['descriptions']['long'],
+                    $existingMethod['descriptions']['long']
+                );
+            }
+
+            $result['methods'][$method['name']] = $resultingMethod;
+        }
+    }
+
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $children
+     */
+    protected function parseChildrenData(ArrayObject $result, $children)
+    {
         foreach ($children as $child) {
             $result['directChildren'][] = $child['fqsen'];
         }
+    }
 
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $implementors
+     */
+    protected function parseImplementorsData(ArrayObject $result, $implementors)
+    {
         foreach ($implementors as $implementor) {
             $result['directImplementors'][] = $implementor['fqsen'];
         }
+    }
 
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $traitUsers
+     */
+    protected function parseTraitUsersData(ArrayObject $result, $traitUsers)
+    {
         foreach ($traitUsers as $trait) {
             $result['directTraitUsers'][] = $trait['fqsen'];
         }
+    }
 
-        // Take all members from the base class as a starting point. Note that there can only be multiple base classes
-        // for interfaces.
+    /**
+     * Takes all members from base classes and attaches them to the result data.
+     *
+     * @param ArrayObject       $result
+     * @param array|Traversable $parents One or more base classes to inherit from (interfaces can have multiple parents).
+     */
+    protected function parseParentData(ArrayObject $result, $parents)
+    {
         foreach ($parents as $parent) {
             $parentInfo = $this->getStructuralElementInfo($parent['id']);
 
@@ -151,9 +371,17 @@ class IndexDataAdapter
                 $result['directParents'][] = $parentInfo['name'];
             }
         }
+    }
 
-        // Append members from direct interfaces to the pool of members. These only supply additional members, but will
-        // never overwrite any existing members as they have a lower priority than inherited members.
+    /**
+     * Appends members from direct interfaces to the pool of members. These only supply additional members, but will
+     * never overwrite any existing members as they have a lower priority than inherited members.
+     *
+     * @param ArrayObject       $result
+     * @param array|Traversable $interfaces
+     */
+    protected function parseInterfaceData(ArrayObject $result, $interfaces)
+    {
         foreach ($interfaces as $interface) {
             $interface = $this->getStructuralElementInfo($interface['id']);
 
@@ -172,7 +400,17 @@ class IndexDataAdapter
                 }
             }
         }
+    }
 
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $traits
+     * @param array             $element
+     *
+     * @return array
+     */
+    protected function parseTraitData(ArrayObject $result, Traversable $traits, $element)
+    {
         $traitAliases = $this->storage->getStructuralElementTraitAliasesAssoc($element['id']);
         $traitPrecedences = $this->storage->getStructuralElementTraitPrecedencesAssoc($element['id']);
 
@@ -267,160 +505,17 @@ class IndexDataAdapter
                 $result['methods'][$method['name']] = $resultingMethod;
             }
         }
+    }
 
-        foreach ($constants as $rawConstantData) {
-            $result['constants'][$rawConstantData['name']] = array_merge($this->getConstantInfo($rawConstantData), [
-                'declaringClass' => [
-                    'name'            => $element['fqsen'],
-                    'filename'        => $element['path'],
-                    'startLine'       => (int) $element['start_line'],
-                    'endLine'         => (int) $element['end_line'],
-                    'type'            => $element['type_name'],
-                ],
-
-                'declaringStructure' => [
-                    'name'            => $element['fqsen'],
-                    'filename'        => $element['path'],
-                    'startLine'       => (int) $element['start_line'],
-                    'endLine'         => (int) $element['end_line'],
-                    'type'            => $element['type_name'],
-                    'startLineMember' => (int) $rawConstantData['start_line'],
-                    'endLineMember'   => (int) $rawConstantData['end_line']
-                ]
-            ]);
-        }
-
-        foreach ($properties as $rawPropertyData) {
-            $inheritedData = [];
-            $existingProperty = null;
-            $overriddenPropertyData = null;
-
-            $property = $this->getPropertyInfo($rawPropertyData);
-
-            if (isset($result['properties'][$property['name']])) {
-                $existingProperty = $result['properties'][$property['name']];
-
-                $overriddenPropertyData = [
-                    'declaringClass'     => $existingProperty['declaringClass'],
-                    'declaringStructure' => $existingProperty['declaringStructure'],
-                    'startLine'          => (int) $existingProperty['startLine'],
-                    'endLine'            => (int) $existingProperty['endLine']
-                ];
-
-                if ($this->isInheritingDocumentation($property)) {
-                    $inheritedData = $this->extractInheritedPropertyInfo($existingProperty);
-                }
-            }
-
-            $resultingProperty = array_merge($property, $inheritedData, [
-                'override'       => $overriddenPropertyData,
-
-                'declaringClass' => [
-                    'name'            => $element['fqsen'],
-                    'filename'        => $element['path'],
-                    'startLine'       => (int) $element['start_line'],
-                    'endLine'         => (int) $element['end_line'],
-                    'type'            => $element['type_name'],
-                ],
-
-                'declaringStructure' => [
-                    'name'            => $element['fqsen'],
-                    'filename'        => $element['path'],
-                    'startLine'       => (int) $element['start_line'],
-                    'endLine'         => (int) $element['end_line'],
-                    'type'            => $element['type_name'],
-                    'startLineMember' => (int) $rawPropertyData['start_line'],
-                    'endLineMember'   => (int) $rawPropertyData['end_line']
-                ]
-            ]);
-
-            if ($resultingProperty['return']['type'] === 'self') {
-                $resultingProperty['return']['resolvedType'] = $element['fqsen'];
-            }
-
-            if ($existingProperty) {
-                $resultingProperty['descriptions']['long'] = $this->resolveInheritDoc(
-                    $resultingProperty['descriptions']['long'],
-                    $existingProperty['descriptions']['long']
-                );
-            }
-
-            $result['properties'][$property['name']] = $resultingProperty;
-        }
-
-        foreach ($methods as $rawMethodData) {
-            $inheritedData = [];
-            $existingMethod = null;
-            $overriddenMethodData = null;
-            $implementedMethodData = null;
-
-            $method = $this->getMethodInfo($rawMethodData);
-
-            if (isset($result['methods'][$method['name']])) {
-                $existingMethod = $result['methods'][$method['name']];
-
-                if ($existingMethod['declaringStructure']['type'] === 'interface') {
-                    $implementedMethodData = [
-                        'declaringClass'     => $existingMethod['declaringClass'],
-                        'declaringStructure' => $existingMethod['declaringStructure'],
-                        'startLine'          => (int) $existingMethod['startLine'],
-                        'endLine'            => (int) $existingMethod['endLine']
-                    ];
-                } else {
-                    $overriddenMethodData = [
-                        'declaringClass'     => $existingMethod['declaringClass'],
-                        'declaringStructure' => $existingMethod['declaringStructure'],
-                        'startLine'          => (int) $existingMethod['startLine'],
-                        'endLine'            => (int) $existingMethod['endLine']
-                    ];
-                }
-
-                if ($this->isInheritingDocumentation($method)) {
-                    $inheritedData = $this->extractInheritedMethodInfo($existingMethod);
-                }
-            }
-
-            $resultingMethod = array_merge($method, $inheritedData, [
-                'override'       => $overriddenMethodData,
-                'implementation' => $implementedMethodData,
-
-                'declaringClass' => [
-                    'name'            => $element['fqsen'],
-                    'filename'        => $element['path'],
-                    'startLine'       => (int) $element['start_line'],
-                    'endLine'         => (int) $element['end_line'],
-                    'type'            => $element['type_name'],
-                ],
-
-                'declaringStructure' => [
-                    'name'            => $element['fqsen'],
-                    'filename'        => $element['path'],
-                    'startLine'       => (int) $element['start_line'],
-                    'endLine'         => (int) $element['end_line'],
-                    'type'            => $element['type_name'],
-                    'startLineMember' => (int) $rawMethodData['start_line'],
-                    'endLineMember'   => (int) $rawMethodData['end_line']
-                ]
-            ]);
-
-            if ($resultingMethod['return']['type'] === 'self') {
-                $resultingMethod['return']['resolvedType'] = $element['fqsen'];
-            }
-
-            if ($existingMethod) {
-                $resultingMethod['descriptions']['long'] = $this->resolveInheritDoc(
-                    $resultingMethod['descriptions']['long'],
-                    $existingMethod['descriptions']['long']
-                );
-            }
-
-            $result['methods'][$method['name']] = $resultingMethod;
-        }
-
-        // Resolve return types.
+    /**
+     * @param ArrayObject $result
+     * @param string      $elementFqsen
+     */
+    protected function resolveReturnTypes(ArrayObject $result, $elementFqsen)
+    {
         foreach ($result['methods'] as $name => &$method) {
             if ($method['return']['type'] === '$this' || $method['return']['type'] === 'static') {
-                $method['return']['resolvedType'] = $element['fqsen'];
+                $method['return']['resolvedType'] = $elementFqsen;
             } elseif (!isset($method['return']['resolvedType'])) {
                 $method['return']['resolvedType'] = $method['return']['type'];
             }
@@ -428,13 +523,11 @@ class IndexDataAdapter
 
         foreach ($result['properties'] as $name => &$property) {
             if ($property['return']['type'] === '$this' || $property['return']['type'] === 'static') {
-                $property['return']['resolvedType'] = $element['fqsen'];
+                $property['return']['resolvedType'] = $elementFqsen;
             } elseif (!isset($property['return']['resolvedType'])) {
                 $property['return']['resolvedType'] = $property['return']['type'];
             }
         }
-
-        return $result;
     }
 
     /**
