@@ -301,7 +301,6 @@ class IndexDataAdapter
         }
     }
 
-
     /**
      * @param ArrayObject       $result
      * @param array|Traversable $children
