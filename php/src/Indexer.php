@@ -182,6 +182,8 @@ class Indexer
      */
     public function indexFile($filePath, $code = null)
     {
+        $this->storage->beginTransaction();
+
         try {
             $code = $code ?: @file_get_contents($filePath);
 
@@ -190,7 +192,11 @@ class Indexer
             }
 
             $this->indexFileOutline($filePath, $code);
+
+            $this->storage->commitTransaction();
         } catch (Error $e) {
+            $this->storage->rollbackTransaction();
+
             throw new Indexer\IndexingFailedException([
                 [
                     'file'        => $filePath,

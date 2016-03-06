@@ -38,7 +38,6 @@ interface StorageInterface
      */
     public function getFileId($path);
 
-
     /**
      * Retrieves the ID of the structural element with the specified FQSEN.
      *
@@ -129,4 +128,13 @@ interface StorageInterface
      * @param array     $data
      */
     public function update($indexStorageItem, $id, array $data);
+
+    /// @inherited
+    public function beginTransaction();
+
+    /// @inherited
+    public function commitTransaction();
+
+    /// @inherited
+    public function rollbackTransaction();
 }

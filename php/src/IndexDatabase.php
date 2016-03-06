@@ -727,4 +727,28 @@ class IndexDatabase implements
 
         return $queryBuilder->execute();
     }
+
+    /**
+     * Starts a transaction.
+     */
+    public function beginTransaction()
+    {
+        $this->getConnection()->beginTransaction();
+    }
+
+    /**
+     * Commits a transaction.
+     */
+    public function commitTransaction()
+    {
+        $this->getConnection()->commit();
+    }
+
+    /**
+     * Rolls back a transaction.
+     */
+    public function rollbackTransaction()
+    {
+        $this->getConnection()->rollBack();
+    }
 }
