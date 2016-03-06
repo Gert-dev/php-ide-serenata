@@ -1,6 +1,7 @@
 ## 0.7.0
 ### Features and enhancements
 * The use of `{@inheritDoc}` to extend long descriptions will now also work for child classes and extending interfaces.
+* Indexing will now respond less aggressively to changes in the buffer. Instead of spawning an indexing process unconditionally each time a file stops changing (after a couple hundred milliseconds), an indexing process will now only be spawned as soon as the previous one finishes. In essence, if an indexing process is already running, the indexer holds on to the changes and issues a reindex as soon as the previous one finishes. If a file takes very long to index and at this point you make multiple changes to the same file, only the last version will be reindexed (i.e. reindexing actions are not actually queued and the indexer does not need to catch up on a possibly long list of changes).
 
 ### Bugs fixed
 * Fixed some parameters of magic methods not showing up at all.

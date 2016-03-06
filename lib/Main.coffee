@@ -171,15 +171,32 @@ module.exports =
      * @param {string|null} source   The source code of the file to index.
     ###
     attemptFileIndex: (fileName, source = null) ->
-        return if fileName of @indexMap
+        if fileName not of @indexMap
+            @indexMap[fileName] = {
+                isBeingIndexed  : true
+                nextIndexSource : null
+            }
 
-        @indexMap[fileName] = true
+        else if @indexMap[fileName].isBeingIndexed
+            # This file is already being indexed, so keep track of the most recent changes so we can index any changes
+            # after the current indexing process finishes.
+            @indexMap[fileName].nextIndexSource = source
+            return
 
-        successHandler = () =>
-            delete @indexMap[fileName]
+        @indexMap[fileName].isBeingIndexed = true
 
-        failureHandler = () =>
-            delete @indexMap[fileName]
+        handler = () =>
+            @indexMap[fileName].isBeingIndexed = false
+
+            if @indexMap[fileName].nextIndexSource?
+                nextIndexSource = @indexMap[fileName].nextIndexSource
+
+                @indexMap[fileName].nextIndexSource = null
+
+                @attemptFileIndex(fileName, nextIndexSource)
+
+        successHandler = handler
+        failureHandler = handler
 
         @performFileIndex(fileName, source).then(successHandler, failureHandler)
 
