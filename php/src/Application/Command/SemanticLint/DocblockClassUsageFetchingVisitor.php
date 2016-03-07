@@ -36,18 +36,25 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
 
             foreach ($matches as $match) {
                 if ($this->isValidType($match[1])) {
-                    $parts = explode('\\', $match[1]);
+                    $type = $match[1];
+                    $parts = explode('\\', $type);
                     $firstPart = array_shift($parts);
-                    $firstCharacter = !empty($firstPart) ? $firstPart[0] : null;
+
+                    $isFullyQualified = false;
+
+                    if (!empty($type) && $type[0] === '\\') {
+                        $isFullyQualified = true;
+                        $type = mb_substr($type, 1);
+                    }
 
                     // NOTE: We use the same start position as end position as we can't fetch the location of the
                     // docblock from the parser.
                     // TODO: This could potentially be done using some magic with token fetching or walking backwards
                     // from the node itself to find the docblock and then calculating the position inside the docblock.
                     $this->classUsageList[] = [
-                        'name'             => $match[1],
+                        'name'             => $type,
                         'firstPart'        => $firstPart,
-                        'isFullyQualified' => $firstCharacter === '\\',
+                        'isFullyQualified' => $isFullyQualified,
                         'namespace'        => $this->lastNamespace,
                         'line'             => $node->getAttribute('startLine')    ? $node->getAttribute('startLine')        : null,
                         'start'            => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')     : null,

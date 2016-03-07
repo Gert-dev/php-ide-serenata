@@ -76,8 +76,8 @@ class SemanticLintTest extends IndexedTest
             [
                 'name'      => 'DateTime',
                 'namespace' => 'A',
-                'start'     => 103,
-                'end'       => 104
+                'start'     => 124,
+                'end'       => 125
             ]
         ]);
     }
