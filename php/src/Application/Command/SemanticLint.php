@@ -83,10 +83,12 @@ class SemanticLint extends BaseCommand
 
         $classUsageFetchingVisitor = new SemanticLint\ClassUsageFetchingVisitor();
         $useStatementFetchingVisitor = new SemanticLint\UseStatementFetchingVisitor();
+        $docblockClassUsageFetchingVisitor = new SemanticLint\DocblockClassUsageFetchingVisitor();
 
         $traverser = new NodeTraverser(false);
         $traverser->addVisitor($classUsageFetchingVisitor);
         $traverser->addVisitor($useStatementFetchingVisitor);
+        $traverser->addVisitor($docblockClassUsageFetchingVisitor);
         $traverser->traverse($nodes);
 
         // Generate a class map for fast lookups.
@@ -103,7 +105,12 @@ class SemanticLint extends BaseCommand
         $resolveTypeCommand = new ResolveType();
         $resolveTypeCommand->setIndexDatabase($this->indexDatabase);
 
-        foreach ($classUsageFetchingVisitor->getClassUsageList() as $classUsage) {
+        $classUsage = array_merge(
+            $classUsageFetchingVisitor->getClassUsageList(),
+            $docblockClassUsageFetchingVisitor->getClassUsageList()
+        );
+
+        foreach ($classUsage as $classUsage) {
             $relevantAlias = $classUsage['firstPart'];
 
             if (!$classUsage['isFullyQualified'] && isset($namespaces[$classUsage['namespace']]['useStatements'][$relevantAlias])) {
@@ -159,7 +166,7 @@ class SemanticLint extends BaseCommand
         if (!$this->parser) {
             $lexer = new Lexer([
                 'usedAttributes' => [
-                    'startLine', 'startFilePos', 'endFilePos'
+                    'comments', 'startLine', 'startFilePos', 'endFilePos'
                 ]
             ]);
 

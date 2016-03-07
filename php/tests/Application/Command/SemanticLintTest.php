@@ -68,6 +68,20 @@ class SemanticLintTest extends IndexedTest
         ]);
     }
 
+    public function testReportsUnknownClassesInDocBlocks()
+    {
+        $output = $this->lintFile('UnknownClassesDocblock.php');
+
+        $this->assertEquals($output['errors']['unknownClasses'], [
+            [
+                'name'      => 'DateTime',
+                'namespace' => 'A',
+                'start'     => 46,
+                'end'       => 47
+            ]
+        ]);
+    }
+
     public function testReportsUnusedUseStatementsWithSingleNamespace()
     {
         $output = $this->lintFile('UnusedUseStatementsSingleNamespace.php');
@@ -103,19 +117,19 @@ class SemanticLintTest extends IndexedTest
         ]);
     }
 
-    // public function testSeesUseStatementsAsUsedIfTheyAppearInComments()
-    // {
-    //     $output = $this->lintFile('UnusedUseStatementsMultipleNamespaces.php');
-    //
-    //     $this->assertEquals($output['warnings']['unusedUseStatements'], [
-    //         [
-    //             'name'  => 'SplMinHeap',
-    //             'alias' => 'SplMinHeap',
-    //             'start' => 47,
-    //             'end'   => 58
-    //         ]
-    //     ]);
-    // }
+    public function testSeesUseStatementsAsUsedIfTheyAppearInComments()
+    {
+        $output = $this->lintFile('UnusedUseStatementsDocblock.php');
+
+        $this->assertEquals($output['warnings']['unusedUseStatements'], [
+            [
+                'name'  => 'SplMinHeap',
+                'alias' => 'SplMinHeap',
+                'start' => 39,
+                'end'   => 49
+            ]
+        ]);
+    }
 
     /**
      * @expectedException \UnexpectedValueException
