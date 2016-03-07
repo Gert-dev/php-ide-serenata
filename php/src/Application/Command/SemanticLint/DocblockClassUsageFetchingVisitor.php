@@ -57,4 +57,12 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
             }
         }
     }
+
+    /// @inherited
+    protected function isValidType($type)
+    {
+        return parent::isValidType($type) && !in_array($type, [
+            'int', 'float', 'string', 'bool', 'resource', 'array', 'mixed'
+        ]);
+    }
 }
