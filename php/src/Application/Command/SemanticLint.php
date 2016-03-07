@@ -82,9 +82,11 @@ class SemanticLint extends BaseCommand
         }
 
         $classUsageFetchingVisitor = new SemanticLint\ClassUsageFetchingVisitor();
+        $useStatementFetchingVisitor = new SemanticLint\UseStatementFetchingVisitor();
 
         $traverser = new NodeTraverser(false);
         $traverser->addVisitor($classUsageFetchingVisitor);
+        $traverser->addVisitor($useStatementFetchingVisitor);
         $traverser->traverse($nodes);
 
         // Generate a class map for fast lookups.
@@ -96,7 +98,7 @@ class SemanticLint extends BaseCommand
 
         // Cross-reference the found class names against the class map.
         $unknownClasses = [];
-        $namespaces = $classUsageFetchingVisitor->getNamespaces();
+        $namespaces = $useStatementFetchingVisitor->getNamespaces();
 
         $resolveTypeCommand = new ResolveType();
         $resolveTypeCommand->setIndexDatabase($this->indexDatabase);
