@@ -103,6 +103,20 @@ class SemanticLintTest extends IndexedTest
         ]);
     }
 
+    // public function testSeesUseStatementsAsUsedIfTheyAppearInComments()
+    // {
+    //     $output = $this->lintFile('UnusedUseStatementsMultipleNamespaces.php');
+    //
+    //     $this->assertEquals($output['warnings']['unusedUseStatements'], [
+    //         [
+    //             'name'  => 'SplMinHeap',
+    //             'alias' => 'SplMinHeap',
+    //             'start' => 47,
+    //             'end'   => 58
+    //         ]
+    //     ]);
+    // }
+
     /**
      * @expectedException \UnexpectedValueException
      */
