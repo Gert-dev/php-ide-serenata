@@ -31,13 +31,6 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
      */
     public function __construct()
     {
-        $this->namespaces[null] = [
-            'name'          => null,
-            'startLine'     => 0,
-            'endLine'       => null,
-            'useStatements' => []
-        ];
-
         $this->lastNamespace = null;
     }
 
