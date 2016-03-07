@@ -46,6 +46,11 @@ module.exports =
     statusBarManager: null
 
     ###*
+     * Whether project indexing is currently happening.
+    ###
+    isProjectIndexBusy: false
+
+    ###*
      * Tests the user's configuration.
      *
      * @return {boolean}
@@ -73,19 +78,11 @@ module.exports =
      * Registers any commands that are available to the user.
     ###
     registerCommands: () ->
-        fs = require 'fs'
-
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
-            return @performProjectIndex()
+            return @attemptProjectIndex()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
-            try
-                fs.unlinkSync(@proxy.getIndexDatabasePath())
-
-            catch error
-                # If the file doesn't exist, just bail out.
-
-            return @performProjectIndex()
+            return @attemptForceProjectIndex()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
             return unless @testConfig()
@@ -99,10 +96,12 @@ module.exports =
     ###
     registerConfigListeners: () ->
         @configuration.onDidChange 'phpCommand', () =>
-            @performProjectIndex()
+            @attemptProjectIndex()
 
     ###*
      * Indexes the project aynschronously.
+     *
+     * @return {Promise}
     ###
     performProjectIndex: () ->
         timerName = @packageName + " - Project indexing"
@@ -147,13 +146,60 @@ module.exports =
 
         @proxy.setIndexDatabaseName(indexDatabaseName)
 
-        @service.reindex(projectPath, null, progressHandler).then(successHandler, failureHandler)
+        return @service.reindex(projectPath, null, progressHandler).then(successHandler, failureHandler)
+
+    ###*
+     * Performs a project index, but only if one is not currently already happening.
+     *
+     * @return {Promise|null}
+    ###
+    attemptProjectIndex: () ->
+        return null if @isProjectIndexBusy
+
+        @isProjectIndexBusy = true
+
+        handler = () =>
+            @isProjectIndexBusy = false
+
+        successHandler = handler
+        failureHandler = handler
+
+        @performProjectIndex().then(successHandler, failureHandler)
+
+    ###*
+     * Forcibly indexes the project in its entirety by removing the existing indexing database first.
+     *
+     * @return {Promise|null}
+    ###
+    forceProjectIndex: () ->
+        fs = require 'fs'
+
+        try
+            fs.unlinkSync(@proxy.getIndexDatabasePath())
+
+        catch error
+            # If the file doesn't exist, just bail out.
+
+        return @attemptProjectIndex()
+
+    ###*
+     * Forcibly indexes the project in its entirety by removing the existing indexing database first, but only if a
+     * project indexing operation is not already busy.
+     *
+     * @return {Promise|null}
+    ###
+    attemptForceProjectIndex: () ->
+        return null if @isProjectIndexBusy
+
+        return @forceProjectIndex()
 
     ###*
      * Indexes a file aynschronously.
      *
      * @param {string}      fileName The file to index.
      * @param {string|null} source   The source code of the file to index.
+     *
+     * @return {Promise}
     ###
     performFileIndex: (fileName, source = null) ->
         successHandler = () =>
@@ -162,15 +208,19 @@ module.exports =
         failureHandler = () =>
             return
 
-        @service.reindex(fileName, source).then(successHandler, failureHandler)
+        return @service.reindex(fileName, source).then(successHandler, failureHandler)
 
     ###*
      * Performs a file index, but only if the file is not currently already being indexed (otherwise silently returns).
      *
      * @param {string}      fileName The file to index.
      * @param {string|null} source   The source code of the file to index.
+     *
+     * @return {Promise|null}
     ###
     attemptFileIndex: (fileName, source = null) ->
+        return null if @isProjectIndexBusy
+
         if fileName not of @indexMap
             @indexMap[fileName] = {
                 isBeingIndexed  : true
@@ -181,7 +231,7 @@ module.exports =
             # This file is already being indexed, so keep track of the most recent changes so we can index any changes
             # after the current indexing process finishes.
             @indexMap[fileName].nextIndexSource = source
-            return
+            return null
 
         @indexMap[fileName].isBeingIndexed = true
 
@@ -198,7 +248,7 @@ module.exports =
         successHandler = handler
         failureHandler = handler
 
-        @performFileIndex(fileName, source).then(successHandler, failureHandler)
+        return @performFileIndex(fileName, source).then(successHandler, failureHandler)
 
     ###*
      * Attaches items to the status bar.
@@ -251,13 +301,13 @@ module.exports =
         # In rare cases, the package is loaded faster than the project gets a chance to load. At that point, no project
         # directory is returned. The onDidChangePaths listener below will also catch that case.
         if atom.project.getDirectories().length > 0
-            @performProjectIndex()
+            @attemptProjectIndex()
 
         atom.project.onDidChangePaths (projectPaths) =>
             # NOTE: This listener is also invoked at shutdown with an empty array as argument, this makes sure we don't
             # try to reindex then.
             if projectPaths.length > 0
-                @performProjectIndex()
+                @attemptProjectIndex()
 
         atom.workspace.observeTextEditors (editor) =>
             # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
