@@ -275,10 +275,10 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
+        Parser        = require './Parser'
         Service       = require './Service'
         AtomConfig    = require './AtomConfig'
         CachingProxy  = require './CachingProxy'
-        CachingParser = require './CachingParser'
         {Emitter}     = require 'event-kit';
 
         @configuration = new AtomConfig(@packageName)
@@ -291,7 +291,7 @@ module.exports =
         @proxy = new CachingProxy(@configuration)
 
         emitter = new Emitter()
-        @parser = new CachingParser(@proxy)
+        @parser = new Parser(@proxy)
 
         @service = new Service(@proxy, @parser, emitter)
 
@@ -338,7 +338,6 @@ module.exports =
 
         # Do not try to index files outside the project.
         if isContainedInProject
-            @parser.clearCache(path)
             @attemptFileIndex(path, editor.getBuffer().getText())
 
     ###*
