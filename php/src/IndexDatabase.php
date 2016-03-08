@@ -6,10 +6,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 
-use Doctrine\DBAL\Exception\TableNotFoundException;
-
-use PhpIntegrator\IndexDataProvider;
-
 class IndexDatabase implements
     Indexer\StorageInterface,
     IndexDataAdapter\ProviderInterface
