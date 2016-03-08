@@ -3,13 +3,12 @@
 namespace A;
 
 /**
- * @see DateTime
- * @see http://www.test.com
- * @see string
- * @see mixed
- * @see \Traversable
+ * @throws DateTime
+ * @throws string
+ * @throws mixed
+ * @throws \Traversable
  */
-class Test
+function foo()
 {
 
 }

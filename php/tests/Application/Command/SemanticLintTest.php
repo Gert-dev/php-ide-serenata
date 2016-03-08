@@ -76,8 +76,8 @@ class SemanticLintTest extends IndexedTest
             [
                 'name'      => 'DateTime',
                 'namespace' => 'A',
-                'start'     => 124,
-                'end'       => 125
+                'start'     => 108,
+                'end'       => 109
             ]
         ]);
     }
@@ -127,6 +127,13 @@ class SemanticLintTest extends IndexedTest
                 'alias' => 'SplMinHeap',
                 'start' => 39,
                 'end'   => 49
+            ],
+
+            [
+                'name'  => 'SplFileInfo',
+                'alias' => 'SplFileInfo',
+                'start' => 72,
+                'end'   => 83
             ]
         ]);
     }

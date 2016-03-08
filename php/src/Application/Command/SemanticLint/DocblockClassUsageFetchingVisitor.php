@@ -28,7 +28,7 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
         if ($docblock) {
             // Look for types right after a tag.
             preg_match_all(
-                '/@[a-zA-Z-]+\s+(\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)($|\s|\})/',
+                '/@(?:param|throws|return|var)\s+(\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)($|\s|\})/',
                 $docblock,
                 $matches,
                 PREG_SET_ORDER
