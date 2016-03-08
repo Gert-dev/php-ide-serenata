@@ -20,6 +20,7 @@
 ### Changes for developers
 * Changes to the service
   * Magic properties and methods will no longer return true for `hasDocblock`.
+  * `determineCurrentClassName` received an extra (optional) `async` parameter.
   * Magic properties and methods now return the class start line as their end line.
   * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
 

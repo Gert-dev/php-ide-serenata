@@ -66,19 +66,29 @@ class Parser
      *
      * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
      * @param {Point}      bufferPosition
+     * @param {boolean}    async
      *
-     * @return {string|null}
+     * @return {Promise|string|null}
     ###
-    determineCurrentClassName: (editor, bufferPosition) ->
+    determineCurrentClassName: (editor, bufferPosition, async = false) ->
         path = editor.getPath()
 
-        classesInFile = @proxy.getClassListForFile(editor.getPath())
+        if not async
+            classesInFile = @proxy.getClassListForFile(editor.getPath())
 
-        for name,classInfo of classesInFile
-            if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
-                return name
+            for name,classInfo of classesInFile
+                if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
+                    return name
 
-        return null
+            return null
+
+        return new Promise (resolve, reject) =>
+            return @proxy.getClassListForFile(editor.getPath(), true).then (classesInFile) =>
+                for name,classInfo of classesInFile
+                    if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
+                        resolve(name)
+
+                resolve(null)
 
     ###*
      * Indicates if the specifiec location is a property usage or not. If it is not, it is most likely a method call.

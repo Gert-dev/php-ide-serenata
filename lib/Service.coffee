@@ -209,11 +209,12 @@ class Service
      *
      * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
      * @param {Point}      bufferPosition
+     * @param {boolean}    async
      *
-     * @return {string|null}
+     * @return {Promise|string|null}
     ###
-    determineCurrentClassName: (editor, bufferPosition) ->
-        return @parser.determineCurrentClassName(editor, bufferPosition)
+    determineCurrentClassName: (editor, bufferPosition, async = false) ->
+        return @parser.determineCurrentClassName(editor, bufferPosition, async)
 
     ###*
      * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
