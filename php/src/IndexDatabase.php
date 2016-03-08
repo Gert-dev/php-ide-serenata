@@ -382,7 +382,7 @@ class IndexDatabase implements
      *
      * @param int $id
      *
-     * @return Doctrine\DBAL\Query\QueryBuilder
+     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     protected function getStructuralElementRawInfoQueryBuilder()
     {
