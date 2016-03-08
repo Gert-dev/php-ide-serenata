@@ -92,6 +92,10 @@ class IndexDatabase implements
         // Have to be a douche about this as these PRAGMA's seem to reset, even though the connection is not closed.
         $this->connection->executeQuery('PRAGMA foreign_keys=ON');
 
+        // Use the new Write-Ahead Logging mode, which offers performance benefits for our purposes. See also
+        // https://www.sqlite.org/draft/wal.html
+        $this->connection->executeQuery('PRAGMA journal_mode=WAL');
+
         return $this->connection;
     }
 
