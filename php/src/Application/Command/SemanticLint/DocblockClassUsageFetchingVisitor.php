@@ -69,7 +69,18 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
     protected function isValidType($type)
     {
         return parent::isValidType($type) && !in_array($type, [
-            'int', 'float', 'string', 'bool', 'resource', 'array', 'mixed', 'void', 'callable'
+            'callable',
+
+            // As per https://github.com/phpDocumentor/fig-standards/blob/master/proposed/phpdoc.md#keyword
+            'string',
+            'int',
+            'bool',
+            'float',
+            'object',
+            'mixed',
+            'array',
+            'resource',
+            'void'
         ]);
     }
 }
