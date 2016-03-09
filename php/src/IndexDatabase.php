@@ -100,6 +100,16 @@ class IndexDatabase implements
     }
 
     /**
+     * Retrieves the currently set databasePath.
+     *
+     * @return string
+     */
+    public function getDatabasePath()
+    {
+        return $this->databasePath;
+    }
+
+    /**
      * (Re)creates the database tables in the database using the specified connection.
      *
      * @param Connection $connection
