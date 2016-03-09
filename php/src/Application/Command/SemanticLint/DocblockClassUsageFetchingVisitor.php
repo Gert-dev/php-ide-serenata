@@ -68,9 +68,7 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
     /// @inherited
     protected function isValidType($type)
     {
-        return parent::isValidType($type) && !in_array($type, [
-            'callable',
-
+        return !in_array($type, [
             // As per https://github.com/phpDocumentor/fig-standards/blob/master/proposed/phpdoc.md#keyword
             'string',
             'int',
@@ -80,7 +78,15 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
             'mixed',
             'array',
             'resource',
-            'void'
+            'void',
+            'null',
+            'callable',
+            'false',
+            'true',
+            'self',
+            'static',
+            'parent',
+            '$this'
         ]);
     }
 }
