@@ -110,7 +110,7 @@ module.exports =
      *
      * @return {Promise}
     ###
-    performDirectoryIndex: (directories) ->
+    performDirectoriesIndex: (directories) ->
         pathStrings = ''
 
         for i,project of directories
@@ -163,7 +163,7 @@ module.exports =
 
         directories = atom.project.getDirectories()
 
-        return @performDirectoryIndex(directories)
+        return @performDirectoriesIndex(directories)
 
     ###*
      * Performs a project index, but only if one is not currently already happening.
