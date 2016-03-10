@@ -106,11 +106,12 @@ module.exports =
     ###*
      * Indexes a list of directories.
      *
-     * @param {array} directories
+     * @param {array}    directories
+     * @param {Callback} progressStreamCallback
      *
      * @return {Promise}
     ###
-    performDirectoriesIndex: (directories) ->
+    performDirectoriesIndex: (directories, progressStreamCallback) ->
         pathStrings = ''
 
         for i,project of directories
@@ -124,7 +125,7 @@ module.exports =
 
         # TODO: Support multiple root project directories. We can't send these one by one, they need to all be sent at
         # the same time in one reindex action or cross-dependencies might not be picked up correctly.
-        return @service.reindex(directories[0], null, progressHandler).then(successHandler, failureHandler)
+        return @service.reindex(directories[0], null, progressStreamCallback)
 
     ###*
      * Indexes the project aynschronously.
@@ -153,7 +154,7 @@ module.exports =
                 @statusBarManager.showMessage("Indexing failed!", "highlight-error")
                 @statusBarManager.hide()
 
-        progressHandler = (progress) =>
+        progressStreamCallback = (progress) =>
             progress = parseFloat(progress)
 
             if not isNaN(progress)
@@ -163,7 +164,7 @@ module.exports =
 
         directories = atom.project.getDirectories()
 
-        return @performDirectoriesIndex(directories)
+        return @performDirectoriesIndex(directories, progressStreamCallback).then(successHandler, failureHandler)
 
     ###*
      * Performs a project index, but only if one is not currently already happening.
