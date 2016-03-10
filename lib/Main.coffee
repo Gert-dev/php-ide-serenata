@@ -125,7 +125,7 @@ module.exports =
 
         # TODO: Support multiple root project directories. We can't send these one by one, they need to all be sent at
         # the same time in one reindex action or cross-dependencies might not be picked up correctly.
-        return @service.reindex(directories[0], null, progressStreamCallback)
+        return @service.reindex(directories[0].path, null, progressStreamCallback)
 
     ###*
      * Indexes the project aynschronously.
@@ -162,7 +162,7 @@ module.exports =
                     @statusBarManager.setProgress(progress)
                     @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        directories = atom.project.getDirectories()
+        directories = @fetchProjectDirectories()
 
         return @performDirectoriesIndex(directories, progressStreamCallback).then(successHandler, failureHandler)
 
@@ -182,7 +182,7 @@ module.exports =
         successHandler = handler
         failureHandler = handler
 
-        @performProjectIndex().then(successHandler, failureHandler)
+        return @performProjectIndex().then(successHandler, failureHandler)
 
     ###*
      * Forcibly indexes the project in its entirety by removing the existing indexing database first.
@@ -269,6 +269,21 @@ module.exports =
         return @performFileIndex(fileName, source).then(successHandler, failureHandler)
 
     ###*
+     * Fetches a list of current project directories (root folders).
+     *
+     * @return {array}
+    ###
+    fetchProjectDirectories: () ->
+        directories = atom.project.getDirectories()
+
+        # In very rare situations, Atom gives us atom://config as project path. Not sure if this is a bug or intended
+        # behavior.
+        directories = directories.filter (directory) ->
+            return directory.path.indexOf('atom://') != 0
+
+        return directories
+
+    ###*
      * Attaches items to the status bar.
      *
      * @param {mixed} statusBarService
@@ -322,13 +337,13 @@ module.exports =
 
         # In rare cases, the package is loaded faster than the project gets a chance to load. At that point, no project
         # directory is returned. The onDidChangePaths listener below will also catch that case.
-        if atom.project.getDirectories().length > 0
+        if @fetchProjectDirectories().length > 0
             @attemptProjectIndex()
 
         @disposables.add atom.project.onDidChangePaths (projectPaths) =>
             # NOTE: This listener is also invoked at shutdown with an empty array as argument, this makes sure we don't
             # try to reindex then.
-            if projectPaths.length > 0
+            if @fetchProjectDirectories().length > 0
                 @attemptProjectIndex()
 
         @disposables.add atom.workspace.observeTextEditors (editor) =>
