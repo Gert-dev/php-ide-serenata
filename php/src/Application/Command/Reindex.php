@@ -112,6 +112,6 @@ class Reindex extends BaseCommand
             return $this->outputJson(true, ['errors' => $errors]);
         }
 
-        throw new UnexpectedValueException('The specified file or directory does not exist!');
+        throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
     }
 }
