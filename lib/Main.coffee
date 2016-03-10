@@ -104,6 +104,29 @@ module.exports =
             @attemptProjectIndex()
 
     ###*
+     * Indexes a list of directories.
+     *
+     * @param {array} directories
+     *
+     * @return {Promise}
+    ###
+    performDirectoryIndex: (directories) ->
+        pathStrings = ''
+
+        for i,project of directories
+            pathStrings += project.path
+
+        md5 = require 'md5'
+
+        indexDatabaseName = md5(pathStrings)
+
+        @proxy.setIndexDatabaseName(indexDatabaseName)
+
+        # TODO: Support multiple root project directories. We can't send these one by one, they need to all be sent at
+        # the same time in one reindex action or cross-dependencies might not be picked up correctly.
+        return @service.reindex(directories[0], null, progressHandler).then(successHandler, failureHandler)
+
+    ###*
      * Indexes the project aynschronously.
      *
      * @return {Promise}
@@ -112,8 +135,6 @@ module.exports =
         timerName = @packageName + " - Project indexing"
 
         console.time(timerName);
-
-        projectPath = atom.project.getDirectories()[0]?.path
 
         if @statusBarManager
             @statusBarManager.setLabel("Indexing...")
@@ -140,18 +161,9 @@ module.exports =
                     @statusBarManager.setProgress(progress)
                     @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        pathStrings = ''
+        directories = atom.project.getDirectories()
 
-        for i,project of atom.project.getDirectories()
-            pathStrings += project.path
-
-        md5 = require 'md5'
-
-        indexDatabaseName = md5(pathStrings)
-
-        @proxy.setIndexDatabaseName(indexDatabaseName)
-
-        return @service.reindex(projectPath, null, progressHandler).then(successHandler, failureHandler)
+        return @performDirectoryIndex(directories)
 
     ###*
      * Performs a project index, but only if one is not currently already happening.
