@@ -7,6 +7,7 @@
 
 ### Bugs fixed
 * Fixed some parameters of magic methods not showing up at all.
+* Fixed event handlers not being disposed when the package was deactivated.
 * Fixed parameter names for magic methods containing a comma in some cases.
 * Fixed parameters for magic methods being incorrectly marked as being optional.
 * Return types for magic properties were not being fetched at all.

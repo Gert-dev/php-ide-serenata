@@ -51,6 +51,11 @@ module.exports =
     isProjectIndexBusy: false
 
     ###*
+     * A list of disposables to dispose when the package deactivates.
+    ###
+    disposables: null
+
+    ###*
      * Tests the user's configuration.
      *
      * @return {boolean}
@@ -275,11 +280,15 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
-        Parser        = require './Parser'
-        Service       = require './Service'
-        AtomConfig    = require './AtomConfig'
-        CachingProxy  = require './CachingProxy'
-        {Emitter}     = require 'event-kit';
+        Parser                = require './Parser'
+        Service               = require './Service'
+        AtomConfig            = require './AtomConfig'
+        CachingProxy          = require './CachingProxy'
+
+        {Emitter}             = require 'event-kit';
+        {CompositeDisposable} = require 'atom';
+
+        @disposables = new CompositeDisposable()
 
         @configuration = new AtomConfig(@packageName)
 
@@ -303,17 +312,19 @@ module.exports =
         if atom.project.getDirectories().length > 0
             @attemptProjectIndex()
 
-        atom.project.onDidChangePaths (projectPaths) =>
+        @disposables.add atom.project.onDidChangePaths (projectPaths) =>
             # NOTE: This listener is also invoked at shutdown with an empty array as argument, this makes sure we don't
             # try to reindex then.
             if projectPaths.length > 0
                 @attemptProjectIndex()
 
-        atom.workspace.observeTextEditors (editor) =>
+        @disposables.add atom.workspace.observeTextEditors (editor) =>
             # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
             # because the contents are still loading.
             setTimeout ( =>
-                editor.onDidStopChanging () =>
+                return if not @disposables
+
+                @disposables.add editor.onDidStopChanging () =>
                     @onEditorDidStopChanging(editor)
             ), 1500
 
@@ -344,6 +355,9 @@ module.exports =
      * Deactivates the package.
     ###
     deactivate: ->
+        if @disposables
+            @disposables.dispose()
+            @disposables = null
 
     ###*
      * Sets the status bar service, which is consumed by this package.
