@@ -124,7 +124,7 @@ class AvailableVariables extends BaseCommand
          if (!$this->parser) {
              $lexer = new Lexer([
                  'usedAttributes' => [
-                     'comments', 'startLine', 'startFilePos', 'endFilePos'
+                     'comments', 'startFilePos', 'endFilePos'
                  ]
              ]);
 
