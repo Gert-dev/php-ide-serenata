@@ -74,6 +74,10 @@ class AvailableVariables extends BaseCommand
              // NOTE: This call is blocking if there is no input!
              $code = file_get_contents('php://stdin');
          } else {
+             if (!$file) {
+                 throw new UnexpectedValueException('The specified file does not exist!');
+             }
+
              $code = @file_get_contents($file);
          }
 
