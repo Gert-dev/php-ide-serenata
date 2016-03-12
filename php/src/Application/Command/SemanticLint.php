@@ -81,6 +81,10 @@ class SemanticLint extends BaseCommand
             throw new UnexpectedValueException('Parsing the file failed!');
         }
 
+        if ($nodes === null) {
+            throw new UnexpectedValueException('Parsing the file failed!');
+        }
+
         $classUsageFetchingVisitor = new SemanticLint\ClassUsageFetchingVisitor();
         $useStatementFetchingVisitor = new SemanticLint\UseStatementFetchingVisitor();
         $docblockClassUsageFetchingVisitor = new SemanticLint\DocblockClassUsageFetchingVisitor();
