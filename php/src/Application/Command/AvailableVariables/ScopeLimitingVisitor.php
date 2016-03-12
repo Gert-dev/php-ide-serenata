@@ -63,9 +63,13 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
                 // statement included in their start and end position. As we want to differentiate between these, we
                 // have to ensure nodes from all statements, except the one where the position is located in, are
                 // ignored.
-                foreach ($node->elseifs as $elseIfNode) {
+                $elseIfNodes = array_reverse($node->elseifs);
+
+                foreach ($elseIfNodes as $elseIfNode) {
                     if ($elseIfNode->getAttribute('startFilePos') < $this->position) {
                         $node->stmts = [];
+                        $node->elseifs = [$elseIfNode];
+                        break;
                     }
                 }
 
