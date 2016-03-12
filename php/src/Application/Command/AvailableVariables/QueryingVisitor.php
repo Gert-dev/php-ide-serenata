@@ -43,7 +43,7 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
-        if ($node->getAttribute('startFilePos') > $this->position) {
+        if ($node->getAttribute('startFilePos') >= $this->position) {
             // We've gone beyond the requested position, there is nothing here that can still be relevant anymore.
             return NodeTraverser::DONT_TRAVERSE_CHILDREN;
         }
@@ -69,7 +69,9 @@ class QueryingVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Expr\Variable) {
-            $this->parseVariable($node);
+            if ($node->getAttribute('endFilePos') < $this->position) {
+                $this->parseVariable($node);
+            }
         } elseif ($node instanceof Node\Expr\ClosureUse) {
             $this->parseClosureUse($node);
         } elseif ($node instanceof Node\Param) {
