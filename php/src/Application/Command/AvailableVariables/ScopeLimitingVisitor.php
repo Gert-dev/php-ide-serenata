@@ -21,7 +21,7 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
      * @var int
      */
     protected $position;
-    
+
     /**
      * Constructor.
      *
@@ -50,7 +50,7 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Stmt\For_ ||
             $node instanceof Node\Stmt\Foreach_ ||
             $node instanceof Node\Stmt\Do_ ||
-            $node instanceof Node\Stmt\Case_
+            $node instanceof Node\Stmt\Switch_
         ) {
             $endFilePos = $node->getAttribute('endFilePos');
             $startFilePos = $node->getAttribute('startFilePos');
@@ -59,10 +59,11 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
             }
 
-            // If-statements have the entire block containing the if statement, the elseif statements and the else
-            // statement included in their start and end position. As we want to differentiate between these, we have
-            // to ensure nodes from all statements, except the one where the position is located in, are ignored.
             if ($node instanceof Node\Stmt\If_) {
+                // If-statements have the entire block containing the if statement, the elseif statements and the else
+                // statement included in their start and end position. As we want to differentiate between these, we
+                // have to ensure nodes from all statements, except the one where the position is located in, are
+                // ignored.
                 foreach ($node->elseifs as $elseIfNode) {
                     if ($elseIfNode->getAttribute('startFilePos') < $this->position) {
                         $node->stmts = [];
@@ -72,6 +73,19 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
                 if ($node->else && $node->else->getAttribute('startFilePos') < $this->position) {
                     $node->stmts = [];
                     $node->elseifs = [];
+                }
+            } elseif ($node instanceof Node\Stmt\Switch_) {
+                // Case statements do encompass their statements with their start and end position, but they do not
+                // encompass whitespace or additional newlines between each other. This means that a set of subsequent
+                // case statements don't describe one contiguous region of code. We work around this by using the
+                // parent switch node instead.
+                $caseNodes = array_reverse($node->cases);
+
+                foreach ($caseNodes as $caseNode) {
+                    if ($caseNode->getAttribute('startFilePos') < $this->position) {
+                        $node->cases = [$caseNode];
+                        break;
+                    }
                 }
             }
         }
