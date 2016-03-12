@@ -28,6 +28,8 @@ class AvailableVariablesTest extends IndexedTest
     {
         $command = $this->getCommand($file);
 
+        $path = $this->getTestFilePath($file);
+
         $markerOffset = $this->getMarkerOffset($path, '<MARKER>');
 
         return $command->getAvailableVariables($path, $markerOffset, false);
