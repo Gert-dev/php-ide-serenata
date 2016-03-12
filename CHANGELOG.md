@@ -23,9 +23,11 @@
 ### Changes for developers
 * Changes to the service
   * Magic properties and methods will no longer return true for `hasDocblock`.
+  * `getAvailableVariables` received an extra (optional) `async` parameter.
   * `determineCurrentClassName` received an extra (optional) `async` parameter.
   * Magic properties and methods now return the class start line as their end line.
   * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
+  * A new method `getAvailableVariablesByOffset` has been added that allows fetching available variables via an offset in a file. This method is implemented in PHP, supports asynchronous operation and the existing `getAvailableVariables` has been rewritten to use this method.
 
 ## 0.6.10
 ### Bugs fixed

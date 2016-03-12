@@ -101,6 +101,16 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    getAvailableVariables: (file, source, offset, async = false) ->
+        if source?
+            # Don't cache calls with full source code as this would make for a large, constantly changing, cache.
+            return super(file, source, offset, async)
+
+        return @wrapCachedRequestToParent("getInvokedFunction-#{file}-#{offset}", 'getINvokedFunction', arguments, async)
+
+    ###*
+     * @inherited
+    ###
     reindex: (path, source, progressStreamCallback) ->
         return super(path, source, progressStreamCallback).then (output) =>
             @clearCache()

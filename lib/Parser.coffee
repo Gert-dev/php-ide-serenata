@@ -35,33 +35,6 @@ class Parser
     constructor: (@proxy) ->
 
     ###*
-     * Retrieves all variables that are available at the specified buffer position.
-     *
-     * @param {TextEditor} editor
-     * @param {Range}      bufferPosition
-     *
-     * @return {Object}
-    ###
-    getAvailableVariables: (editor, bufferPosition) ->
-        matches = {}
-
-        scopeList = @getFunctionScopeListAt(editor, bufferPosition).reverse()
-
-        for range in scopeList
-            editor.getBuffer().backwardsScanInRange /(\$[a-zA-Z_][a-zA-Z0-9_]*)/g, range, (matchInfo) =>
-                if matchInfo.matchText not of matches
-                    matches[matchInfo.matchText] =
-                        name : matchInfo.matchText
-                        type : null # @getVariableType(editor, bufferPosition, matchInfo.matchText)
-
-        if '$this' not of matches
-            matches['$this'] =
-                name : '$this'
-                type : @getVariableType(editor, bufferPosition, '$this')
-
-        return matches
-
-    ###*
      * Determines the current class' FQCN based on the specified buffer position.
      *
      * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
