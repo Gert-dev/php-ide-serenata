@@ -106,7 +106,7 @@ class CachingProxy extends Proxy
             # Don't cache calls with full source code as this would make for a large, constantly changing, cache.
             return super(file, source, offset, async)
 
-        return @wrapCachedRequestToParent("getInvokedFunction-#{file}-#{offset}", 'getINvokedFunction', arguments, async)
+        return @wrapCachedRequestToParent("getAvailableVariables-#{file}-#{offset}", 'getINvokedFunction', arguments, async)
 
     ###*
      * @inherited
