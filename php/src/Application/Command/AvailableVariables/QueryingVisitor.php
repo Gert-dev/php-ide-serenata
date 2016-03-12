@@ -19,6 +19,11 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $variables = [];
 
     /**
+     * @var int
+     */
+    protected $position;
+
+    /**
      * @var bool
      */
     protected $hasThisContext;
