@@ -21,7 +21,7 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
      * @var int
      */
     protected $position;
-
+    
     /**
      * Constructor.
      *
@@ -44,8 +44,6 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Stmt\ClassMethod ||
             $node instanceof Node\Expr\Closure ||
             $node instanceof Node\Stmt\If_ ||
-            $node instanceof Node\Stmt\ElseIf_ ||
-            $node instanceof Node\Stmt\Else_ ||
             $node instanceof Node\Stmt\TryCatch ||
             $node instanceof Node\Stmt\Catch_ ||
             $node instanceof Node\Stmt\While_ ||
@@ -54,10 +52,27 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Stmt\Do_ ||
             $node instanceof Node\Stmt\Case_
         ) {
-            if ($node->getAttribute('startFilePos') >= $this->position ||
-                $node->getAttribute('endFilePos') <= $this->position
-            ) {
+            $endFilePos = $node->getAttribute('endFilePos');
+            $startFilePos = $node->getAttribute('startFilePos');
+
+            if ($startFilePos >= $this->position || $endFilePos <= $this->position) {
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+
+            // If-statements have the entire block containing the if statement, the elseif statements and the else
+            // statement included in their start and end position. As we want to differentiate between these, we have
+            // to ensure nodes from all statements, except the one where the position is located in, are ignored.
+            if ($node instanceof Node\Stmt\If_) {
+                foreach ($node->elseifs as $elseIfNode) {
+                    if ($elseIfNode->getAttribute('startFilePos') < $this->position) {
+                        $node->stmts = [];
+                    }
+                }
+
+                if ($node->else && $node->else->getAttribute('startFilePos') < $this->position) {
+                    $node->stmts = [];
+                    $node->elseifs = [];
+                }
             }
         }
     }
