@@ -91,13 +91,17 @@ class Reindex extends BaseCommand
                 $code = file_get_contents('php://stdin');
             }
 
-            // All other commands don't abide by these locks, so they can just happily continue using the database (as
-            // they are only reading, that poses no problem). However, writing in a transaction will cause the database
-            // to become locked, which poses a problem if two simultaneous reindexing processes are spawned. If that
-            // happens, just block until the database becomes available again. If we don't, we will receive an
-            // exception from the driver.
-            $f = fopen($this->indexDatabase->getDatabasePath(), 'rw');
-            flock($f, LOCK_EX);
+            $isInMemoryDatabase = ($this->indexDatabase->getDatabasePath() === ':memory:');
+
+            if (!$isInMemoryDatabase) {
+                // All other commands don't abide by these locks, so they can just happily continue using the database (as
+                // they are only reading, that poses no problem). However, writing in a transaction will cause the database
+                // to become locked, which poses a problem if two simultaneous reindexing processes are spawned. If that
+                // happens, just block until the database becomes available again. If we don't, we will receive an
+                // exception from the driver.
+                $f = fopen($this->indexDatabase->getDatabasePath(), 'rw');
+                flock($f, LOCK_EX);
+            }
 
             $errors = [];
 
@@ -107,7 +111,9 @@ class Reindex extends BaseCommand
                 $errors = $e->getErrors();
             }
 
-            flock($f, LOCK_UN);
+            if (!$isInMemoryDatabase) {
+                flock($f, LOCK_UN);
+            }
 
             return $this->outputJson(true, ['errors' => $errors]);
         }
