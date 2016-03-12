@@ -45,7 +45,6 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Expr\Closure ||
             $node instanceof Node\Stmt\If_ ||
             $node instanceof Node\Stmt\TryCatch ||
-            $node instanceof Node\Stmt\Catch_ ||
             $node instanceof Node\Stmt\While_ ||
             $node instanceof Node\Stmt\For_ ||
             $node instanceof Node\Stmt\Foreach_ ||
@@ -86,6 +85,24 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
                         $node->cases = [$caseNode];
                         break;
                     }
+                }
+            } elseif ($node instanceof Node\Stmt\TryCatch) {
+                $catchNodes = array_reverse($node->catches);
+
+                foreach ($catchNodes as $catchNode) {
+                    if ($catchNode->getAttribute('startFilePos') < $this->position) {
+                        $node->stmts = [];
+                        $node->catches = [$catchNode];
+                        break;
+                    }
+                }
+
+                // Finally statements have no own node, so use the first statement as a reference point instead. This
+                // won't be entirely correct, but it's the best we can do. See also
+                // https://github.com/nikic/PHP-Parser/issues/254
+                if ($node->finallyStmts && $node->finallyStmts[0]->getAttribute('startFilePos') < $this->position) {
+                    $node->stmts = [];
+                    $node->catches = [];
                 }
             }
         }
