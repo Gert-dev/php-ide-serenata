@@ -56,7 +56,13 @@ class Parser
             return null
 
         return new Promise (resolve, reject) =>
-            return @proxy.getClassListForFile(editor.getPath(), true).then (classesInFile) =>
+            path = editor.getPath()
+
+            if not path?
+                reject()
+                return
+
+            return @proxy.getClassListForFile(path, true).then (classesInFile) =>
                 for name,classInfo of classesInFile
                     if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
                         resolve(name)
