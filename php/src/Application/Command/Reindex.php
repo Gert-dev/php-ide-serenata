@@ -83,7 +83,7 @@ class Reindex extends BaseCommand
             $errors = $indexer->indexDirectory($path);
 
             return $this->outputJson(true, ['errors' => $errors]);
-        } elseif (is_file($path)) {
+        } elseif (is_file($path) || $useStdin) {
             $code = null;
 
             if ($useStdin) {
