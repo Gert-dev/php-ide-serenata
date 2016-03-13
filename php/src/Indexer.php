@@ -11,6 +11,7 @@ use RecursiveDirectoryIterator;
 
 use PhpParser\Lexer;
 use PhpParser\Error;
+use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use PhpParser\NodeTraverser;
 
@@ -742,7 +743,7 @@ class Indexer
      * @param array                                    $rawData
      * @param int                                      $fileId
      * @param string                                   $fqsen
-     * @param boolean                                  $isBuiltin
+     * @param bool                                     $isBuiltin
      * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
      * @return int The ID of the structural element.
@@ -1431,7 +1432,7 @@ class Indexer
 
 
     /**
-     * @return PhpParser\Parser
+     * @return Parser
      */
     protected function getParser()
     {
