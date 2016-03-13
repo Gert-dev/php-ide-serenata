@@ -7,16 +7,6 @@ module.exports =
 ##
 class Parser
     ###*
-     * Regular expression that will search for a use statement.
-    ###
-    useStatementRegex : /(?:use)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:(?:[ ]+as[ ]+)(\w+))?(?:;)/
-
-    ###*
-     * Regular expression that will search for a namespace declaration.
-    ###
-    namespaceDeclarationRegex : /(?:namespace)(?:[^\w\\])([\w\\]+)(?![\w\\])(?:;)/
-
-    ###*
      * A string that can be inserted into regular expressions that will match a class name, including its namespace,
      * if present.
     ###
