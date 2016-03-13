@@ -33,6 +33,8 @@ class SemanticLint extends BaseCommand
     {
         $optionCollection->add('file?', 'The file to lint.')->isa('string');
         $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
+        $optionCollection->add('no-unknown-classes?', 'If set, unknown class names will not be returned.');
+        $optionCollection->add('no-unused-use-statements?', 'If set, unused use statements will not be returned.');
     }
 
     /**
@@ -44,7 +46,12 @@ class SemanticLint extends BaseCommand
             throw new UnexpectedValueException('A file name is required for this command.');
         }
 
-        $output = $this->semanticLint($arguments['file']->value, isset($arguments['stdin']));
+        $output = $this->semanticLint(
+            $arguments['file']->value,
+            (isset($arguments['stdin']) && $arguments['stdin']->value),
+            !(isset($arguments['no-unknown-classes']) && $arguments['no-unknown-classes']->value),
+            !(isset($arguments['no-unused-use-statements']) && $arguments['no-unused-use-statements']->value)
+        );
 
         return $this->outputJson(true, $output);
     }
@@ -52,11 +59,17 @@ class SemanticLint extends BaseCommand
     /**
      * @param string $file
      * @param bool   $useStdin
+     * @param bool   $retrieveUnknownClasses
+     * @param bool   $retrieveUnusedUseStatements
      *
      * @return array
      */
-    public function semanticLint($file, $useStdin)
-    {
+    public function semanticLint(
+        $file,
+        $useStdin,
+        $retrieveUnknownClasses = true,
+        $retrieveUnusedUseStatements = true
+    ) {
         $fileId = $this->indexDatabase->getFileId($file);
 
         if (!$fileId) {
@@ -86,17 +99,22 @@ class SemanticLint extends BaseCommand
             throw new UnexpectedValueException('Parsing the file failed!');
         }
 
-        $unknownClassAnalyzer = new SemanticLint\UnknownClassAnalyzer($file, $this->indexDatabase);
-        $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer();
-
         $traverser = new NodeTraverser(false);
 
-        foreach ($unknownClassAnalyzer->getVisitors() as $visitor) {
-            $traverser->addVisitor($visitor);
+        if ($retrieveUnknownClasses) {
+            $unknownClassAnalyzer = new SemanticLint\UnknownClassAnalyzer($file, $this->indexDatabase);
+
+            foreach ($unknownClassAnalyzer->getVisitors() as $visitor) {
+                $traverser->addVisitor($visitor);
+            }
         }
 
-        foreach ($unusedUseStatementAnalyzer->getVisitors() as $visitor) {
-            $traverser->addVisitor($visitor);
+        if ($retrieveUnusedUseStatements) {
+            $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer();
+
+            foreach ($unusedUseStatementAnalyzer->getVisitors() as $visitor) {
+                $traverser->addVisitor($visitor);
+            }
         }
 
         $traverser->traverse($nodes);
