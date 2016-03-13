@@ -91,8 +91,6 @@ class Proxy
      * @return {Promise}
     ###
     performRequestAsync: (command, parameters, streamCallback = null, stdinData = null) ->
-        console.log(command, parameters)
-
         return new Promise (resolve, reject) =>
             proc = child_process.spawn(command, parameters)
 
