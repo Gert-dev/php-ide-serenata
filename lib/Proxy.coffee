@@ -28,7 +28,7 @@ class Proxy
     constructor: (@config) ->
 
     ###*
-     * Prepares parameters for execution by escaping them.
+     * Prepares parameters for execution.
      *
      * @param {array} parameters
      *
@@ -37,11 +37,11 @@ class Proxy
     prepareParameters: (args) ->
         parameters = [
             '-d memory_limit=-1',
-            Utility.escapeShellParameter(__dirname + "/../php/src/Main.php")
+            __dirname + "/../php/src/Main.php"
         ]
 
         for a in args
-            parameters.push(Utility.escapeShellParameter(a))
+            parameters.push(a)
 
         return parameters
 
@@ -91,6 +91,8 @@ class Proxy
      * @return {Promise}
     ###
     performRequestAsync: (command, parameters, streamCallback = null, stdinData = null) ->
+        console.log(command, parameters)
+
         return new Promise (resolve, reject) =>
             proc = child_process.spawn(command, parameters)
 

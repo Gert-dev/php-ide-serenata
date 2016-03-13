@@ -11,6 +11,7 @@
 * Fixed parameter names for magic methods containing a comma in some cases.
 * Fixed parameters for magic methods being incorrectly marked as being optional.
 * Return types for magic properties were not being fetched at all.
+* Fixed problems with paths containing spaces on anything non-Windows (Linux, Mac OS X, ...).
 * Fixed the indexing progress bar disappearing sometimes if you edited a file while it was busy.
 * Fixed the `Warning: is_dir(): Unable to find the wrapper "atom"` error showing up in rare cases.
 * Return types for magic methods were not being resolved relative to use statements or the namespace.
