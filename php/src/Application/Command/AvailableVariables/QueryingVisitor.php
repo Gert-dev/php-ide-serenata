@@ -2,8 +2,6 @@
 
 namespace PhpIntegrator\Application\Command\AvailableVariables;
 
-use UnexpectedValueException;
-
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
