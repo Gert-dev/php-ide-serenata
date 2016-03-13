@@ -26,7 +26,7 @@ class AvailableVariables extends BaseCommand
     protected $parser;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
     {
@@ -36,7 +36,7 @@ class AvailableVariables extends BaseCommand
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
      protected function process(ArrayAccess $arguments)
      {

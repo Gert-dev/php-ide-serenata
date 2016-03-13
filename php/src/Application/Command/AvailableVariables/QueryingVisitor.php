@@ -37,7 +37,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function enterNode(Node $node)
     {
