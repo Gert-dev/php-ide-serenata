@@ -2,8 +2,6 @@ fs            = require 'fs'
 stream        = require 'stream'
 child_process = require 'child_process'
 
-Utility = require "./Utility"
-
 module.exports =
 
 ##*
