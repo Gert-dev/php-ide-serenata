@@ -1,8 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\AvailableVariables;
-
-use UnexpectedValueException;
+namespace PhpIntegrator\Application\Command\Visitor;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;

@@ -94,7 +94,7 @@ class AvailableVariables extends BaseCommand
          }
 
          $queryingVisitor = new AvailableVariables\QueryingVisitor($offset);
-         $scopeLimitingVisitor = new AvailableVariables\ScopeLimitingVisitor($offset);
+         $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
 
          $traverser = new NodeTraverser(false);
          $traverser->addVisitor($scopeLimitingVisitor);
