@@ -35,6 +35,47 @@ class Parser
     constructor: (@proxy) ->
 
     ###*
+     * Indicates if the specifiec location is a property usage or not. If it is not, it is most likely a method call.
+     * This is useful to distinguish between properties and methods with the same name.
+     *
+     * @example When querying "$this->test", using a position inside 'test' will return true.
+     *
+     * @param {TextEditor} editor
+     * @param {Point}      bufferPosition
+     *
+     * @return {boolean}
+    ###
+    isUsingProperty: (editor, bufferPosition) ->
+        scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition).getScopeChain()
+
+        return (scopeDescriptor.indexOf('.property') != -1)
+
+    ###*
+     * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
+     *
+     * @param {string} type
+     *
+     * @return {boolean}
+    ###
+    isBasicType: (type) ->
+        return /^(array|object|bool|string|static|null|boolean|void|int|integer|mixed|callable)$/i.test(type)
+
+    ###*
+     * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
+     * parameters for the editor and buffer position.
+     *
+     * @param {TextEditor} editor         The editor.
+     * @param {Point}      bufferPosition The location of the type.
+     * @param {string}     type           The (local) type to resolve.
+     *
+     * @return {string|null}
+     *
+     * @example In a file with namespace A\B, determining C could lead to A\B\C.
+    ###
+    resolveTypeAt: (editor, bufferPosition, type) ->
+        return @proxy.resolveType(editor.getPath(), bufferPosition.row + 1, type)
+
+    ###*
      * Determines the current class' FQCN based on the specified buffer position.
      *
      * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
@@ -68,32 +109,6 @@ class Parser
                         resolve(name)
 
                 resolve(null)
-
-    ###*
-     * Indicates if the specifiec location is a property usage or not. If it is not, it is most likely a method call.
-     * This is useful to distinguish between properties and methods with the same name.
-     *
-     * @example When querying "$this->test", using a position inside 'test' will return true.
-     *
-     * @param {TextEditor} editor
-     * @param {Point}      bufferPosition
-     *
-     * @return {boolean}
-    ###
-    isUsingProperty: (editor, bufferPosition) ->
-        scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition).getScopeChain()
-
-        return (scopeDescriptor.indexOf('.property') != -1)
-
-    ###*
-     * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
-     *
-     * @param {string} type
-     *
-     * @return {boolean}
-    ###
-    isBasicType: (type) ->
-        return /^(array|object|bool|string|static|null|boolean|void|int|integer|mixed|callable)$/i.test(type)
 
     ###*
      * Retrieves an array of ranges that contain code that apply to the function the specified buffer position is in.
@@ -374,23 +389,6 @@ class Parser
         return new Point(line, i)
 
     ###*
-     * Does exactly the same as {@see retrieveSanitizedCallStack}, but will automatically retrieve the relevant code
-     * of the call at the specified location in the buffer.
-     *
-     * @param  {TextEditor} editor
-     * @param  {Point}      bufferPosition
-     * @param  {boolean}    backwards      Whether to walk backwards from the buffer position or forwards.
-     *
-     * @return {Object}
-    ###
-    retrieveSanitizedCallStackAt: (editor, bufferPosition, backwards = true) ->
-        boundary = @determineBoundaryOfExpression(editor, bufferPosition, backwards)
-
-        textSlice = editor.getTextInBufferRange([boundary, bufferPosition])
-
-        return @retrieveSanitizedCallStack(textSlice)
-
-    ###*
      * Removes content inside the specified open and close character pairs (including nested pairs).
      *
      * @param {string} text           String to analyze.
@@ -470,6 +468,23 @@ class Parser
             elements[key] = element.trim()
 
         return elements
+
+    ###*
+     * Does exactly the same as {@see retrieveSanitizedCallStack}, but will automatically retrieve the relevant code
+     * of the call at the specified location in the buffer.
+     *
+     * @param  {TextEditor} editor
+     * @param  {Point}      bufferPosition
+     * @param  {boolean}    backwards      Whether to walk backwards from the buffer position or forwards.
+     *
+     * @return {Object}
+    ###
+    retrieveSanitizedCallStackAt: (editor, bufferPosition, backwards = true) ->
+        boundary = @determineBoundaryOfExpression(editor, bufferPosition, backwards)
+
+        textSlice = editor.getTextInBufferRange([boundary, bufferPosition])
+
+        return @retrieveSanitizedCallStack(textSlice)
 
     ###*
      * Retrieves the type of a variable, relative to the context at the specified buffer location. Class names will
@@ -891,18 +906,3 @@ class Parser
                             }
 
         return null
-
-    ###*
-     * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
-     * parameters for the editor and buffer position.
-     *
-     * @param {TextEditor} editor         The editor.
-     * @param {Point}      bufferPosition The location of the type.
-     * @param {string}     type           The (local) type to resolve.
-     *
-     * @return {string|null}
-     *
-     * @example In a file with namespace A\B, determining C could lead to A\B\C.
-    ###
-    resolveTypeAt: (editor, bufferPosition, type) ->
-        return @proxy.resolveType(editor.getPath(), bufferPosition.row + 1, type)
