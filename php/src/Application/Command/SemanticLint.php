@@ -11,6 +11,7 @@ use PhpIntegrator\Application\Command as BaseCommand;
 
 use PhpParser\Error;
 use PhpParser\Lexer;
+use PhpParser\Parser;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 
@@ -21,7 +22,7 @@ use PhpParser\ParserFactory;
 class SemanticLint extends BaseCommand
 {
     /**
-     * @var PhpParser\Parser
+     * @var Parser
      */
     protected $parser;
 
@@ -112,7 +113,7 @@ class SemanticLint extends BaseCommand
     }
 
     /**
-     * @return PhpParser\Parser
+     * @return Parser
      */
     protected function getParser()
     {
