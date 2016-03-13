@@ -85,79 +85,28 @@ class SemanticLint extends BaseCommand
             throw new UnexpectedValueException('Parsing the file failed!');
         }
 
-        $classUsageFetchingVisitor = new SemanticLint\ClassUsageFetchingVisitor();
-        $useStatementFetchingVisitor = new SemanticLint\UseStatementFetchingVisitor();
-        $docblockClassUsageFetchingVisitor = new SemanticLint\DocblockClassUsageFetchingVisitor();
+        $unknownClassAnalyzer = new SemanticLint\UnknownClassAnalyzer($file, $this->indexDatabase);
+        $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer();
 
         $traverser = new NodeTraverser(false);
-        $traverser->addVisitor($classUsageFetchingVisitor);
-        $traverser->addVisitor($useStatementFetchingVisitor);
-        $traverser->addVisitor($docblockClassUsageFetchingVisitor);
+
+        foreach ($unknownClassAnalyzer->getVisitors() as $visitor) {
+            $traverser->addVisitor($visitor);
+        }
+
+        foreach ($unusedUseStatementAnalyzer->getVisitors() as $visitor) {
+            $traverser->addVisitor($visitor);
+        }
+
         $traverser->traverse($nodes);
-
-        // Generate a class map for fast lookups.
-        $classMap = [];
-
-        foreach ($this->indexDatabase->getAllStructuralElementsRawInfo(null) as $element) {
-            $classMap[$element['fqsen']] = true;
-        }
-
-        // Cross-reference the found class names against the class map.
-        $unknownClasses = [];
-        $namespaces = $useStatementFetchingVisitor->getNamespaces();
-
-        $resolveTypeCommand = new ResolveType();
-        $resolveTypeCommand->setIndexDatabase($this->indexDatabase);
-
-        $classUsage = array_merge(
-            $classUsageFetchingVisitor->getClassUsageList(),
-            $docblockClassUsageFetchingVisitor->getClassUsageList()
-        );
-
-        foreach ($classUsage as $classUsage) {
-            $relevantAlias = $classUsage['firstPart'];
-
-            if (!$classUsage['isFullyQualified'] && isset($namespaces[$classUsage['namespace']]['useStatements'][$relevantAlias])) {
-                // Mark the accompanying used statement, if any, as used.
-                $namespaces[$classUsage['namespace']]['useStatements'][$relevantAlias]['used'] = true;
-            }
-
-            if ($classUsage['isFullyQualified']) {
-                $fqsen = $classUsage['name'];
-            } else {
-                $fqsen = $resolveTypeCommand->resolveType(
-                    $classUsage['name'],
-                    $file,
-                    $classUsage['line']
-                );
-            }
-
-            if (!isset($classMap[$fqsen])) {
-                unset($classUsage['line'], $classUsage['firstPart'], $classUsage['isFullyQualified']);
-
-                $unknownClasses[] = $classUsage;
-            }
-        }
-
-        $unusedUseStatements = [];
-
-        foreach ($namespaces as $namespace => $namespaceData) {
-            $useStatementMap = $namespaceData['useStatements'];
-
-            foreach ($useStatementMap as $alias => $data) {
-                if (!array_key_exists('used', $data) || !$data['used']) {
-                    $unusedUseStatements[] = $data;
-                }
-            }
-        }
 
         return [
             'errors' => [
-                'unknownClasses' => $unknownClasses
+                'unknownClasses' => $unknownClassAnalyzer->getOutput()
             ],
 
             'warnings' => [
-                'unusedUseStatements' => $unusedUseStatements
+                'unusedUseStatements' => $unusedUseStatementAnalyzer->getOutput()
             ]
         ];
     }

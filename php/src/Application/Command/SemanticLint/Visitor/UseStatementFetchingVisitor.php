@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\SemanticLint;
+namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
