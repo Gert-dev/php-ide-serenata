@@ -24,6 +24,10 @@ if (function_exists('xdebug_disable')) {
     xdebug_disable();
 }
 
+// Explicitly set the timezone to avoid warnings in some older PHP 5 versions. Also, this prevents files suddenly being
+// picked up as being modified if the user changes the timezone in php.ini.
+date_default_timezone_set('UTC');
+
 chdir(__DIR__);
 
 require '../vendor/autoload.php';

@@ -15,6 +15,7 @@
 * Fixed the `Warning: is_dir(): Unable to find the wrapper "atom"` error showing up in rare cases.
 * Return types for magic methods were not being resolved relative to use statements or the namespace.
 * Parameter names for magic methods no longer contain a dollar sign (consistent with everything else).
+* Always set the timezone to UTC. (I changed my mind about this, due to reasons listed in PR #129.) (thanks to @tillkruss).
 * Some non-standard behavior has been removed that may or may not be noticable to users:
   * Constants in traits will no longer be picked up (PHP error).
   * Properties in traits will no longer be scanned for aliases (PHP error).
