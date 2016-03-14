@@ -234,6 +234,7 @@ class Parser
         lastCharacter = null
         startedKeyword = false
         startedStaticClassName = false
+        didStartedInsideString = (editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain().indexOf('.meta.string-contents.quoted.double') != -1)
 
         range = if backwards then [bufferPosition.row .. -1] else [bufferPosition.row .. editor.getLineCount()]
 
@@ -249,9 +250,10 @@ class Parser
                 lineRange = if backwards then [(bufferPosition.column - 1) .. 0] else [bufferPosition.column .. (lineText.length - 1)]
 
             for i in lineRange
-                scopeDescriptor = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
+                scopeDescriptorList = editor.scopeDescriptorForBufferPosition([line, i])
+                scopeDescriptor = scopeDescriptorList.getScopeChain()
 
-                if scopeDescriptor.indexOf('.comment') != -1 or scopeDescriptor.indexOf('.string-contents') != -1
+                if scopeDescriptor.indexOf('.comment') != -1 or (not not didStartedInsideString and scopeDescriptor.indexOf('.string-contents') != -1)
                     # Do nothing, we just keep parsing. (Comments can occur inside call stacks.)
 
                 else if lineText[i] == '('

@@ -291,6 +291,31 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition, false)).toEqual(expectedResult)
 
+    it "correctly stops when when the bracket syntax is used for variables inside strings.", ->
+        source =
+            """
+            <?php
+
+            $test = "
+                SELECT *
+
+                FROM {$this->foo}
+            ";
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            '$this',
+            ''
+        ]
+
+        bufferPosition =
+            row: editor.getLineCount() - 2
+            column: 17
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
     it "correctly stops when the first element is an instantiation wrapped in parentheses.", ->
         source =
             """

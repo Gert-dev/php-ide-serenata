@@ -14,6 +14,7 @@
 * Fixed problems with paths containing spaces on anything non-Windows (Linux, Mac OS X, ...).
 * Fixed the indexing progress bar disappearing sometimes if you edited a file while it was busy.
 * Fixed the `Warning: is_dir(): Unable to find the wrapper "atom"` error showing up in rare cases.
+* Fixed call stacks of simple expressions interpolated inside strings not being correctly retrieved.
 * Return types for magic methods were not being resolved relative to use statements or the namespace.
 * Parameter names for magic methods no longer contain a dollar sign (consistent with everything else).
 * Always set the timezone to UTC. (I changed my mind about this, due to reasons listed in [PR #129](https://github.com/Gert-dev/php-integrator-base/pull/129).) (thanks to [@tillkruss](https://github.com/tillkruss)).
