@@ -44,7 +44,8 @@ class ParentClass
     }
 }
 
-class ChildClass extends ParentClass
+// NOTE: Deliberately started with a lower case character here.
+class childClass extends ParentClass
 {
     /**
      * @var self
@@ -81,6 +82,14 @@ class ChildClass extends ParentClass
      * @return $this
      */
     public function methodThis()
+    {
+
+    }
+
+    /**
+     * @return childClass
+     */
+    public function methodOwnClassName()
     {
 
     }

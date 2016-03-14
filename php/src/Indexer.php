@@ -41,7 +41,12 @@ class Indexer
     protected $docParser;
 
     /**
-     * @var PhpParser\Parser|null
+     * @var TypeAnalyzer|null
+     */
+    protected $typeAnalyzer;
+
+    /**
+     * @var Parser|null
      */
     protected $parser;
 
@@ -1381,7 +1386,7 @@ class Indexer
             $classTypes = [];
 
             foreach ($types as $type) {
-                if ($this->isClassType($type)) {
+                if (!$this->getTypeAnalyzer()->isSpecialType($type)) {
                     $classTypes[] = $type;
                 }
             }
@@ -1392,18 +1397,6 @@ class Indexer
         }
 
         return null;
-    }
-
-    /**
-     * Returns a boolean indicating if the specified value is a class type or not.
-     *
-     * @param string $type
-     *
-     * @return bool
-     */
-    protected function isClassType($type)
-    {
-        return ucfirst($type) === $type && $type !== '$this';
     }
 
     /**
@@ -1447,6 +1440,18 @@ class Indexer
         }
 
         return $this->parser;
+    }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 
     /**

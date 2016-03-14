@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
 
+use PhpIntegrator\TypeAnalyzer;
+
 use PhpParser\Node;
 
 /**
@@ -13,6 +15,11 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
      * @var string|null
      */
     protected $lastNamespace = null;
+
+    /**
+     * @var TypeAnalyzer|null
+     */
+    protected $typeAnalyzer = null;
 
     /**
      * @inheritDoc
@@ -68,25 +75,18 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
     /// @inherited
     protected function isValidType($type)
     {
-        return !in_array($type, [
-            // As per https://github.com/phpDocumentor/fig-standards/blob/master/proposed/phpdoc.md#keyword
-            'string',
-            'int',
-            'bool',
-            'float',
-            'object',
-            'mixed',
-            'array',
-            'resource',
-            'void',
-            'null',
-            'callable',
-            'false',
-            'true',
-            'self',
-            'static',
-            'parent',
-            '$this'
-        ]);
+        return !$this->getTypeAnalyzer()->isSpecialType($type);
+    }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 }
