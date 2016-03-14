@@ -48,7 +48,7 @@ class Parser
      * @return {boolean}
     ###
     isBasicType: (type) ->
-        return /^(array|object|bool|string|static|null|boolean|void|int|integer|mixed|callable)$/i.test(type)
+        return /^(string|int|bool|float|object|mixed|array|resource|void|null|callable|false|true|self|static|parent|\$this)$/i.test(type)
 
     ###*
      * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
