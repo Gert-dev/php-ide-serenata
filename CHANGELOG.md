@@ -1,3 +1,9 @@
+## 0.8.0
+### Changes for developers
+* Changes to the service
+  * Methods will now contain information about whether they are abstract or not.
+  * Methods will now contain information about whether the method they override was abstract or not.
+
 ## 0.7.0
 ### Features and enhancements
 * The SQLite database will now use the WAL journal mode, which offers performance benefits. (See also [the SQLite documentation](https://www.sqlite.org/draft/wal.html) for those interested.)

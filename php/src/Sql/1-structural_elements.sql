@@ -188,6 +188,7 @@ CREATE TABLE functions(
     end_line              integer unsigned,
 
     is_builtin            tinyint(1) NOT NULL DEFAULT 0,
+    is_abstract           tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
 
     short_description     text,

@@ -198,6 +198,7 @@ class ClassInfoTest extends IndexedTest
             'isProtected'        => false,
             'isPrivate'          => false,
             'isStatic'           => false,
+            'isAbstract'         => false,
             'override'           => null,
             'implementation'     => null,
 
@@ -384,8 +385,9 @@ class ClassInfoTest extends IndexedTest
         $output = $this->getClassInfo($fileName, 'A\ChildClass');
 
         $this->assertEquals($output['methods']['parentTraitMethod']['override'], [
-            'startLine' => 7,
-            'endLine'   => 10,
+            'startLine'   => 7,
+            'endLine'     => 10,
+            'wasAbstract' => false,
 
             'declaringClass' => [
                 'name'      => 'A\ParentClass',
@@ -407,8 +409,9 @@ class ClassInfoTest extends IndexedTest
         ]);
 
         $this->assertEquals($output['methods']['parentMethod']['override'], [
-            'startLine' => 17,
-            'endLine'   => 20,
+            'startLine'   => 17,
+            'endLine'     => 20,
+            'wasAbstract' => false,
 
             'declaringClass' => [
                 'name'      => 'A\ParentClass',
@@ -430,14 +433,15 @@ class ClassInfoTest extends IndexedTest
         ]);
 
         $this->assertEquals($output['methods']['traitMethod']['override'], [
-            'startLine' => 25,
-            'endLine'   => 28,
+            'startLine'   => 25,
+            'endLine'     => 28,
+            'wasAbstract' => false,
 
             'declaringClass' => [
                 'name'      => 'A\ChildClass',
                 'filename'  =>  $this->getPathFor($fileName),
-                'startLine' => 31,
-                'endLine'   => 49,
+                'startLine' => 33,
+                'endLine'   => 56,
                 'type'      => 'class'
             ],
 
@@ -445,12 +449,14 @@ class ClassInfoTest extends IndexedTest
                 'name'            => 'A\TestTrait',
                 'filename'        => $this->getPathFor($fileName),
                 'startLine'       => 23,
-                'endLine'         => 29,
+                'endLine'         => 31,
                 'type'            => 'trait',
                 'startLineMember' => 25,
                 'endLineMember'   => 28
             ]
         ]);
+
+        $this->assertEquals($output['methods']['abstractMethod']['override']['wasAbstract'], true);
     }
 
     public function testPropertyOverridingIsAnalyzedCorrectly()

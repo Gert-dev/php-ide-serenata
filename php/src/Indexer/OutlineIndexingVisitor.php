@@ -275,6 +275,7 @@ class OutlineIndexingVisitor extends NameResolver
             'isPublic'       => $node->isPublic(),
             'isPrivate'      => $node->isPrivate(),
             'isProtected'    => $node->isProtected(),
+            'isAbstract'     => $node->isAbstract(),
             'isStatic'       => $node->isStatic(),
             'returnType'     => $localReturnType,
             'fullReturnType' => (string) $node->getReturnType(),

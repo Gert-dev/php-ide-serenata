@@ -26,6 +26,8 @@ trait TestTrait
     {
 
     }
+
+    abstract public function abstractMethod();
 }
 
 class ChildClass extends ParentClass
@@ -43,6 +45,11 @@ class ChildClass extends ParentClass
     }
 
     protected function traitMethod()
+    {
+
+    }
+
+    public function abstractMethod()
     {
 
     }

@@ -1224,6 +1224,7 @@ class Indexer
             'start_line'            => $rawData['startLine'],
             'end_line'              => $rawData['endLine'],
             'is_builtin'            => 0,
+            'is_abstract'           => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],

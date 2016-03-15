@@ -254,7 +254,8 @@ class IndexDataAdapter
                         'declaringClass'     => $existingMethod['declaringClass'],
                         'declaringStructure' => $existingMethod['declaringStructure'],
                         'startLine'          => (int) $existingMethod['startLine'],
-                        'endLine'            => (int) $existingMethod['endLine']
+                        'endLine'            => (int) $existingMethod['endLine'],
+                        'wasAbstract'        => (bool) $existingMethod['isAbstract']
                     ];
                 }
 
@@ -542,6 +543,7 @@ class IndexDataAdapter
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
             'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
             'isStatic'           => !!$rawInfo['is_static'],
+            'isAbstract'         => !!$rawInfo['is_abstract'],
 
             'override'           => null,
             'implementation'     => null,
