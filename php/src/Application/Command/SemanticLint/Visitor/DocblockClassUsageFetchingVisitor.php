@@ -3,7 +3,6 @@
 namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
 
 use PhpIntegrator\DocParser;
-use PhpIntegrator\TypeAnalyzer;
 
 use PhpParser\Node;
 
@@ -16,11 +15,6 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
      * @var string|null
      */
     protected $lastNamespace = null;
-
-    /**
-     * @var TypeAnalyzer|null
-     */
-    protected $typeAnalyzer = null;
 
     /**
      * @inheritDoc
@@ -74,23 +68,5 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
                 }
             }
         }
-    }
-
-    /// @inherited
-    protected function isValidType($type)
-    {
-        return !$this->getTypeAnalyzer()->isSpecialType($type);
-    }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
     }
 }
