@@ -3,7 +3,7 @@
 namespace A;
 
 /**
- * @throws DateTime
+ * @throws string|A\B|int
  * @throws string
  * @throws mixed
  * @throws \Traversable

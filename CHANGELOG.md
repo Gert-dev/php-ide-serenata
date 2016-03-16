@@ -4,6 +4,11 @@
   * Methods will now contain information about whether they are abstract or not.
   * Methods will now contain information about whether the method they override was abstract or not.
 
+## 0.7.1
+### Bugs fixed
+* Fixed semantic linting not marking use statements as used when their types were used inside a type union (e.g. `string|DateTime`).
+* Fixed semantic linting not checking if class names existed when they occurred inside a type union (e.g. `string|DateTime`).
+
 ## 0.7.0
 ### Features and enhancements
 * The SQLite database will now use the WAL journal mode, which offers performance benefits. (See also [the SQLite documentation](https://www.sqlite.org/draft/wal.html) for those interested.)
