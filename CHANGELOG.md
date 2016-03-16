@@ -6,8 +6,8 @@
 
 ## 0.7.1
 ### Bugs fixed
-* Fixed semantic linting not marking use statements as used when their types were used inside a type union (e.g. `string|DateTime`).
-* Fixed semantic linting not checking if class names existed when they occurred inside a type union (e.g. `string|DateTime`).
+* Fixed semantic linting not marking use statements in docblocks as used when their types were used inside a type union (e.g. `string|DateTime`).
+* Fixed semantic linting not checking if class names in docblocks existed when they occurred inside a type union (e.g. `string|DateTime`).
 * Fixed semantic linting not validating class names that were used inside function calls or in class constant fetching.
 * Fixed semantic linting marking use statements as unused whilst they were being used inside function calls or in class constant fetching.
 
