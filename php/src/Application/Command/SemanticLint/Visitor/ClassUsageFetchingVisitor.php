@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
 
+use PhpIntegrator\TypeAnalyzer;
+
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
@@ -20,6 +22,11 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
      * @var Node|null
      */
     protected $lastNode;
+
+    /**
+     * @var TypeAnalyzer|null
+     */
+    protected $typeAnalyzer = null;
 
     /**
      * @var string|null
@@ -43,29 +50,28 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
             $this->lastNamespace = (string) $node->name;
         }
 
-        // We don't care about these names at the moment.
-        if ($node instanceof Node\Expr\ConstFetch ||
-            $node instanceof Node\Expr\FuncCall ||
-            $node instanceof Node\Stmt\Use_ ||
-            $this->lastNode instanceof Node\Stmt\Namespace_) {
-            // TODO: Constants and functions can also have a fully qualified name, but these are not indexed at the
-            // moment. See also https://secure.php.net/manual/en/language.namespaces.importing.php .
-            $this->lastNode = $node;
-
+        if ($node instanceof Node\Stmt\Use_) {
             return NodeTraverser::DONT_TRAVERSE_CHILDREN;
         }
 
         if ($node instanceof Node\Name) {
-            if ($this->isValidType((string) $node)) {
-                $this->classUsageList[] = [
-                    'name'             => (string) $node,
-                    'firstPart'        => $node->getFirst(),
-                    'isFullyQualified' => $node->isFullyQualified(),
-                    'namespace'        => $this->lastNamespace,
-                    'line'             => $node->getAttribute('startLine')    ? $node->getAttribute('startLine')      : null,
-                    'start'            => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
-                    'end'              => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
-                ];
+            // TODO: Constants and functions can also have a fully qualified name, but these are not indexed at the
+            // moment. See also https://secure.php.net/manual/en/language.namespaces.importing.php .
+            if (!$this->lastNode instanceof Node\Expr\FuncCall &&
+                !$this->lastNode instanceof Node\Expr\ConstFetch &&
+                !$this->lastNode instanceof Node\Stmt\Namespace_
+            ) {
+                if ($this->isValidType((string) $node)) {
+                    $this->classUsageList[] = [
+                        'name'             => (string) $node,
+                        'firstPart'        => $node->getFirst(),
+                        'isFullyQualified' => $node->isFullyQualified(),
+                        'namespace'        => $this->lastNamespace,
+                        'line'             => $node->getAttribute('startLine')    ? $node->getAttribute('startLine')      : null,
+                        'start'            => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
+                        'end'              => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
+                    ];
+                }
             }
         }
 
@@ -77,9 +83,21 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
      *
      * @return bool
      */
-    protected function isValidType($type)
+     protected function isValidType($type)
+     {
+         return !$this->getTypeAnalyzer()->isSpecialType($type);
+     }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
     {
-        return !in_array($type, ['self', 'static', 'parent']);
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 
     /**

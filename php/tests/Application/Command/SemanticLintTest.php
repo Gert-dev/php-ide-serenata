@@ -43,6 +43,12 @@ class SemanticLintTest extends IndexedTest
                 'namespace' => 'A',
                 'start'     => 64,
                 'end'       => 72
+            ],
+            [
+                'name'      => 'DateTimeZone',
+                'namespace' => 'A',
+                'start'     => 85,
+                'end'       => 97
             ]
         ]);
     }
