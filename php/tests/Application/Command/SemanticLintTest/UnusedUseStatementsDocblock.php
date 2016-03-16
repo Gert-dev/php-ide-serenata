@@ -11,7 +11,7 @@ use UnexpectedValueException;
 /**
  * Pre. {@see SplFileInfo} Post. This uses the SplMinHeap function.
  *
- * @param DateTime $test
+ * @param string|DateTime|int $test
  *
  * @throws UnexpectedValueException
  *

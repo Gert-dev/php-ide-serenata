@@ -74,10 +74,10 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals($output['errors']['unknownClasses'], [
             [
-                'name'      => 'DateTime',
+                'name'      => 'A\B',
                 'namespace' => 'A',
-                'start'     => 108,
-                'end'       => 109
+                'start'     => 114,
+                'end'       => 115
             ]
         ]);
     }
