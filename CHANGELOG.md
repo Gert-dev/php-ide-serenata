@@ -1,4 +1,10 @@
 ## 0.7.2
+### Features and enhancements
+* A project index will now be triggered when the repository (if present) changes statusses. This isn't as aggressive as a file monitor, but will at least remove the annoyance of having to manually rescan when checking out a different branch to avoid incorrect data being served. Events that will trigger this involve:
+  * Doing a checkout to switch to a different branch.
+  * Modifying a file from the project tree externally and then coming back to Atom.
+
+## 0.7.2
 ### Bugs fixed
 * Fixed minor error where the service version was bumped incorrectly.
 

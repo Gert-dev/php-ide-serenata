@@ -313,6 +313,19 @@ module.exports =
         if projectDirectories.length > 0
             @attemptProjectIndex()
 
+            successHandler = (repository) =>
+                return if not repository
+
+                # Will trigger on things such as git checkout.
+                repository.onDidChangeStatuses () =>
+                    @attemptProjectIndex()
+
+            failureHandler = () =>
+                return
+
+            for projectDirectory in projectDirectories
+                atom.project.repositoryForDirectory(projectDirectory).then(successHandler, failureHandler)
+
     ###*
      * Activates the package.
     ###
