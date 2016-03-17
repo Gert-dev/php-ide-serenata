@@ -303,7 +303,7 @@ class Proxy
     ###
     reindex: (path, source, progressStreamCallback) ->
         if not path
-            throw new Error('No class name passed!')
+            throw new Error('No filename passed!')
 
         progressStreamCallbackWrapper = (output) =>
             # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
