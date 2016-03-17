@@ -374,16 +374,10 @@ module.exports =
 
         return if not path
 
-        isContainedInProject = false
-
-        for projectDirectory in atom.project.getDirectories()
-            if path.indexOf(projectDirectory.path) != -1
-                isContainedInProject = true
-                break
-
-        # Do not try to index files outside the project.
-        if isContainedInProject
-            @attemptFileIndex(path, editor.getBuffer().getText())
+        for projectDirectory in @fetchProjectDirectories()
+            if projectDirectory.contains(path)
+                @attemptFileIndex(path, editor.getBuffer().getText())
+                return
 
     ###*
      * Deactivates the package.
