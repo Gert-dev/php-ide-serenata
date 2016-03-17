@@ -1,9 +1,18 @@
+## 0.7.2
+### Bugs fixed
+* Fixed minor error where the service version was bumped incorrectly.
+
 ## 0.7.1
 ### Bugs fixed
 * Fixed semantic linting not marking use statements in docblocks as used when their types were used inside a type union (e.g. `string|DateTime`).
 * Fixed semantic linting not checking if class names in docblocks existed when they occurred inside a type union (e.g. `string|DateTime`).
 * Fixed semantic linting not validating class names that were used inside function calls or in class constant fetching.
 * Fixed semantic linting marking use statements as unused whilst they were being used inside function calls or in class constant fetching.
+
+### Changes for developers
+* Changes to the service
+  * Methods will now contain information about whether they are abstract or not.
+  * Methods will now contain information about whether the method they override was abstract or not.
 
 ## 0.7.0
 ### Features and enhancements
