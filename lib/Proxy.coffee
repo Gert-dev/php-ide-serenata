@@ -313,8 +313,13 @@ class Proxy
             for percentage in percentages
                 progressStreamCallback(percentage)
 
+        parameters = ['--reindex', '--database=' + @getIndexDatabasePath(), '--source=' + path, '--stream-progress']
+
+        if source?
+            parameters.push('--stdin')
+
         return @performRequest(
-            ['--reindex', '--database=' + @getIndexDatabasePath(), '--source=' + path, '--stream-progress', '--stdin'],
+            prepareParameters,
             true,
             progressStreamCallbackWrapper,
             source
