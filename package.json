@@ -11,7 +11,7 @@
   "providedServices": {
     "php-integrator.service": {
       "versions": {
-        "0.8.0": "getService"
+        "0.7.0": "getService"
       }
     }
   },
