@@ -305,6 +305,15 @@ module.exports =
             @statusBarManager = null
 
     ###*
+     * Synchronizes internally with changes to the current project folders.
+    ###
+    syncWithAtomProjectFolders: () ->
+        projectDirectories = @fetchProjectDirectories()
+
+        if projectDirectories.length > 0
+            @attemptProjectIndex()
+
+    ###*
      * Activates the package.
     ###
     activate: ->
@@ -337,14 +346,11 @@ module.exports =
 
         # In rare cases, the package is loaded faster than the project gets a chance to load. At that point, no project
         # directory is returned. The onDidChangePaths listener below will also catch that case.
-        if @fetchProjectDirectories().length > 0
-            @attemptProjectIndex()
+        @syncWithAtomProjectFolders()
 
         @disposables.add atom.project.onDidChangePaths (projectPaths) =>
-            # NOTE: This listener is also invoked at shutdown with an empty array as argument, this makes sure we don't
-            # try to reindex then.
-            if @fetchProjectDirectories().length > 0
-                @attemptProjectIndex()
+            # NOTE: This listener is also invoked at shutdown with an empty array as argument.
+            @syncWithAtomProjectFolders()
 
         @disposables.add atom.workspace.observeTextEditors (editor) =>
             # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
