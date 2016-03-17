@@ -319,7 +319,7 @@ class Proxy
             parameters.push('--stdin')
 
         return @performRequest(
-            prepareParameters,
+            parameters,
             true,
             progressStreamCallbackWrapper,
             source
