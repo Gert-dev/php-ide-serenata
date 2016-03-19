@@ -317,7 +317,7 @@ module.exports =
                 return if not repository
 
                 # Will trigger on things such as git checkout.
-                repository.onDidChangeStatuses () =>
+                repository.async.onDidChangeStatuses () =>
                     @attemptProjectIndex()
 
             failureHandler = () =>
