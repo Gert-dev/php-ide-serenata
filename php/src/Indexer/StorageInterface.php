@@ -129,12 +129,18 @@ interface StorageInterface
      */
     public function update($indexStorageItem, $id, array $data);
 
-    /// @inherited
+    /**
+     * @inheritDoc
+     */
     public function beginTransaction();
 
-    /// @inherited
+    /**
+     * @inheritDoc
+     */
     public function commitTransaction();
 
-    /// @inherited
+    /**
+     * @inheritDoc
+     */
     public function rollbackTransaction();
 }
