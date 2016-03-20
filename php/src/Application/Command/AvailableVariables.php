@@ -42,9 +42,7 @@ class AvailableVariables extends BaseCommand
      {
          if (!isset($arguments['file']) && (!isset($arguments['stdin']) || !$arguments['stdin']->value)) {
              throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
-         }
-
-         if (!isset($arguments['offset'])) {
+         } elseif (!isset($arguments['offset'])) {
              throw new UnexpectedValueException('An --offset must be supplied into the source code!');
          }
 
