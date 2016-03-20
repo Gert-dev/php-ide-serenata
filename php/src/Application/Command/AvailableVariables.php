@@ -62,10 +62,6 @@ class AvailableVariables extends BaseCommand
       */
      public function getAvailableVariables($file, $offset, $isStdin)
      {
-         $lexer = new Lexer([
-             'usedAttributes' => ['startFilePos', 'endFilePos']
-         ]);
-
          $code = null;
 
          if ($isStdin) {
