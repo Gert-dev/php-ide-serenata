@@ -21,7 +21,7 @@ class DependencyFetchingVisitor extends NameResolver
     /**
      * @var Node\Stmt\Class_|null
      */
-    protected $currentStructuralElement;
+    protected $currentStructure;
 
     /**
      * @inheritDoc
@@ -33,7 +33,7 @@ class DependencyFetchingVisitor extends NameResolver
         if ($node instanceof Node\Stmt\Class_) {
             // Ticket #45 - This could potentially not be set for PHP 7 anonymous classes.
             if (isset($node->namespacedName)) {
-                $this->currentStructuralElement = $node;
+                $this->currentStructure = $node;
 
                 $fqcn = $node->namespacedName->toString();
 
@@ -49,7 +49,7 @@ class DependencyFetchingVisitor extends NameResolver
             }
         } elseif ($node instanceof Node\Stmt\Interface_) {
             if (isset($node->namespacedName)) {
-                $this->currentStructuralElement = $node;
+                $this->currentStructure = $node;
 
                 $fqcn = $node->namespacedName->toString();
 
@@ -66,14 +66,14 @@ class DependencyFetchingVisitor extends NameResolver
             }
         } elseif ($node instanceof Node\Stmt\Trait_) {
             if (isset($node->namespacedName)) {
-                $this->currentStructuralElement = $node;
+                $this->currentStructure = $node;
 
                 $fqcn = $node->namespacedName->toString();
 
                 $this->fqsenDependencyMap[$fqcn] = [];
             }
         } elseif ($node instanceof Node\Stmt\TraitUse) {
-            $fqcn = $this->currentStructuralElement->namespacedName->toString();
+            $fqcn = $this->currentStructure->namespacedName->toString();
 
             foreach ($node->traits as $trait) {
                 $this->fqsenDependencyMap[$fqcn][] = $trait->toString();
@@ -88,8 +88,8 @@ class DependencyFetchingVisitor extends NameResolver
     {
         parent::leaveNode($node);
 
-        if ($this->currentStructuralElement === $node) {
-            $this->currentStructuralElement = null;
+        if ($this->currentStructure === $node) {
+            $this->currentStructure = null;
         }
     }
 

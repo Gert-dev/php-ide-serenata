@@ -18,7 +18,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
     * @var array|null
     */
-    protected $structuralElementRawInfo = null;
+    protected $structureRawInfo = null;
 
     /**
      * Constructor.
@@ -31,7 +31,7 @@ class ClassListProxyProvider implements ProviderInterface
     }
 
     /**
-     * Sets the data to return for the {@see getStructuralElementRawInfo} call. If set to null (the default), that call
+     * Sets the data to return for the {@see getStructureRawInfo} call. If set to null (the default), that call
      * will proxy the method from the proxied object as usual.
      *
      * Can be used to avoid performing an additional proxy call to improve performance or just to override the returned
@@ -41,34 +41,26 @@ class ClassListProxyProvider implements ProviderInterface
      *
      * @return $this
      */
-    public function setStructuralElementRawInfo(array $rawInfo = null)
+    public function setStructureRawInfo(array $rawInfo = null)
     {
-        $this->structuralElementRawInfo = $rawInfo;
+        $this->structureRawInfo = $rawInfo;
         return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawInfo($id)
+    public function getStructureRawInfo($id)
     {
-        return ($this->structuralElementRawInfo !== null) ?
-            $this->structuralElementRawInfo :
-            $this->proxiedObject->getStructuralElementRawInfo($id);
+        return ($this->structureRawInfo !== null) ?
+            $this->structureRawInfo :
+            $this->proxiedObject->getStructureRawInfo($id);
     }
 
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawParents($id)
-    {
-        return new ArrayIterator([]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getStructuralElementRawChildren($id)
+    public function getStructureRawParents($id)
     {
         return new ArrayIterator([]);
     }
@@ -76,7 +68,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawInterfaces($id)
+    public function getStructureRawChildren($id)
     {
         return new ArrayIterator([]);
     }
@@ -84,7 +76,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawImplementors($id)
+    public function getStructureRawInterfaces($id)
     {
         return new ArrayIterator([]);
     }
@@ -92,7 +84,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawTraits($id)
+    public function getStructureRawImplementors($id)
     {
         return new ArrayIterator([]);
     }
@@ -100,7 +92,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawTraitUsers($id)
+    public function getStructureRawTraits($id)
     {
         return new ArrayIterator([]);
     }
@@ -108,7 +100,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawConstants($id)
+    public function getStructureRawTraitUsers($id)
     {
         return new ArrayIterator([]);
     }
@@ -116,7 +108,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawProperties($id)
+    public function getStructureRawConstants($id)
     {
         return new ArrayIterator([]);
     }
@@ -124,7 +116,15 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementRawMethods($id)
+    public function getStructureRawProperties($id)
+    {
+        return new ArrayIterator([]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getStructureRawMethods($id)
     {
         return [];
     }
@@ -132,7 +132,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementTraitAliasesAssoc($id)
+    public function getStructureTraitAliasesAssoc($id)
     {
         return [];
     }
@@ -140,7 +140,7 @@ class ClassListProxyProvider implements ProviderInterface
     /**
      * @inheritDoc
      */
-    public function getStructuralElementTraitPrecedencesAssoc($id)
+    public function getStructureTraitPrecedencesAssoc($id)
     {
         return [];
     }

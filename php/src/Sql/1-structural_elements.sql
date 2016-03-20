@@ -13,12 +13,12 @@ CREATE TABLE files(
 );
 
 --
-CREATE TABLE structural_element_types(
+CREATE TABLE structure_types(
     id   integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     name varchar(255) NOT NULL
 );
 
-INSERT INTO structural_element_types (id, name) VALUES
+INSERT INTO structure_types (id, name) VALUES
     (NULL, 'class'),
     (NULL, 'trait'),
     (NULL, 'interface');
@@ -62,7 +62,7 @@ CREATE TABLE files_namespaces_imports(
 );
 
 --
-CREATE TABLE structural_elements(
+CREATE TABLE structures(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                       varchar(255) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE structural_elements(
     start_line                 integer unsigned,
     end_line                   integer unsigned,
 
-    structural_element_type_id integer NOT NULL,
+    structure_type_id integer NOT NULL,
     short_description          text,
     long_description           text,
     is_builtin                 tinyint(1) NOT NULL DEFAULT 0,
@@ -83,75 +83,75 @@ CREATE TABLE structural_elements(
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(structural_element_type_id) REFERENCES structural_element_types(id)
+    FOREIGN KEY(structure_type_id) REFERENCES structure_types(id)
         ON DELETE RESTRICT
         ON UPDATE RESTRICT
 );
 
 -- Contains references to parent structural elements for structural elements.
-CREATE TABLE structural_elements_parents_linked(
-    structural_element_id        integer unsigned NOT NULL,
-    linked_structural_element_id integer unsigned NOT NULL,
+CREATE TABLE structures_parents_linked(
+    structure_id        integer unsigned NOT NULL,
+    linked_structure_id integer unsigned NOT NULL,
 
-    PRIMARY KEY(structural_element_id, linked_structural_element_id),
+    PRIMARY KEY(structure_id, linked_structure_id),
 
-    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(linked_structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(linked_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- Contains interfaces implemented by structural elements.
-CREATE TABLE structural_elements_interfaces_linked(
-    structural_element_id        integer unsigned NOT NULL,
-    linked_structural_element_id integer unsigned NOT NULL,
+CREATE TABLE structures_interfaces_linked(
+    structure_id        integer unsigned NOT NULL,
+    linked_structure_id integer unsigned NOT NULL,
 
-    PRIMARY KEY(structural_element_id, linked_structural_element_id),
+    PRIMARY KEY(structure_id, linked_structure_id),
 
-    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(linked_structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(linked_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- Contains traits used by structural elements.
-CREATE TABLE structural_elements_traits_linked(
-    structural_element_id        integer unsigned NOT NULL,
-    linked_structural_element_id integer unsigned NOT NULL,
+CREATE TABLE structures_traits_linked(
+    structure_id        integer unsigned NOT NULL,
+    linked_structure_id integer unsigned NOT NULL,
 
-    PRIMARY KEY(structural_element_id, linked_structural_element_id),
+    PRIMARY KEY(structure_id, linked_structure_id),
 
-    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(linked_structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(linked_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- Contains trait aliases used by structural elements.
-CREATE TABLE structural_elements_traits_aliases(
+CREATE TABLE structures_traits_aliases(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
-    structural_element_id       integer unsigned NOT NULL,
-    trait_structural_element_id integer unsigned,
+    structure_id       integer unsigned NOT NULL,
+    trait_structure_id integer unsigned,
     access_modifier_id          integer unsigned,
 
     name                        varchar(255) NOT NULL,
     alias                       varchar(255),
 
-    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(trait_structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(trait_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 
@@ -161,19 +161,19 @@ CREATE TABLE structural_elements_traits_aliases(
 );
 
 -- Contains trait precedences used by structural elements.
-CREATE TABLE structural_elements_traits_precedences(
+CREATE TABLE structures_traits_precedences(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
-    structural_element_id       integer unsigned NOT NULL,
-    trait_structural_element_id integer unsigned NOT NULL,
+    structure_id       integer unsigned NOT NULL,
+    trait_structure_id integer unsigned NOT NULL,
 
     name                        varchar(255) NOT NULL,
 
-    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(trait_structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(trait_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -199,7 +199,7 @@ CREATE TABLE functions(
     return_description    text,
 
     -- Specific to members.
-    structural_element_id integer unsigned,
+    structure_id integer unsigned,
     access_modifier_id    integer unsigned,
 
     is_magic              tinyint(1),
@@ -217,7 +217,7 @@ CREATE TABLE functions(
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
@@ -280,7 +280,7 @@ CREATE TABLE properties(
     full_return_type      varchar(255),
     return_description    text,
 
-    structural_element_id integer unsigned NOT NULL,
+    structure_id integer unsigned NOT NULL,
     access_modifier_id    integer unsigned NOT NULL,
 
     is_magic              tinyint(1) NOT NULL DEFAULT 0,
@@ -291,7 +291,7 @@ CREATE TABLE properties(
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
@@ -321,13 +321,13 @@ CREATE TABLE constants(
     return_description    text,
 
     -- Specific to member constants.
-    structural_element_id integer unsigned,
+    structure_id integer unsigned,
 
     FOREIGN KEY(file_id) REFERENCES files(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
 
-    FOREIGN KEY(structural_element_id) REFERENCES structural_elements(id)
+    FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );

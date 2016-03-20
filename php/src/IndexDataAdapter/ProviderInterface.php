@@ -12,82 +12,82 @@ interface ProviderInterface
      *
      * @return array
      */
-    public function getStructuralElementRawInfo($id);
+    public function getStructureRawInfo($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawParents($id);
+    public function getStructureRawParents($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawChildren($id);
+    public function getStructureRawChildren($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawInterfaces($id);
+    public function getStructureRawInterfaces($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawImplementors($id);
+    public function getStructureRawImplementors($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawTraits($id);
+    public function getStructureRawTraits($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawTraitUsers($id);
+    public function getStructureRawTraitUsers($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawConstants($id);
+    public function getStructureRawConstants($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawProperties($id);
+    public function getStructureRawProperties($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementRawMethods($id);
+    public function getStructureRawMethods($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementTraitAliasesAssoc($id);
+    public function getStructureTraitAliasesAssoc($id);
 
     /**
      * @param int $id
      *
      * @return array
      */
-    public function getStructuralElementTraitPrecedencesAssoc($id);
+    public function getStructureTraitPrecedencesAssoc($id);
 }

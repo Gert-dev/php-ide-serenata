@@ -35,19 +35,19 @@ class IndexDataAdapter
      *
      * @return array
      */
-    public function getStructuralElementInfo($id)
+    public function getStructureInfo($id)
     {
-        return $this->resolveStructuralElement(
-            $this->storage->getStructuralElementRawInfo($id),
-            $this->storage->getStructuralElementRawParents($id),
-            $this->storage->getStructuralElementRawChildren($id),
-            $this->storage->getStructuralElementRawInterfaces($id),
-            $this->storage->getStructuralElementRawImplementors($id),
-            $this->storage->getStructuralElementRawTraits($id),
-            $this->storage->getStructuralElementRawTraitUsers($id),
-            $this->storage->getStructuralElementRawConstants($id),
-            $this->storage->getStructuralElementRawProperties($id),
-            $this->storage->getStructuralElementRawMethods($id)
+        return $this->resolveStructure(
+            $this->storage->getStructureRawInfo($id),
+            $this->storage->getStructureRawParents($id),
+            $this->storage->getStructureRawChildren($id),
+            $this->storage->getStructureRawInterfaces($id),
+            $this->storage->getStructureRawImplementors($id),
+            $this->storage->getStructureRawTraits($id),
+            $this->storage->getStructureRawTraitUsers($id),
+            $this->storage->getStructureRawConstants($id),
+            $this->storage->getStructureRawProperties($id),
+            $this->storage->getStructureRawMethods($id)
         );
     }
 
@@ -67,7 +67,7 @@ class IndexDataAdapter
      *
      * @return array
      */
-    public function resolveStructuralElement(
+    public function resolveStructure(
         $element,
         $parents,
         $children,
@@ -344,7 +344,7 @@ class IndexDataAdapter
     protected function parseParentData(ArrayObject $result, $parents)
     {
         foreach ($parents as $parent) {
-            $parentInfo = $this->getStructuralElementInfo($parent['id']);
+            $parentInfo = $this->getStructureInfo($parent['id']);
 
             if ($parentInfo) {
                 if (!$result['descriptions']['short']) {
@@ -383,7 +383,7 @@ class IndexDataAdapter
     protected function parseInterfaceData(ArrayObject $result, $interfaces)
     {
         foreach ($interfaces as $interface) {
-            $interface = $this->getStructuralElementInfo($interface['id']);
+            $interface = $this->getStructureInfo($interface['id']);
 
             $result['interfaces'][] = $interface['name'];
             $result['directInterfaces'][] = $interface['name'];
@@ -411,11 +411,11 @@ class IndexDataAdapter
      */
     protected function parseTraitData(ArrayObject $result, Traversable $traits, $element)
     {
-        $traitAliases = $this->storage->getStructuralElementTraitAliasesAssoc($element['id']);
-        $traitPrecedences = $this->storage->getStructuralElementTraitPrecedencesAssoc($element['id']);
+        $traitAliases = $this->storage->getStructureTraitAliasesAssoc($element['id']);
+        $traitPrecedences = $this->storage->getStructureTraitPrecedencesAssoc($element['id']);
 
         foreach ($traits as $trait) {
-            $trait = $this->getStructuralElementInfo($trait['id']);
+            $trait = $this->getStructureInfo($trait['id']);
 
             $result['traits'][] = $trait['name'];
             $result['directTraits'][] = $trait['name'];

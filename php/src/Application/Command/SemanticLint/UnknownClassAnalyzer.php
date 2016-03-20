@@ -73,7 +73,7 @@ class UnknownClassAnalyzer implements AnalyzerInterface
         // Generate a class map for fast lookups.
         $classMap = [];
 
-        foreach ($this->indexDatabase->getAllStructuralElementsRawInfo(null) as $element) {
+        foreach ($this->indexDatabase->getAllStructuresRawInfo(null) as $element) {
             $classMap[$element['fqsen']] = true;
         }
 

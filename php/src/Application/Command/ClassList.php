@@ -47,12 +47,12 @@ class ClassList extends BaseCommand
          $storageProxy = new IndexDataAdapter\ClassListProxyProvider($this->indexDatabase);
          $dataAdapter = new IndexDataAdapter($storageProxy);
 
-         foreach ($this->indexDatabase->getAllStructuralElementsRawInfo($file) as $element) {
+         foreach ($this->indexDatabase->getAllStructuresRawInfo($file) as $element) {
              // Directly load in the raw information we already have, this avoids performing a database query for each
              // record.
-             $storageProxy->setStructuralElementRawInfo($element);
+             $storageProxy->setStructureRawInfo($element);
 
-             $info = $dataAdapter->getStructuralElementInfo($element['id']);
+             $info = $dataAdapter->getStructureInfo($element['id']);
 
              unset($info['constants'], $info['properties'], $info['methods']);
 

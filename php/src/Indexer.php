@@ -58,7 +58,7 @@ class Indexer
     /**
      * @var array|null
      */
-    protected $structuralElementTypeMap;
+    protected $structureTypeMap;
 
     /**
      * Whether to display (debug) output.
@@ -512,7 +512,7 @@ class Indexer
             $element = new ReflectionClass($trait);
 
             if ($element->isInternal()) {
-                $this->indexBuiltinStructuralElement($element);
+                $this->indexBuiltinStructure($element);
             }
         }
 
@@ -520,7 +520,7 @@ class Indexer
             $element = new ReflectionClass($interface);
 
             if ($element->isInternal()) {
-                $this->indexBuiltinStructuralElement($element);
+                $this->indexBuiltinStructure($element);
             }
         }
 
@@ -528,7 +528,7 @@ class Indexer
             $element = new ReflectionClass($class);
 
             if ($element->isInternal()) {
-                $this->indexBuiltinStructuralElement($element);
+                $this->indexBuiltinStructure($element);
             }
         }
     }
@@ -538,7 +538,7 @@ class Indexer
      *
      * @param ReflectionClass $element
      */
-    protected function indexBuiltinStructuralElement(ReflectionClass $element)
+    protected function indexBuiltinStructure(ReflectionClass $element)
     {
         $type = null;
         $parents = [];
@@ -649,7 +649,7 @@ class Indexer
             ];
         }
 
-        $this->indexStructuralElement($rawData, null, $element->getName(), true);
+        $this->indexStructure($rawData, null, $element->getName(), true);
     }
 
     /**
@@ -702,9 +702,9 @@ class Indexer
 
         $indexedSeIds = [];
 
-        foreach ($outlineIndexingVisitor->getStructuralElements() as $fqsen => $structuralElement) {
-            $indexedSeIds[] = $this->indexStructuralElement(
-                $structuralElement,
+        foreach ($outlineIndexingVisitor->getStructures() as $fqsen => $structure) {
+            $indexedSeIds[] = $this->indexStructure(
+                $structure,
                 $fileId,
                 $fqsen,
                 false,
@@ -739,7 +739,7 @@ class Indexer
         }
 
         // Remove structural elements that are no longer in this file.
-        $this->storage->deleteExcludedStructuralElementsByFileId($fileId, $indexedSeIds);
+        $this->storage->deleteExcludedStructuresByFileId($fileId, $indexedSeIds);
     }
 
     /**
@@ -753,14 +753,14 @@ class Indexer
      *
      * @return int The ID of the structural element.
      */
-    protected function indexStructuralElement(
+    protected function indexStructure(
         array $rawData,
         $fileId,
         $fqsen,
         $isBuiltin,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        $structuralElementTypeMap = $this->getStructuralElementTypeMap();
+        $structureTypeMap = $this->getStructureTypeMap();
 
         $documentation = $this->getDocParser()->parse($rawData['docComment'], [
             DocParser::DEPRECATED,
@@ -777,7 +777,7 @@ class Indexer
             'file_id'                    => $fileId,
             'start_line'                 => $rawData['startLine'],
             'end_line'                   => $rawData['endLine'],
-            'structural_element_type_id' => $structuralElementTypeMap[$rawData['type']],
+            'structure_type_id' => $structureTypeMap[$rawData['type']],
             'is_abstract'                => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
             'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
             'is_builtin'                 => $isBuiltin ? 1 : 0,
@@ -786,7 +786,7 @@ class Indexer
             'long_description'           => $documentation['descriptions']['long']
         ];
 
-        $seId = $this->storage->getStructuralElementId($fqsen);
+        $seId = $this->storage->getStructureId($fqsen);
 
         if ($seId) {
             $this->storage->deletePropertiesFor($seId);
@@ -797,21 +797,21 @@ class Indexer
             $this->storage->deleteInterfaceLinksFor($seId);
             $this->storage->deleteTraitLinksFor($seId);
 
-            $this->storage->update(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, $seId, $seData);
+            $this->storage->update(IndexStorageItemEnum::STRUCTURES, $seId, $seData);
         } else {
-            $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS, $seData);
+            $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, $seData);
         }
 
         $accessModifierMap = $this->getAccessModifierMap();
 
         if (isset($rawData['parents'])) {
             foreach ($rawData['parents'] as $parent) {
-                $parentSeId = $this->storage->getStructuralElementId($parent);
+                $parentSeId = $this->storage->getStructureId($parent);
 
                 if ($parentSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_PARENTS_LINKED, [
-                        'structural_element_id'        => $seId,
-                        'linked_structural_element_id' => $parentSeId
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
+                        'structure_id'        => $seId,
+                        'linked_structure_id' => $parentSeId
                     ]);
                 } else {
                     $this->logMessage(
@@ -824,12 +824,12 @@ class Indexer
 
         if (isset($rawData['interfaces'])) {
             foreach ($rawData['interfaces'] as $interface) {
-                $interfaceSeId = $this->storage->getStructuralElementId($interface);
+                $interfaceSeId = $this->storage->getStructureId($interface);
 
                 if ($interfaceSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_INTERFACES_LINKED, [
-                        'structural_element_id'        => $seId,
-                        'linked_structural_element_id' => $interfaceSeId
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
+                        'structure_id'        => $seId,
+                        'linked_structure_id' => $interfaceSeId
                     ]);
                 } else {
                     $this->logMessage(
@@ -842,12 +842,12 @@ class Indexer
 
         if (isset($rawData['traits'])) {
             foreach ($rawData['traits'] as $trait) {
-                $traitSeId = $this->storage->getStructuralElementId($trait);
+                $traitSeId = $this->storage->getStructureId($trait);
 
                 if ($traitSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_LINKED, [
-                        'structural_element_id'        => $seId,
-                        'linked_structural_element_id' => $traitSeId
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
+                        'structure_id'        => $seId,
+                        'linked_structure_id' => $traitSeId
                     ]);
                 } else {
                     $this->logMessage(
@@ -865,7 +865,7 @@ class Indexer
                 $traitSeId = null;
 
                 if ($traitAlias['trait']) {
-                    $traitSeId = $this->storage->getStructuralElementId($traitAlias['trait']);
+                    $traitSeId = $this->storage->getStructureId($traitAlias['trait']);
 
                     if (!$traitSeId) {
                         $this->logMessage(
@@ -875,9 +875,9 @@ class Indexer
                     }
                 }
 
-                $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_ALIASES, [
-                    'structural_element_id'       => $seId,
-                    'trait_structural_element_id' => $traitSeId,
+                $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_ALIASES, [
+                    'structure_id'       => $seId,
+                    'trait_structure_id' => $traitSeId,
                     'access_modifier_id'          => $accessModifier ? $accessModifierMap[$accessModifier] : null,
                     'name'                        => $traitAlias['name'],
                     'alias'                       => $traitAlias['alias']
@@ -887,12 +887,12 @@ class Indexer
 
         if (isset($rawData['traitPrecedences'])) {
             foreach ($rawData['traitPrecedences'] as $traitPrecedence) {
-                $traitSeId = $this->storage->getStructuralElementId($traitPrecedence['trait']);
+                $traitSeId = $this->storage->getStructureId($traitPrecedence['trait']);
 
                 if ($traitSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURAL_ELEMENTS_TRAITS_PRECEDENCES, [
-                        'structural_element_id'       => $seId,
-                        'trait_structural_element_id' => $traitSeId,
+                    $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, [
+                        'structure_id'       => $seId,
+                        'trait_structure_id' => $traitSeId,
                         'name'                        => $traitPrecedence['name']
                     ]);
                 } else {
@@ -1102,7 +1102,7 @@ class Indexer
             'return_type'           => $returnType,
             'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
-            'structural_element_id' => $seId,
+            'structure_id' => $seId,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1
         ]);
     }
@@ -1167,7 +1167,7 @@ class Indexer
             'return_type'           => $returnType,
             'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
-            'structural_element_id' => $seId,
+            'structure_id' => $seId,
             'access_modifier_id'    => $amId,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'is_magic'              => $isMagic ? 1 : 0,
@@ -1231,7 +1231,7 @@ class Indexer
             'return_type'           => $returnType,
             'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['return']['description'],
-            'structural_element_id' => $seId,
+            'structure_id' => $seId,
             'access_modifier_id'    => $amId,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'is_magic'              => $isMagic ? 1 : 0,
@@ -1415,13 +1415,13 @@ class Indexer
     /**
      * @return array
      */
-    protected function getStructuralElementTypeMap()
+    protected function getStructureTypeMap()
     {
-        if (!$this->structuralElementTypeMap) {
-            $this->structuralElementTypeMap = $this->storage->getStructuralElementTypeMap();
+        if (!$this->structureTypeMap) {
+            $this->structureTypeMap = $this->storage->getStructureTypeMap();
         }
 
-        return $this->structuralElementTypeMap;
+        return $this->structureTypeMap;
     }
 
 

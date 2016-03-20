@@ -51,12 +51,12 @@ class ClassInfo extends BaseCommand
             $fqsen = mb_substr($fqsen, 1);
         }
 
-        $id = $this->indexDatabase->getStructuralElementId($fqsen);
+        $id = $this->indexDatabase->getStructureId($fqsen);
 
         if (!$id) {
             throw new UnexpectedValueException('The structural element "' . $fqsen . '" was not found!');
         }
 
-        return $this->getIndexDataAdapter()->getStructuralElementInfo($id);
+        return $this->getIndexDataAdapter()->getStructureInfo($id);
     }
 }
