@@ -632,7 +632,6 @@ class Parser
                 matchInfo.stop()
 
             # Check if we can find a foreach.
-            # foreach\s+\((\$[a-zA-Z0-9_]+)\s+as\s+(?:(?:\$[a-zA-Z0-9_]+)\s*=>)?\s*(\$[a-zA-Z0-9_]+)\)
             regexForeach = ///(foreach\s+\(.+)\s+as\s+(?:(?:\$[a-zA-Z0-9_]+)\s*=>)?\s*(#{elementForRegex})\)///
 
             editor.getBuffer().backwardsScanInRange regexForeach, [scanStartPosition, bufferPosition], (matchInfo) =>
