@@ -50,9 +50,4 @@ As the service allows fetching information about the code base, other packages c
   * ... automatically creating methods and/or properties when they don't exist yet (e.g. on alt-enter).
   * ... generating, updating and linting docblocks.
 
-## What does not work?
-Most of the issue reports indicate things that are missing, but indexing should be working fairly well in general. There are also some things that won't be supported because they are fairly complex to implement (usually for fairly little benefit). These limitations may also affect other packages using the provided service:
-
-* `static` and `self` behave mostly like `$this` in **non-static** contexts, i.e. they can also access non-static members.
-
 ![GPLv3 Logo](http://gplv3.fsf.org/gplv3-127x51.png)
