@@ -305,13 +305,16 @@ class Proxy
         if not path
             throw new Error('No filename passed!')
 
-        progressStreamCallbackWrapper = (output) =>
-            # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
-            percentages = output.toString('ascii').split("\n")
-            percentages.pop() # Ditch the empty value.
+        progressStreamCallbackWrapper = null
 
-            for percentage in percentages
-                progressStreamCallback(percentage)
+        if progressStreamCallback?
+            progressStreamCallbackWrapper = (output) =>
+                # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
+                percentages = output.toString('ascii').split("\n")
+                percentages.pop() # Ditch the empty value.
+
+                for percentage in percentages
+                    progressStreamCallback(percentage)
 
         parameters = ['--reindex', '--database=' + @getIndexDatabasePath(), '--source=' + path, '--stream-progress']
 

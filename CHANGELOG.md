@@ -6,6 +6,7 @@
 
 ### Bugs fixed
 * Fixed PHP 7 anonymous classes still being parsed.
+* Fixed a rare error relating to an "undefined progressStreamCallback".
 
 ## 0.7.2
 ### Bugs fixed
