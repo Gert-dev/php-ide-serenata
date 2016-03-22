@@ -3,6 +3,7 @@
 namespace PhpIntegrator\Indexer;
 
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 
 use PhpParser\NodeVisitor\NameResolver;
 
@@ -48,6 +49,11 @@ class OutlineIndexingVisitor extends NameResolver
         } elseif ($node instanceof Node\Stmt\Const_) {
             $this->parseConstantNode($node);
         } elseif ($node instanceof Node\Stmt\Class_) {
+            if (!isset($node->namespacedName)) {
+                // Ticket #45 - This could potentially not be set for PHP 7 anonymous classes.
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+
             $this->parseClassNode($node);
         } elseif ($node instanceof Node\Stmt\Interface_) {
             $this->parseInterfaceNode($node);
@@ -67,10 +73,6 @@ class OutlineIndexingVisitor extends NameResolver
     protected function parseClassNode(Node\Stmt\Class_ $node)
     {
         parent::enterNode($node);
-
-        if (!isset($node->namespacedName)) {
-            return; // Ticket #45 - This could potentially not be set for PHP 7 anonymous classes.
-        }
 
         $this->currentStructure = $node;
 

@@ -4,6 +4,9 @@
   * Doing a checkout to switch to a different branch.
   * Modifying a file from the project tree externally and then coming back to Atom.
 
+### Bugs fixed
+* Fixed PHP 7 anonymous classes still being parsed.
+
 ## 0.7.2
 ### Bugs fixed
 * Fixed minor error where the service version was bumped incorrectly.
