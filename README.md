@@ -39,10 +39,8 @@ You can very easily start using the service by simply consuming the service in y
 
 As the service allows fetching information about the code base, other packages can do all kinds of interesting things with it that brings Atom closer to an IDE for PHP, yet completely open-source. Here are some idea's of things that could be done with the service (besides what the existing packages listed above already do):
 * A package listing all the classes implementing an interface, using a trait, or extending another class.
+* A package performing a semantic lint on an entire project, showing various problems with each file in a navigatable list.
 * An (UML?) class diagram builder that creates a visual representation of the relations between all classes in a code base (i.e. their implemented interfaces, base classes and traits).
-* A refactoring package that allows:
-  * ... automatically adding methods that are present in an interface of the current class but aren't present yet in the current file.
-  * ... automatically creating methods and/or properties when they don't exist yet (e.g. on alt-enter).
-  * ... generating, updating and linting docblocks.
+* Most of the existing packages could use new improvements, contributions are most welcome.
 
 ![GPLv3 Logo](http://gplv3.fsf.org/gplv3-127x51.png)
