@@ -49,8 +49,8 @@ class OutlineIndexingVisitor extends NameResolver
         } elseif ($node instanceof Node\Stmt\Const_) {
             $this->parseConstantNode($node);
         } elseif ($node instanceof Node\Stmt\Class_) {
-            if (!isset($node->namespacedName)) {
-                // Ticket #45 - This could potentially not be set for PHP 7 anonymous classes.
+            if ($node->isAnonymous()) {
+                // Ticket #45 - Skip PHP 7 anonymous classes.
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
             }
 
