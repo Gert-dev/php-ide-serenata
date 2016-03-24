@@ -33,6 +33,11 @@ class VariableType extends BaseCommand
     protected $resolveTypeCommand;
 
     /**
+     * @var DeduceTypeCommand
+     */
+    protected $deduceTypeCommand;
+
+    /**
      * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
@@ -106,10 +111,12 @@ class VariableType extends BaseCommand
         $offsetLine = $this->calculateLineByOffset($code, $offset);
 
         $queryingVisitor = new VariableType\QueryingVisitor(
+        $file,
             $offset,
             $offsetLine,
             mb_substr($name, 1),
-            $this->getResolveTypeCommand()
+            $this->getResolveTypeCommand(),
+            $this->getDeduceTypeCommand()
         );
 
         $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
@@ -118,6 +125,16 @@ class VariableType extends BaseCommand
         $traverser->addVisitor($scopeLimitingVisitor);
         $traverser->addVisitor($queryingVisitor);
         $traverser->traverse($nodes);
+
+
+
+
+
+
+        // TODO: Remove 'resolvedType'. If the caller wants the resolved type, he should use the resolve type command
+        // manually. If he doesn't, this saves unnecessary expensive type resolution.
+
+
 
         return [
             'type'         => $queryingVisitor->getType(),
@@ -137,6 +154,7 @@ class VariableType extends BaseCommand
     public function setIndexDatabase(IndexDatabase $indexDatabase)
     {
         if ($this->resolveTypeCommand) {
+            $this->getDeduceTypeCommand()->setIndexDatabase($indexDatabase);
             $this->getResolveTypeCommand()->setIndexDatabase($indexDatabase);
         }
 
@@ -154,6 +172,19 @@ class VariableType extends BaseCommand
         }
 
         return $this->resolveTypeCommand;
+    }
+
+    /**
+     * @return ResolveType
+     */
+    protected function getDeduceTypeCommand()
+    {
+        if (!$this->deduceTypeCommand) {
+            $this->deduceTypeCommand = new DeduceType();
+            $this->deduceTypeCommand->setIndexDatabase($this->indexDatabase);
+        }
+
+        return $this->deduceTypeCommand;
     }
 
     /**

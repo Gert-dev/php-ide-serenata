@@ -4,6 +4,7 @@ namespace PhpIntegrator\Application\Command\VariableType;
 
 use PhpIntegrator\DocParser;
 
+use PhpIntegrator\Application\Command\DeduceType;
 use PhpIntegrator\Application\Command\ResolveType;
 
 use PhpParser\Node;
@@ -31,23 +32,37 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $name;
 
     /**
+     * @var string
+     */
+    protected $file;
+
+    /**
      * @var ResolveType
      */
     protected $resolveTypeCommand;
 
     /**
+     * @var DeduceType
+     */
+    protected $deduceTypeCommand;
+
+    /**
      * Constructor.
      *
+     * @param string      $file
      * @param int         $position
      * @param int         $line
      * @param string      $name
      * @param ResolveType $resolveTypeCommand
+     * @param DeduceType  $deduceTypeCommand
      */
-    public function __construct($position, $line, $name, ResolveType $resolveTypeCommand)
+    public function __construct($file, $position, $line, $name, ResolveType $resolveTypeCommand, DeduceType $deduceTypeCommand)
     {
         $this->name = $name;
         $this->line = $line;
+        $this->file = $file;
         $this->position = $position;
+        $this->deduceTypeCommand = $deduceTypeCommand;
         $this->resolveTypeCommand = $resolveTypeCommand;
     }
 
@@ -74,14 +89,7 @@ class QueryingVisitor extends NodeVisitorAbstract
             return NodeTraverser::DONT_TRAVERSE_CHILDREN;
         }
 
-        // TODO: Don't actually fetch any types or resolve call stacks yet, as we usually need the last interesting
-        // assignment to the variable, and not the first. This will save us a lot of expensive determinations that will
-        // be discarded anyway.
-
         $this->parseNodeDocblock($node);
-
-        // TODO: If we meet the variable name being assigned to something else, we'll have to parse the expression
-        // to see what it is.
 
         if ($node instanceof Node\Stmt\Catch_) {
             if ($node->var === $this->name) {
@@ -97,7 +105,28 @@ class QueryingVisitor extends NodeVisitorAbstract
                     }
                 }
             }
+        } elseif ($node instanceof Node\Expr\Assign) {
+            // TODO: What kind of expression is this supposed to be?
+            die(var_dump($node->var));
+
+            if ($node->var instanceof Node\Name && $node->var === $this->name) {
+                $expressionParts = $this->convertExpressionToStringParts($node->expr);
+
+                $this->bestMatch = $this->deduceTypeCommand->deduceType(
+                    $this->file,
+                    $expressionParts,
+                    $node->getAttribute('startFilePos'),
+                    false
+                );
+            }
         }
+
+
+        // TODO: Cleanup.
+
+        // TODO: Don't actually fetch any types or resolve call stacks yet, as we usually need the last interesting
+        // assignment to the variable, and not the first. This will save us a lot of expensive determinations that will
+        // be discarded anyway.
 
         // TODO: Parse foreach, examine the first argument, determine its type, if its an array (e.g. "Foo[]"), we know
         // the type of the foreach variable is a "Foo".
