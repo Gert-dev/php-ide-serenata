@@ -90,7 +90,6 @@ class QueryingVisitor extends NodeVisitorAbstract
         } elseif ($node instanceof Node\Stmt\If_ || $node instanceof Node\Stmt\ElseIf_) {
             if ($node->cond instanceof Node\Expr\Instanceof_) {
                 if ($node->cond->expr instanceof Node\Expr\Variable && $node->cond->expr->name === $this->name) {
-
                     if ($node->cond->class instanceof Node\Name) {
                         $this->bestMatch = $this->fetchFqcn($node->cond->class);
                     } else {
