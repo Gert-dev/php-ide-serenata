@@ -134,6 +134,16 @@ class VariableTypeTest extends IndexedTest
         ], $output);
     }
 
+    public function testCorrectlyAnalyzesIfStatementWithInstanceof()
+    {
+        $output = $this->getVariableType('Instanceof.php', '$b');
+
+        $this->assertEquals([
+            'type'         => 'B',
+            'resolvedType' => 'A\B'
+        ], $output);
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */

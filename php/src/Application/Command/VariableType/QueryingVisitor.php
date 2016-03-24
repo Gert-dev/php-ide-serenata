@@ -87,9 +87,18 @@ class QueryingVisitor extends NodeVisitorAbstract
             if ($node->var === $this->name) {
                 $this->bestMatch = $this->fetchFqcn($node->type);
             }
-        }
+        } elseif ($node instanceof Node\Stmt\If_ || $node instanceof Node\Stmt\ElseIf_) {
+            if ($node->cond instanceof Node\Expr\Instanceof_) {
+                if ($node->cond->expr instanceof Node\Expr\Variable && $node->cond->expr->name === $this->name) {
 
-        // TODO: Parse instanceof in if statements.
+                    if ($node->cond->class instanceof Node\Name) {
+                        $this->bestMatch = $this->fetchFqcn($node->cond->class);
+                    } else {
+                        // TODO: This is an expression, parse it to retrieve its return value.
+                    }
+                }
+            }
+        }
 
         // TODO: Parse foreach, examine the first argument, determine its type, if its an array (e.g. "Foo[]"), we know
         // the type of the foreach variable is a "Foo".
