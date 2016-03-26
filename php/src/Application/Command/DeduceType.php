@@ -70,17 +70,16 @@ class DeduceType extends BaseCommand
     //     } elseif (!isset($arguments['name'])) {
     //         throw new UnexpectedValueException('The name of the variable must be set using --name!');
     //     }
-       //
+    //
     //     $result = $this->getVariableType(
     //        isset($arguments['file']) ? $arguments['file']->value : null,
     //        $arguments['name']->value,
     //        $arguments['offset']->value,
     //        isset($arguments['stdin']) && $arguments['stdin']->value
     //    );
-       //
+    //
     //    return $this->outputJson(true, $result);
     }
-
 
     /**
      * @param string|null $file
@@ -211,6 +210,13 @@ class DeduceType extends BaseCommand
         return $className;
     }
 
+    /**
+     * @param string $file
+     * @param string $source
+     * @param int    $offset
+     *
+     * @return string|null
+     */
     protected function getCurrentClassAt($file, $source, $offset)
     {
         $line = $this->calculateLineByOffset($source, $offset);
@@ -226,12 +232,6 @@ class DeduceType extends BaseCommand
         }
 
         return null;
-    }
-
-    // TODO: Move somewhere we can reuse this. Calculates the 1-indexed line. Also already exists in VariableType.
-    protected function calculateLineByOffset($source, $offset)
-    {
-        return substr_count($source, "\n", 0, $offset) + 1;
     }
 
     /**

@@ -134,13 +134,7 @@ class VariableType extends BaseCommand
             'resolvedType' => $queryingVisitor->getResolvedType($file)
         ];
     }
-
-    // TODO: Move somewhere we can reuse this. Calculates the 1-indexed line.
-    protected function calculateLineByOffset($source, $offset)
-    {
-        return substr_count($source, "\n", 0, $offset) + 1;
-    }
-
+    
     /**
      * @inheritDoc
      */

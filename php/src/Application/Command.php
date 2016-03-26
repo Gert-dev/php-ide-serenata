@@ -147,6 +147,19 @@ abstract class Command implements CommandInterface
     }
 
     /**
+     * Calculates the 1-indexed line the specified byte offset is located at.
+     *
+     * @param string $source
+     * @param int    $offset
+     *
+     * @return int
+     */
+    protected function calculateLineByOffset($source, $offset)
+    {
+        return substr_count($source, "\n", 0, $offset) + 1;
+    }
+
+    /**
      * @return IndexDataAdapter
      */
     protected function getIndexDataAdapter()
