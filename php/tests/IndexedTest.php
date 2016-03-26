@@ -19,12 +19,7 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
         $reindexCommand = new Command\Reindex();
         $reindexCommand->setIndexDatabase($indexDatabase);
 
-        $reflectionClass = new ReflectionClass(Command\Reindex::class);
-        $method = $reflectionClass->getMethod('reindex');
-        $method->setAccessible(true);
-
-        $reindexOutput = $method->invoke(
-            $reindexCommand,
+        $reindexOutput = $reindexCommand->reindex(
             $testPath,
             false,
             false,
