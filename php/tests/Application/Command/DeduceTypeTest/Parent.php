@@ -1,22 +1,17 @@
 <?php
 
-/**
- * @return \DateTime
- */
-function global_function()
-{
-
-}
-
 class ParentClass
 {
     /**
-     * @var \\DateTime
+     * @var B
      */
     public $testProperty;
 }
 
 class Bar extends ParentClass
 {
-
+    public function __construct()
+    {
+        // <MARKER>
+    }
 }

@@ -11,7 +11,7 @@ use PhpParser\ParserFactory;
 
 class DeduceTypeTest extends IndexedTest
 {
-    protected function deduceType($file, $name)
+    protected function deduceType($file, array $expressionParts)
     {
         $path = __DIR__ . '/DeduceTypeTest/' . $file;
 
@@ -22,7 +22,7 @@ class DeduceTypeTest extends IndexedTest
         $command = new DeduceType();
         $command->setIndexDatabase($indexDatabase);
 
-        return $command->deduceType($path, $name, $markerOffset, false);
+        return $command->deduceType($path, $expressionParts, $markerOffset, false);
     }
 
     protected function getMarkerOffset($path, $marker)
@@ -34,313 +34,172 @@ class DeduceTypeTest extends IndexedTest
         return $markerOffset;
     }
 
-    public function testCorrectlyAnalyzesTypeOverrideAnnotations()
-    {
-        $output = $this->deduceType('TypeOverrideAnnotations.php', '$a');
-
-        $this->assertEquals([
-            'type'         => '\Traversable',
-            'resolvedType' => '\Traversable'
-        ], $output);
-
-        $output = $this->deduceType('TypeOverrideAnnotations.php', '$b');
-
-        $this->assertEquals([
-            'type'         => '\Traversable',
-            'resolvedType' => '\Traversable'
-        ], $output);
-
-        $output = $this->deduceType('TypeOverrideAnnotations.php', '$c');
-
-        $this->assertEquals([
-            'type'         => 'C',
-            'resolvedType' => 'A\C'
-        ], $output);
-    }
-
     /**
      * @expectedException \UnexpectedValueException
      */
-    public function testThrowsExceptionOnUnknownFile()
-    {
-        $command = new DeduceType();
-        $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
-
-        $output = $this->deduceType('MissingFile.php', '$test');
-    }
-
-
-
-
-
+    // public function testThrowsExceptionOnUnknownFile()
+    // {
+    //     $command = new DeduceType();
+    //     $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
+    //
+    //     $output = $this->deduceType('MissingFile.php', '$test');
+    // }
 
 
     /**
      * @return Parser
      */
-    protected function getParser()
-    {
-        $lexer = new Lexer([
-            'usedAttributes' => [
-                'comments', 'startLine', 'startFilePos', 'endFilePos'
-            ]
-        ]);
-
-        return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-    }
-
-    protected function getExpressionNodeFor($code)
-    {
-        $nodes = $this->getParser()->parse($code);
-
-        assert($nodes);
-
-        return $nodes;
-    }
+    // protected function getParser()
+    // {
+    //     $lexer = new Lexer([
+    //         'usedAttributes' => [
+    //             'comments', 'startLine', 'startFilePos', 'endFilePos'
+    //         ]
+    //     ]);
+    //
+    //     return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+    // }
+    //
+    // protected function getExpressionNodeFor($code)
+    // {
+    //     $nodes = $this->getParser()->parse($code);
+    //
+    //     assert($nodes);
+    //
+    //     return $nodes;
+    // }
 
     public function testCorrectlyAnalyzesStaticPropertyAccess()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'StaticPropertyAccess.php',
+            ['Bar', '$testProperty']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            Bar::$testProperty;
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('\DateTime', $result);
     }
 
     public function testCorrectlyAnalyzesSelf()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'Self.php',
+            ['self', '$testProperty']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            class Bar
-            {
-                public function __construct()
-                {
-                    self::$testProperty
-                }
-            }
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('B', $result);
     }
 
     public function testCorrectlyAnalyzesStatic()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'Static.php',
+            ['static', '$testProperty']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            class Bar
-            {
-                public function __construct()
-                {
-                    static::$testProperty
-                }
-            }
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('B', $result);
     }
 
     public function testCorrectlyAnalyzesParent()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'Parent.php',
+            ['parent', '$testProperty']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            class Bar
-            {
-                public function __construct()
-                {
-                    parent::$testProperty
-                }
-            }
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('B', $result);
     }
 
     public function testCorrectlyAnalyzesThis()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'This.php',
+            ['$this', 'testProperty']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            class Bar
-            {
-                public function __construct()
-                {
-                    $this->testProperty
-                }
-            }
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('B', $result);
     }
 
     public function testCorrectlyAnalyzesVariables()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'Variable.php',
+            ['$var', 'testProperty']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            $var = new Bar();
-            $var->testProperty
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('B', $result);
     }
 
     public function testCorrectlyAnalyzesGlobalFunctions()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'GlobalFunction.php',
+            ['global_function()']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            global_function()->
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('B', $result);
     }
 
     public function testCorrectlyAnalyzesClosures()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'Closure.php',
+            ['$var']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            $var = function () {
-
-            };
-
-            $var->bindTo();
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('\Closure', $result);
     }
 
     public function testCorrectlyAnalyzesNewWithStatic()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'NewWithStatic.php',
+            ['new static']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            class Bar
-            {
-                public function __construct()
-                {
-                    $test = new static();
-                }
-            }
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('Bar', $result);
     }
 
     public function testCorrectlyAnalyzesClone()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'Clone.php',
+            ['clone $var']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            $var = new \DateTime();
-
-            $test = clone $var;
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('Bar', $result);
     }
 
     public function testCorrectlyAnalyzesLongerChains()
     {
-        $file = __DIR__ . '/SampleCode.php';
+        $result = $this->deduceType(
+            'LongerChain.php',
+            ['$this', 'testProperty', 'aMethod()', 'anotherProperty']
+        );
 
-        $typeDeducer = new DeduceType();
-
-        $code = '
-            <?php
-
-            class Bar
-            {
-                public function __construct()
-                {
-                    $this->testProperty->aMethod()->anotherProperty;
-                }
-            }
-        ';
-
-        $this->assertEquals([
-            'type'         => 'A',
-            'resolvedType' => 'A\B'
-        ], $typeDeducer->deduceType($file, $this->getExpressionNodeFor($code)));
+        $this->assertEquals('\DateTime', $result);
     }
 
-    public function testCorrectlyAnalyzesBasicTypes()
+    public function testCorrectlyAnalyzesScalarTypes()
     {
-        // TODO
+        $file = 'ScalarType.php';
+
+        $this->assertEquals('int', $this->deduceType($file, ['5']));
+        $this->assertEquals('int', $this->deduceType($file, ['05']));
+        $this->assertEquals('int', $this->deduceType($file, ['0x5']));
+        $this->assertEquals('float', $this->deduceType($file, ['5.5']));
+        $this->assertEquals('bool', $this->deduceType($file, ['true']));
+        $this->assertEquals('bool', $this->deduceType($file, ['false']));
+        $this->assertEquals('string', $this->deduceType($file, ['"test"']));
+        $this->assertEquals('string', $this->deduceType($file, ['\'test\'']));
+        $this->assertEquals('array', $this->deduceType($file, ['[$test1, function() {}]']));
+        $this->assertEquals('array', $this->deduceType($file, ['array($test1, function())']));
+
+        $this->assertEquals('string', $this->deduceType($file, ['"
+            test
+        "']));
+
+        $this->assertEquals('string', $this->deduceType($file, ['\'
+            test
+        \'']));
     }
 }

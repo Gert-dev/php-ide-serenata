@@ -124,21 +124,23 @@ class DeduceType extends BaseCommand
         if ($firstElement[0] === '$') {
             // TODO: Feed source code.
             $className = $this->getVariableTypeCommand()->getVariableType($file, $firstElement, $offset, false);
+
+            $className = $className['resolvedType'];
         } elseif ($firstElement === 'static' or $firstElement === 'self') {
             $propertyAccessNeedsDollarSign = true;
 
-            $class = $this->getCurrentClassInfoAt($file, $source, $offset);
-
-            if ($class) {
-                $className = $class['fqsen'];
-            }
+            $className = $this->getCurrentClassAt($file, $code, $offset);
         } elseif ($firstElement === 'parent') {
             $propertyAccessNeedsDollarSign = true;
 
-            $class = $this->getCurrentClassInfoAt($file, $source, $offset);
+            $className = $this->getCurrentClassAt($file, $code, $offset);
 
-            if ($class && !empty($class['parents'])) {
-                $className = $class['parents'][0];
+            if ($className) {
+                $classInfo = $this->getClassInfoCommand()->getClassInfo($className);
+
+                if ($classInfo && !empty($classInfo['parents'])) {
+                    $className = $classInfo['parents'][0];
+                }
             }
         } elseif ($firstElement[0] === '[') {
             $className = 'array';
@@ -175,7 +177,7 @@ class DeduceType extends BaseCommand
             // Static class name.
             $propertyAccessNeedsDollarSign = true;
 
-            $line = $this->calculateLineByOffset($source, $offset);
+            $line = $this->calculateLineByOffset($code, $offset);
 
             $className = $this->getResolveTypeCommand()->resolveType($matches[1], $file, $line);
         } else {
@@ -227,7 +229,7 @@ class DeduceType extends BaseCommand
         return $className;
     }
 
-    protected function getCurrentClassInfoAt($file, $source, $offset)
+    protected function getCurrentClassAt($file, $source, $offset)
     {
         $line = $this->calculateLineByOffset($source, $offset);
 
@@ -237,7 +239,7 @@ class DeduceType extends BaseCommand
 
         foreach ($classes as $fqsen => $class) {
             if ($line >= $class['startLine'] && $line <= $class['endLine']) {
-                return $class;
+                return $fqsen;
             }
         }
 
@@ -255,8 +257,24 @@ class DeduceType extends BaseCommand
      */
     public function setIndexDatabase(IndexDatabase $indexDatabase)
     {
+        if ($this->variableTypeCommand) {
+            $this->getVariableTypeCommand()->setIndexDatabase($indexDatabase);
+        }
+
+        if ($this->classListCommand) {
+            $this->getClassListCommand()->setIndexDatabase($indexDatabase);
+        }
+
+        if ($this->classInfoCommand) {
+            $this->getClassInfoCommand()->setIndexDatabase($indexDatabase);
+        }
+
         if ($this->resolveTypeCommand) {
             $this->getResolveTypeCommand()->setIndexDatabase($indexDatabase);
+        }
+
+        if ($this->globalFunctionsCommand) {
+            $this->getGlobalFunctionsCommand()->setIndexDatabase($indexDatabase);
         }
 
         parent::setIndexDatabase($indexDatabase);
@@ -293,12 +311,12 @@ class DeduceType extends BaseCommand
      */
     protected function getClassInfoCommand()
     {
-        if (!$this->classinfoCommand) {
-            $this->classinfoCommand = new ClassInfo();
-            $this->classinfoCommand->setIndexDatabase($this->indexDatabase);
+        if (!$this->classInfoCommand) {
+            $this->classInfoCommand = new ClassInfo();
+            $this->classInfoCommand->setIndexDatabase($this->indexDatabase);
         }
 
-        return $this->classinfoCommand;
+        return $this->classInfoCommand;
     }
 
     /**
@@ -319,12 +337,12 @@ class DeduceType extends BaseCommand
      */
     protected function getResolveTypeCommand()
     {
-        if (!$this->resolveType) {
-            $this->resolveType = new ResolveType();
-            $this->resolveType->setIndexDatabase($this->indexDatabase);
+        if (!$this->resolveTypeCommand) {
+            $this->resolveTypeCommand = new ResolveType();
+            $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
         }
 
-        return $this->resolveType;
+        return $this->resolveTypeCommand;
     }
 
     /**
@@ -334,7 +352,6 @@ class DeduceType extends BaseCommand
     {
         if (!$this->typeAnalyzer) {
             $this->typeAnalyzer = new TypeAnalyzer();
-            $this->typeAnalyzer->setIndexDatabase($this->indexDatabase);
         }
 
         return $this->typeAnalyzer;

@@ -93,45 +93,64 @@ class QueryingVisitor extends NodeVisitorAbstract
 
         if ($node instanceof Node\Stmt\Catch_) {
             if ($node->var === $this->name) {
-                $this->bestMatch = $this->fetchFqcn($node->type);
+                $this->bestMatch = $this->fetchClassName($node->type);
             }
         } elseif ($node instanceof Node\Stmt\If_ || $node instanceof Node\Stmt\ElseIf_) {
             if ($node->cond instanceof Node\Expr\Instanceof_) {
                 if ($node->cond->expr instanceof Node\Expr\Variable && $node->cond->expr->name === $this->name) {
                     if ($node->cond->class instanceof Node\Name) {
-                        $this->bestMatch = $this->fetchFqcn($node->cond->class);
+                        $this->bestMatch = $this->fetchClassName($node->cond->class);
                     } else {
                         // TODO: This is an expression, parse it to retrieve its return value.
                     }
                 }
             }
         } elseif ($node instanceof Node\Expr\Assign) {
-            // TODO: What kind of expression is this supposed to be?
-            die(var_dump($node->var));
+            if ($node->var instanceof Node\Expr\Variable) {
+                $variableName = null;
 
-            if ($node->var instanceof Node\Name && $node->var === $this->name) {
+                if ($node->var->name instanceof Node\Name) {
+                    $variableName = (string) $node->var->name;
+                } elseif (is_string($node->var->name)) {
+                    $variableName = $node->var->name;
+                }
+
+                if ($variableName) {
+                    $expressionParts = $this->convertExpressionToStringParts($node->expr);
+
+                    if ($expressionParts) {
+                        $this->bestMatch = $this->deduceTypeCommand->deduceType(
+                            $this->file,
+                            $expressionParts,
+                            $node->getAttribute('startFilePos'),
+                            false
+                        );
+                    }
+                }
+            }
+        } elseif ($node instanceof Node\Stmt\Foreach_) {
+            die(var_dump($node));
+
+            if ($node->valueVar->name === $this->name) {
                 $expressionParts = $this->convertExpressionToStringParts($node->expr);
 
-                $this->bestMatch = $this->deduceTypeCommand->deduceType(
-                    $this->file,
-                    $expressionParts,
-                    $node->getAttribute('startFilePos'),
-                    false
-                );
+                if ($expressionParts) {
+                    $listType = $this->deduceTypeCommand->deduceType(
+                        $this->file,
+                        $expressionParts,
+                        $node->getAttribute('startFilePos'),
+                        false
+                    );
+
+                    if ($listType && mb_strpos($listType, '[]') !== false) {
+                        $this->bestMatch = mb_substr($listType, 0, -2);
+                    }
+                }
             }
         }
 
-
         // TODO: Cleanup.
-
-        // TODO: Don't actually fetch any types or resolve call stacks yet, as we usually need the last interesting
-        // assignment to the variable, and not the first. This will save us a lot of expensive determinations that will
-        // be discarded anyway.
-
-        // TODO: Parse foreach, examine the first argument, determine its type, if its an array (e.g. "Foo[]"), we know
-        // the type of the foreach variable is a "Foo".
-
-        // TODO: Tests!
+        // TODO: Tests for variable assignment and foreach.
 
         if ($node->getAttribute('startFilePos') <= $this->position &&
             $node->getAttribute('endFilePos') >= $this->position
@@ -167,7 +186,7 @@ class QueryingVisitor extends NodeVisitorAbstract
         }
     }
 
-    protected function fetchFqcn(Node\Name $name)
+    protected function fetchClassName(Node\Name $name)
     {
         $newName = (string) $name;
 
@@ -176,6 +195,63 @@ class QueryingVisitor extends NodeVisitorAbstract
         }
 
         return $newName;
+    }
+
+    protected function convertExpressionToStringParts(Node\Expr $node)
+    {
+        // NOTE: This function acts as an adapter for AST node data to an array of strings for the reimplementation of
+        // the CoffeeScript DeduceType method. As such, this bridge will be removed over time, as soon as DeduceType
+        // works with an AST instead of regular expression parsing. At that point, input of string call stacks from the
+        // command line can be converted to an intermediate AST so data from CoffeeScript (that has no notion of the AST)
+        // can be treated the same way.
+
+        if ($node instanceof Node\Expr\New_) {
+            if ($node->class instanceof Node\Name) {
+                return ['new ' . (string) $node->class];
+            }
+        } elseif ($node instanceof Node\Expr\Clone_) {
+            if ($node->expr instanceof Node\Expr\Variable) {
+                return ['clone $' . $node->expr->name];
+            }
+        } elseif ($node instanceof Node\Expr\Closure) {
+            return ['function ()'];
+        } elseif ($node instanceof Node\Expr\Array_) {
+            return ['['];
+        } elseif ($node instanceof Node\Scalar\LNumber) {
+            return ['1'];
+        } elseif ($node instanceof Node\Scalar\DNumber) {
+            return ['1.1'];
+        } elseif ($node instanceof Node\Expr\ConstFetch) {
+            if ($node->name->toString() === 'true' || $node->name->toString() === 'false') {
+                return ['true'];
+            }
+        } elseif ($node instanceof Node\Scalar\String_) {
+            return ['""'];
+        } elseif ($node instanceof Node\Expr\MethodCall) {
+            if (is_string($node->name)) {
+                $parts = $this->convertExpressionToStringParts($node->var);
+                $parts[] = $node->name . '()';
+
+                return $parts;
+            }
+        } elseif ($node instanceof Node\Expr\StaticCall) {
+            if (is_string($node->name) && $node->class instanceof Node\Name) {
+                return [$node->name->toString(), $node->name . '()'];
+            }
+        } elseif ($node instanceof Node\Expr\PropertyFetch) {
+            if (is_string($node->name)) {
+                $parts = $this->convertExpressionToStringParts($node->var);
+                $parts[] = $node->name;
+
+                return $parts;
+            }
+        } elseif ($node instanceof Node\Expr\StaticPropertyFetch) {
+            if (is_string($node->name) && $node->class instanceof Node\Name) {
+                return [$node->name->toString(), $node->name];
+            }
+        }
+
+        return null;
     }
 
     protected function resetStateForNewScope()
@@ -200,7 +276,7 @@ class QueryingVisitor extends NodeVisitorAbstract
                     if ($param->type) {
                         // Found a type hint.
                         if ($param->type instanceof Node\Name) {
-                            return $this->fetchFqcn($param->type);
+                            return $this->fetchClassName($param->type);
                         }
 
                         return $param->type;
