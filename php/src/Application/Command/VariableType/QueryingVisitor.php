@@ -47,6 +47,31 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $deduceTypeCommand;
 
     /**
+     * @var Node\FunctionLike|null
+     */
+    protected $lastFunctionLikeNode;
+
+    /**
+     * @var string|null
+     */
+    protected $currentClassName;
+
+    /**
+     * @var string|null
+     */
+    protected $bestMatch;
+
+    /**
+     * @var string|null
+     */
+    protected $bestTypeOverrideMatch;
+
+    /**
+     * @var int|null
+     */
+    protected $bestTypeOverrideMatchLine;
+
+    /**
      * Constructor.
      *
      * @param string      $file
@@ -65,19 +90,6 @@ class QueryingVisitor extends NodeVisitorAbstract
         $this->deduceTypeCommand = $deduceTypeCommand;
         $this->resolveTypeCommand = $resolveTypeCommand;
     }
-
-
-
-    protected $currentClassName = null;
-    protected $bestMatch = null;
-    protected $bestTypeOverrideMatch = null;
-    protected $bestTypeOverrideMatchLine = null;
-
-    /**
-     * @var Node\FunctionLike|null
-     */
-    protected $lastFunctionLikeNode = null;
-
 
     /**
      * @inheritDoc
@@ -167,6 +179,9 @@ class QueryingVisitor extends NodeVisitorAbstract
         }
     }
 
+    /**
+     * @param Node $node
+     */
     protected function parseNodeDocblock(Node $node)
     {
         $docblock = $node->getDocComment();
@@ -186,6 +201,13 @@ class QueryingVisitor extends NodeVisitorAbstract
         }
     }
 
+    /**
+     * Takes a class name and turns it into a string.
+     *
+     * @param Node\Name $name
+     *
+     * @return string
+     */
     protected function fetchClassName(Node\Name $name)
     {
         $newName = (string) $name;
@@ -197,14 +219,19 @@ class QueryingVisitor extends NodeVisitorAbstract
         return $newName;
     }
 
+    /**
+     * This function acts as an adapter for AST node data to an array of strings for the reimplementation of the
+     * CoffeeScript DeduceType method. As such, this bridge will be removed over time, as soon as DeduceType  works with
+     * an AST instead of regular expression parsing. At that point, input of string call stacks from the command line
+     * can be converted to an intermediate AST so data from CoffeeScript (that has no notion of the AST) can be treated
+     * the same way.
+     *
+     * @param Node\Expr $node
+     *
+     * @return string[]|null
+     */
     protected function convertExpressionToStringParts(Node\Expr $node)
     {
-        // NOTE: This function acts as an adapter for AST node data to an array of strings for the reimplementation of
-        // the CoffeeScript DeduceType method. As such, this bridge will be removed over time, as soon as DeduceType
-        // works with an AST instead of regular expression parsing. At that point, input of string call stacks from the
-        // command line can be converted to an intermediate AST so data from CoffeeScript (that has no notion of the AST)
-        // can be treated the same way.
-
         if ($node instanceof Node\Expr\New_) {
             if ($node->class instanceof Node\Name) {
                 return ['new ' . (string) $node->class];
@@ -254,6 +281,9 @@ class QueryingVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @return void
+     */
     protected function resetStateForNewScope()
     {
         $this->bestMatch = null;
