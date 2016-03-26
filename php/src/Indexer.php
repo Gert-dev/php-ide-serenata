@@ -329,8 +329,12 @@ class Indexer
                 $topologicalSorter->add($fqsen, $filename, $dependencyList);
             }
         }
-
-        $sortedDependencies = $topologicalSorter->sort();
+        
+        try {
+            $sortedDependencies = $topologicalSorter->sort();
+        } catch (\Exception  $e) {
+            //some kind of warning would be nice
+        }
 
         foreach ($topologicalSorter->getGroups() as $group) {
             $result[] = $group->type;
