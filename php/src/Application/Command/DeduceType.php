@@ -90,8 +90,6 @@ class DeduceType extends BaseCommand
      */
     public function deduceType($file, $code, array $expressionParts, $offset)
     {
-        // TODO: Must be able to feed source code to other commands, need to split off source code fetching there.
-
         // TODO: Using regular expressions here is kind of silly. We should refactor this to actually analyze php-parser
         // nodes at a later stage. At the moment this is just a one-to-one translation of the original CoffeeScript
         // method.
