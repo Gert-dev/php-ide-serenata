@@ -131,18 +131,18 @@ class QueryingVisitor extends NodeVisitorAbstract
                     $expressionParts = $this->convertExpressionToStringParts($node->expr);
 
                     if ($expressionParts) {
+                        // The position + 1 ensures that this node is also taken up in the scan for its type, causing
+                        // its docblock (which could contain a type annotation override) to also be examined.
                         $this->bestMatch = $this->deduceTypeCommand->deduceType(
                             $this->file,
                             $expressionParts,
-                            $node->getAttribute('startFilePos'),
+                            $node->getAttribute('startFilePos') + 1,
                             false
                         );
                     }
                 }
             }
         } elseif ($node instanceof Node\Stmt\Foreach_) {
-            die(var_dump($node));
-
             if ($node->valueVar->name === $this->name) {
                 $expressionParts = $this->convertExpressionToStringParts($node->expr);
 
@@ -150,7 +150,7 @@ class QueryingVisitor extends NodeVisitorAbstract
                     $listType = $this->deduceTypeCommand->deduceType(
                         $this->file,
                         $expressionParts,
-                        $node->getAttribute('startFilePos'),
+                        $node->getAttribute('startFilePos') + 1, // Same as above.
                         false
                     );
 
@@ -160,9 +160,6 @@ class QueryingVisitor extends NodeVisitorAbstract
                 }
             }
         }
-
-        // TODO: Cleanup.
-        // TODO: Tests for variable assignment and foreach.
 
         if ($node->getAttribute('startFilePos') <= $this->position &&
             $node->getAttribute('endFilePos') >= $this->position
@@ -232,7 +229,11 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     protected function convertExpressionToStringParts(Node\Expr $node)
     {
-        if ($node instanceof Node\Expr\New_) {
+        if ($node instanceof Node\Expr\Variable) {
+            if (is_string($node->name)) {
+                return ['$' . (string) $node->name];
+            }
+        } elseif ($node instanceof Node\Expr\New_) {
             if ($node->class instanceof Node\Name) {
                 return ['new ' . (string) $node->class];
             }

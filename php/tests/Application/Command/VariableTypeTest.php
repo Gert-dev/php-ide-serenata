@@ -144,6 +144,26 @@ class VariableTypeTest extends IndexedTest
         ], $output);
     }
 
+    public function testCorrectlyAnalyzesForeach()
+    {
+        $output = $this->getVariableType('Foreach.php', '$a');
+
+        $this->assertEquals([
+            'type'         => '\DateTime',
+            'resolvedType' => '\DateTime'
+        ], $output);
+    }
+
+    public function testCorrectlyAnalyzesAssignments()
+    {
+        $output = $this->getVariableType('Assignment.php', '$a');
+
+        $this->assertEquals([
+            'type'         => 'DateTime',
+            'resolvedType' => 'DateTime'
+        ], $output);
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */
