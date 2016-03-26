@@ -46,35 +46,22 @@ class AvailableVariables extends BaseCommand
              throw new UnexpectedValueException('An --offset must be supplied into the source code!');
          }
 
-         $result = $this->getAvailableVariables(
+         $code = $this->getSourceCode(
             isset($arguments['file']) ? $arguments['file']->value : null,
-            $arguments['offset']->value,
             isset($arguments['stdin']) && $arguments['stdin']->value
         );
+
+         $result = $this->getAvailableVariables($code, $arguments['offset']->value);
 
         return $this->outputJson(true, $result);
      }
 
      /**
-      * @param string|null $file
-      * @param int         $offset
-      * @param bool        $isStdin
+      * @param string $code
+      * @param int    $offset
       */
-     public function getAvailableVariables($file, $offset, $isStdin)
+     public function getAvailableVariables($code, $offset)
      {
-         $code = null;
-
-         if ($isStdin) {
-             // NOTE: This call is blocking if there is no input!
-             $code = file_get_contents('php://stdin');
-         } else {
-             if (!$file) {
-                 throw new UnexpectedValueException('The specified file does not exist!');
-             }
-
-             $code = @file_get_contents($file);
-         }
-
          $parser = $this->getParser();
 
          try {

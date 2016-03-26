@@ -3,6 +3,7 @@
 namespace PhpIntegrator\Application;
 
 use ArrayAccess;
+use LogicException;
 use UnexpectedValueException;
 
 use GetOptionKit\OptionParser;
@@ -119,6 +120,31 @@ abstract class Command implements CommandInterface
      * @return string Output to pass back.
      */
     abstract protected function process(ArrayAccess $arguments);
+
+    /**
+     * @param string|null $file
+     * @param bool        $isStdin
+     *
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     */
+    protected function getSourceCode($file, $isStdin)
+    {
+        $code = null;
+
+        if ($isStdin) {
+            // NOTE: This call is blocking if there is no input!
+            return file_get_contents('php://stdin');
+        } else {
+            if (!$file) {
+                throw new UnexpectedValueException('The specified file does not exist!');
+            }
+
+            return @file_get_contents($file);
+        }
+
+        throw new LogicException('Should never be reached.');
+    }
 
     /**
      * @return IndexDataAdapter

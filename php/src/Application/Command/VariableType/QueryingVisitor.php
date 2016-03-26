@@ -34,6 +34,11 @@ class QueryingVisitor extends NodeVisitorAbstract
     /**
      * @var string
      */
+    protected $code;
+
+    /**
+     * @var string
+     */
     protected $file;
 
     /**
@@ -75,17 +80,19 @@ class QueryingVisitor extends NodeVisitorAbstract
      * Constructor.
      *
      * @param string      $file
+     * @param string      $code
      * @param int         $position
      * @param int         $line
      * @param string      $name
      * @param ResolveType $resolveTypeCommand
      * @param DeduceType  $deduceTypeCommand
      */
-    public function __construct($file, $position, $line, $name, ResolveType $resolveTypeCommand, DeduceType $deduceTypeCommand)
+    public function __construct($file, $code, $position, $line, $name, ResolveType $resolveTypeCommand, DeduceType $deduceTypeCommand)
     {
         $this->name = $name;
         $this->line = $line;
         $this->file = $file;
+        $this->code = $code;
         $this->position = $position;
         $this->deduceTypeCommand = $deduceTypeCommand;
         $this->resolveTypeCommand = $resolveTypeCommand;
@@ -135,9 +142,9 @@ class QueryingVisitor extends NodeVisitorAbstract
                         // its docblock (which could contain a type annotation override) to also be examined.
                         $this->bestMatch = $this->deduceTypeCommand->deduceType(
                             $this->file,
+                            $this->code,
                             $expressionParts,
-                            $node->getAttribute('startFilePos') + 1,
-                            false
+                            $node->getAttribute('startFilePos') + 1
                         );
                     }
                 }
@@ -149,9 +156,9 @@ class QueryingVisitor extends NodeVisitorAbstract
                 if ($expressionParts) {
                     $listType = $this->deduceTypeCommand->deduceType(
                         $this->file,
+                        $this->code,
                         $expressionParts,
-                        $node->getAttribute('startFilePos') + 1, // Same as above.
-                        false
+                        $node->getAttribute('startFilePos') + 1 // Same as above.
                     );
 
                     if ($listType && mb_strpos($listType, '[]') !== false) {

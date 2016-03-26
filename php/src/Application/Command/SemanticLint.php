@@ -46,9 +46,14 @@ class SemanticLint extends BaseCommand
             throw new UnexpectedValueException('A file name is required for this command.');
         }
 
+        $code = $this->getSourceCode(
+            $arguments['file']->value,
+            (isset($arguments['stdin']) && $arguments['stdin']->value)
+        );
+
         $output = $this->semanticLint(
             $arguments['file']->value,
-            (isset($arguments['stdin']) && $arguments['stdin']->value),
+            $code,
             !(isset($arguments['no-unknown-classes']) && $arguments['no-unknown-classes']->value),
             !(isset($arguments['no-unused-use-statements']) && $arguments['no-unused-use-statements']->value)
         );
@@ -58,7 +63,7 @@ class SemanticLint extends BaseCommand
 
     /**
      * @param string $file
-     * @param bool   $useStdin
+     * @param string $code
      * @param bool   $retrieveUnknownClasses
      * @param bool   $retrieveUnusedUseStatements
      *
@@ -66,7 +71,7 @@ class SemanticLint extends BaseCommand
      */
     public function semanticLint(
         $file,
-        $useStdin,
+        $code,
         $retrieveUnknownClasses = true,
         $retrieveUnusedUseStatements = true
     ) {
@@ -74,15 +79,6 @@ class SemanticLint extends BaseCommand
 
         if (!$fileId) {
             throw new UnexpectedValueException('The specified file is not present in the index!');
-        }
-
-        $code = null;
-
-        if ($useStdin) {
-            // NOTE: This call is blocking if there is no input!
-            $code = file_get_contents('php://stdin');
-        } else {
-            $code = @file_get_contents($file);
         }
 
         // Parse the file to fetch the information we need.

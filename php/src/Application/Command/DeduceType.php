@@ -84,25 +84,12 @@ class DeduceType extends BaseCommand
 
     /**
      * @param string|null $file
+     * @param string      $code
      * @param string[]    $expressionParts
      * @param int         $offset
-     * @param bool        $isStdin
      */
-    public function deduceType($file, array $expressionParts, $offset, $isStdin)
+    public function deduceType($file, $code, array $expressionParts, $offset)
     {
-        $code = null;
-
-        if ($isStdin) {
-            // NOTE: This call is blocking if there is no input!
-            $code = file_get_contents('php://stdin');
-        } else {
-            if (!$file) {
-                throw new UnexpectedValueException('The specified file does not exist!');
-            }
-
-            $code = @file_get_contents($file);
-        }
-
         // TODO: Must be able to feed source code to other commands, need to split off source code fetching there.
 
         // TODO: Using regular expressions here is kind of silly. We should refactor this to actually analyze php-parser
@@ -122,8 +109,7 @@ class DeduceType extends BaseCommand
         $classRegexPart = "?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*";
 
         if ($firstElement[0] === '$') {
-            // TODO: Feed source code.
-            $className = $this->getVariableTypeCommand()->getVariableType($file, $firstElement, $offset, false);
+            $className = $this->getVariableTypeCommand()->getVariableType($file, $code, $firstElement, $offset);
 
             $className = $className['resolvedType'];
         } elseif ($firstElement === 'static' or $firstElement === 'self') {
@@ -159,11 +145,9 @@ class DeduceType extends BaseCommand
         } elseif (preg_match('/^function\s*\(/', $firstElement) === 1) {
             $className = '\\Closure';
         } elseif (preg_match("/^new\s+((${classRegexPart}))(?:\(\))?/", $firstElement, $matches) === 1) {
-            // TODO: Feed source code.
-            $className = $this->deduceType($file, [$matches[1]], $offset, false);
+            $className = $this->deduceType($file, $code, [$matches[1]], $offset);
         } elseif (preg_match('/^clone\s+(\$[a-zA-Z0-9_]+)/', $firstElement, $matches) === 1) {
-            // TODO: Feed source code.
-            $className = $this->deduceType($file, [$matches[1]], $offset, false);
+            $className = $this->deduceType($file, $code, [$matches[1]], $offset);
         } elseif (preg_match('/^(.*?)\(\)$/', $firstElement, $matches) === 1) {
             // Global PHP function.
 

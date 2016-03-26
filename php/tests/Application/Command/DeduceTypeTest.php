@@ -22,7 +22,7 @@ class DeduceTypeTest extends IndexedTest
         $command = new DeduceType();
         $command->setIndexDatabase($indexDatabase);
 
-        return $command->deduceType($path, $expressionParts, $markerOffset, false);
+        return $command->deduceType($path, file_get_contents($path), $expressionParts, $markerOffset);
     }
 
     protected function getMarkerOffset($path, $marker)

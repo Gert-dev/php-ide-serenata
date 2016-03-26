@@ -32,7 +32,7 @@ class AvailableVariablesTest extends IndexedTest
 
         $markerOffset = $this->getMarkerOffset($path, '<MARKER>');
 
-        return $command->getAvailableVariables($path, $markerOffset, false);
+        return $command->getAvailableVariables(file_get_contents($path), $markerOffset);
     }
 
     protected function getMarkerOffset($path, $marker)
@@ -119,7 +119,7 @@ class AvailableVariablesTest extends IndexedTest
 
             $this->assertEquals(
                 $list,
-                $command->getAvailableVariables($fullPath, $markerOffsets[$markerNumber], false)
+                $command->getAvailableVariables(file_get_contents($fullPath), $markerOffsets[$markerNumber])
             );
         };
 
@@ -158,11 +158,11 @@ class AvailableVariablesTest extends IndexedTest
     /**
      * @expectedException \UnexpectedValueException
      */
-    public function testThrowsExceptionOnUnknownFile()
+    public function testThrowsExceptionOnParsingFailed()
     {
         $command = new AvailableVariables();
         $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
 
-        $output = $this->getAvailableVariables('MissingFile.php', 0, false);
+        $output = $this->getAvailableVariables('MissingFile.php', 0);
     }
 }

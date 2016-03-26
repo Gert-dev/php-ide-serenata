@@ -18,7 +18,7 @@ class VariableTypeTest extends IndexedTest
         $command = new VariableType();
         $command->setIndexDatabase($indexDatabase);
 
-        return $command->getVariableType($path, $name, $markerOffset, false);
+        return $command->getVariableType($path, file_get_contents($path), $name, $markerOffset);
     }
 
     protected function getMarkerOffset($path, $marker)

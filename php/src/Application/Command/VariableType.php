@@ -61,11 +61,16 @@ class VariableType extends BaseCommand
             throw new UnexpectedValueException('The name of the variable must be set using --name!');
         }
 
+        $code = $this->getSourceCode(
+            isset($arguments['file']) ? $arguments['file']->value : null,
+            isset($arguments['stdin']) && $arguments['stdin']->value
+        );
+
         $result = $this->getVariableType(
            isset($arguments['file']) ? $arguments['file']->value : null,
+           $code,
            $arguments['name']->value,
-           $arguments['offset']->value,
-           isset($arguments['stdin']) && $arguments['stdin']->value
+           $arguments['offset']->value
        );
 
        return $this->outputJson(true, $result);
@@ -73,27 +78,14 @@ class VariableType extends BaseCommand
 
     /**
      * @param string|null $file
+     * @param string      $code
      * @param string      $name
      * @param int         $offset
-     * @param bool        $isStdin
      */
-    public function getVariableType($file, $name, $offset, $isStdin)
+    public function getVariableType($file, $code, $name, $offset)
     {
         if (empty($name) || $name[0] !== '$') {
             throw new UnexpectedValueException('The variable name must start with a dollar sign!');
-        }
-
-        $code = null;
-
-        if ($isStdin) {
-            // NOTE: This call is blocking if there is no input!
-            $code = file_get_contents('php://stdin');
-        } else {
-            if (!$file) {
-                throw new UnexpectedValueException('The specified file does not exist!');
-            }
-
-            $code = @file_get_contents($file);
         }
 
         $parser = $this->getParser();
@@ -111,7 +103,8 @@ class VariableType extends BaseCommand
         $offsetLine = $this->calculateLineByOffset($code, $offset);
 
         $queryingVisitor = new VariableType\QueryingVisitor(
-        $file,
+            $file,
+            $code,
             $offset,
             $offsetLine,
             mb_substr($name, 1),
