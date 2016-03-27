@@ -7,22 +7,6 @@ module.exports =
 ##
 class Parser
     ###*
-     * Indicates if the specifiec location is a property usage or not. If it is not, it is most likely a method call.
-     * This is useful to distinguish between properties and methods with the same name.
-     *
-     * @example When querying "$this->test", using a position inside 'test' will return true.
-     *
-     * @param {TextEditor} editor
-     * @param {Point}      bufferPosition
-     *
-     * @return {boolean}
-    ###
-    isUsingProperty: (editor, bufferPosition) ->
-        scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition).getScopeChain()
-
-        return (scopeDescriptor.indexOf('.property') != -1)
-
-    ###*
      * Starts at the specified buffer position, and walks backwards or forwards to find the end of an expression.
      *
      * @param  {TextEditor} editor
