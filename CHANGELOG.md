@@ -13,6 +13,7 @@
   * `getClassMember` and `getClassMemberAt` have been removed, they weren't used and just provided a very thin wrapper over existing functionality.
   * A new method, `deduceType` has been added.
   * A new method, `getVariableTypeByOffset` has been added.
+  * `getResultingTypeAt` has received an additional parameter, `async`, that will make type deduction asynchronous.
   * `getVariableType` and `getResultingTypeAt` have been rewritten in PHP. Class types returned by these methods will now _always_ be absolute and _always_ include a leading slash. Previously the returned type was _sometimes_ relative to the current file and _sometimes_ absolute. To make things worse, absolute types _sometimes_ contained a leading slash, leading to confusion. (Scalar types will still not include a leading slash.)
 
 ## 0.7.2

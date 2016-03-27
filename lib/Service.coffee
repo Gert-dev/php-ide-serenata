@@ -459,16 +459,17 @@ class Service
      *                                       is still writing code, e.g. "$this->foo()->b" would normally return the
      *                                       type (class) of 'b', as it is the last element, but as the user is still
      *                                       writing code, you may instead be interested in the type of 'foo()' instead.
+     * @param {boolean}    async
      *
      * @throws an error if one of the elements in the call stack does not exist, which can happen if the user is writing
      *         invalid code.
      *
-     * @return {string|null}
+     * @return {Promise|string|null}
      *
      * @example Invoking it on MyMethod::foo()->bar() will ask what class 'bar' is invoked on, which will whatever type
      *          foo returns.
     ###
-    getResultingTypeAt: (editor, bufferPosition, ignoreLastElement) ->
+    getResultingTypeAt: (editor, bufferPosition, ignoreLastElement, async = false) ->
         callStack = @parser.retrieveSanitizedCallStackAt(editor, bufferPosition)
 
         if ignoreLastElement
@@ -478,7 +479,7 @@ class Service
 
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
-        return @deduceType(callStack, editor.getPath(), editor.getBuffer().getText(), offset, false)
+        return @deduceType(callStack, editor.getPath(), editor.getBuffer().getText(), offset, async)
 
     ###*
      * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
