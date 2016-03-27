@@ -7,6 +7,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDatabase;
 
 use PhpIntegrator\Application\Command as BaseCommand;
@@ -36,6 +37,11 @@ class VariableType extends BaseCommand
      * @var DeduceTypeCommand
      */
     protected $deduceTypeCommand;
+
+    /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
 
     /**
      * @inheritDoc
@@ -108,6 +114,7 @@ class VariableType extends BaseCommand
             $offset,
             $offsetLine,
             mb_substr($name, 1),
+            $this->getTypeAnalyzer(),
             $this->getResolveTypeCommand(),
             $this->getDeduceTypeCommand()
         );
@@ -119,10 +126,7 @@ class VariableType extends BaseCommand
         $traverser->addVisitor($queryingVisitor);
         $traverser->traverse($nodes);
 
-        return [
-            'type'         => $queryingVisitor->getType(),
-            'resolvedType' => $queryingVisitor->getResolvedType($file)
-        ];
+        return $queryingVisitor->getResolvedType($file);
     }
 
     /**
@@ -162,6 +166,18 @@ class VariableType extends BaseCommand
         }
 
         return $this->deduceTypeCommand;
+    }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 
     /**

@@ -494,8 +494,7 @@ class Parser
         result = @proxy.getVariableType(name, editor.getPath(), editor.getBuffer().getText(), offset, false)
 
         return null if not result
-
-        return result.type
+        return result
 
     ###*
      * Parses all elements from the given call stack to return the last type (if any). Returns null if the type of a

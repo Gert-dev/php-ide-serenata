@@ -3,6 +3,7 @@
 namespace PhpIntegrator\Application\Command\VariableType;
 
 use PhpIntegrator\DocParser;
+use PhpIntegrator\TypeAnalyzer;
 
 use PhpIntegrator\Application\Command\DeduceType;
 use PhpIntegrator\Application\Command\ResolveType;
@@ -52,6 +53,11 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $deduceTypeCommand;
 
     /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
      * @var Node\FunctionLike|null
      */
     protected $lastFunctionLikeNode;
@@ -79,21 +85,31 @@ class QueryingVisitor extends NodeVisitorAbstract
     /**
      * Constructor.
      *
-     * @param string      $file
-     * @param string      $code
-     * @param int         $position
-     * @param int         $line
-     * @param string      $name
-     * @param ResolveType $resolveTypeCommand
-     * @param DeduceType  $deduceTypeCommand
+     * @param string       $file
+     * @param string       $code
+     * @param int          $position
+     * @param int          $line
+     * @param string       $name
+     * @param TypeAnalyzer $typeAnalyzer
+     * @param ResolveType  $resolveTypeCommand
+     * @param DeduceType   $deduceTypeCommand
      */
-    public function __construct($file, $code, $position, $line, $name, ResolveType $resolveTypeCommand, DeduceType $deduceTypeCommand)
-    {
+    public function __construct(
+        $file,
+        $code,
+        $position,
+        $line,
+        $name,
+        TypeAnalyzer $typeAnalyzer,
+        ResolveType $resolveTypeCommand,
+        DeduceType $deduceTypeCommand
+    ) {
         $this->name = $name;
         $this->line = $line;
         $this->file = $file;
         $this->code = $code;
         $this->position = $position;
+        $this->typeAnalyzer = $typeAnalyzer;
         $this->deduceTypeCommand = $deduceTypeCommand;
         $this->resolveTypeCommand = $resolveTypeCommand;
     }
@@ -282,7 +298,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     /**
      * @var string|null
      */
-    public function getType()
+    protected function getType()
     {
         if ($this->bestTypeOverrideMatch) {
             return $this->bestTypeOverrideMatch;
@@ -374,12 +390,18 @@ class QueryingVisitor extends NodeVisitorAbstract
     {
         $type = $this->getType();
 
-        if ($type && $type[0] !== '\\') {
-            return $this->resolveTypeCommand->resolveType(
+        if (!$type || $this->typeAnalyzer->isSpecialType($type)) {
+            return $type;
+        }
+
+        if ($type[0] !== "\\") {
+            $type = $this->resolveTypeCommand->resolveType(
                 $type,
                 $file,
                 $this->bestTypeOverrideMatchLine ?: $this->line
             );
+
+            return "\\" . $type;
         }
 
         return $type;

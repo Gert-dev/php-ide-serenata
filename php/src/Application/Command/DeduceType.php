@@ -107,8 +107,6 @@ class DeduceType extends BaseCommand
 
         if ($firstElement[0] === '$') {
             $className = $this->getVariableTypeCommand()->getVariableType($file, $code, $firstElement, $offset);
-
-            $className = $className['resolvedType'];
         } elseif ($firstElement === 'static' or $firstElement === 'self') {
             $propertyAccessNeedsDollarSign = true;
 
@@ -205,6 +203,10 @@ class DeduceType extends BaseCommand
             }
 
             $propertyAccessNeedsDollarSign = false;
+        }
+
+        if ($className && !$this->getTypeAnalyzer()->isSpecialType($className) && $className[0] !== "\\") {
+            $className = "\\" . $className;
         }
 
         return $className;

@@ -45,7 +45,6 @@ class DeduceTypeTest extends IndexedTest
     //     $output = $this->deduceType('MissingFile.php', '$test');
     // }
 
-
     /**
      * @return Parser
      */
@@ -86,7 +85,7 @@ class DeduceTypeTest extends IndexedTest
             ['self', '$testProperty']
         );
 
-        $this->assertEquals('B', $result);
+        $this->assertEquals('\B', $result);
     }
 
     public function testCorrectlyAnalyzesStatic()
@@ -96,7 +95,7 @@ class DeduceTypeTest extends IndexedTest
             ['static', '$testProperty']
         );
 
-        $this->assertEquals('B', $result);
+        $this->assertEquals('\B', $result);
     }
 
     public function testCorrectlyAnalyzesParent()
@@ -106,7 +105,7 @@ class DeduceTypeTest extends IndexedTest
             ['parent', '$testProperty']
         );
 
-        $this->assertEquals('B', $result);
+        $this->assertEquals('\B', $result);
     }
 
     public function testCorrectlyAnalyzesThis()
@@ -116,7 +115,7 @@ class DeduceTypeTest extends IndexedTest
             ['$this', 'testProperty']
         );
 
-        $this->assertEquals('B', $result);
+        $this->assertEquals('\B', $result);
     }
 
     public function testCorrectlyAnalyzesVariables()
@@ -126,7 +125,7 @@ class DeduceTypeTest extends IndexedTest
             ['$var', 'testProperty']
         );
 
-        $this->assertEquals('B', $result);
+        $this->assertEquals('\B', $result);
     }
 
     public function testCorrectlyAnalyzesGlobalFunctions()
@@ -136,7 +135,7 @@ class DeduceTypeTest extends IndexedTest
             ['global_function()']
         );
 
-        $this->assertEquals('B', $result);
+        $this->assertEquals('\B', $result);
     }
 
     public function testCorrectlyAnalyzesClosures()
@@ -156,7 +155,7 @@ class DeduceTypeTest extends IndexedTest
             ['new static']
         );
 
-        $this->assertEquals('Bar', $result);
+        $this->assertEquals('\Bar', $result);
     }
 
     public function testCorrectlyAnalyzesClone()
@@ -166,7 +165,7 @@ class DeduceTypeTest extends IndexedTest
             ['clone $var']
         );
 
-        $this->assertEquals('Bar', $result);
+        $this->assertEquals('\Bar', $result);
     }
 
     public function testCorrectlyAnalyzesLongerChains()
