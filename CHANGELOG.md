@@ -11,7 +11,7 @@
 ### Changes for developers
 * Changes to the service
   * A new method, `getVariableTypeByOffset` has been added.
-  * `getVariableType` has been rewritten in PHP. Class types returned by this method will now always include a leading slash and _always_ be absolute. Previously the returned type was _sometimes_ relative to the current file and _sometimes_ absolute. To make things worse, absolute types _sometimes_ contained a leading slash, leading to confusion. (Scalar types will still not include a leading slash.)
+  * `getVariableType` has been rewritten in PHP. Class types returned by this method will now _always_ be absolute and _always_ include a leading slash. Previously the returned type was _sometimes_ relative to the current file and _sometimes_ absolute. To make things worse, absolute types _sometimes_ contained a leading slash, leading to confusion. (Scalar types will still not include a leading slash.)
 
 ## 0.7.2
 ### Bugs fixed
