@@ -260,6 +260,10 @@ class QueryingVisitor extends NodeVisitorAbstract
             if (is_string($node->name) && $node->class instanceof Node\Name) {
                 return [$node->name->toString(), $node->name];
             }
+        } elseif ($node instanceof Node\Expr\FuncCall) {
+            if ($node->name instanceof Node\Name) {
+                return [$node->name->toString() . '()'];
+            }
         }
 
         return null;
