@@ -159,8 +159,8 @@ class VariableTypeTest extends IndexedTest
         $output = $this->getVariableType('Assignment.php', '$a');
 
         $this->assertEquals([
-            'type'         => 'DateTime',
-            'resolvedType' => 'DateTime'
+            'type'         => '\DateTime',
+            'resolvedType' => '\DateTime'
         ], $output);
     }
 

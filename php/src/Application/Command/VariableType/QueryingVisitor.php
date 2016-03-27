@@ -218,7 +218,7 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
         } elseif ($node instanceof Node\Expr\New_) {
             if ($node->class instanceof Node\Name) {
-                return ['new ' . (string) $node->class];
+                return ['new ' . $this->fetchClassName($node->class)];
             }
         } elseif ($node instanceof Node\Expr\Clone_) {
             if ($node->expr instanceof Node\Expr\Variable) {
