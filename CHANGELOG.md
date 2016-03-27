@@ -9,7 +9,7 @@
 * Fixed a rare error relating to an "undefined progressStreamCallback".
 
 ### Changes for developers
-* Almost all service methods have an async parameter. It is recommended that you always use this functionality as it will ensure the editor remains responsive for the end user. In a future release, support for synchronous calls *will _probably_ be removed*.
+* Almost all service methods have an async parameter. It is recommended that you always use this functionality as it will ensure the editor remains responsive for the end user. In a future release, support for synchronous calls **will _probably_ be removed**.
 * Changes to the service
   * A new method `deduceType` has been added.
   * A new method `getVariableTypeByOffset` has been added.
