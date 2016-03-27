@@ -134,7 +134,7 @@ class QueryingVisitor extends NodeVisitorAbstract
                     $variableName = $node->var->name;
                 }
 
-                if ($variableName) {
+                if ($variableName && $variableName === $this->name) {
                     $expressionParts = $this->convertExpressionToStringParts($node->expr);
 
                     if ($expressionParts) {
