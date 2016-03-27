@@ -142,6 +142,20 @@ class Service
         return @proxy.getAvailableVariables(file, source, offset, async)
 
     ###*
+     * Fetches the type of the specified variable at the specified location.
+     *
+     * @param {string}      name   The variable to fetch, including its leading dollar sign.
+     * @param {string|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {string|null} source The source code to search. May be null if a file is passed instead.
+     * @param {number}      offset The character offset into the file to examine.
+     * @param {boolean}     async
+     *
+     * @return {Promise|Object}
+    ###
+    getVariableTypeByOffset: (file, source, offset, async = false) ->
+        return @proxy.getVariableType(name, file, source, offset, async)
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {string}      path                   The full path to the file  or folder to refresh.

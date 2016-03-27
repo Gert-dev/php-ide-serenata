@@ -313,9 +313,9 @@ class QueryingVisitor extends NodeVisitorAbstract
                         return mb_substr($listType, 0, -2);
                     }
                 }
+            } else {
+                return $this->bestMatch;
             }
-
-            return $this->bestMatch;
         } elseif ($this->lastFunctionLikeNode) {
             foreach ($this->lastFunctionLikeNode->getParams() as $param) {
                 if ($param->name === $this->name) {

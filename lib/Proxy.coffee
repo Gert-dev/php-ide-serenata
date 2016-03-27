@@ -292,6 +292,37 @@ class Proxy
         )
 
     ###*
+     * Fetches the type of the specified variable at the specified location.
+     *
+     * @param {string}      name   The variable to fetch, including its leading dollar sign.
+     * @param {string|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {string|null} source The source code to search. May be null if a file is passed instead.
+     * @param {number}      offset The character offset into the file to examine.
+     * @param {boolean}     async
+     *
+     * @return {Promise|Object}
+    ###
+    getVariableType: (name, file, source, offset, async = false) ->
+        if not file? and not source?
+            throw 'Either a path to a file or source code must be passed!'
+
+        if file?
+            parameter = '--file=' + file
+
+        else if not async
+            throw 'Passing direct file contents is only supported for asynchronous calls!'
+
+        else
+            parameter = '--stdin'
+
+        return @performRequest(
+            ['--variable-type', '--database=' + @getIndexDatabasePath(), parameter, '--name=' + name, '--offset=' + offset],
+            async,
+            null,
+            source
+        )
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {string}      path                   The full path to the file  or folder to refresh.

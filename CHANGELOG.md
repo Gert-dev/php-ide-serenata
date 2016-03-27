@@ -8,6 +8,10 @@
 * Fixed PHP 7 anonymous classes still being parsed.
 * Fixed a rare error relating to an "undefined progressStreamCallback".
 
+### Changes for developers
+* Changes to the service
+  * A new method, `getVariableTypeByOffset` has been added.
+
 ## 0.7.2
 ### Bugs fixed
 * Fixed minor error where the service version was bumped incorrectly.

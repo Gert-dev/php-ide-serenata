@@ -30,7 +30,8 @@ class Application
             '--reindex'             => 'Reindex',
             '--resolve-type'        => 'ResolveType',
             '--semantic-lint'       => 'SemanticLint',
-            '--available-variables' => 'AvailableVariables'
+            '--available-variables' => 'AvailableVariables',
+            '--variable-type'       => 'VariableType'
         ];
 
         if (isset($commands[$command])) {
