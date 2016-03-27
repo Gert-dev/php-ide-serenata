@@ -119,22 +119,12 @@ class VariableType extends BaseCommand
         $traverser->addVisitor($queryingVisitor);
         $traverser->traverse($nodes);
 
-
-
-
-
-
-        // TODO: Remove 'resolvedType'. If the caller wants the resolved type, he should use the resolve type command
-        // manually. If he doesn't, this saves unnecessary expensive type resolution.
-
-
-
         return [
             'type'         => $queryingVisitor->getType(),
             'resolvedType' => $queryingVisitor->getResolvedType($file)
         ];
     }
-    
+
     /**
      * @inheritDoc
      */
