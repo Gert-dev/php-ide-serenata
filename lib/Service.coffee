@@ -329,7 +329,7 @@ class Service
      * @param {string}     name
      * @param {boolean}    async
      *
-     * @return {string|null}
+     * @return {Promise|string|null}
     ###
     getVariableType: (editor, bufferPosition, name, async = false) ->
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
