@@ -52,10 +52,10 @@ class DeduceType extends BaseCommand
      */
     protected function attachOptions(OptionCollection $optionCollection)
     {
-        // $optionCollection->add('file?', 'The file to examine.')->isa('string');
-        // $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
-        // $optionCollection->add('name:', 'The name of the variable to examine.')->isa('string');
-        // $optionCollection->add('offset:', 'The character byte offset into the code to use for the determination.')->isa('number');
+        $optionCollection->add('file?', 'The file to examine.')->isa('string');
+        $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
+        $optionCollection->add('part+', 'A part of the expression as string. Specify this as many times as you have parts.')->isa('string');
+        $optionCollection->add('offset:', 'The character byte offset into the code to use for the determination.')->isa('number');
     }
 
     /**
@@ -63,22 +63,27 @@ class DeduceType extends BaseCommand
      */
     protected function process(ArrayAccess $arguments)
     {
-    //     if (!isset($arguments['file']) && (!isset($arguments['stdin']) || !$arguments['stdin']->value)) {
-    //         throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
-    //     } elseif (!isset($arguments['offset'])) {
-    //         throw new UnexpectedValueException('An --offset must be supplied into the source code!');
-    //     } elseif (!isset($arguments['name'])) {
-    //         throw new UnexpectedValueException('The name of the variable must be set using --name!');
-    //     }
-    //
-    //     $result = $this->getVariableType(
-    //        isset($arguments['file']) ? $arguments['file']->value : null,
-    //        $arguments['name']->value,
-    //        $arguments['offset']->value,
-    //        isset($arguments['stdin']) && $arguments['stdin']->value
-    //    );
-    //
-    //    return $this->outputJson(true, $result);
+        if (!isset($arguments['file']) && (!isset($arguments['stdin']) || !$arguments['stdin']->value)) {
+            throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
+        } elseif (!isset($arguments['offset'])) {
+            throw new UnexpectedValueException('An --offset must be supplied into the source code!');
+        } elseif (!isset($arguments['part'])) {
+            throw new UnexpectedValueException('You must specify at least one part using --part!');
+        }
+
+        $code = $this->getSourceCode(
+            isset($arguments['file']) ? $arguments['file']->value : null,
+            isset($arguments['stdin']) && $arguments['stdin']->value
+        );
+
+        $result = $this->deduceType(
+           isset($arguments['file']) ? $arguments['file']->value : null,
+           $code,
+           $arguments['part']->value,
+           $arguments['offset']->value
+        );
+
+        return $this->outputJson(true, $result);
     }
 
     /**

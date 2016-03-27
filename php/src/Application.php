@@ -31,7 +31,8 @@ class Application
             '--resolve-type'        => 'ResolveType',
             '--semantic-lint'       => 'SemanticLint',
             '--available-variables' => 'AvailableVariables',
-            '--variable-type'       => 'VariableType'
+            '--variable-type'       => 'VariableType',
+            '--deduce-type'         => 'DeduceType'
         ];
 
         if (isset($commands[$command])) {
