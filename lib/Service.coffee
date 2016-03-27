@@ -32,18 +32,6 @@ class Service
     constructor: (@proxy, @parser, @indexingEventEmitter) ->
 
     ###*
-     * Creates a popover with the specified constructor arguments.
-    ###
-    createPopover: () ->
-        return new Popover(arguments...)
-
-    ###*
-     * Creates an attached popover with the specified constructor arguments.
-    ###
-    createAttachedPopover: () ->
-        return new AttachedPopover(arguments...)
-
-    ###*
      * Clears the autocompletion cache. Most fetching operations such as fetching constants, autocompletion, fetching
      * members, etc. are cached when they are first retrieved. This clears the cache, forcing them to be retrieved
      # again. Clearing the cache is automatically performed, so this method is usually unnecessary.
@@ -220,32 +208,6 @@ class Service
         @indexingEventEmitter.on('php-integrator-base:indexing-failed', callback)
 
     ###*
-     * Gets the correct selector for the class or namespace that is part of the specified event.
-     *
-     * @param  {jQuery.Event}  event  A jQuery event.
-     *
-     * @return {object|null} A selector to be used with jQuery.
-    ###
-    getClassSelectorFromEvent: (event) ->
-        selector = event.currentTarget
-
-        $ = require 'jquery'
-
-        if $(selector).parent().hasClass('function argument')
-            return $(selector).parent().children('.namespace, .class:not(.operator):not(.constant)')
-
-        if $(selector).prev().hasClass('namespace') && $(selector).hasClass('class')
-            return $([$(selector).prev()[0], selector])
-
-        if $(selector).next().hasClass('class') && $(selector).hasClass('namespace')
-           return $([selector, $(selector).next()[0]])
-
-        if $(selector).prev().hasClass('namespace') || $(selector).next().hasClass('inherited-class')
-            return $(selector).parent().children('.namespace, .inherited-class')
-
-        return selector
-
-    ###*
      * Determines the current class' FQCN based on the specified buffer position.
      *
      * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
@@ -295,16 +257,6 @@ class Service
     ###
     resolveTypeAt: (editor, bufferPosition, type, async = false) ->
         return @resolveType(editor.getPath(), bufferPosition.row + 1, type, async)
-
-    ###*
-     * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
-     *
-     * @param {string} type
-     *
-     * @return {boolean}
-    ###
-    isBasicType: (type) ->
-        return /^(string|int|bool|float|object|mixed|array|resource|void|null|callable|false|true|self|static|parent|\$this)$/i.test(type)
 
     ###*
      * Retrieves all variables that are available at the specified buffer position.
@@ -391,3 +343,51 @@ class Service
     ###
     getInvocationInfoAt: (editor, bufferPosition) ->
         return @parser.getInvocationInfoAt(editor, bufferPosition)
+
+    ###*
+     * Creates a popover with the specified constructor arguments.
+    ###
+    createPopover: () ->
+        return new Popover(arguments...)
+
+    ###*
+     * Creates an attached popover with the specified constructor arguments.
+    ###
+    createAttachedPopover: () ->
+        return new AttachedPopover(arguments...)
+
+    ###*
+     * Gets the correct selector for the class or namespace that is part of the specified event.
+     *
+     * @param  {jQuery.Event}  event  A jQuery event.
+     *
+     * @return {object|null} A selector to be used with jQuery.
+    ###
+    getClassSelectorFromEvent: (event) ->
+        selector = event.currentTarget
+
+        $ = require 'jquery'
+
+        if $(selector).parent().hasClass('function argument')
+            return $(selector).parent().children('.namespace, .class:not(.operator):not(.constant)')
+
+        if $(selector).prev().hasClass('namespace') && $(selector).hasClass('class')
+            return $([$(selector).prev()[0], selector])
+
+        if $(selector).next().hasClass('class') && $(selector).hasClass('namespace')
+           return $([selector, $(selector).next()[0]])
+
+        if $(selector).prev().hasClass('namespace') || $(selector).next().hasClass('inherited-class')
+            return $(selector).parent().children('.namespace, .inherited-class')
+
+        return selector
+
+    ###*
+     * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
+     *
+     * @param {string} type
+     *
+     * @return {boolean}
+    ###
+    isBasicType: (type) ->
+        return /^(string|int|bool|float|object|mixed|array|resource|void|null|callable|false|true|self|static|parent|\$this)$/i.test(type)
