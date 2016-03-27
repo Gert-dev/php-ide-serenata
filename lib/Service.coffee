@@ -287,13 +287,14 @@ class Service
      * @param {TextEditor} editor         The editor.
      * @param {Point}      bufferPosition The location of the type.
      * @param {string}     type           The (local) type to resolve.
+     * @param {boolean}    async
      *
-     * @return {string|null}
+     * @return {Promise|string|null}
      *
      * @example In a file with namespace A\B, determining C could lead to A\B\C.
     ###
-    resolveTypeAt: (editor, bufferPosition, type) ->
-        return @proxy.resolveType(editor.getPath(), bufferPosition.row + 1, type)
+    resolveTypeAt: (editor, bufferPosition, type, async = false) ->
+        return @resolveType(editor.getPath(), bufferPosition.row + 1, type, async)
 
     ###*
      * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
@@ -312,7 +313,7 @@ class Service
      * @param {Range}      bufferPosition
      * @param {bool}       async
      *
-     * @return {Object}
+     * @return {Promise|Object}
     ###
     getAvailableVariables: (editor, bufferPosition, async = false) ->
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)

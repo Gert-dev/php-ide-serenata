@@ -12,7 +12,7 @@
 * Changes to the service
   * A new method `deduceType` has been added.
   * A new method `getVariableTypeByOffset` has been added.
-  * `getVariableType` and `getResultingTypeAt` have received an additional parameter, `async`, that will make type deduction asynchronous.
+  * `getVariableType`, `getResultingTypeAt` and `resolveTypeAt` have received an additional parameter, `async`, that will make them (mostly) asynchronous.
   * `getVariableType` and `getResultingTypeAt` have been rewritten in PHP. Class types returned by these methods will now _always_ be absolute and _always_ include a leading slash. Previously the returned type was _sometimes_ relative to the current file and _sometimes_ absolute. To make things worse, absolute types _sometimes_ contained a leading slash, leading to confusion. (Scalar types will still not include a leading slash.)
   * The following methods have been removed, they were barely used and just provided very thin wrappers over existing functionality.:
     * `getClassMember`
