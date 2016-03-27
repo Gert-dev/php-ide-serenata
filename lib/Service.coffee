@@ -333,16 +333,23 @@ class Service
      *
      * @param {TextEditor} editor
      * @param {Point}      bufferPosition
+     * @param {boolean}    async
      *
      * @example "$this->test(1, function () {},| 2);" (where the vertical bar denotes the cursor position) will yield
      *          ['$this', 'test'].
      *
-     * @return {Object|null} With elements 'callStack' (array) as well as 'argumentIndex' which denotes the argument in
-     *                       the parameter list the position is located at. Returns 'null' if not in a method or
-     *                       function call.
+     * @return {Promise"Object|null} With elements 'callStack' (array) as well as 'argumentIndex' which denotes the
+     *                               argument in the parameter list the position is located at. Returns 'null' if not
+     *                               in a method or function call.
     ###
-    getInvocationInfoAt: (editor, bufferPosition) ->
-        return @parser.getInvocationInfoAt(editor, bufferPosition)
+    getInvocationInfoAt: (editor, bufferPosition, async = false) ->
+        result = @parser.getInvocationInfoAt(editor, bufferPosition)
+
+        if not async
+            return result
+
+        return new Promise (resolve, reject) =>
+            resolve(result)
 
     ###*
      * Creates a popover with the specified constructor arguments.
