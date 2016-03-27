@@ -156,6 +156,20 @@ class Service
         return @proxy.getVariableType(name, file, source, offset, async)
 
     ###*
+     * Deduces the resulting type of an expression based on its parts.
+     *
+     * @param {array}       parts  One or more strings that are part of the expression, e.g. ['$this', 'foo()'].
+     * @param {string|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {string|null} source The source code to search. May be null if a file is passed instead.
+     * @param {number}      offset The character offset into the file to examine.
+     * @param {boolean}     async
+     *
+     * @return {Promise|Object}
+    ###
+    deduceType: (parts, file, source, offset, async = false) ->
+        return @proxy.deduceType(parts, file, source, offset, async)
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {string}      path                   The full path to the file  or folder to refresh.
@@ -482,7 +496,9 @@ class Service
 
         return null if not callStack or callStack.length == 0
 
-        return @parser.getResultingTypeFromCallStack(editor, bufferPosition, callStack)
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
+
+        return @deduceType(callStack, editor.getPath(), editor.getBuffer().getText(), offset, false)
 
     ###*
      * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be

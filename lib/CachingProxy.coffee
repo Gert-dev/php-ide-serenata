@@ -121,6 +121,21 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    deduceType: (parts, file, source, offset, async = false) ->
+        if source?
+            # Don't cache calls with full source code as this would make for a large, constantly changing, cache.
+            return super(parts, file, source, offset, async)
+
+        partsKey = ''
+
+        for part in parts
+            partsKey += part
+
+        return @wrapCachedRequestToParent("deduceType-#{partsKey}-#{file}-#{offset}", 'deduceType', arguments, async)
+
+    ###*
+     * @inherited
+    ###
     reindex: (path, source, progressStreamCallback) ->
         return super(path, source, progressStreamCallback).then (output) =>
             @clearCache()

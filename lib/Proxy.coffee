@@ -323,6 +323,42 @@ class Proxy
         )
 
     ###*
+     * Deduces the resulting type of an expression based on its parts.
+     *
+     * @param {array}       parts  One or more strings that are part of the expression, e.g. ['$this', 'foo()'].
+     * @param {string|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {string|null} source The source code to search. May be null if a file is passed instead.
+     * @param {number}      offset The character offset into the file to examine.
+     * @param {boolean}     async
+     *
+     * @return {Promise|Object}
+    ###
+    deduceType: (parts, file, source, offset, async = false) ->
+        if not file? and not source?
+            throw 'Either a path to a file or source code must be passed!'
+
+        if file?
+            parameter = '--file=' + file
+
+        else if not async
+            throw 'Passing direct file contents is only supported for asynchronous calls!'
+
+        else
+            parameter = '--stdin'
+
+        parameters = ['--deduce-type', '--database=' + @getIndexDatabasePath(), parameter, '--offset=' + offset]
+
+        for part in parts
+            parameters.push('--part=' + part)
+
+        return @performRequest(
+            parameters,
+            async,
+            null,
+            source
+        )
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {string}      path                   The full path to the file  or folder to refresh.
