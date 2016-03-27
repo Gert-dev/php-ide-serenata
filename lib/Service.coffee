@@ -338,38 +338,7 @@ class Service
         return result
 
     ###*
-     * Retrieves contextual information about the class member at the specified location in the editor. This is
-     * essentially the same as {@see getClassMember}, but will automatically determine the class based on the code at
-     * the specified location.
-     *
-     * @param {TextEditor} editor         The text editor to use.
-     * @param {Point}      bufferPosition The cursor location of the member.
-     * @param {string}     name           The name of the member to retrieve information about.
-     *
-     * @return {Object|null}
-    ###
-    getClassMemberAt: (editor, bufferPosition, name) ->
-        className = @getResultingTypeAt(editor, bufferPosition, true)
-
-        members = @getClassMember(className, name)
-
-        # Methods and properties can share the same name, which one is being used depends on the context, so we have
-        # to disambiguate in this case.
-        if members.method and members.property
-            if @parser.isUsingProperty(editor, bufferPosition)
-                return members.property
-
-            else
-                return members.method
-
-        return members.method if members.method
-        return members.property if members.property
-        return members.constant if members.constant
-
-        return null
-
-    ###*
-     * Same as {@see getClassMemberAt}, but only returns methods.
+     * Returns the class method used at the specified location.
      *
      * @param {TextEditor} editor         The text editor to use.
      * @param {Point}      bufferPosition The cursor location of the member.
@@ -386,7 +355,7 @@ class Service
         return @getClassMethod(className, name)
 
     ###*
-     * Same as {@see getClassMemberAt}, but only returns properties.
+     * Returns the class property used at the specified location.
      *
      * @param {TextEditor} editor         The text editor to use.
      * @param {Point}      bufferPosition The cursor location of the member.
@@ -403,7 +372,7 @@ class Service
         return @getClassProperty(className, name)
 
     ###*
-     * Same as {@see getClassMemberAt}, but only returns constants.
+     * Returns the class constant used at the specified location.
      *
      * @param {TextEditor} editor         The text editor to use.
      * @param {Point}      bufferPosition The cursor location of the member.
@@ -415,23 +384,6 @@ class Service
         className = @getResultingTypeAt(editor, bufferPosition, true)
 
         return @getClassConstant(className, name)
-
-    ###*
-     * Retrieves information about members of the specified class. Note that this always returns an object, as there may
-     * be multiple members (e.g. methods and properties) sharing the same name. The object's properties are 'method',
-     * 'property' and 'constant'.
-     *
-     * @param {string} className The full name of the class to examine.
-     * @param {string} name      The name of the member to retrieve information about.
-     *
-     * @return {Object}
-    ###
-    getClassMember: (className, name) ->
-        return {
-            method   : @getClassMethod(className, name)
-            property : @getClassProperty(className, name)
-            constant : @getClassConstant(className, name)
-        }
 
     ###*
      * Retrieves information about the specified method of the specified class.
