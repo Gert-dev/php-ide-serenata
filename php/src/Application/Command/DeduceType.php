@@ -223,8 +223,6 @@ class DeduceType extends BaseCommand
 
         $classes = $this->getClassListCommand()->getClassList($file);
 
-        // TODO: check if returned value is also 1-indexed.
-
         foreach ($classes as $fqsen => $class) {
             if ($line >= $class['startLine'] && $line <= $class['endLine']) {
                 return $fqsen;
