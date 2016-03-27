@@ -7,24 +7,6 @@ module.exports =
 ##
 class Parser
     ###*
-     * A string that can be inserted into regular expressions that will match a class name, including its namespace,
-     * if present.
-    ###
-    classRegexPart = '\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*'
-
-    ###*
-     * The proxy that can be used to query information about the code.
-    ###
-    proxy: null
-
-    ###*
-     * Constructor.
-     *
-     * @param {Proxy} proxy
-    ###
-    constructor: (@proxy) ->
-
-    ###*
      * Indicates if the specifiec location is a property usage or not. If it is not, it is most likely a method call.
      * This is useful to distinguish between properties and methods with the same name.
      *
@@ -39,66 +21,6 @@ class Parser
         scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition).getScopeChain()
 
         return (scopeDescriptor.indexOf('.property') != -1)
-
-    ###*
-     * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
-     *
-     * @param {string} type
-     *
-     * @return {boolean}
-    ###
-    isBasicType: (type) ->
-        return /^(string|int|bool|float|object|mixed|array|resource|void|null|callable|false|true|self|static|parent|\$this)$/i.test(type)
-
-    ###*
-     * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
-     * parameters for the editor and buffer position.
-     *
-     * @param {TextEditor} editor         The editor.
-     * @param {Point}      bufferPosition The location of the type.
-     * @param {string}     type           The (local) type to resolve.
-     *
-     * @return {string|null}
-     *
-     * @example In a file with namespace A\B, determining C could lead to A\B\C.
-    ###
-    resolveTypeAt: (editor, bufferPosition, type) ->
-        return @proxy.resolveType(editor.getPath(), bufferPosition.row + 1, type)
-
-    ###*
-     * Determines the current class' FQCN based on the specified buffer position.
-     *
-     * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
-     * @param {Point}      bufferPosition
-     * @param {boolean}    async
-     *
-     * @return {Promise|string|null}
-    ###
-    determineCurrentClassName: (editor, bufferPosition, async = false) ->
-        path = editor.getPath()
-
-        if not async
-            classesInFile = @proxy.getClassListForFile(editor.getPath())
-
-            for name,classInfo of classesInFile
-                if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
-                    return name
-
-            return null
-
-        return new Promise (resolve, reject) =>
-            path = editor.getPath()
-
-            if not path?
-                reject()
-                return
-
-            return @proxy.getClassListForFile(path, true).then (classesInFile) =>
-                for name,classInfo of classesInFile
-                    if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
-                        resolve(name)
-
-                resolve(null)
 
     ###*
      * Starts at the specified buffer position, and walks backwards or forwards to find the end of an expression.
@@ -364,24 +286,6 @@ class Parser
         textSlice = editor.getTextInBufferRange([boundary, bufferPosition])
 
         return @retrieveSanitizedCallStack(textSlice)
-
-    ###*
-     * Retrieves the type of a variable, relative to the context at the specified buffer location. Class names will
-     * be returned in their full form (full class name, but not necessarily with a leading slash).
-     *
-     * @param {TextEditor} editor
-     * @param {Range}      bufferPosition
-     * @param {string}     name
-     *
-     * @return {string|null}
-    ###
-    getVariableType: (editor, bufferPosition, name) ->
-        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
-
-        result = @proxy.getVariableType(name, editor.getPath(), editor.getBuffer().getText(), offset, false)
-
-        return null if not result
-        return result
 
     ###*
      * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be

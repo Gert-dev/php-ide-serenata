@@ -152,7 +152,7 @@ class Service
      *
      * @return {Promise|Object}
     ###
-    getVariableTypeByOffset: (file, source, offset, async = false) ->
+    getVariableTypeByOffset: (name, file, source, offset, async = false) ->
         return @proxy.getVariableType(name, file, source, offset, async)
 
     ###*
@@ -255,7 +255,30 @@ class Service
      * @return {Promise|string|null}
     ###
     determineCurrentClassName: (editor, bufferPosition, async = false) ->
-        return @parser.determineCurrentClassName(editor, bufferPosition, async)
+        path = editor.getPath()
+
+        if not async
+            classesInFile = @proxy.getClassListForFile(editor.getPath())
+
+            for name,classInfo of classesInFile
+                if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
+                    return name
+
+            return null
+
+        return new Promise (resolve, reject) =>
+            path = editor.getPath()
+
+            if not path?
+                reject()
+                return
+
+            return @proxy.getClassListForFile(path, true).then (classesInFile) =>
+                for name,classInfo of classesInFile
+                    if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
+                        resolve(name)
+
+                resolve(null)
 
     ###*
      * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
@@ -270,7 +293,7 @@ class Service
      * @example In a file with namespace A\B, determining C could lead to A\B\C.
     ###
     resolveTypeAt: (editor, bufferPosition, type) ->
-        return @parser.resolveTypeAt(editor, bufferPosition, type)
+        return @proxy.resolveType(editor.getPath(), bufferPosition.row + 1, type)
 
     ###*
      * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
@@ -280,7 +303,7 @@ class Service
      * @return {boolean}
     ###
     isBasicType: (type) ->
-        return @parser.isBasicType(type)
+        return /^(string|int|bool|float|object|mixed|array|resource|void|null|callable|false|true|self|static|parent|\$this)$/i.test(type)
 
     ###*
      * Retrieves all variables that are available at the specified buffer position.
@@ -307,7 +330,12 @@ class Service
      * @return {string|null}
     ###
     getVariableType: (editor, bufferPosition, name) ->
-        return @parser.getVariableType(editor, bufferPosition, name)
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
+
+        result = @proxy.getVariableType(name, editor.getPath(), editor.getBuffer().getText(), offset, false)
+
+        return null if not result
+        return result
 
     ###*
      * Retrieves contextual information about the class member at the specified location in the editor. This is

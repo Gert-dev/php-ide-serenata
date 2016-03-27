@@ -350,7 +350,7 @@ module.exports =
         @proxy = new CachingProxy(@configuration)
 
         emitter = new Emitter()
-        @parser = new Parser(@proxy)
+        @parser = new Parser()
 
         @service = new Service(@proxy, @parser, emitter)
 
