@@ -62,7 +62,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $currentClassName;
 
     /**
-     * @var string|null
+     * @var Node|string||null
      */
     protected $bestMatch;
 
@@ -135,36 +135,12 @@ class QueryingVisitor extends NodeVisitorAbstract
                 }
 
                 if ($variableName && $variableName === $this->name) {
-                    $expressionParts = $this->convertExpressionToStringParts($node->expr);
-
-                    if ($expressionParts) {
-                        // The position + 1 ensures that this node is also taken up in the scan for its type, causing
-                        // its docblock (which could contain a type annotation override) to also be examined.
-                        $this->bestMatch = $this->deduceTypeCommand->deduceType(
-                            $this->file,
-                            $this->code,
-                            $expressionParts,
-                            $node->getAttribute('startFilePos') + 1
-                        );
-                    }
+                    $this->bestMatch = $node;
                 }
             }
         } elseif ($node instanceof Node\Stmt\Foreach_) {
             if ($node->valueVar->name === $this->name) {
-                $expressionParts = $this->convertExpressionToStringParts($node->expr);
-
-                if ($expressionParts) {
-                    $listType = $this->deduceTypeCommand->deduceType(
-                        $this->file,
-                        $this->code,
-                        $expressionParts,
-                        $node->getAttribute('startFilePos') + 1 // Same as above.
-                    );
-
-                    if ($listType && mb_strpos($listType, '[]') !== false) {
-                        $this->bestMatch = mb_substr($listType, 0, -2);
-                    }
-                }
+                $this->bestMatch = $node;
             }
         }
 
@@ -308,6 +284,38 @@ class QueryingVisitor extends NodeVisitorAbstract
             return $this->bestTypeOverrideMatch;
         } elseif ($this->name === 'this') {
             return $this->currentClassName;
+        } elseif ($this->bestMatch) {
+            if ($this->bestMatch instanceof Node\Expr\Assign) {
+                $expressionParts = $this->convertExpressionToStringParts($this->bestMatch->expr);
+
+                if ($expressionParts) {
+                    // The position + 1 ensures that this node is also taken up in the scan for its type, causing
+                    // its docblock (which could contain a type annotation override) to also be examined.
+                    return $this->deduceTypeCommand->deduceType(
+                        $this->file,
+                        $this->code,
+                        $expressionParts,
+                        $this->bestMatch->getAttribute('startFilePos') + 1
+                    );
+                }
+            } elseif ($this->bestMatch instanceof Node\Stmt\Foreach_) {
+                $expressionParts = $this->convertExpressionToStringParts($this->bestMatch->expr);
+
+                if ($expressionParts) {
+                    $listType = $this->deduceTypeCommand->deduceType(
+                        $this->file,
+                        $this->code,
+                        $expressionParts,
+                        $this->bestMatch->getAttribute('startFilePos') + 1 // Same as above.
+                    );
+
+                    if ($listType && mb_strpos($listType, '[]') !== false) {
+                        return mb_substr($listType, 0, -2);
+                    }
+                }
+            }
+
+            return $this->bestMatch;
         } elseif ($this->lastFunctionLikeNode) {
             foreach ($this->lastFunctionLikeNode->getParams() as $param) {
                 if ($param->name === $this->name) {
@@ -350,7 +358,7 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
         }
 
-        return $this->bestMatch;
+        return null;
     }
 
     /**
