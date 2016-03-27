@@ -326,13 +326,14 @@ class Service
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition
      * @param {string}     name
+     * @param {boolean}    async
      *
      * @return {string|null}
     ###
-    getVariableType: (editor, bufferPosition, name) ->
+    getVariableType: (editor, bufferPosition, name, async = false) ->
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
-        result = @proxy.getVariableType(name, editor.getPath(), editor.getBuffer().getText(), offset, false)
+        result = @proxy.getVariableType(name, editor.getPath(), editor.getBuffer().getText(), offset, async)
 
         return null if not result
         return result
