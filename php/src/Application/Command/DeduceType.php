@@ -93,6 +93,8 @@ class DeduceType extends BaseCommand
      * @param string      $code
      * @param string[]    $expressionParts
      * @param int         $offset
+     *
+     * @return string|null
      */
     public function deduceType($file, $code, array $expressionParts, $offset)
     {
@@ -220,6 +222,21 @@ class DeduceType extends BaseCommand
     }
 
     /**
+     * @param string|null $file
+     * @param string      $code
+     * @param Node\Expr   $expression
+     * @param int         $offset
+     *
+     * @return string|null
+     */
+    public function deduceTypeFromNode($file, $code, Node\Expr $expression, $offset)
+    {
+        $expressionParts = $this->convertExpressionToStringParts($expression);
+
+        return $expressionParts ? $this->deduceType($file, $code, $expressionParts, $offset) : null;
+    }
+
+    /**
      * This function acts as an adapter for AST node data to an array of strings for the reimplementation of the
      * CoffeeScript DeduceType method. As such, this bridge will be removed over time, as soon as DeduceType  works with
      * an AST instead of regular expression parsing. At that point, input of string call stacks from the command line
@@ -230,7 +247,7 @@ class DeduceType extends BaseCommand
      *
      * @return string[]|null
      */
-    public function convertExpressionToStringParts(Node\Expr $node)
+    protected function convertExpressionToStringParts(Node\Expr $node)
     {
         if ($node instanceof Node\Expr\Variable) {
             if (is_string($node->name)) {

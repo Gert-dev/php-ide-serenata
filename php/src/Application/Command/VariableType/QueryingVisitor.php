@@ -236,32 +236,24 @@ class QueryingVisitor extends NodeVisitorAbstract
             return $this->currentClassName;
         } elseif ($this->bestMatch) {
             if ($this->bestMatch instanceof Node\Expr\Assign) {
-                $expressionParts = $this->deduceTypeCommand->convertExpressionToStringParts($this->bestMatch->expr);
-
-                if ($expressionParts) {
-                    // The position + 1 ensures that this node is also taken up in the scan for its type, causing
-                    // its docblock (which could contain a type annotation override) to also be examined.
-                    return $this->deduceTypeCommand->deduceType(
-                        $this->file,
-                        $this->code,
-                        $expressionParts,
-                        $this->bestMatch->getAttribute('startFilePos') + 1
-                    );
-                }
+                // The position + 1 ensures that this node is also taken up in the scan for its type, causing
+                // its docblock (which could contain a type annotation override) to also be examined.
+                return $this->deduceTypeCommand->deduceTypeFromNode(
+                    $this->file,
+                    $this->code,
+                    $this->bestMatch->expr,
+                    $this->bestMatch->getAttribute('startFilePos') + 1
+                );
             } elseif ($this->bestMatch instanceof Node\Stmt\Foreach_) {
-                $expressionParts = $this->deduceTypeCommand->convertExpressionToStringParts($this->bestMatch->expr);
+                $listType = $this->deduceTypeCommand->deduceTypeFromNode(
+                    $this->file,
+                    $this->code,
+                    $this->bestMatch->expr,
+                    $this->bestMatch->getAttribute('startFilePos') + 1 // Same as above.
+                );
 
-                if ($expressionParts) {
-                    $listType = $this->deduceTypeCommand->deduceType(
-                        $this->file,
-                        $this->code,
-                        $expressionParts,
-                        $this->bestMatch->getAttribute('startFilePos') + 1 // Same as above.
-                    );
-
-                    if ($listType && mb_strpos($listType, '[]') !== false) {
-                        return mb_substr($listType, 0, -2);
-                    }
+                if ($listType && mb_strpos($listType, '[]') !== false) {
+                    return mb_substr($listType, 0, -2);
                 }
             } else {
                 return $this->bestMatch;
