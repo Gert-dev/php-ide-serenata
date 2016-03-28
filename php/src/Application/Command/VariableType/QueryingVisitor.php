@@ -216,76 +216,6 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * This function acts as an adapter for AST node data to an array of strings for the reimplementation of the
-     * CoffeeScript DeduceType method. As such, this bridge will be removed over time, as soon as DeduceType  works with
-     * an AST instead of regular expression parsing. At that point, input of string call stacks from the command line
-     * can be converted to an intermediate AST so data from CoffeeScript (that has no notion of the AST) can be treated
-     * the same way.
-     *
-     * @param Node\Expr $node
-     *
-     * @return string[]|null
-     */
-    protected function convertExpressionToStringParts(Node\Expr $node)
-    {
-        if ($node instanceof Node\Expr\Variable) {
-            if (is_string($node->name)) {
-                return ['$' . (string) $node->name];
-            }
-        } elseif ($node instanceof Node\Expr\New_) {
-            if ($node->class instanceof Node\Name) {
-                return ['new ' . $this->fetchClassName($node->class)];
-            }
-        } elseif ($node instanceof Node\Expr\Clone_) {
-            if ($node->expr instanceof Node\Expr\Variable) {
-                return ['clone $' . $node->expr->name];
-            }
-        } elseif ($node instanceof Node\Expr\Closure) {
-            return ['function ()'];
-        } elseif ($node instanceof Node\Expr\Array_) {
-            return ['['];
-        } elseif ($node instanceof Node\Scalar\LNumber) {
-            return ['1'];
-        } elseif ($node instanceof Node\Scalar\DNumber) {
-            return ['1.1'];
-        } elseif ($node instanceof Node\Expr\ConstFetch) {
-            if ($node->name->toString() === 'true' || $node->name->toString() === 'false') {
-                return ['true'];
-            }
-        } elseif ($node instanceof Node\Scalar\String_) {
-            return ['""'];
-        } elseif ($node instanceof Node\Expr\MethodCall) {
-            if (is_string($node->name)) {
-                $parts = $this->convertExpressionToStringParts($node->var);
-                $parts[] = $node->name . '()';
-
-                return $parts;
-            }
-        } elseif ($node instanceof Node\Expr\StaticCall) {
-            if (is_string($node->name) && $node->class instanceof Node\Name) {
-                return [$node->name->toString(), $node->name . '()'];
-            }
-        } elseif ($node instanceof Node\Expr\PropertyFetch) {
-            if (is_string($node->name)) {
-                $parts = $this->convertExpressionToStringParts($node->var);
-                $parts[] = $node->name;
-
-                return $parts;
-            }
-        } elseif ($node instanceof Node\Expr\StaticPropertyFetch) {
-            if (is_string($node->name) && $node->class instanceof Node\Name) {
-                return [$node->name->toString(), $node->name];
-            }
-        } elseif ($node instanceof Node\Expr\FuncCall) {
-            if ($node->name instanceof Node\Name) {
-                return [$node->name->toString() . '()'];
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @return void
      */
     protected function resetStateForNewScope()
@@ -306,7 +236,7 @@ class QueryingVisitor extends NodeVisitorAbstract
             return $this->currentClassName;
         } elseif ($this->bestMatch) {
             if ($this->bestMatch instanceof Node\Expr\Assign) {
-                $expressionParts = $this->convertExpressionToStringParts($this->bestMatch->expr);
+                $expressionParts = $this->deduceTypeCommand->convertExpressionToStringParts($this->bestMatch->expr);
 
                 if ($expressionParts) {
                     // The position + 1 ensures that this node is also taken up in the scan for its type, causing
@@ -319,7 +249,7 @@ class QueryingVisitor extends NodeVisitorAbstract
                     );
                 }
             } elseif ($this->bestMatch instanceof Node\Stmt\Foreach_) {
-                $expressionParts = $this->convertExpressionToStringParts($this->bestMatch->expr);
+                $expressionParts = $this->deduceTypeCommand->convertExpressionToStringParts($this->bestMatch->expr);
 
                 if ($expressionParts) {
                     $listType = $this->deduceTypeCommand->deduceType(
