@@ -363,6 +363,8 @@ class Parser
                     isClassName = (chain.indexOf('.support.class') != -1)
                     isKeyword = (chain.indexOf('.storage.type') != -1)
 
+                    return null if (chain.indexOf('.keyword.control') != -1)
+
                     if chain.indexOf('.function-call') != -1 or
                        chain.indexOf('.support.function') != -1 or
                        isClassName or

@@ -364,3 +364,27 @@ describe "getInvocationInfoAt", ->
         result = parser.getInvocationInfoAt(editor, bufferPosition)
 
         expect(result).toEqual(null)
+
+    it "correctly returns null when not in an invocation.", ->
+        source =
+            """
+            <?php
+
+            if (preg_match('/^array\s*\(/', $firstElement) === 1) {
+                $className = 'array';
+            } elseif (
+
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        result = parser.getInvocationInfoAt(editor, bufferPosition)
+
+        expect(result).toEqual(null)

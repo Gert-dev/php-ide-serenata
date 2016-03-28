@@ -7,6 +7,7 @@
 ### Bugs fixed
 * Fixed PHP 7 anonymous classes still being parsed.
 * Fixed a rare error relating to an "undefined progressStreamCallback".
+* Fixed `getInvocationInfoAt` incorrectly walking past control keywords such as `elseif`.
 
 ### Changes for developers
 * Almost all service methods now have an async parameter. It is recommended that you always use this functionality as it will ensure the editor remains responsive for the end user. In a future release, support for synchronous calls **will _probably_ be removed**.
