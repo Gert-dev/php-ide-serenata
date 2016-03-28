@@ -11,7 +11,7 @@ class VariableTypeTest extends IndexedTest
     {
         $path = __DIR__ . '/VariableTypeTest/' . $file;
 
-        $markerOffset = $this->getMarkerOffset($path, '<MARKER>');
+        $markerOffset = $this->getMarkerOffset($path, '// <MARKER>');
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
@@ -118,6 +118,13 @@ class VariableTypeTest extends IndexedTest
     public function testCorrectlyAnalyzesAssignments()
     {
         $output = $this->getVariableType('Assignment.php', '$a');
+
+        $this->assertEquals('\DateTime', $output);
+    }
+
+    public function testCorrectlyIgnoresAssignmentsOutOfScope()
+    {
+        $output = $this->getVariableType('AssignmentOutOfScope.php', '$a');
 
         $this->assertEquals('\DateTime', $output);
     }
