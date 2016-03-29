@@ -295,7 +295,7 @@ class Proxy
      * Fetches the type of the specified variable at the specified location.
      *
      * @param {string}      name   The variable to fetch, including its leading dollar sign.
-     * @param {string|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {string}      file   The path to the file to examine. May be null if the source parameter is passed.
      * @param {string|null} source The source code to search. May be null if a file is passed instead.
      * @param {number}      offset The character offset into the file to examine.
      * @param {boolean}     async
