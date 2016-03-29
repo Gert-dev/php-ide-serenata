@@ -48,7 +48,7 @@ class VariableType extends BaseCommand
      */
     protected function attachOptions(OptionCollection $optionCollection)
     {
-        $optionCollection->add('file?', 'The file to examine.')->isa('string');
+        $optionCollection->add('file:', 'The file to examine.')->isa('string');
         $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
         $optionCollection->add('name:', 'The name of the variable to examine.')->isa('string');
         $optionCollection->add('offset:', 'The character byte offset into the code to use for the determination.')->isa('number');
