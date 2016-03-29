@@ -77,7 +77,6 @@ class Proxy
 
         return response?.result
 
-
     ###*
      * Performs an asynchronous request to the PHP side.
      *
