@@ -303,8 +303,8 @@ class Proxy
      * @return {Promise|Object}
     ###
     getVariableType: (name, file, source, offset, async = false) ->
-        if not file? and not source?
-            throw 'Either a path to a file or source code must be passed!'
+        if not file?
+            throw 'A path to a file must be passed!'
 
         if file?
             parameter = '--file=' + file
