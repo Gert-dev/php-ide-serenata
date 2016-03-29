@@ -305,17 +305,19 @@ class Proxy
         if not file?
             throw 'A path to a file must be passed!'
 
-        if file?
-            parameter = '--file=' + file
-
-        else if not async
+        if source? and not async
             throw 'Passing direct file contents is only supported for asynchronous calls!'
 
-        else
-            parameter = '--stdin'
+        parameters = ['--variable-type', '--database=' + @getIndexDatabasePath(), '--name=' + name, '--offset=' + offset]
+
+        if file?
+            parameters.push('--file=' + file)
+
+        if source?
+            parameters.push('--stdin')
 
         return @performRequest(
-            ['--variable-type', '--database=' + @getIndexDatabasePath(), parameter, '--name=' + name, '--offset=' + offset],
+            parameters,
             async,
             null,
             source
@@ -336,16 +338,16 @@ class Proxy
         if not file?
             throw 'A path to a file must be passed!'
 
-        if file?
-            parameter = '--file=' + file
-
-        else if not async
+        if source? and not async
             throw 'Passing direct file contents is only supported for asynchronous calls!'
 
-        else
-            parameter = '--stdin'
+        parameters = ['--deduce-type', '--database=' + @getIndexDatabasePath(), '--offset=' + offset]
 
-        parameters = ['--deduce-type', '--database=' + @getIndexDatabasePath(), parameter, '--offset=' + offset]
+        if file?
+            parameters.push('--file=' + file)
+
+        if source?
+            parameters.push('--stdin')
 
         for part in parts
             parameters.push('--part=' + part)
