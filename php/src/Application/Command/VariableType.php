@@ -59,7 +59,7 @@ class VariableType extends BaseCommand
      */
     protected function process(ArrayAccess $arguments)
     {
-        if (!isset($arguments['file']) && (!isset($arguments['stdin']) || !$arguments['stdin']->value)) {
+        if (!isset($arguments['file'])) {
             throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
         } elseif (!isset($arguments['offset'])) {
             throw new UnexpectedValueException('An --offset must be supplied into the source code!');
@@ -83,10 +83,10 @@ class VariableType extends BaseCommand
     }
 
     /**
-     * @param string|null $file
-     * @param string      $code
-     * @param string      $name
-     * @param int         $offset
+     * @param string $file
+     * @param string $code
+     * @param string $name
+     * @param int    $offset
      */
     public function getVariableType($file, $code, $name, $offset)
     {

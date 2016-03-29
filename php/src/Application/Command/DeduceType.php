@@ -54,7 +54,7 @@ class DeduceType extends BaseCommand
      */
     protected function attachOptions(OptionCollection $optionCollection)
     {
-        $optionCollection->add('file?', 'The file to examine.')->isa('string');
+        $optionCollection->add('file:', 'The file to examine.')->isa('string');
         $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
         $optionCollection->add('part+', 'A part of the expression as string. Specify this as many times as you have parts.')->isa('string');
         $optionCollection->add('offset:', 'The character byte offset into the code to use for the determination.')->isa('number');
@@ -65,7 +65,7 @@ class DeduceType extends BaseCommand
      */
     protected function process(ArrayAccess $arguments)
     {
-        if (!isset($arguments['file']) && (!isset($arguments['stdin']) || !$arguments['stdin']->value)) {
+        if (!isset($arguments['file'])) {
             throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
         } elseif (!isset($arguments['offset'])) {
             throw new UnexpectedValueException('An --offset must be supplied into the source code!');
@@ -89,10 +89,10 @@ class DeduceType extends BaseCommand
     }
 
     /**
-     * @param string|null $file
-     * @param string      $code
-     * @param string[]    $expressionParts
-     * @param int         $offset
+     * @param string   $file
+     * @param string   $code
+     * @param string[] $expressionParts
+     * @param int      $offset
      *
      * @return string|null
      */
