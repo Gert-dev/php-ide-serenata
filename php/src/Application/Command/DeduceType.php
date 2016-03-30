@@ -290,7 +290,7 @@ class DeduceType extends BaseCommand
             }
         } elseif ($node instanceof Node\Expr\StaticCall) {
             if (is_string($node->name) && $node->class instanceof Node\Name) {
-                return [$node->name->toString(), $node->name . '()'];
+                return [$node->class->toString(), $node->name . '()'];
             }
         } elseif ($node instanceof Node\Expr\PropertyFetch) {
             if (is_string($node->name)) {
