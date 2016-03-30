@@ -325,7 +325,12 @@ class Service
 
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
-        return @deduceType(callStack, editor.getPath(), editor.getBuffer().getText(), offset, async)
+        bufferText = null
+
+        if async
+            bufferText = editor.getBuffer().getText()
+
+        return @deduceType(callStack, editor.getPath(), bufferText, offset, async)
 
     ###*
      * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
