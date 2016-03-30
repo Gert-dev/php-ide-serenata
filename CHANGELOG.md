@@ -25,6 +25,7 @@
     * `getClassMethodAt`
     * `getClassProperty`
     * `getClassPropertyAt`
+    * `getClassSelectorFromEvent` (didn't really belong in the base package).
 
 ## 0.7.2
 ### Bugs fixed
