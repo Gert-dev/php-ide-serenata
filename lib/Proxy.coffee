@@ -327,7 +327,7 @@ class Proxy
      * Deduces the resulting type of an expression based on its parts.
      *
      * @param {array}       parts  One or more strings that are part of the expression, e.g. ['$this', 'foo()'].
-     * @param {string|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {string}      file   The path to the file to examine.
      * @param {string|null} source The source code to search. May be null if a file is passed instead.
      * @param {number}      offset The character offset into the file to examine.
      * @param {boolean}     async
