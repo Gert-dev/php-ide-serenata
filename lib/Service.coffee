@@ -286,7 +286,12 @@ class Service
     getVariableType: (editor, bufferPosition, name, async = false) ->
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
-        result = @proxy.getVariableType(name, editor.getPath(), editor.getBuffer().getText(), offset, async)
+        bufferText = null
+
+        if async
+            bufferText = editor.getBuffer().getText()
+
+        result = @proxy.getVariableType(name, editor.getPath(), bufferText, offset, async)
 
         return null if not result
         return result
