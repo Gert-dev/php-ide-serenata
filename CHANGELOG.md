@@ -1,5 +1,6 @@
 ## 0.8.0
 ### Features and enhancements
+* Some internal logic has been rewritten to support working asynchronously. The existing list of packages have already been adjusted to make use of this change, which will improve apparant responsiveness across the board.
 * A project index will now be triggered when the repository (if present) changes statusses. This isn't as aggressive as a file monitor, but will at least remove the annoyance of having to manually rescan when checking out a different branch to avoid incorrect data being served. Events that will trigger this involve:
   * Doing a checkout to switch to a different branch.
   * Modifying a file from the project tree externally and then coming back to Atom.
