@@ -291,7 +291,7 @@ class Service
         if async
             bufferText = editor.getBuffer().getText()
 
-        result = @proxy.getVariableType(name, editor.getPath(), bufferText, offset, async)
+        result = @getVariableType(name, editor.getPath(), bufferText, offset, async)
 
         return null if not result
         return result
