@@ -1,3 +1,5 @@
+md5 = require 'md5'
+
 Proxy = require './Proxy'
 
 module.exports =
@@ -92,46 +94,39 @@ class CachingProxy extends Proxy
      * @inherited
     ###
     semanticLint: (file, source, async = false) ->
-        if source?
-            # Don't cache when analyzing STDIN data.
-            return super(file, source, async)
+        # md5 may sound expensive, but it's not as expensive as spawning an extra process that parses PHP code.
+        sourceKey = if source then md5(source) else null
 
-        return @wrapCachedRequestToParent("semanticLint-#{file}", 'semanticLint', arguments, async)
+        return @wrapCachedRequestToParent("semanticLint-#{file}-#{sourceKey}", 'semanticLint', arguments, async)
 
     ###*
      * @inherited
     ###
     getAvailableVariables: (file, source, offset, async = false) ->
-        if source?
-            # Don't cache calls with full source code as this would make for a large, constantly changing, cache.
-            return super(file, source, offset, async)
+        sourceKey = if source then md5(source) else null
 
-        return @wrapCachedRequestToParent("getAvailableVariables-#{file}-#{offset}", 'getAvailableVariables', arguments, async)
+        return @wrapCachedRequestToParent("getAvailableVariables-#{file}-#{sourceKey}-#{offset}", 'getAvailableVariables', arguments, async)
 
     ###*
      * @inherited
     ###
     getVariableType: (name, file, source, offset, async = false) ->
-        if source?
-            # Don't cache calls with full source code as this would make for a large, constantly changing, cache.
-            return super(name, file, source, offset, async)
+        sourceKey = if source then md5(source) else null
 
-        return @wrapCachedRequestToParent("getVariableType-#{name}-#{file}-#{offset}", 'getVariableType', arguments, async)
+        return @wrapCachedRequestToParent("getVariableType-#{name}-#{file}-#{sourceKey}-#{offset}", 'getVariableType', arguments, async)
 
     ###*
      * @inherited
     ###
     deduceType: (parts, file, source, offset, async = false) ->
-        if source?
-            # Don't cache calls with full source code as this would make for a large, constantly changing, cache.
-            return super(parts, file, source, offset, async)
+        sourceKey = if source then md5(source) else null
 
         partsKey = ''
 
         for part in parts
             partsKey += part
 
-        return @wrapCachedRequestToParent("deduceType-#{partsKey}-#{file}-#{offset}", 'deduceType', arguments, async)
+        return @wrapCachedRequestToParent("deduceType-#{partsKey}#{file}-#{sourceKey}-#{offset}", 'deduceType', arguments, async)
 
     ###*
      * @inherited
