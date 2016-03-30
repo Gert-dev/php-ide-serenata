@@ -95,7 +95,7 @@ class CachingProxy extends Proxy
     ###
     semanticLint: (file, source, async = false) ->
         # md5 may sound expensive, but it's not as expensive as spawning an extra process that parses PHP code.
-        sourceKey = if source then md5(source) else null
+        sourceKey = if source? then md5(source) else null
 
         return @wrapCachedRequestToParent("semanticLint-#{file}-#{sourceKey}", 'semanticLint', arguments, async)
 
@@ -103,7 +103,7 @@ class CachingProxy extends Proxy
      * @inherited
     ###
     getAvailableVariables: (file, source, offset, async = false) ->
-        sourceKey = if source then md5(source) else null
+        sourceKey = if source? then md5(source) else null
 
         return @wrapCachedRequestToParent("getAvailableVariables-#{file}-#{sourceKey}-#{offset}", 'getAvailableVariables', arguments, async)
 
@@ -111,7 +111,7 @@ class CachingProxy extends Proxy
      * @inherited
     ###
     getVariableType: (name, file, source, offset, async = false) ->
-        sourceKey = if source then md5(source) else null
+        sourceKey = if source? then md5(source) else null
 
         return @wrapCachedRequestToParent("getVariableType-#{name}-#{file}-#{sourceKey}-#{offset}", 'getVariableType', arguments, async)
 
@@ -119,7 +119,7 @@ class CachingProxy extends Proxy
      * @inherited
     ###
     deduceType: (parts, file, source, offset, async = false) ->
-        sourceKey = if source then md5(source) else null
+        sourceKey = if source? then md5(source) else null
 
         partsKey = ''
 
