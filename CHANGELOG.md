@@ -8,6 +8,7 @@
 ### Bugs fixed
 * Fixed PHP 7 anonymous classes still being parsed.
 * Fixed a rare error relating to an "undefined progressStreamCallback".
+* Fixed arrays of class names (e.g. `Foo[]`) in docblocks not being semantically linted.
 * Fixed `getInvocationInfoAt` incorrectly walking past control keywords such as `elseif`.
 
 ### Changes for developers

@@ -3,7 +3,7 @@
 namespace A;
 
 /**
- * @throws string|A\B|int
+ * @throws string|A\B|A\C[]|int
  * @throws string
  * @throws mixed
  * @throws \Traversable

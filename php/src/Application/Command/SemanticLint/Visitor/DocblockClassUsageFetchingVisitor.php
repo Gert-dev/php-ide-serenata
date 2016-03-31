@@ -30,7 +30,7 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
         if ($docblock) {
             // Look for types right after a tag.
             preg_match_all(
-                '/@(?:param|throws|return|var)\s+((?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\|(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*))*)(?:$|\s|\})/',
+                '/@(?:param|throws|return|var)\s+((?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?(?:\|(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?)*)(?:$|\s|\})/',
                 $docblock,
                 $matches,
                 PREG_SET_ORDER
@@ -40,6 +40,10 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
                 $types = explode(DocParser::TYPE_SPLITTER, $match[1]);
 
                 foreach ($types as $type) {
+                    if (mb_substr($type, -2) === '[]') {
+                        $type = mb_substr($type, 0, -2);
+                    }
+
                     if ($this->isValidType($type)) {
                         $parts = explode('\\', $type);
                         $firstPart = array_shift($parts);
