@@ -9,6 +9,7 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDatabase;
+use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Application\Command as BaseCommand;
 
@@ -178,37 +179,45 @@ class DeduceType extends BaseCommand
 
         // We now know what class we need to start from, now it's just a matter of fetching the return types of members
         // in the call stack.
+        $storageProxy = new DeduceType\IndexDataAdapterProvider($this->indexDatabase, null);
+        $dataAdapter = new IndexDataAdapter($storageProxy);
+
         foreach ($expressionParts as $element) {
-            if (!$this->getTypeAnalyzer()->isSpecialType($className)) {
-                $info = $this->getClassInfoCommand()->getClassInfo($className);
-
-                $className = null;
-
-                if (mb_strpos($element, '()') !== false) {
-                    $element = str_replace('()', '', $element);
-
-                    if (isset($info['methods'][$element])) {
-                        $className = $info['methods'][$element]['return']['resolvedType'];
-                    }
-                } elseif (isset($info['constants'][$element])) {
-                    $className = $info['constants'][$element]['return']['resolvedType'];
-                } else {
-                    $isValidPropertyAccess = false;
-
-                    if (!$propertyAccessNeedsDollarSign) {
-                        $isValidPropertyAccess = true;
-                    } elseif (!empty($element) && $element[0] === '$') {
-                        $element = mb_substr($element, 1);
-                        $isValidPropertyAccess = true;
-                    }
-
-                    if ($isValidPropertyAccess && isset($info['properties'][$element])) {
-                        $className = $info['properties'][$element]['return']['resolvedType'];
-                    }
-                }
-            } else {
+            if ($this->getTypeAnalyzer()->isSpecialType($className)) {
                 $className = null;
                 break;
+            }
+
+            $isMethod = false;
+            $isValidPropertyAccess = false;
+
+            if (mb_strpos($element, '()') !== false) {
+                $isMethod = true;
+                $element = str_replace('()', '', $element);
+            } elseif (!$propertyAccessNeedsDollarSign) {
+                $isValidPropertyAccess = true;
+            } elseif (!empty($element) && $element[0] === '$') {
+                $element = mb_substr($element, 1);
+                $isValidPropertyAccess = true;
+            }
+
+            $classNameToSearch = ($className && $className[0] === '\\' ? mb_substr($className, 1) : $className);
+
+            $id = $this->indexDatabase->getStructureId($classNameToSearch);
+
+            $storageProxy->setMemberFilter($element);
+            $info = $dataAdapter->getStructureInfo($id);
+
+            $className = null;
+
+            if ($isMethod) {
+                if (isset($info['methods'][$element])) {
+                    $className = $info['methods'][$element]['return']['resolvedType'];
+                }
+            } elseif (isset($info['constants'][$element])) {
+                $className = $info['constants'][$element]['return']['resolvedType'];
+            } elseif ($isValidPropertyAccess && isset($info['properties'][$element])) {
+                $className = $info['properties'][$element]['return']['resolvedType'];
             }
 
             $propertyAccessNeedsDollarSign = false;
