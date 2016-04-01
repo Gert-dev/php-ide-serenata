@@ -27,7 +27,7 @@ class IndexDataAdapterProvider implements ProviderInterface
      * @param ProviderInterface $proxiedObject
      * @param string|null       $memberFilter
      */
-    public function __construct(ProviderInterface $proxiedObject, $memberFilter = null)
+    public function __construct(ProviderInterface $proxiedObject, $memberFilter)
     {
         $this->memberFilter = $memberFilter;
         $this->proxiedObject = $proxiedObject;
