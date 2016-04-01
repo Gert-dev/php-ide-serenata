@@ -44,7 +44,7 @@ class ClassList extends BaseCommand
      {
          $result = [];
 
-         $storageProxy = new IndexDataAdapter\ClassListProxyProvider($this->indexDatabase);
+         $storageProxy = new ClassList\ProxyProvider($this->indexDatabase);
          $dataAdapter = new IndexDataAdapter($storageProxy);
 
          foreach ($this->indexDatabase->getAllStructuresRawInfo($file) as $element) {

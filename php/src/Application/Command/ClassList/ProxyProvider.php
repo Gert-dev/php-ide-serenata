@@ -1,14 +1,16 @@
 <?php
 
-namespace PhpIntegrator\IndexDataAdapter;
+namespace PhpIntegrator\Application\Command\ClassList;
 
 use ArrayIterator;
+
+use PhpIntegrator\IndexDataAdapter\ProviderInterface;
 
 /**
  * Proxy for a ProviderInterface that does not return any data (is a "white hole") for several methods that are
  * unnecessary when fetching the structural element list to avoid their cost and to improve performance.
  */
-class ClassListProxyProvider implements ProviderInterface
+class ProxyProvider implements ProviderInterface
 {
     /**
      * @var ProviderInterface
