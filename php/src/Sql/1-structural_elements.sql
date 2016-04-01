@@ -12,11 +12,15 @@ CREATE TABLE files(
     indexed_time datetime NOT NULL
 );
 
+CREATE INDEX `files_path` ON `files` (`path`);
+
 --
 CREATE TABLE structure_types(
     id   integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     name varchar(255) NOT NULL
 );
+
+CREATE INDEX `structure_types_name` ON `structure_types` (`name`);
 
 INSERT INTO structure_types (id, name) VALUES
     (NULL, 'class'),
@@ -28,6 +32,8 @@ CREATE TABLE access_modifiers(
     id   integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     name varchar(255) NOT NULL
 );
+
+CREATE INDEX `access_modifiers_name` ON `access_modifiers` (`name`);
 
 INSERT INTO access_modifiers (id, name) VALUES
     (NULL, 'public'),
@@ -87,6 +93,8 @@ CREATE TABLE structures(
         ON DELETE RESTRICT
         ON UPDATE RESTRICT
 );
+
+CREATE INDEX `structures_fqsen` ON `structures` (`fqsen`);
 
 -- Contains references to parent structural elements for structural elements.
 CREATE TABLE structures_parents_linked(
