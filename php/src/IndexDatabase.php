@@ -87,6 +87,11 @@ class IndexDatabase implements
             // hard disk I/O during indexing and increases indexing speed dramatically (dropped from over a minute to a
             // couple of seconds for a very small (!) project).
             $this->connection->executeQuery('PRAGMA synchronous=OFF');
+
+            // Activate memory-mapped I/O. See also https://www.sqlite.org/mmap.html . In a test case, this halved the
+            // time it took to build information about a structure (from 250 ms to 125 ms). On systems that do not
+            // support it, this pragma just does nothing.
+            $this->connection->executeQuery('PRAGMA mmap_size=50000000'); // About 50 MB.
         }
 
         // Have to be a douche about this as these PRAGMA's seem to reset, even though the connection is not closed.
