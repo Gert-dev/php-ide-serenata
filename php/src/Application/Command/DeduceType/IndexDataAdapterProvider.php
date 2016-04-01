@@ -19,7 +19,7 @@ class IndexDataAdapterProvider implements ProviderInterface
     /**
     * @var string|null
     */
-    protected $memberFilter = null;
+    protected $memberFilter;
 
     /**
      * Constructor.
