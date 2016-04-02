@@ -95,6 +95,7 @@ class ClassInfoTest extends IndexedTest
             'isStatic'           => false,
             'isDeprecated'       => false,
             'hasDocblock'        => true,
+            'hasDocumentation'   => true,
 
             'descriptions'       => [
                 'short' => 'This is the summary.',
@@ -181,6 +182,7 @@ class ClassInfoTest extends IndexedTest
 
             'isDeprecated'       => false,
             'hasDocblock'        => true,
+            'hasDocumentation'   => true,
 
             'descriptions'       => [
                 'short' => 'This is the summary.',
@@ -240,6 +242,7 @@ class ClassInfoTest extends IndexedTest
             'isStatic'           => true,
             'isDeprecated'       => false,
             'hasDocblock'        => true,
+            'hasDocumentation'   => true,
 
             'descriptions'       => [
                 'short' => 'This is the summary.',
@@ -301,6 +304,7 @@ class ClassInfoTest extends IndexedTest
         $parentClassOutput = $this->getClassInfo($fileName, 'A\ParentClass');
 
         $keysToTestForEquality = [
+            'hasDocumentation',
             'isDeprecated',
             'descriptions',
             'return',
@@ -350,6 +354,7 @@ class ClassInfoTest extends IndexedTest
         $parentClassOutput = $this->getClassInfo($fileName, 'A\ParentClass');
 
         $keysToTestForEquality = [
+            'hasDocumentation',
             'isDeprecated',
             'descriptions',
             'return'
@@ -591,6 +596,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
         $this->assertEquals($data['hasDocblock'], false);
+        $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['descriptions'], [
@@ -611,6 +617,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
         $this->assertEquals($data['hasDocblock'], false);
+        $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['descriptions'], [
@@ -631,6 +638,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
         $this->assertEquals($data['hasDocblock'], false);
+        $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['descriptions'], [
@@ -651,6 +659,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
         $this->assertEquals($data['hasDocblock'], false);
+        $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], true);
 
         $this->assertEquals($data['descriptions'], [
@@ -678,6 +687,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
         $this->assertEquals($data['hasDocblock'], false);
+        $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['parameters'], []);
@@ -700,6 +710,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
         $this->assertEquals($data['hasDocblock'], false);
+        $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], false);
 
         $this->assertEquals($data['parameters'], [
@@ -762,6 +773,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['startLine'], 11);
         $this->assertEquals($data['endLine'], 11);
         $this->assertEquals($data['hasDocblock'], false);
+        $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], true);
 
         $this->assertEquals($data['parameters'], []);

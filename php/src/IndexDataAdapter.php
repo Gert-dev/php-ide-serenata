@@ -585,16 +585,17 @@ class IndexDataAdapter
         }
 
         return [
-            'name'          => $rawInfo['name'],
-            'isBuiltin'     => !!$rawInfo['is_builtin'],
-            'startLine'     => (int) $rawInfo['start_line'],
-            'endLine'       => (int) $rawInfo['end_line'],
-            'filename'      => $rawInfo['path'],
+            'name'             => $rawInfo['name'],
+            'isBuiltin'        => !!$rawInfo['is_builtin'],
+            'startLine'        => (int) $rawInfo['start_line'],
+            'endLine'          => (int) $rawInfo['end_line'],
+            'filename'         => $rawInfo['path'],
 
-            'parameters'    => $parameters,
-            'throws'        => $throwsAssoc,
-            'isDeprecated'  => !!$rawInfo['is_deprecated'],
-            'hasDocblock'   => !!$rawInfo['has_docblock'],
+            'parameters'       => $parameters,
+            'throws'           => $throwsAssoc,
+            'isDeprecated'     => !!$rawInfo['is_deprecated'],
+            'hasDocblock'      => !!$rawInfo['has_docblock'],
+            'hasDocumentation' => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
                 'short' => $rawInfo['short_description'],
@@ -627,6 +628,7 @@ class IndexDataAdapter
             'isStatic'           => !!$rawInfo['is_static'],
             'isDeprecated'       => !!$rawInfo['is_deprecated'],
             'hasDocblock'        => !!$rawInfo['has_docblock'],
+            'hasDocumentation'   => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
                 'short' => $rawInfo['short_description'],
@@ -653,18 +655,19 @@ class IndexDataAdapter
     public function getConstantInfo(array $rawInfo)
     {
         return [
-            'name'         => $rawInfo['name'],
-            'isBuiltin'    => !!$rawInfo['is_builtin'],
-            'startLine'    => (int) $rawInfo['start_line'],
-            'endLine'      => (int) $rawInfo['end_line'],
-            'filename'     => $rawInfo['path'],
+            'name'             => $rawInfo['name'],
+            'isBuiltin'        => !!$rawInfo['is_builtin'],
+            'startLine'        => (int) $rawInfo['start_line'],
+            'endLine'          => (int) $rawInfo['end_line'],
+            'filename'         => $rawInfo['path'],
 
-            'isPublic'     => true,
-            'isProtected'  => false,
-            'isPrivate'    => false,
-            'isStatic'     => true,
-            'isDeprecated' => !!$rawInfo['is_deprecated'],
-            'hasDocblock'  => !!$rawInfo['has_docblock'],
+            'isPublic'         => true,
+            'isProtected'      => false,
+            'isPrivate'        => false,
+            'isStatic'         => true,
+            'isDeprecated'     => !!$rawInfo['is_deprecated'],
+            'hasDocblock'      => !!$rawInfo['has_docblock'],
+            'hasDocumentation' => !!$rawInfo['has_docblock'],
 
             'descriptions'  => [
                 'short' => $rawInfo['short_description'],
@@ -731,6 +734,7 @@ class IndexDataAdapter
         $info = [];
 
         $inheritedKeys = [
+            'hasDocumentation',
             'isDeprecated',
             'descriptions',
             'return'
@@ -757,6 +761,7 @@ class IndexDataAdapter
         $info = [];
 
         $inheritedKeys = [
+            'hasDocumentation',
             'isDeprecated',
             'descriptions',
             'return',
