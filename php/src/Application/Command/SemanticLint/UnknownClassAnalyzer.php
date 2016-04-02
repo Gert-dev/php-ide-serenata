@@ -7,8 +7,7 @@ use PhpIntegrator\IndexDatabase;
 use PhpIntegrator\Application\Command\ResolveType;
 
 /**
- * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the
- * indexer).
+ * Looks for unknown class names.
  */
 class UnknownClassAnalyzer implements AnalyzerInterface
 {

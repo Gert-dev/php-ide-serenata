@@ -3,8 +3,7 @@
 namespace PhpIntegrator\Application\Command\SemanticLint;
 
 /**
- * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the
- * indexer).
+ * Looks for unused use statements.
  */
 class UnusedUseStatementAnalyzer implements AnalyzerInterface
 {
