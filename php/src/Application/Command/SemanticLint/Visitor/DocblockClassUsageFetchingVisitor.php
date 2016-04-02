@@ -57,8 +57,8 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
 
                         // NOTE: We use the same start position as end position as we can't fetch the location of the
                         // docblock from the parser.
-                        // TODO: This could potentially be done using some magic with token fetching or walking backwards
-                        // from the node itself to find the docblock and then calculating the position inside the docblock.
+                        // TODO: A next release of php-parser will allow for this, see also
+                        // https://github.com/nikic/PHP-Parser/issues/263#issuecomment-204693050
                         $this->classUsageList[] = [
                             'name'             => $type,
                             'firstPart'        => $firstPart,
