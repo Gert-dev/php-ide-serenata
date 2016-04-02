@@ -188,15 +188,15 @@ class Indexer
      */
     public function indexFile($filePath, $code = null)
     {
+        $code = $code ?: @file_get_contents($filePath);
+
+        if (!is_string($code)) {
+            throw new Indexer\IndexingFailedException();
+        }
+
         $this->storage->beginTransaction();
 
         try {
-            $code = $code ?: @file_get_contents($filePath);
-
-            if (!is_string($code)) {
-                throw new Indexer\IndexingFailedException();
-            }
-
             $this->indexFileOutline($filePath, $code);
 
             $this->storage->commitTransaction();
