@@ -3,14 +3,26 @@
 namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
 
 use PhpIntegrator\DocParser;
+use PhpIntegrator\TypeAnalyzer;
 
 use PhpParser\Node;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * Node visitor that fetches usages of class, trait, and interface names from docblocks.
  */
-class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
+class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
 {
+    /**
+     * @var array
+     */
+    protected $classUsageList = [];
+
+    /**
+     * @var TypeAnalyzer|null
+     */
+    protected $typeAnalyzer = null;
+
     /**
      * @var string|null
      */
@@ -72,5 +84,37 @@ class DocblockClassUsageFetchingVisitor extends ClassUsageFetchingVisitor
                 }
             }
         }
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+     protected function isValidType($type)
+     {
+         return !$this->getTypeAnalyzer()->isSpecialType($type);
+     }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
+    }
+
+    /**
+     * Retrieves the class usage list.
+     *
+     * @return array
+     */
+    public function getClassUsageList()
+    {
+        return $this->classUsageList;
     }
 }
