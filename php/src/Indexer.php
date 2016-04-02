@@ -1102,7 +1102,7 @@ class Indexer
             'return_type'           => $returnType,
             'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
-            'structure_id' => $seId,
+            'structure_id'          => $seId,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1
         ]);
     }
@@ -1167,7 +1167,7 @@ class Indexer
             'return_type'           => $returnType,
             'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
-            'structure_id' => $seId,
+            'structure_id'          => $seId,
             'access_modifier_id'    => $amId,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'is_magic'              => $isMagic ? 1 : 0,
@@ -1231,7 +1231,7 @@ class Indexer
             'return_type'           => $returnType,
             'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['return']['description'],
-            'structure_id' => $seId,
+            'structure_id'          => $seId,
             'access_modifier_id'    => $amId,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'is_magic'              => $isMagic ? 1 : 0,
