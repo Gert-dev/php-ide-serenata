@@ -326,14 +326,21 @@ class Service
         if ignoreLastElement
             callStack.pop();
 
-        return null if not callStack or callStack.length == 0
-
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
         bufferText = null
 
         if async
             bufferText = editor.getBuffer().getText()
+
+            if not callStack or callStack.length == 0
+                promise = new Promise (resolve, reject) ->
+                    resolve(null)
+
+                return promise
+
+        else
+            return null if not callStack or callStack.length == 0
 
         return @deduceType(callStack, editor.getPath(), bufferText, offset, async)
 
