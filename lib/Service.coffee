@@ -324,7 +324,7 @@ class Service
         callStack = @parser.retrieveSanitizedCallStackAt(editor, bufferPosition)
 
         if ignoreLastElement
-            callStack.pop();
+            callStack.pop()
 
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
