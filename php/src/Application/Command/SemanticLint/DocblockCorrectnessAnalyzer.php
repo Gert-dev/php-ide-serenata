@@ -5,6 +5,8 @@ namespace PhpIntegrator\Application\Command\SemanticLint;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\IndexDatabase;
 
+use PhpIntegrator\Application\Command\ClassInfo;
+
 use PhpIntegrator\Indexer\OutlineIndexingVisitor;
 
 /**
@@ -33,15 +35,21 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     protected $docParser;
 
     /**
+     * @var ClassInfo
+     */
+    protected $classInfoCommand;
+
+    /**
      * Constructor.
      *
      * @param string        $file
      * @param IndexDatabase $indexDatabase
      */
-    public function __construct($file, IndexDatabase $indexDatabase)
+    public function __construct($file, IndexDatabase $indexDatabase, ClassInfo $classInfoCommand)
     {
         $this->file = $file;
         $this->indexDatabase = $indexDatabase;
+        $this->classInfoCommand = $classInfoCommand;
 
         $this->outlineIndexingVisitor = new OutlineIndexingVisitor();
     }
@@ -172,13 +180,24 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      */
     protected function analyzeClassConstantDocblock(array $structure, array $constant)
     {
-        if ($constant['docComment']) {
-            // TODO: Warn if there is no @var tag.
-            return [];
+        $docblockIssues = [
+            'missingDocumentation' => []
+        ];
+
+        if (!$constant['docComment']) {
+            $docblockIssues['missingDocumentation'][] = [
+                'name'  => $constant['name'],
+                'class' => $structure['name'],
+                'line'  => $constant['startLine'],
+                'start' => $constant['startPos'],
+                'end'   => $constant['endPos']
+            ];
+
+            return $docblockIssues;
         }
 
-        // TODO: Fetch class information to see if 'hasDocumentation' = true.
-        return [];
+        // TODO: Warn if there is no @var tag.
+        return $docblockIssues;
     }
 
     /**
@@ -192,7 +211,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             'missingDocumentation'  => [],
             'parameterMissing'      => [],
             'parameterTypeMismatch' => [],
-            'superfluousParameter' => []
+            'superfluousParameter'  => []
         ];
 
         if (!$function['docComment']) {

@@ -157,19 +157,20 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals([
             [
+                'name'  => 'SOME_CONST',
+                'class' => 'C',
+                'line'  => 28,
+                'start' => 268,
+                'end'   => 288
+            ],
+
+            [
                 'name'  => 'some_function',
                 'line'  => 5,
                 'start' => 21,
                 'end'   => 49
             ],
 
-            // [
-            //     'name'  => 'SOME_CONST',
-            //     'class' => 'C',
-            //     'start' => 72,
-            //     'end'   => 83
-            // ],
-            //
             // [
             //     'name'  => 'someProperty',
             //     'class' => 'C',

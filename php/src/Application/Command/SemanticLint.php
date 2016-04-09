@@ -7,6 +7,8 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\IndexDatabase;
+
 use PhpIntegrator\Application\Command as BaseCommand;
 
 use PhpParser\Error;
@@ -25,6 +27,11 @@ class SemanticLint extends BaseCommand
      * @var Parser
      */
     protected $parser;
+
+    /**
+     * @var ClassInfo
+     */
+    protected $classInfoCommand;
 
     /**
      * @inheritDoc
@@ -114,7 +121,11 @@ class SemanticLint extends BaseCommand
         $docblockCorrectnessAnalyzer = null;
 
         if ($analyzeDocblockCorrectness) {
-            $docblockCorrectnessAnalyzer = new SemanticLint\DocblockCorrectnessAnalyzer($file, $this->indexDatabase);
+            $docblockCorrectnessAnalyzer = new SemanticLint\DocblockCorrectnessAnalyzer(
+                $file,
+                $this->indexDatabase,
+                $this->getClassInfoCommand()
+            );
 
             foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
                 $traverser->addVisitor($visitor);
@@ -151,6 +162,31 @@ class SemanticLint extends BaseCommand
         }
 
         return $output;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setIndexDatabase(IndexDatabase $indexDatabase)
+    {
+        if ($this->classInfoCommand) {
+            $this->getClassInfoCommand()->setIndexDatabase($indexDatabase);
+        }
+
+        parent::setIndexDatabase($indexDatabase);
+    }
+
+    /**
+     * @return ClassInfo
+     */
+    protected function getClassInfoCommand()
+    {
+        if (!$this->classInfoCommand) {
+            $this->classInfoCommand = new ClassInfo();
+            $this->classInfoCommand->setIndexDatabase($this->indexDatabase);
+        }
+
+        return $this->classInfoCommand;
     }
 
     /**
