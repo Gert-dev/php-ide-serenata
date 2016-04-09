@@ -84,6 +84,7 @@ class OutlineIndexingVisitor extends NameResolver
 
         $this->structures[$node->namespacedName->toString()] = [
             'name'       => $node->name,
+            'fqcn'       => $node->namespacedName->toString(),
             'type'       => 'class',
             'startLine'  => $node->getLine(),
             'endLine'    => $node->getAttribute('endLine'),
@@ -121,6 +122,7 @@ class OutlineIndexingVisitor extends NameResolver
 
         $this->structures[$node->namespacedName->toString()] = [
             'name'       => $node->name,
+            'fqcn'       => $node->namespacedName->toString(),
             'type'       => 'interface',
             'startLine'  => $node->getLine(),
             'endLine'    => $node->getAttribute('endLine'),
@@ -150,6 +152,7 @@ class OutlineIndexingVisitor extends NameResolver
 
         $this->structures[$node->namespacedName->toString()] = [
             'name'       => $node->name,
+            'fqcn'       => $node->namespacedName->toString(),
             'type'       => 'trait',
             'startLine'  => $node->getLine(),
             'endLine'    => $node->getAttribute('endLine'),
