@@ -146,8 +146,8 @@ class ClassInfoTest extends IndexedTest
             'parameters'         => [
                 [
                     'name'        => 'firstParameter',
-                    'type'        => 'DateTime',
-                    'fullType'    => 'DateTime',
+                    'type'        => '\DateTime',
+                    'fullType'    => '\DateTime',
                     'description' => 'First parameter description.',
                     'isReference' => false,
                     'isVariadic'  => false,
@@ -283,14 +283,14 @@ class ClassInfoTest extends IndexedTest
         $parentClassOutput = $this->getClassInfo($fileName, 'A\ParentClass');
         $anotherChildClassOutput = $this->getClassInfo($fileName, 'A\AnotherChildClass');
 
-        $this->assertEquals($childClassOutput['descriptions'], [
+        $this->assertEquals([
             'short' => 'This is the summary.',
             'long'  => 'This is a long description.'
-        ]);
+        ], $childClassOutput['descriptions']);
 
         $this->assertEquals(
-            $anotherChildClassOutput['descriptions']['long'],
-            'Pre. ' . $parentClassOutput['descriptions']['long'] . ' Post.'
+            'Pre. ' . $parentClassOutput['descriptions']['long'] . ' Post.',
+            $anotherChildClassOutput['descriptions']['long']
         );
     }
 

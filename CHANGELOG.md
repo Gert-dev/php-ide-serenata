@@ -1,3 +1,8 @@
+## 0.9.0
+### Changes for developers
+* Changes to the service
+  * When fetching class information, types were sometimes returned missing their leading slash.
+
 ## 0.8.0
 ### Features and enhancements
 * Some internal logic has been rewritten to support working asynchronously. The existing list of packages have already been adjusted to make use of this change, which will improve apparant responsiveness across the board.

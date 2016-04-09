@@ -786,7 +786,7 @@ class Indexer
             'long_description'           => $documentation['descriptions']['long']
         ];
 
-        $seId = $this->storage->getStructureId($fqsen);
+        $seId = $this->storage->getStructureId($this->getNormalizedFqcn($fqsen));
 
         if ($seId) {
             $this->storage->deletePropertiesFor($seId);
@@ -806,7 +806,7 @@ class Indexer
 
         if (isset($rawData['parents'])) {
             foreach ($rawData['parents'] as $parent) {
-                $parentSeId = $this->storage->getStructureId($parent);
+                $parentSeId = $this->storage->getStructureId($this->getNormalizedFqcn($parent));
 
                 if ($parentSeId) {
                     $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
@@ -824,7 +824,7 @@ class Indexer
 
         if (isset($rawData['interfaces'])) {
             foreach ($rawData['interfaces'] as $interface) {
-                $interfaceSeId = $this->storage->getStructureId($interface);
+                $interfaceSeId = $this->storage->getStructureId($this->getNormalizedFqcn($interface));
 
                 if ($interfaceSeId) {
                     $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
@@ -842,7 +842,7 @@ class Indexer
 
         if (isset($rawData['traits'])) {
             foreach ($rawData['traits'] as $trait) {
-                $traitSeId = $this->storage->getStructureId($trait);
+                $traitSeId = $this->storage->getStructureId($this->getNormalizedFqcn($trait));
 
                 if ($traitSeId) {
                     $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
@@ -865,7 +865,7 @@ class Indexer
                 $traitSeId = null;
 
                 if ($traitAlias['trait']) {
-                    $traitSeId = $this->storage->getStructureId($traitAlias['trait']);
+                    $traitSeId = $this->storage->getStructureId($this->getNormalizedFqcn($traitAlias['trait']));
 
                     if (!$traitSeId) {
                         $this->logMessage(
@@ -887,7 +887,7 @@ class Indexer
 
         if (isset($rawData['traitPrecedences'])) {
             foreach ($rawData['traitPrecedences'] as $traitPrecedence) {
-                $traitSeId = $this->storage->getStructureId($traitPrecedence['trait']);
+                $traitSeId = $this->storage->getStructureId($this->getNormalizedFqcn($traitPrecedence['trait']));
 
                 if ($traitSeId) {
                     $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, [
@@ -1401,6 +1401,20 @@ class Indexer
     }
 
     /**
+     * @param string $fqcn
+     *
+     * @return string
+     */
+    protected function getNormalizedFqcn($fqcn)
+    {
+        if ($fqcn && $fqcn[0] === '\\') {
+            return mb_substr($fqcn, 1);
+        }
+
+        return $fqcn;
+    }
+
+    /**
      * @return array
      */
     protected function getAccessModifierMap()
@@ -1423,7 +1437,6 @@ class Indexer
 
         return $this->structureTypeMap;
     }
-
 
     /**
      * @return Parser
