@@ -71,26 +71,31 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         $structures = $this->outlineIndexingVisitor->getStructures();
 
         foreach ($structures as $structure) {
+            $docblockIssues = array_merge_recursive(
+                $docblockIssues,
+                $this->analyzeStructureDocblock($structure)
+            );
+
             foreach ($structure['methods'] as $method) {
-                // TODO: Validate all the same things as a global function, but if no docblock was found, fetch class
-                // information to see if 'hasDocumentation' = true.
+                $docblockIssues = array_merge_recursive(
+                    $docblockIssues,
+                    $this->analyzeMethodDocblock($structure, $method)
+                );
             }
 
             foreach ($structure['properties'] as $property) {
-
+                $docblockIssues = array_merge_recursive(
+                    $docblockIssues,
+                    $this->analyzePropertyDocblock($structure, $property)
+                );
             }
 
             foreach ($structure['constants'] as $constant) {
-
+                $docblockIssues = array_merge_recursive(
+                    $docblockIssues,
+                    $this->analyzeClassConstantDocblock($structure, $constant)
+                );
             }
-
-            // if (!$structuralElement['docblock']) {
-                // if (!$structuralElement['class']) {
-                    // TODO: Warning: missing docblock.
-                // }
-            // }
-
-            // $structuralElement['docblock'];
         }
 
         $globalFunctions = $this->outlineIndexingVisitor->getGlobalFunctions();
@@ -102,25 +107,78 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             );
         }
 
-        $globalConstants = $this->outlineIndexingVisitor->getGlobalConstants();
-
-        foreach ($globalConstants as $constant) {
-            // TODO
-        }
-
-        // TODO: This new code somehow broke the remaining tests.
-
-        // TODO: The OutlineIndexingVisitor does not prepend a leading slash to fully qualified paths. Must
-        // happen for the fullType as well as the type. Also update tests (if any generate problems).
-
         // TODO: Write tests.
+        // TODO: This new code somehow broke the remaining tests.
         // TODO: Before we enable this for everyone, add support to the linter for disabling certain validation. I can
         // imagine some users will find this behavior too aggressive (or simply have codebases that aren't documented
         // properly yet and don't want to get spammed by warnings).
 
-
-
         return $docblockIssues;
+    }
+
+    /**
+     * @param array $structure
+     *
+     * @return array
+     */
+    protected function analyzeStructureDocblock(array $structure)
+    {
+        if ($structure['docComment']) {
+            return [];
+        }
+
+        // TODO: Fetch class information to see if 'hasDocumentation' = true.
+        return [];
+    }
+
+    /**
+     * @param array $structure
+     * @param array $method
+     *
+     * @return array
+     */
+    protected function analyzeMethodDocblock(array $structure, array $method)
+    {
+        if ($method['docComment']) {
+            return $this->analyzeFunctionDocblock($method);
+        }
+
+        // TODO: Fetch class information to see if 'hasDocumentation' = true.
+        return [];
+    }
+
+    /**
+     * @param array $structure
+     * @param array $method
+     *
+     * @return array
+     */
+    protected function analyzePropertyDocblock(array $structure, array $property)
+    {
+        if ($property['docComment']) {
+            // TODO: Warn if there is no @var tag.
+            return [];
+        }
+
+        // TODO: Fetch class information to see if 'hasDocumentation' = true.
+        return [];
+    }
+
+    /**
+     * @param array $structure
+     * @param array $constant
+     *
+     * @return array
+     */
+    protected function analyzeClassConstantDocblock(array $structure, array $constant)
+    {
+        if ($constant['docComment']) {
+            // TODO: Warn if there is no @var tag.
+            return [];
+        }
+
+        // TODO: Fetch class information to see if 'hasDocumentation' = true.
+        return [];
     }
 
     /**
