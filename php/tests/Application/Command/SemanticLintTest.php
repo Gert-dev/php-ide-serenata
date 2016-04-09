@@ -164,6 +164,13 @@ class SemanticLintTest extends IndexedTest
             ],
 
             [
+                'name'  => 'someProperty',
+                'line'  => 33,
+                'start' => 321,
+                'end'   => 344
+            ],
+
+            [
                 'name'  => 'SOME_CONST',
                 'line'  => 31,
                 'start' => 294,
@@ -182,13 +189,7 @@ class SemanticLintTest extends IndexedTest
                 'line'  => 5,
                 'start' => 21,
                 'end'   => 49
-            ],
-
-            // [
-            //     'name'  => 'someProperty',
-            //     'start' => 72,
-            //     'end'   => 83
-            // ],
+            ]
         ], $output['warnings']['docblockIssues']['missingDocumentation']);
     }
 

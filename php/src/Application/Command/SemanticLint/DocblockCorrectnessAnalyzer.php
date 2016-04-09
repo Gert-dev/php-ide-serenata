@@ -191,7 +191,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
 
     /**
      * @param array $structure
-     * @param array $method
+     * @param array $property
      *
      * @return array
      */
@@ -202,8 +202,23 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             return [];
         }
 
-        // TODO: Fetch class information to see if 'hasDocumentation' = true.
-        return [];
+        $docblockIssues = [];
+
+        $classInfo = $this->getClassInfo($structure['fqcn']);
+
+        if ($classInfo &&
+            isset($classInfo['properties'][$property['name']]) &&
+            !$classInfo['properties'][$property['name']]['hasDocumentation']
+        ) {
+            $docblockIssues['missingDocumentation'][] = [
+                'name'  => $property['name'],
+                'line'  => $property['startLine'],
+                'start' => $property['startPos'],
+                'end'   => $property['endPos']
+            ];
+        }
+
+        return $docblockIssues;
     }
 
     /**
