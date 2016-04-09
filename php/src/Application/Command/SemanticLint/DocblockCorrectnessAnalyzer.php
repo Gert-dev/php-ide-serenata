@@ -108,6 +108,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             // TODO
         }
 
+        // TODO: This new code somehow broke the remaining tests.
+
         // TODO: The OutlineIndexingVisitor does not prepend a leading slash to fully qualified paths. Must
         // happen for the fullType as well as the type. Also update tests (if any generate problems).
 
@@ -152,23 +154,27 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         $docblockParameters = $result['params'];
 
         foreach ($function['parameters'] as $parameter) {
-            if (!isset($docblockParameters['$' . $parameter['name']])) {
+            $dollarName = '$' . $parameter['name'];
+
+            if (isset($docblockParameters[$dollarName])) {
+                $keysFound[] = $dollarName;
+            }
+
+            if (!isset($docblockParameters[$dollarName])) {
                 $docblockIssues['parameterMissing'][] = [
                     'name'      => $function['name'],
-                    'parameter' => $parameter['name'],
+                    'parameter' => $dollarName,
                     'line'      => $function['startLine'],
                     'start'     => $function['startPos'],
                     'end'       => $function['endPos']
                 ];
-
-                $keysFound[] = '$' . $parameter['name'];
             } elseif (
                 $parameter['type'] &&
-                $parameter['type'] !== $docblockParameters['$' . $parameter['name']]['type']
+                $parameter['type'] !== $docblockParameters[$dollarName]['type']
             ) {
                 $docblockIssues['parameterTypeMismatch'][] = [
                     'name'      => $function['name'],
-                    'parameter' => $parameter['name'],
+                    'parameter' => $dollarName,
                     'line'      => $function['startLine'],
                     'start'     => $function['startPos'],
                     'end'       => $function['endPos']
@@ -176,7 +182,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             }
         }
 
-        $superfluousParameterNames = array_intersect($keysFound, array_keys($docblockParameters));
+        $superfluousParameterNames = array_values(array_diff(array_keys($docblockParameters), $keysFound));
 
         if (!empty($superfluousParameterNames)) {
             $docblockIssues['superfluousParameter'][] = [
