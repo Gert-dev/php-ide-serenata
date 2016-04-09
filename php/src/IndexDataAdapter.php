@@ -89,6 +89,8 @@ class IndexDataAdapter
             'isAbstract'         => !!$element['is_abstract'],
             'isBuiltin'          => !!$element['is_builtin'],
             'isDeprecated'       => !!$element['is_deprecated'],
+            'hasDocblock'        => !!$element['has_docblock'],
+            'hasDocumentation'   => !!$element['has_docblock'],
 
             'descriptions'       => [
                 'short' => $element['short_description'],
@@ -359,6 +361,8 @@ class IndexDataAdapter
                         $parentInfo['descriptions']['long']
                     );
                 }
+
+                $result['hasDocumentation'] = $result['hasDocumentation'] || $parentInfo['hasDocumentation'];
 
                 $result['constants']  = array_merge($result['constants'], $parentInfo['constants']);
                 $result['properties'] = array_merge($result['properties'], $parentInfo['properties']);

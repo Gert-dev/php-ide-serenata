@@ -1,6 +1,7 @@
 ## 0.9.0
 ### Changes for developers
 * Changes to the service
+  * Classes didn't return information about whether they have a docblock or documentation.
   * When fetching class information, types were sometimes returned missing their leading slash.
 
 ## 0.8.0

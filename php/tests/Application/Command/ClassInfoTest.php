@@ -57,6 +57,8 @@ class ClassInfoTest extends IndexedTest
             'isAbstract'         => false,
             'isBuiltin'          => false,
             'isDeprecated'       => false,
+            'hasDocblock'        => true,
+            'hasDocumentation'   => true,
 
             'descriptions'       => [
                 'short' => 'This is the summary.',
