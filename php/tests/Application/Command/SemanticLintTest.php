@@ -157,8 +157,14 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals([
             [
+                'name'  => 'someMethod',
+                'line'  => 41,
+                'start' => 448,
+                'end'   => 491
+            ],
+
+            [
                 'name'  => 'SOME_CONST',
-                'class' => 'C',
                 'line'  => 31,
                 'start' => 294,
                 'end'   => 314
@@ -176,35 +182,13 @@ class SemanticLintTest extends IndexedTest
                 'line'  => 5,
                 'start' => 21,
                 'end'   => 49
-            ]
+            ],
 
             // [
-            //     'name'  => 'someBaseClassProperty',
-            //     'class' => 'C',
-            //     'start' => 72,
-            //     'end'   => 83
-            // ],
-            //
-            // [
             //     'name'  => 'someProperty',
-            //     'class' => 'C',
             //     'start' => 72,
             //     'end'   => 83
             // ],
-            //
-            // [
-            //     'name'  => 'someBaseClassMethod',
-            //     'class' => 'C',
-            //     'start' => 72,
-            //     'end'   => 83
-            // ],
-            //
-            // [
-            //     'name'  => 'someMethod',
-            //     'class' => 'C',
-            //     'start' => 72,
-            //     'end'   => 83
-            // ]
         ], $output['warnings']['docblockIssues']['missingDocumentation']);
     }
 

@@ -170,8 +170,23 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             return $this->analyzeFunctionDocblock($method);
         }
 
-        // TODO: Fetch class information to see if 'hasDocumentation' = true.
-        return [];
+        $docblockIssues = [];
+
+        $classInfo = $this->getClassInfo($structure['fqcn']);
+
+        if ($classInfo &&
+            isset($classInfo['methods'][$method['name']]) &&
+            !$classInfo['methods'][$method['name']]['hasDocumentation']
+        ) {
+            $docblockIssues['missingDocumentation'][] = [
+                'name'  => $method['name'],
+                'line'  => $method['startLine'],
+                'start' => $method['startPos'],
+                'end'   => $method['endPos']
+            ];
+        }
+
+        return $docblockIssues;
     }
 
     /**
@@ -206,7 +221,6 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         if (!$constant['docComment']) {
             $docblockIssues['missingDocumentation'][] = [
                 'name'  => $constant['name'],
-                'class' => $structure['name'],
                 'line'  => $constant['startLine'],
                 'start' => $constant['startPos'],
                 'end'   => $constant['endPos']
