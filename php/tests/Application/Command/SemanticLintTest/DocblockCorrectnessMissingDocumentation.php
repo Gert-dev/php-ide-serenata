@@ -7,6 +7,9 @@ function some_function()
 
 }
 
+/**
+ * Documentation.
+ */
 class Base
 {
     /**
@@ -39,4 +42,9 @@ class C extends Base
     {
 
     }
+}
+
+class MissingDocumentation
+{
+
 }

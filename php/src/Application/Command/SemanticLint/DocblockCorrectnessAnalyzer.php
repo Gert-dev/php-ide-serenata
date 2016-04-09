@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Application\Command\SemanticLint;
 
+use UnexpectedValueException;
+
 use PhpIntegrator\DocParser;
 use PhpIntegrator\IndexDatabase;
 
@@ -38,6 +40,11 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      * @var ClassInfo
      */
     protected $classInfoCommand;
+
+    /**
+     * @var array
+     */
+    protected $classCache = [];
 
     /**
      * Constructor.
@@ -135,8 +142,20 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             return [];
         }
 
-        // TODO: Fetch class information to see if 'hasDocumentation' = true.
-        return [];
+        $docblockIssues = [];
+
+        $classInfo = $this->getClassInfo($structure['fqcn']);
+
+        if ($classInfo && !$classInfo['hasDocumentation']) {
+            $docblockIssues['missingDocumentation'][] = [
+                'name'  => $structure['name'],
+                'line'  => $structure['startLine'],
+                'start' => $structure['startPos'],
+                'end'   => $structure['endPos']
+            ];
+        }
+
+        return $docblockIssues;
     }
 
     /**
@@ -272,6 +291,24 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         }
 
         return $docblockIssues;
+    }
+
+    /**
+     * @param string $fqcn
+     *
+     * @return array|null
+     */
+    protected function getClassInfo($fqcn)
+    {
+        if (!isset($classCache[$fqcn])) {
+            try {
+                $classCache[$fqcn] = $this->classInfoCommand->getClassInfo($fqcn);
+            } catch (UnexpectedValueException $e) {
+                $classCache[$fqcn] = null;
+            }
+        }
+
+        return $classCache[$fqcn];
     }
 
     /**

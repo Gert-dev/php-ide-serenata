@@ -159,9 +159,16 @@ class SemanticLintTest extends IndexedTest
             [
                 'name'  => 'SOME_CONST',
                 'class' => 'C',
-                'line'  => 28,
-                'start' => 268,
-                'end'   => 288
+                'line'  => 31,
+                'start' => 294,
+                'end'   => 314
+            ],
+
+            [
+                'name'  => 'MissingDocumentation',
+                'line'  => 47,
+                'start' => 496,
+                'end'   => 526
             ],
 
             [
@@ -169,8 +176,15 @@ class SemanticLintTest extends IndexedTest
                 'line'  => 5,
                 'start' => 21,
                 'end'   => 49
-            ],
+            ]
 
+            // [
+            //     'name'  => 'someBaseClassProperty',
+            //     'class' => 'C',
+            //     'start' => 72,
+            //     'end'   => 83
+            // ],
+            //
             // [
             //     'name'  => 'someProperty',
             //     'class' => 'C',
