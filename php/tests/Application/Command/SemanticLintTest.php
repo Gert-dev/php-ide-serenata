@@ -151,6 +151,91 @@ class SemanticLintTest extends IndexedTest
         ]);
     }
 
+    public function testCorrectlyIdentifiesMissingDocumentation()
+    {
+        $output = $this->lintFile('DocblockCorrectnessMissingDocumentation.php');
+
+        $this->assertEquals([
+            [
+                'name'  => 'some_function',
+                'line'  => 5,
+                'start' => 21,
+                'end'   => 49
+            ],
+
+            // [
+            //     'name'  => 'SOME_CONST',
+            //     'class' => 'C',
+            //     'start' => 72,
+            //     'end'   => 83
+            // ],
+            //
+            // [
+            //     'name'  => 'someProperty',
+            //     'class' => 'C',
+            //     'start' => 72,
+            //     'end'   => 83
+            // ],
+            //
+            // [
+            //     'name'  => 'someBaseClassMethod',
+            //     'class' => 'C',
+            //     'start' => 72,
+            //     'end'   => 83
+            // ],
+            //
+            // [
+            //     'name'  => 'someMethod',
+            //     'class' => 'C',
+            //     'start' => 72,
+            //     'end'   => 83
+            // ]
+        ], $output['warnings']['docblockIssues']['missingDocumentation']);
+    }
+
+    public function testCorrectlyIdentifiesDocblockMissingParameter()
+    {
+        $output = $this->lintFile('DocblockCorrectnessMissingParameter.php');
+
+        $this->assertEquals([
+            [
+                'name'      => 'some_function_missing_parameter',
+                'line'      => 17,
+                'start'     => 186,
+                'end'       => 258,
+                'parameter' => 'param2'
+            ]
+        ], $output['warnings']['docblockIssues']['parameterMissing']);
+    }
+
+    public function testCorrectlyIdentifiesDocblockParameterTypeMismatch()
+    {
+        $output = $this->lintFile('DocblockCorrectnessParameterTypeMismatch.php');
+
+        $this->assertEquals([
+            [
+                'name'  => 'some_function_parameter_incorrect_type',
+                'line'  => 5,
+                'start' => 21,
+                'end'   => 49
+            ],
+        ], $output['warnings']['docblockIssues']['parameterTypeMismatch']);
+    }
+
+    public function testCorrectlyIdentifiesDocblockSuperfluousParameters()
+    {
+        $output = $this->lintFile('DocblockCorrectnessSuperfluousParameters.php');
+
+        $this->assertEquals([
+            [
+                'name'  => 'some_function_extra_parameter',
+                'line'  => 5,
+                'start' => 21,
+                'end'   => 49
+            ]
+        ], $output['warnings']['docblockIssues']['superfluousParameters']);
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */
