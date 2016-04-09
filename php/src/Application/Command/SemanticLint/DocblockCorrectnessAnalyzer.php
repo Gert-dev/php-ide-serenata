@@ -77,6 +77,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     public function getOutput()
     {
         $docblockIssues = [
+            'varTagMissing'         => [],
             'missingDocumentation'  => [],
             'parameterMissing'      => [],
             'parameterTypeMismatch' => [],
@@ -142,7 +143,9 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             return [];
         }
 
-        $docblockIssues = [];
+        $docblockIssues = [
+            'missingDocumentation' => []
+        ];
 
         $classInfo = $this->getClassInfo($structure['fqcn']);
 
@@ -170,7 +173,9 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             return $this->analyzeFunctionDocblock($method);
         }
 
-        $docblockIssues = [];
+        $docblockIssues = [
+            'missingDocumentation' => []
+        ];
 
         $classInfo = $this->getClassInfo($structure['fqcn']);
 
@@ -197,25 +202,36 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      */
     protected function analyzePropertyDocblock(array $structure, array $property)
     {
+        $docblockIssues = [
+            'varTagMissing'        => [],
+            'missingDocumentation' => []
+        ];
+
         if ($property['docComment']) {
-            // TODO: Warn if there is no @var tag.
-            return [];
-        }
+            $result = $this->getDocParser()->parse($property['docComment'], [DocParser::VAR_TYPE], $property['name']);
 
-        $docblockIssues = [];
+            if (!$result['var']['type']) {
+                $docblockIssues['varTagMissing'][] = [
+                    'name'  => $property['name'],
+                    'line'  => $property['startLine'],
+                    'start' => $property['startPos'],
+                    'end'   => $property['endPos']
+                ];
+            }
+        } else {
+            $classInfo = $this->getClassInfo($structure['fqcn']);
 
-        $classInfo = $this->getClassInfo($structure['fqcn']);
-
-        if ($classInfo &&
-            isset($classInfo['properties'][$property['name']]) &&
-            !$classInfo['properties'][$property['name']]['hasDocumentation']
-        ) {
-            $docblockIssues['missingDocumentation'][] = [
-                'name'  => $property['name'],
-                'line'  => $property['startLine'],
-                'start' => $property['startPos'],
-                'end'   => $property['endPos']
-            ];
+            if ($classInfo &&
+                isset($classInfo['properties'][$property['name']]) &&
+                !$classInfo['properties'][$property['name']]['hasDocumentation']
+            ) {
+                $docblockIssues['missingDocumentation'][] = [
+                    'name'  => $property['name'],
+                    'line'  => $property['startLine'],
+                    'start' => $property['startPos'],
+                    'end'   => $property['endPos']
+                ];
+            }
         }
 
         return $docblockIssues;
@@ -230,21 +246,30 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     protected function analyzeClassConstantDocblock(array $structure, array $constant)
     {
         $docblockIssues = [
+            'varTagMissing'        => [],
             'missingDocumentation' => []
         ];
 
-        if (!$constant['docComment']) {
+        if ($constant['docComment']) {
+            $result = $this->getDocParser()->parse($constant['docComment'], [DocParser::VAR_TYPE], $constant['name']);
+
+            if (!$result['var']['type']) {
+                $docblockIssues['varTagMissing'][] = [
+                    'name'  => $constant['name'],
+                    'line'  => $constant['startLine'],
+                    'start' => $constant['startPos'],
+                    'end'   => $constant['endPos']
+                ];
+            }
+        } else {
             $docblockIssues['missingDocumentation'][] = [
                 'name'  => $constant['name'],
                 'line'  => $constant['startLine'],
                 'start' => $constant['startPos'],
                 'end'   => $constant['endPos']
             ];
-
-            return $docblockIssues;
         }
 
-        // TODO: Warn if there is no @var tag.
         return $docblockIssues;
     }
 

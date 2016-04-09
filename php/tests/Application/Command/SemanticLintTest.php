@@ -238,6 +238,27 @@ class SemanticLintTest extends IndexedTest
         ], $output['warnings']['docblockIssues']['superfluousParameter']);
     }
 
+    public function testCorrectlyIdentifiesDocblockMissingVarTag()
+    {
+        $output = $this->lintFile('DocblockCorrectnessMissingVarTag.php');
+
+        $this->assertEquals([
+            [
+                'name'       => 'property',
+                'line'       => 15,
+                'start'      => 106,
+                'end'        => 125
+            ],
+
+            [
+                'name'       => 'CONSTANT',
+                'line'       => 10,
+                'start'      => 58,
+                'end'        => 76
+            ]
+        ], $output['warnings']['docblockIssues']['varTagMissing']);
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */
