@@ -123,12 +123,6 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             );
         }
 
-        // TODO: Write tests.
-        // TODO: This new code somehow broke the remaining tests.
-        // TODO: Before we enable this for everyone, add support to the linter for disabling certain validation. I can
-        // imagine some users will find this behavior too aggressive (or simply have codebases that aren't documented
-        // properly yet and don't want to get spammed by warnings).
-
         return $docblockIssues;
     }
 
