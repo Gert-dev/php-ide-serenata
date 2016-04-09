@@ -203,7 +203,7 @@ class SemanticLintTest extends IndexedTest
                 'line'      => 17,
                 'start'     => 186,
                 'end'       => 258,
-                'parameter' => 'param2'
+                'parameter' => '$param2'
             ]
         ], $output['warnings']['docblockIssues']['parameterMissing']);
     }
@@ -214,10 +214,11 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'  => 'some_function_parameter_incorrect_type',
-                'line'  => 5,
-                'start' => 21,
-                'end'   => 49
+                'name'      => 'some_function_parameter_incorrect_type',
+                'line'      => 17,
+                'start'     => 189,
+                'end'       => 259,
+                'parameter' => '$param1'
             ],
         ], $output['warnings']['docblockIssues']['parameterTypeMismatch']);
     }
@@ -228,12 +229,13 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'  => 'some_function_extra_parameter',
-                'line'  => 5,
-                'start' => 21,
-                'end'   => 49
+                'name'       => 'some_function_extra_parameter',
+                'line'       => 20,
+                'start'      => 270,
+                'end'        => 340,
+                'parameters' => ['$extra1', '$extra2']
             ]
-        ], $output['warnings']['docblockIssues']['superfluousParameters']);
+        ], $output['warnings']['docblockIssues']['superfluousParameter']);
     }
 
     /**
