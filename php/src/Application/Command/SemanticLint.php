@@ -118,20 +118,6 @@ class SemanticLint extends BaseCommand
             }
         }
 
-        $docblockCorrectnessAnalyzer = null;
-
-        if ($analyzeDocblockCorrectness) {
-            $docblockCorrectnessAnalyzer = new SemanticLint\DocblockCorrectnessAnalyzer(
-                $file,
-                $this->indexDatabase,
-                $this->getClassInfoCommand()
-            );
-
-            foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
-                $traverser->addVisitor($visitor);
-            }
-        }
-
         $unusedUseStatementAnalyzer = null;
 
         if ($retrieveUnusedUseStatements) {
@@ -143,6 +129,25 @@ class SemanticLint extends BaseCommand
         }
 
         $traverser->traverse($nodes);
+
+        $docblockCorrectnessAnalyzer = null;
+
+        if ($analyzeDocblockCorrectness) {
+            // This analyzer needs to traverse the nodes separately as it modifies them.
+            $traverser = new NodeTraverser(false);
+
+            $docblockCorrectnessAnalyzer = new SemanticLint\DocblockCorrectnessAnalyzer(
+                $file,
+                $this->indexDatabase,
+                $this->getClassInfoCommand()
+            );
+
+            foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
+                $traverser->addVisitor($visitor);
+            }
+
+            $traverser->traverse($nodes);
+        }
 
         $output = [
             'errors'   => [],
