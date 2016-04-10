@@ -160,35 +160,35 @@ class SemanticLintTest extends IndexedTest
                 'name'  => 'someMethod',
                 'line'  => 41,
                 'start' => 448,
-                'end'   => 491
+                'end'   => 449
             ],
 
             [
                 'name'  => 'someProperty',
                 'line'  => 33,
                 'start' => 321,
-                'end'   => 344
+                'end'   => 322
             ],
 
             [
                 'name'  => 'SOME_CONST',
                 'line'  => 31,
                 'start' => 294,
-                'end'   => 314
+                'end'   => 295
             ],
 
             [
                 'name'  => 'MissingDocumentation',
                 'line'  => 47,
                 'start' => 496,
-                'end'   => 526
+                'end'   => 497
             ],
 
             [
                 'name'  => 'some_function',
                 'line'  => 5,
                 'start' => 21,
-                'end'   => 49
+                'end'   => 22
             ]
         ], $output['warnings']['docblockIssues']['missingDocumentation']);
     }
@@ -202,7 +202,7 @@ class SemanticLintTest extends IndexedTest
                 'name'      => 'some_function_missing_parameter',
                 'line'      => 17,
                 'start'     => 186,
-                'end'       => 258,
+                'end'       => 187,
                 'parameter' => '$param2'
             ]
         ], $output['warnings']['docblockIssues']['parameterMissing']);
@@ -217,7 +217,7 @@ class SemanticLintTest extends IndexedTest
                 'name'      => 'some_function_parameter_incorrect_type',
                 'line'      => 17,
                 'start'     => 189,
-                'end'       => 259,
+                'end'       => 190,
                 'parameter' => '$param1'
             ],
         ], $output['warnings']['docblockIssues']['parameterTypeMismatch']);
@@ -232,7 +232,7 @@ class SemanticLintTest extends IndexedTest
                 'name'       => 'some_function_extra_parameter',
                 'line'       => 20,
                 'start'      => 270,
-                'end'        => 340,
+                'end'        => 271,
                 'parameters' => ['$extra1', '$extra2']
             ]
         ], $output['warnings']['docblockIssues']['superfluousParameter']);
@@ -247,14 +247,14 @@ class SemanticLintTest extends IndexedTest
                 'name'       => 'property',
                 'line'       => 15,
                 'start'      => 106,
-                'end'        => 125
+                'end'        => 107
             ],
 
             [
                 'name'       => 'CONSTANT',
                 'line'       => 10,
                 'start'      => 58,
-                'end'        => 76
+                'end'        => 59
             ]
         ], $output['warnings']['docblockIssues']['varTagMissing']);
     }
