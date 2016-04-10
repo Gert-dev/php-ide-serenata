@@ -23,21 +23,21 @@ class SemanticLintTest extends IndexedTest
     {
         $output = $this->lintFile('UnknownClassesNoNamespace.php');
 
-        $this->assertEquals($output['errors']['unknownClasses'], [
+        $this->assertEquals([
             [
                 'name'      => 'A\B',
                 'namespace' => null,
                 'start'     => 16,
                 'end'       => 19
             ]
-        ]);
+        ], $output['errors']['unknownClasses']);
     }
 
     public function testReportsUnknownClassesWithSingleNamespace()
     {
         $output = $this->lintFile('UnknownClassesSingleNamespace.php');
 
-        $this->assertEquals($output['errors']['unknownClasses'], [
+        $this->assertEquals([
             [
                 'name'      => 'DateTime',
                 'namespace' => 'A',
@@ -50,14 +50,14 @@ class SemanticLintTest extends IndexedTest
                 'start'     => 85,
                 'end'       => 97
             ]
-        ]);
+        ], $output['errors']['unknownClasses']);
     }
 
     public function testReportsUnknownClassesWithMultipleNamespaces()
     {
         $output = $this->lintFile('UnknownClassesMultipleNamespaces.php');
 
-        $this->assertEquals($output['errors']['unknownClasses'], [
+        $this->assertEquals([
             [
                 'name'      => 'DateTime',
                 'namespace' => 'A',
@@ -71,14 +71,14 @@ class SemanticLintTest extends IndexedTest
                 'start'     => 117,
                 'end'       => 128
             ]
-        ]);
+        ], $output['errors']['unknownClasses']);
     }
 
     public function testReportsUnknownClassesInDocBlocks()
     {
         $output = $this->lintFile('UnknownClassesDocblock.php');
 
-        $this->assertEquals($output['errors']['unknownClasses'], [
+        $this->assertEquals([
             [
                 'name'      => 'A\B',
                 'namespace' => 'A',
@@ -92,28 +92,28 @@ class SemanticLintTest extends IndexedTest
                 'start'     => 120,
                 'end'       => 121
             ]
-        ]);
+        ], $output['errors']['unknownClasses']);
     }
 
     public function testReportsUnusedUseStatementsWithSingleNamespace()
     {
         $output = $this->lintFile('UnusedUseStatementsSingleNamespace.php');
 
-        $this->assertEquals($output['warnings']['unusedUseStatements'], [
+        $this->assertEquals([
             [
                 'name'  => 'Traversable',
                 'alias' => 'Traversable',
                 'start' => 39,
                 'end'   => 50
             ]
-        ]);
+        ], $output['warnings']['unusedUseStatements']);
     }
 
     public function testReportsUnusedUseStatementsWithMultipleNamespaces()
     {
         $output = $this->lintFile('UnusedUseStatementsMultipleNamespaces.php');
 
-        $this->assertEquals($output['warnings']['unusedUseStatements'], [
+        $this->assertEquals([
             [
                 'name'  => 'SplFileInfo',
                 'alias' => 'SplFileInfo',
@@ -127,14 +127,14 @@ class SemanticLintTest extends IndexedTest
                 'start' => 111,
                 'end'   => 119
             ]
-        ]);
+        ], $output['warnings']['unusedUseStatements']);
     }
 
     public function testSeesUseStatementsAsUsedIfTheyAppearInComments()
     {
         $output = $this->lintFile('UnusedUseStatementsDocblock.php');
 
-        $this->assertEquals($output['warnings']['unusedUseStatements'], [
+        $this->assertEquals([
             [
                 'name'  => 'SplMinHeap',
                 'alias' => 'SplMinHeap',
@@ -148,7 +148,7 @@ class SemanticLintTest extends IndexedTest
                 'start' => 72,
                 'end'   => 83
             ]
-        ]);
+        ], $output['warnings']['unusedUseStatements']);
     }
 
     public function testCorrectlyIdentifiesMissingDocumentation()
