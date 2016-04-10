@@ -109,12 +109,14 @@ class Service
      *
      * @param {string}      file
      * @param {string|null} source The source code of the file to index. May be null if a directory is passed instead.
+     * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses,
+     *                              noDocblockCorrectness and noUnusedUseStatements are supported.
      * @param {boolean}     async
      *
      * @return {Promise|Object}
     ###
-    semanticLint: (file, source, async = false) ->
-        return @proxy.semanticLint(file, source, async)
+    semanticLint: (file, source, options = {}, async = false) ->
+        return @proxy.semanticLint(file, source, options, async)
 
     ###*
      * Fetches all available variables at a specific location.

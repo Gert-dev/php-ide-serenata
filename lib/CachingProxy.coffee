@@ -93,11 +93,13 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    semanticLint: (file, source, async = false) ->
+    semanticLint: (file, source, options, async = false) ->
         # md5 may sound expensive, but it's not as expensive as spawning an extra process that parses PHP code.
         sourceKey = if source? then md5(source) else null
+        
+        optionsKey = JSON.stringify(options)
 
-        return @wrapCachedRequestToParent("semanticLint-#{file}-#{sourceKey}", 'semanticLint', arguments, async)
+        return @wrapCachedRequestToParent("semanticLint-#{file}-#{sourceKey}-#{optionsKey}", 'semanticLint', arguments, async)
 
     ###*
      * @inherited

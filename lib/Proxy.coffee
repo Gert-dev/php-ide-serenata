@@ -245,16 +245,29 @@ class Proxy
      * Performs a semantic lint of the specified file.
      *
      * @param {string}      file
-     * @param {string|null} source The source code of the file to index. May be null if a directory is passed instead.
+     * @param {string|null} source  The source code of the file to index. May be null if a directory is passed instead.
+     * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses,
+     *                              noDocblockCorrectness and noUnusedUseStatements are supported.
      * @param {boolean}     async
      *
      * @return {Promise|Object}
     ###
-    semanticLint: (file, source, async = false) ->
+    semanticLint: (file, source, options = {}, async = false) ->
         throw new Error('No file passed!') if not file
 
+        parameters = ['--semantic-lint', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--stdin']
+
+        if options.noUnknownClasses == true
+            parameters.push('--no-unknown-classes')
+
+        if options.noDocblockCorrectness == true
+            parameters.push('--no-docblock-correctness')
+
+        if options.noUnusedUseStatements == true
+            parameters.push('--no-unused-use-statements')
+
         return @performRequest(
-            ['--semantic-lint', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--stdin'],
+            parameters,
             async,
             null,
             source
