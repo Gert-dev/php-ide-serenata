@@ -75,12 +75,12 @@ class UnknownClassAnalyzer implements AnalyzerInterface
         $resolveTypeCommand = new ResolveType();
         $resolveTypeCommand->setIndexDatabase($this->indexDatabase);
 
-        $classUsage = array_merge(
+        $classUsages = array_merge(
             $this->classUsageFetchingVisitor->getClassUsageList(),
             $this->docblockClassUsageFetchingVisitor->getClassUsageList()
         );
 
-        foreach ($classUsage as $classUsage) {
+        foreach ($classUsages as $classUsage) {
             if ($classUsage['isFullyQualified']) {
                 $fqsen = $classUsage['name'];
             } else {
