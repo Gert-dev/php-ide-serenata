@@ -2,7 +2,7 @@
 ### Changes for developers
 * Changes to the service
   * Classes didn't return information about whether they have a docblock or documentation.
-  * When fetching class information, types were sometimes returned missing their leading slash.
+  * When fetching class information, types were sometimes returned without their leading slash.
   * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.
 
 ## 0.8.0
