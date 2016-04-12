@@ -293,7 +293,7 @@ class Service
         if async
             bufferText = editor.getBuffer().getText()
 
-        result = @getVariableType(name, editor.getPath(), bufferText, offset, async)
+        result = @getVariableTypeByOffset(name, editor.getPath(), bufferText, offset, async)
 
         return null if not result
         return result
