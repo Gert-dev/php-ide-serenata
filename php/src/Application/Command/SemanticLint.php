@@ -146,7 +146,13 @@ class SemanticLint extends BaseCommand
                 $traverser->addVisitor($visitor);
             }
 
-            $traverser->traverse($nodes);
+            try {
+                $traverser->traverse($nodes);
+            } catch (Error $e) {
+                // The NameResolver can throw exceptions on things such as duplicate use statements. Seeing as that is
+                // a PHP error, just fetch any output at all.
+                $docblockCorrectnessAnalyzer = null;
+            }
         }
 
         $output = [
