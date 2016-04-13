@@ -1,6 +1,7 @@
 ## 0.9.0
 ### Changes for developers
 * Changes to the service
+  * Semantic linting can now lint docblock correctness.
   * Support for calling most methods synchronously has been removed.
   * Classes didn't return information about whether they have a docblock or documentation.
   * When fetching class information, types were sometimes returned without their leading slash.
