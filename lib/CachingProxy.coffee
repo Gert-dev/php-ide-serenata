@@ -33,18 +33,11 @@ class CachingProxy extends Proxy
      * @param {string}  cacheKey
      * @param {string}  parentMethodName
      * @param {array}   parameters
-     * @param {boolean} async
      *
      * @return {Promise|Object}
     ###
-    wrapCachedRequestToParent: (cacheKey, parentMethodName, parameters, async) ->
-        if not async
-            if cacheKey not of @cache
-                @cache[cacheKey] = CachingProxy.__super__[parentMethodName].apply(this, parameters)
-
-            return @cache[cacheKey]
-
-        else if cacheKey of @cache
+    wrapCachedRequestToParent: (cacheKey, parentMethodName, parameters) ->
+        if cacheKey of @cache
             return new Promise (resolve, reject) =>
                 resolve(@cache[cacheKey])
 
@@ -57,70 +50,70 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    getClassList: (async = false) ->
-        return @wrapCachedRequestToParent("getClassList", 'getClassList', arguments, async)
+    getClassList: () ->
+        return @wrapCachedRequestToParent("getClassList", 'getClassList', arguments)
 
     ###*
      * @inherited
     ###
-    getClassListForFile: (file, async = false) ->
-        return @wrapCachedRequestToParent("getClassListForFile-#{file}", 'getClassListForFile', arguments, async)
+    getClassListForFile: (file) ->
+        return @wrapCachedRequestToParent("getClassListForFile-#{file}", 'getClassListForFile', arguments)
 
     ###*
      * @inherited
     ###
-    getGlobalConstants: (async = false) ->
-        return @wrapCachedRequestToParent("getGlobalConstants", 'getGlobalConstants', arguments, async)
+    getGlobalConstants: () ->
+        return @wrapCachedRequestToParent("getGlobalConstants", 'getGlobalConstants', arguments)
 
     ###*
      * @inherited
     ###
-    getGlobalFunctions: (async = false) ->
-        return @wrapCachedRequestToParent("getGlobalFunctions", 'getGlobalFunctions', arguments, async)
+    getGlobalFunctions: () ->
+        return @wrapCachedRequestToParent("getGlobalFunctions", 'getGlobalFunctions', arguments)
 
     ###*
      * @inherited
     ###
-    getClassInfo: (className, async = false) ->
-        return @wrapCachedRequestToParent("getClassInfo-#{className}", 'getClassInfo', arguments, async)
+    getClassInfo: (className) ->
+        return @wrapCachedRequestToParent("getClassInfo-#{className}", 'getClassInfo', arguments)
 
     ###*
      * @inherited
     ###
-    resolveType: (file, line, type, async = false) ->
-        return @wrapCachedRequestToParent("resolveType-#{file}-#{line}-#{type}", 'resolveType', arguments, async)
+    resolveType: (file, line, type) ->
+        return @wrapCachedRequestToParent("resolveType-#{file}-#{line}-#{type}", 'resolveType', arguments)
 
     ###*
      * @inherited
     ###
-    semanticLint: (file, source, options, async = false) ->
+    semanticLint: (file, source, options) ->
         # md5 may sound expensive, but it's not as expensive as spawning an extra process that parses PHP code.
         sourceKey = if source? then md5(source) else null
-        
+
         optionsKey = JSON.stringify(options)
 
-        return @wrapCachedRequestToParent("semanticLint-#{file}-#{sourceKey}-#{optionsKey}", 'semanticLint', arguments, async)
+        return @wrapCachedRequestToParent("semanticLint-#{file}-#{sourceKey}-#{optionsKey}", 'semanticLint', arguments)
 
     ###*
      * @inherited
     ###
-    getAvailableVariables: (file, source, offset, async = false) ->
+    getAvailableVariables: (file, source, offset) ->
         sourceKey = if source? then md5(source) else null
 
-        return @wrapCachedRequestToParent("getAvailableVariables-#{file}-#{sourceKey}-#{offset}", 'getAvailableVariables', arguments, async)
+        return @wrapCachedRequestToParent("getAvailableVariables-#{file}-#{sourceKey}-#{offset}", 'getAvailableVariables', arguments)
 
     ###*
      * @inherited
     ###
-    getVariableType: (name, file, source, offset, async = false) ->
+    getVariableType: (name, file, source, offset) ->
         sourceKey = if source? then md5(source) else null
 
-        return @wrapCachedRequestToParent("getVariableType-#{name}-#{file}-#{sourceKey}-#{offset}", 'getVariableType', arguments, async)
+        return @wrapCachedRequestToParent("getVariableType-#{name}-#{file}-#{sourceKey}-#{offset}", 'getVariableType', arguments)
 
     ###*
      * @inherited
     ###
-    deduceType: (parts, file, source, offset, async = false) ->
+    deduceType: (parts, file, source, offset) ->
         sourceKey = if source? then md5(source) else null
 
         partsKey = ''
@@ -128,7 +121,7 @@ class CachingProxy extends Proxy
         for part in parts
             partsKey += part
 
-        return @wrapCachedRequestToParent("deduceType-#{partsKey}#{file}-#{sourceKey}-#{offset}", 'deduceType', arguments, async)
+        return @wrapCachedRequestToParent("deduceType-#{partsKey}#{file}-#{sourceKey}-#{offset}", 'deduceType', arguments)
 
     ###*
      * @inherited

@@ -44,40 +44,6 @@ class Proxy
         return parameters
 
     ###*
-     * Performs a synchronous request to the PHP side.
-     *
-     * @param {string} command    The command to execute.
-     * @param {array}  parameters The arguments to pass.
-     *
-     * @return {Object}
-    ###
-    performRequestSync: (command, parameters) ->
-        try
-            response = child_process.spawnSync(command, parameters)
-
-            rawOutput = response.output[1].toString('ascii')
-            rawOutputStderr = response.output[2].toString('ascii')
-
-            if rawOutputStderr
-                @showUnexpectedOutputError(rawOutputStderr)
-                throw new Error('The PHP side is producing error messages or notices!')
-
-            try
-                response = JSON.parse(rawOutput)
-
-            catch error
-                @showUnexpectedOutputError(rawOutput)
-                throw new Error('Unexpected JSON output encountered!')
-
-            if not response or not response.success
-                throw new Error('An unsuccessful status code was returned by the PHP side!')
-
-        catch error
-            throw (if error.message then error.message else error)
-
-        return response?.result
-
-    ###*
      * Performs an asynchronous request to the PHP side.
      *
      * @param {string}   command        The command to execute.
@@ -142,83 +108,69 @@ class Proxy
      * Performs a request to the PHP side.
      *
      * @param {array}    args           The arguments to pass.
-     * @param {boolean}  async          Whether to execute the method asynchronously or not.
      * @param {Callback} streamCallback A method to invoke each time streaming data is received.
      * @param {string}   stdinData      The data to pass to STDIN.
      *
      * @todo Support stdinData for synchronous requests as well.
      *
-     * @return {Promise|Object} If the operation is asynchronous, a Promise, otherwise the result as object.
+     * @return {Promise}
     ###
-    performRequest: (args, async, streamCallback = null, stdinData = null) ->
+    performRequest: (args, streamCallback = null, stdinData = null) ->
         php = @config.get('phpCommand')
         parameters = @prepareParameters(args)
 
-        if not async
-            return @performRequestSync(php, parameters)
-
-        else
-            return @performRequestAsync(php, parameters, streamCallback, stdinData)
+        return @performRequestAsync(php, parameters, streamCallback, stdinData)
 
     ###*
      * Retrieves a list of available classes.
      *
-     * @param {boolean} async
-     *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    getClassList: (async = false) ->
-        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath()], async)
+    getClassList: () ->
+        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath()])
 
     ###*
      * Retrieves a list of available classes in the specified file.
      *
-     * @param {string}  file
-     * @param {boolean} async
+     * @param {string} file
      *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    getClassListForFile: (file, async = false) ->
+    getClassListForFile: (file) ->
         if not file
             throw new Error('No file passed!')
 
-        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath(), '--file=' + file], async)
+        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath(), '--file=' + file])
 
     ###*
      * Retrieves a list of available global constants.
      *
-     * @param {boolean} async
-     *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    getGlobalConstants: (async = false) ->
-        return @performRequest(['--constants', '--database=' + @getIndexDatabasePath()], async)
+    getGlobalConstants: () ->
+        return @performRequest(['--constants', '--database=' + @getIndexDatabasePath()])
 
     ###*
      * Retrieves a list of available global functions.
      *
-     * @param {boolean} async
-     *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    getGlobalFunctions: (async = false) ->
-        return @performRequest(['--functions', '--database=' + @getIndexDatabasePath()], async)
+    getGlobalFunctions: () ->
+        return @performRequest(['--functions', '--database=' + @getIndexDatabasePath()])
 
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
      *
      * @param {string} className
-     * @param {boolean} async
      *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    getClassInfo: (className, async = false) ->
+    getClassInfo: (className) ->
         if not className
             throw new Error('No class name passed!')
 
         return @performRequest(
-            ['--class-info', '--database=' + @getIndexDatabasePath(), '--name=' + className],
-            async
+            ['--class-info', '--database=' + @getIndexDatabasePath(), '--name=' + className]
         )
 
     ###*
@@ -227,18 +179,16 @@ class Proxy
      * @param {string}  file
      * @param {number}  line   The line the type is located at. The first line is 1, not 0.
      * @param {string}  type
-     * @param {boolean} async
      *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    resolveType: (file, line, type, async = false) ->
+    resolveType: (file, line, type) ->
         throw new Error('No file passed!') if not file
         throw new Error('No line passed!') if not line
         throw new Error('No type passed!') if not type
 
         return @performRequest(
-            ['--resolve-type', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--line=' + line, '--type=' + type],
-            async
+            ['--resolve-type', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--line=' + line, '--type=' + type]
         )
 
     ###*
@@ -248,11 +198,10 @@ class Proxy
      * @param {string|null} source  The source code of the file to index. May be null if a directory is passed instead.
      * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses,
      *                              noDocblockCorrectness and noUnusedUseStatements are supported.
-     * @param {boolean}     async
      *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    semanticLint: (file, source, options = {}, async = false) ->
+    semanticLint: (file, source, options = {}) ->
         throw new Error('No file passed!') if not file
 
         parameters = ['--semantic-lint', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--stdin']
@@ -268,7 +217,6 @@ class Proxy
 
         return @performRequest(
             parameters,
-            async,
             null,
             source
         )
@@ -279,26 +227,21 @@ class Proxy
      * @param {string|null} file   The path to the file to examine. May be null if the source parameter is passed.
      * @param {string|null} source The source code to search. May be null if a file is passed instead.
      * @param {number}      offset The character offset into the file to examine.
-     * @param {boolean}     async
      *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    getAvailableVariables: (file, source, offset, async = false) ->
+    getAvailableVariables: (file, source, offset) ->
         if not file? and not source?
             throw 'Either a path to a file or source code must be passed!'
 
         if file?
             parameter = '--file=' + file
 
-        else if not async
-            throw 'Passing direct file contents is only supported for asynchronous calls!'
-
         else
             parameter = '--stdin'
 
         return @performRequest(
             ['--available-variables', '--database=' + @getIndexDatabasePath(), parameter, '--offset=' + offset],
-            async,
             null,
             source
         )
@@ -310,16 +253,12 @@ class Proxy
      * @param {string}      file   The path to the file to examine.
      * @param {string|null} source The source code to search. May be null if a file is passed instead.
      * @param {number}      offset The character offset into the file to examine.
-     * @param {boolean}     async
      *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    getVariableType: (name, file, source, offset, async = false) ->
+    getVariableType: (name, file, source, offset) ->
         if not file?
             throw 'A path to a file must be passed!'
-
-        if source? and not async
-            throw 'Passing direct file contents is only supported for asynchronous calls!'
 
         parameters = ['--variable-type', '--database=' + @getIndexDatabasePath(), '--name=' + name, '--offset=' + offset]
 
@@ -331,7 +270,6 @@ class Proxy
 
         return @performRequest(
             parameters,
-            async,
             null,
             source
         )
@@ -343,16 +281,12 @@ class Proxy
      * @param {string}      file   The path to the file to examine.
      * @param {string|null} source The source code to search. May be null if a file is passed instead.
      * @param {number}      offset The character offset into the file to examine.
-     * @param {boolean}     async
      *
-     * @return {Promise|Object}
+     * @return {Promise}
     ###
-    deduceType: (parts, file, source, offset, async = false) ->
+    deduceType: (parts, file, source, offset) ->
         if not file?
             throw 'A path to a file must be passed!'
-
-        if source? and not async
-            throw 'Passing direct file contents is only supported for asynchronous calls!'
 
         parameters = ['--deduce-type', '--database=' + @getIndexDatabasePath(), '--offset=' + offset]
 
@@ -367,7 +301,6 @@ class Proxy
 
         return @performRequest(
             parameters,
-            async,
             null,
             source
         )
@@ -404,7 +337,6 @@ class Proxy
 
         return @performRequest(
             parameters,
-            true,
             progressStreamCallbackWrapper,
             source
         )
