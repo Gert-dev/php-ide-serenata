@@ -7,6 +7,10 @@
   * When fetching class information, types were sometimes returned without their leading slash.
   * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.
 
+## 0.8.1
+### Bugs fixed
+Fixed infinite loop occurring when assigning variables to an expression containing themselves.
+
 ## 0.8.0
 ### Features and enhancements
 * Some internal logic has been rewritten to support working asynchronously. The existing list of packages have already been adjusted to make use of this change, which will improve apparant responsiveness across the board.
