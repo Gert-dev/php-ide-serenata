@@ -119,7 +119,16 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
-        if ($node->getAttribute('startFilePos') >= $this->position) {
+        $startFilePos = $node->getAttribute('startFilePos');
+
+        if ($startFilePos >= $this->position) {
+            if ($startFilePos == $this->position) {
+                // We won't analyze this node anymore (it falls outside the position and can cause infinite recursion
+                // otherwise), but php-parser matches each docblock with the next node. That docblock might still
+                // contain a type override annotation we need to parse.
+                $this->parseNodeDocblock($node);
+            }
+
             // We've gone beyond the requested position, there is nothing here that can still be relevant anymore.
             return NodeTraverser::DONT_TRAVERSE_CHILDREN;
         }
@@ -236,20 +245,18 @@ class QueryingVisitor extends NodeVisitorAbstract
             return $this->currentClassName;
         } elseif ($this->bestMatch) {
             if ($this->bestMatch instanceof Node\Expr\Assign) {
-                // The position + 1 ensures that this node is also taken up in the scan for its type, causing
-                // its docblock (which could contain a type annotation override) to also be examined.
                 return $this->deduceTypeCommand->deduceTypeFromNode(
                     $this->file,
                     $this->code,
                     $this->bestMatch->expr,
-                    $this->bestMatch->getAttribute('startFilePos') + 1
+                    $this->bestMatch->getAttribute('startFilePos')
                 );
             } elseif ($this->bestMatch instanceof Node\Stmt\Foreach_) {
                 $listType = $this->deduceTypeCommand->deduceTypeFromNode(
                     $this->file,
                     $this->code,
                     $this->bestMatch->expr,
-                    $this->bestMatch->getAttribute('startFilePos') + 1 // Same as above.
+                    $this->bestMatch->getAttribute('startFilePos')
                 );
 
                 if ($listType && mb_strpos($listType, '[]') !== false) {

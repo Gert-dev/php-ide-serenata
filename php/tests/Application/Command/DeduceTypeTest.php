@@ -201,4 +201,14 @@ class DeduceTypeTest extends IndexedTest
             test
         \'']));
     }
+
+    public function testCorrectlyProcessesSelfAssign()
+    {
+        $result = $this->deduceType(
+            'SelfAssign.php',
+            ['$data', 'getData()']
+        );
+
+        $this->assertEquals(null, $result);
+    }
 }
