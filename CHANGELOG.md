@@ -1,6 +1,6 @@
 ## 0.8.1
 ### Bugs fixed
-Fixed infinite loop occurring when assigning variables to an expression containing themselves.
+* Fixed infinite loop occurring when assigning variables to an expression containing themselves.
 
 ## 0.8.0
 ### Features and enhancements
