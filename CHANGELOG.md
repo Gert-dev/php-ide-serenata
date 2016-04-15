@@ -1,3 +1,7 @@
+## 0.8.1
+### Bugs fixed
+Fixed infinite loop occurring when assigning variables to an expression containing themselves.
+
 ## 0.8.0
 ### Features and enhancements
 * Some internal logic has been rewritten to support working asynchronously. The existing list of packages have already been adjusted to make use of this change, which will improve apparant responsiveness across the board.
