@@ -138,13 +138,8 @@ class Indexer
         $this->logMessage('Scanning for files that need (re)indexing...');
         $fileClassMap = $this->scan($directory);
 
-        $this->logMessage('Sorting the result by dependencies...');
-        $files = $this->getFilesSortedByDependenciesFromScanResult($fileClassMap);
-
-        foreach ($files as $filename) {
+        foreach ($fileClassMap as $filename => $fqsens) {
             $this->logMessage('  - ' . $filename);
-
-            $fqsens = $fileClassMap[$filename];
 
             foreach ($fqsens as $fqsen => $dependencyFqsens) {
                 $this->logMessage('    - ' . $fqsen);
@@ -281,62 +276,6 @@ class Indexer
         }
 
         return $fileClassMap;
-    }
-
-    /**
-     * Sorts the specified result set from the {@see scan} method to ensure that files containing structural elements
-     * that depend on other structural elements end up after their dependencies in the list.
-     *
-     * @param array $scanResult
-     *
-     * @return array A list of files, sorted in such a way that dependencies are listed before their dependents.
-     */
-    protected function getFilesSortedByDependenciesFromScanResult(array $scanResult)
-    {
-        $result = [];
-
-        // Build a list of all FQSEN's that we received.
-        $fullFqsenList = [];
-
-        foreach ($scanResult as $filename => $fqsens) {
-            foreach ($fqsens as $fqsen => $dependencyFqsens) {
-                $fullFqsenList[$fqsen] = true;
-            }
-        }
-
-        // See also https://github.com/marcj/topsort.php .
-        $topologicalSorter = new \MJS\TopSort\Implementations\GroupedStringSort();
-
-        foreach ($scanResult as $filename => $fqsens) {
-            if (empty($fqsens)) {
-                $result[] = $filename; // This file doesn't need sorting, index it first.
-                continue;
-            }
-
-            foreach ($fqsens as $fqsen => $dependencyFqsens) {
-                $dependencyList = [];
-
-                foreach ($dependencyFqsens as $dependencyFqsen) {
-                    // The topological sorter requires that, before sorting, all dependencies actually exist. For full
-                    // indexes, this will (should) be the case, but when doing an incremental index, we may only have a
-                    // couple of files that need to be indexed and things such as base classes might not need to be
-                    // reindexed.
-                    if (isset($fullFqsenList[$dependencyFqsen])) {
-                        $dependencyList[] = $dependencyFqsen;
-                    }
-                }
-
-                $topologicalSorter->add($fqsen, $filename, $dependencyList);
-            }
-        }
-
-        $sortedDependencies = $topologicalSorter->sort();
-
-        foreach ($topologicalSorter->getGroups() as $group) {
-            $result[] = $group->type;
-        }
-
-        return $result;
     }
 
     /**
