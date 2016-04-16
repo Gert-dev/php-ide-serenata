@@ -178,9 +178,24 @@ class DocParser
             foreach ($tags[static::PARAM_TYPE] as $tag) {
                 list($type, $variableName, $description) = $this->filterParameterTag($tag, 3);
 
+                $isVariadic = false;
+                $isReference = false;
+
+                if (mb_strpos($variableName, '...') === 0) {
+                    $isVariadic = true;
+                    $variableName = mb_substr($variableName, mb_strlen('...'));
+                }
+
+                if (mb_strpos($variableName, '&amp;') === 0) {
+                    $isReference = true;
+                    $variableName = mb_substr($variableName, mb_strlen('&amp;'));
+                }
+
                 $params[$variableName] = [
                     'type'        => $type,
-                    'description' => $description
+                    'description' => $description,
+                    'isVariadic'  => $isVariadic,
+                    'isReference' => $isReference
                 ];
             }
         }

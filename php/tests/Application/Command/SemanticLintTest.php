@@ -208,6 +208,24 @@ class SemanticLintTest extends IndexedTest
         ], $output['warnings']['docblockIssues']['parameterMissing']);
     }
 
+    public function testCorrectlyDoesNotComplainAboutMissingParameterWhenItIsAReference()
+    {
+        $output = $this->lintFile('DocblockCorrectnessParamWithReference.php');
+
+        $this->assertEquals([
+
+        ], $output['warnings']['docblockIssues']['parameterMissing']);
+    }
+
+    public function testCorrectlyDoesNotComplainAboutMissingParameterWhenItIsVariadic()
+    {
+        $output = $this->lintFile('DocblockCorrectnessVariadicParam.php');
+
+        $this->assertEquals([
+
+        ], $output['warnings']['docblockIssues']['parameterMissing']);
+    }
+
     public function testCorrectlyIdentifiesDocblockParameterTypeMismatch()
     {
         $output = $this->lintFile('DocblockCorrectnessParameterTypeMismatch.php');
