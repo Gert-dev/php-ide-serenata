@@ -281,6 +281,8 @@ class Indexer
     /**
      * Retrieves a list of FQSENs in the specified file along with their dependencies.
      *
+     * @param string $filename
+     *
      * @throws Error When the file could not be parsed.
      *
      * @return array
