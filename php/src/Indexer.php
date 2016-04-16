@@ -150,6 +150,8 @@ class Indexer
             }
         }
 
+        $files = array_keys($fileClassMap);
+
         $this->logMessage('Indexing outline...');
 
         $totalItems = count($files);
