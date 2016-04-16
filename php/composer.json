@@ -10,7 +10,6 @@
         "php": ">=5.4.0",
         "nikic/php-parser": "~2.0.0",
         "doctrine/dbal": "~2.5",
-        "marcj/topsort": "~1.0",
         "corneltek/getoptionkit": "~2.2.0"
     }
 }

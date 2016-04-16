@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c1111d109da1c947d1e0d96d47354e39",
-    "content-hash": "63225dcef2fc88952a861f7e4adf22da",
+    "hash": "ad243ff9bbb5e41e27b8cb718e831d99",
+    "content-hash": "771d1e9d27bcb22a97669cf30f8dec64",
     "packages": [
         {
             "name": "corneltek/getoptionkit",
@@ -517,53 +517,6 @@
                 "parser"
             ],
             "time": "2014-09-09 13:34:57"
-        },
-        {
-            "name": "marcj/topsort",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/marcj/topsort.php.git",
-                "reference": "c989b5707def46271f6bf4d33d71c81da78ae279"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/marcj/topsort.php/zipball/c989b5707def46271f6bf4d33d71c81da78ae279",
-                "reference": "c989b5707def46271f6bf4d33d71c81da78ae279",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "codeclimate/php-test-reporter": "dev-master",
-                "phpunit/phpunit": "~4.0",
-                "symfony/console": "~2.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "MJS\\TopSort\\": "src/",
-                    "MJS\\TopSort\\Tests\\": "tests/Tests/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marc J. Schmidt",
-                    "email": "marc@marcjschmidt.de"
-                }
-            ],
-            "description": "High-Performance TopSort/Dependency resolving algorithm",
-            "keywords": [
-                "dependency resolving",
-                "topological sort",
-                "topsort"
-            ],
-            "time": "2015-06-17 11:08:53"
         },
         {
             "name": "nikic/php-parser",
