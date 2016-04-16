@@ -312,17 +312,18 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                     'start'     => $function['startPos'],
                     'end'       => $function['startPos'] + 1
                 ];
-            } elseif (
-                $parameter['type'] &&
-                $parameter['type'] !== $docblockParameters[$dollarName]['type']
-            ) {
-                $docblockIssues['parameterTypeMismatch'][] = [
-                    'name'      => $function['name'],
-                    'parameter' => $dollarName,
-                    'line'      => $function['startLine'],
-                    'start'     => $function['startPos'],
-                    'end'       => $function['startPos'] + 1
-                ];
+            } elseif ($parameter['type']) {
+                $docblockParameterTypes = explode(DocParser::TYPE_SPLITTER, $docblockParameters[$dollarName]['type']);
+
+                if (!in_array($parameter['type'], $docblockParameterTypes)) {
+                    $docblockIssues['parameterTypeMismatch'][] = [
+                        'name'      => $function['name'],
+                        'parameter' => $dollarName,
+                        'line'      => $function['startLine'],
+                        'start'     => $function['startPos'],
+                        'end'       => $function['startPos'] + 1
+                    ];
+                }
             }
         }
 
