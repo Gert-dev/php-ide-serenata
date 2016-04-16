@@ -230,170 +230,25 @@ class IndexDatabase implements
     /**
      * @inheritDoc
      */
-    public function deleteFile($fileId)
+    public function deleteFile($path)
     {
         $this->getConnection()->createQueryBuilder()
             ->delete(IndexStorageItemEnum::FILES)
-            ->where('id = ?')
-            ->setParameter(0, $fileId)
+            ->where('path = ?')
+            ->setParameter(0, $path)
             ->execute();
     }
 
     /**
      * @inheritDoc
      */
-    public function deletePropertiesByFileId($fileId)
+    public function deleteStructure($fqsen)
     {
         $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::PROPERTIES)
-            ->where('file_id = ?')
-            ->setParameter(0, $fileId)
+            ->delete(IndexStorageItemEnum::STRUCTURES)
+            ->where('fqsen = ?')
+            ->setParameter(0, $fqsen)
             ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteConstantsByFileId($fileId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::CONSTANTS)
-            ->where('file_id = ?')
-            ->setParameter(0, $fileId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteFunctionsByFileId($fileId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::FUNCTIONS)
-            ->where('file_id = ?')
-            ->setParameter(0, $fileId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteNamespacesByFileId($fileId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::FILES_NAMESPACES)
-            ->where('file_id = ?')
-            ->setParameter(0, $fileId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deletePropertiesFor($seId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::PROPERTIES)
-            ->where('structure_id = ?')
-            ->setParameter(0, $seId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteMethodsFor($seId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::FUNCTIONS)
-            ->where('structure_id = ?')
-            ->setParameter(0, $seId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteConstantsFor($seId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::CONSTANTS)
-            ->where('structure_id = ?')
-            ->setParameter(0, $seId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteParentLinksFor($seId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED)
-            ->where('structure_id = ?')
-            ->setParameter(0, $seId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteInterfaceLinksFor($seId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED)
-            ->where('structure_id = ?')
-            ->setParameter(0, $seId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteTraitLinksFor($seId)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED)
-            ->where('structure_id = ?')
-            ->setParameter(0, $seId)
-            ->execute();
-
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::STRUCTURES_TRAITS_ALIASES)
-            ->where('structure_id = ?')
-            ->setParameter(0, $seId)
-            ->execute();
-
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES)
-            ->where('structure_id = ?')
-            ->setParameter(0, $seId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteExcludedStructuresByFileId($fileId, array $excludedIds)
-    {
-        if (empty($excludedIds)) {
-            $this->getConnection()->createQueryBuilder()
-                ->delete(IndexStorageItemEnum::STRUCTURES)
-                ->where('file_id = ?')
-                ->setParameter(0, $fileId)
-                ->execute();
-        } else {
-            $queryBuilder = $this->getConnection()->createQueryBuilder();
-
-            $queryBuilder
-                ->delete(IndexStorageItemEnum::STRUCTURES)
-                ->where(
-                    'file_id = ' . $queryBuilder->createNamedParameter($fileId) .
-                    ' AND ' .
-                    'id NOT IN (' . $queryBuilder->createNamedParameter($excludedIds, Connection::PARAM_INT_ARRAY) . ')'
-                )
-                ->execute();
-        }
     }
 
     /**
@@ -409,12 +264,13 @@ class IndexDatabase implements
             ->select(
                 'se.*',
                 'fi.path',
-                '(setype.name) AS type_name',
-                'sepl.linked_structure_id'
+                '(setype.name) AS type_name'//,
+                // 'sepl.linked_structure_id'
             )
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURE_TYPES, 'setype', 'setype.id = se.structure_type_id')
-            ->leftJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.structure_id = se.id')
+            // ->leftJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.structure_id = se.id')
+            // ->leftJoin('se', IndexStorageItemEnum::STRUCTURES, 'se_parent', 'se_parent.fqsen = sepl.linked_structure_fqsen')
             ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id');
     }
 
@@ -458,7 +314,7 @@ class IndexDatabase implements
         return $this->getConnection()->createQueryBuilder()
             ->select('se.id')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.linked_structure_id = se.id')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.linked_structure_fqsen = se.fqsen')
             ->where('sepl.structure_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -473,7 +329,8 @@ class IndexDatabase implements
             ->select('se.id', 'se.fqsen')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.structure_id = se.id')
-            ->where('sepl.linked_structure_id = ?')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
+            ->where('sepl.linked_structure_fqsen = se2.fqsen')
             ->setParameter(0, $id)
             ->execute();
     }
@@ -486,7 +343,7 @@ class IndexDatabase implements
         return $this->getConnection()->createQueryBuilder()
             ->select('se.id')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.linked_structure_id = se.id')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.linked_structure_fqsen = se.fqsen')
             ->where('seil.structure_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -501,7 +358,8 @@ class IndexDatabase implements
             ->select('se.id', 'se.fqsen')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.structure_id = se.id')
-            ->where('seil.linked_structure_id = ?')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
+            ->where('seil.linked_structure_fqsen = se2.fqsen')
             ->setParameter(0, $id)
             ->execute();
     }
@@ -514,7 +372,7 @@ class IndexDatabase implements
         return $this->getConnection()->createQueryBuilder()
             ->select('se.id')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.linked_structure_id = se.id')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.linked_structure_fqsen = se.fqsen')
             ->where('setl.structure_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -529,7 +387,8 @@ class IndexDatabase implements
             ->select('se.id', 'se.fqsen')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.structure_id = se.id')
-            ->where('setl.linked_structure_id = ?')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
+            ->where('setl.linked_structure_fqsen = se2.fqsen')
             ->setParameter(0, $id)
             ->execute();
     }
@@ -586,7 +445,7 @@ class IndexDatabase implements
             ->select('seta.*', 'se.fqsen AS trait_fqsen', 'am.name AS access_modifier')
             ->from(IndexStorageItemEnum::STRUCTURES_TRAITS_ALIASES, 'seta')
             ->leftJoin('seta', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = seta.access_modifier_id')
-            ->leftJoin('seta', IndexStorageItemEnum::STRUCTURES, 'se', 'se.id = seta.trait_structure_id')
+            ->leftJoin('seta', IndexStorageItemEnum::STRUCTURES, 'se', 'se.fqsen = seta.trait_structure_fqsen')
             ->where('structure_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -608,7 +467,7 @@ class IndexDatabase implements
         $result = $this->getConnection()->createQueryBuilder()
             ->select('setp.*', 'se.fqsen AS trait_fqsen')
             ->from(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, 'setp')
-            ->innerJoin('setp', IndexStorageItemEnum::STRUCTURES, 'se', 'se.id = setp.trait_structure_id')
+            ->innerJoin('setp', IndexStorageItemEnum::STRUCTURES, 'se', 'se.fqsen = setp.trait_structure_fqsen')
             ->where('structure_id = ?')
             ->setParameter(0, $id)
             ->execute();

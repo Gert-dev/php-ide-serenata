@@ -659,12 +659,12 @@ class Indexer
      * the file. For structural elements, this also includes (direct) members, information about the parent class,
      * used traits, etc.
      *
-     * @param string $filename
+     * @param string $fileName
      * @param string $code
      *
      * @throws Error When the file could not be parsed.
      */
-    protected function indexFileOutline($filename, $code)
+    protected function indexFileOutline($fileName, $code)
     {
         $nodes = $this->getParser()->parse($code);
 
@@ -680,25 +680,12 @@ class Indexer
         $traverser->addVisitor($useStatementFetchingVisitor);
         $traverser->traverse($nodes);
 
-        $fileId = $this->storage->getFileId($filename);
+        $this->storage->deleteFile($fileName);
 
-        $time = (new DateTime())->format('Y-m-d H:i:s');
-
-        if ($fileId) {
-            $this->storage->deletePropertiesByFileId($fileId);
-            $this->storage->deleteConstantsByFileId($fileId);
-            $this->storage->deleteFunctionsByFileId($fileId);
-            $this->storage->deleteNamespacesByFileId($fileId);
-
-            $this->storage->update(IndexStorageItemEnum::FILES, $fileId, [
-                'indexed_time' => $time
-            ]);
-        } else {
-            $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
-                'path'         => $filename,
-                'indexed_time' => $time
-            ]);
-        }
+        $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
+            'path'         => $fileName,
+            'indexed_time' => (new DateTime())->format('Y-m-d H:i:s')
+        ]);
 
         $indexedSeIds = [];
 
@@ -737,9 +724,6 @@ class Indexer
                 ]);
             }
         }
-
-        // Remove structural elements that are no longer in this file.
-        $this->storage->deleteExcludedStructuresByFileId($fileId, $indexedSeIds);
     }
 
     /**
@@ -772,89 +756,50 @@ class Indexer
         ], $rawData['name']);
 
         $seData = [
-            'name'                       => $rawData['name'],
-            'fqsen'                      => $fqsen,
-            'file_id'                    => $fileId,
-            'start_line'                 => $rawData['startLine'],
-            'end_line'                   => $rawData['endLine'],
+            'name'              => $rawData['name'],
+            'fqsen'             => $fqsen,
+            'file_id'           => $fileId,
+            'start_line'        => $rawData['startLine'],
+            'end_line'          => $rawData['endLine'],
             'structure_type_id' => $structureTypeMap[$rawData['type']],
-            'is_abstract'                => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
-            'is_deprecated'              => $documentation['deprecated'] ? 1 : 0,
-            'is_builtin'                 => $isBuiltin ? 1 : 0,
-            'has_docblock'               => empty($rawData['docComment']) ? 0 : 1,
-            'short_description'          => $documentation['descriptions']['short'],
-            'long_description'           => $documentation['descriptions']['long']
+            'is_abstract'       => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
+            'is_deprecated'     => $documentation['deprecated'] ? 1 : 0,
+            'is_builtin'        => $isBuiltin ? 1 : 0,
+            'has_docblock'      => empty($rawData['docComment']) ? 0 : 1,
+            'short_description' => $documentation['descriptions']['short'],
+            'long_description'  => $documentation['descriptions']['long']
         ];
 
-        $seId = $this->storage->getStructureId($this->getNormalizedFqcn($fqsen));
+        $this->storage->deleteStructure($this->getNormalizedFqcn($fqsen));
 
-        if ($seId) {
-            $this->storage->deletePropertiesFor($seId);
-            $this->storage->deleteMethodsFor($seId);
-            $this->storage->deleteConstantsFor($seId);
-
-            $this->storage->deleteParentLinksFor($seId);
-            $this->storage->deleteInterfaceLinksFor($seId);
-            $this->storage->deleteTraitLinksFor($seId);
-
-            $this->storage->update(IndexStorageItemEnum::STRUCTURES, $seId, $seData);
-        } else {
-            $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, $seData);
-        }
+        $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, $seData);
 
         $accessModifierMap = $this->getAccessModifierMap();
 
         if (isset($rawData['parents'])) {
             foreach ($rawData['parents'] as $parent) {
-                $parentSeId = $this->storage->getStructureId($this->getNormalizedFqcn($parent));
-
-                if ($parentSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
-                        'structure_id'        => $seId,
-                        'linked_structure_id' => $parentSeId
-                    ]);
-                } else {
-                    $this->logMessage(
-                        '  - WARNING: Could not find a record for parent FQSEN ' .
-                        $parent . ' of FQSEN ' . $fqsen
-                    );
-                }
+                $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
+                    'structure_id'           => $seId,
+                    'linked_structure_fqsen' => $this->getNormalizedFqcn($parent)
+                ]);
             }
         }
 
         if (isset($rawData['interfaces'])) {
             foreach ($rawData['interfaces'] as $interface) {
-                $interfaceSeId = $this->storage->getStructureId($this->getNormalizedFqcn($interface));
-
-                if ($interfaceSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
-                        'structure_id'        => $seId,
-                        'linked_structure_id' => $interfaceSeId
-                    ]);
-                } else {
-                    $this->logMessage(
-                        '  - WARNING: Could not find a record for the interface ' .
-                        $interface . ' of FQSEN ' . $fqsen
-                    );
-                }
+                $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
+                    'structure_id'           => $seId,
+                    'linked_structure_fqsen' => $this->getNormalizedFqcn($interface)
+                ]);
             }
         }
 
         if (isset($rawData['traits'])) {
             foreach ($rawData['traits'] as $trait) {
-                $traitSeId = $this->storage->getStructureId($this->getNormalizedFqcn($trait));
-
-                if ($traitSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
-                        'structure_id'        => $seId,
-                        'linked_structure_id' => $traitSeId
-                    ]);
-                } else {
-                    $this->logMessage(
-                        '  - WARNING: Could not find a record for the trait ' .
-                        $trait . ' of FQSEN ' . $fqsen
-                    );
-                }
+                $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
+                    'structure_id'           => $seId,
+                    'linked_structure_fqsen' => $this->getNormalizedFqcn($trait)
+                ]);
             }
         }
 
@@ -862,45 +807,23 @@ class Indexer
             foreach ($rawData['traitAliases'] as $traitAlias) {
                 $accessModifier = $this->parseAccessModifier($traitAlias, true);
 
-                $traitSeId = null;
-
-                if ($traitAlias['trait']) {
-                    $traitSeId = $this->storage->getStructureId($this->getNormalizedFqcn($traitAlias['trait']));
-
-                    if (!$traitSeId) {
-                        $this->logMessage(
-                            '  - WARNING: Could not find a record for the trait ' .
-                            $traitAlias['trait'] . ' of FQSEN ' . $fqsen
-                        );
-                    }
-                }
-
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_ALIASES, [
-                    'structure_id'       => $seId,
-                    'trait_structure_id' => $traitSeId,
-                    'access_modifier_id'          => $accessModifier ? $accessModifierMap[$accessModifier] : null,
-                    'name'                        => $traitAlias['name'],
-                    'alias'                       => $traitAlias['alias']
+                    'structure_id'          => $seId,
+                    'trait_structure_fqsen' => $this->getNormalizedFqcn($traitAlias['trait']),
+                    'access_modifier_id'    => $accessModifier ? $accessModifierMap[$accessModifier] : null,
+                    'name'                  => $traitAlias['name'],
+                    'alias'                 => $traitAlias['alias']
                 ]);
             }
         }
 
         if (isset($rawData['traitPrecedences'])) {
             foreach ($rawData['traitPrecedences'] as $traitPrecedence) {
-                $traitSeId = $this->storage->getStructureId($this->getNormalizedFqcn($traitPrecedence['trait']));
-
-                if ($traitSeId) {
-                    $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, [
-                        'structure_id'       => $seId,
-                        'trait_structure_id' => $traitSeId,
-                        'name'                        => $traitPrecedence['name']
-                    ]);
-                } else {
-                    $this->logMessage(
-                        '  - WARNING: Could not find a record for the trait ' .
-                        $traitPrecedence['trait'] . ' of FQSEN ' . $fqsen
-                    );
-                }
+                $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, [
+                    'structure_id'          => $seId,
+                    'trait_structure_fqsen' => $this->getNormalizedFqcn($traitPrecedence['trait']),
+                    'name'                  => $traitPrecedence['name']
+                ]);
             }
         }
 

@@ -48,67 +48,14 @@ interface StorageInterface
     public function getStructureId($fqsen);
 
     /**
-     * @param int $fileId
+     * @param string $path
      */
-    public function deleteFile($fileId);
+    public function deleteFile($path);
 
     /**
-     * @param int $fileId
+     * @param string $fqsen
      */
-    public function deletePropertiesByFileId($fileId);
-
-    /**
-     * @param int $fileId
-     */
-    public function deleteConstantsByFileId($fileId);
-
-    /**
-     * @param int $fileId
-     */
-    public function deleteFunctionsByFileId($fileId);
-
-    /**
-     * @param int $fileId
-     */
-    public function deleteNamespacesByFileId($fileId);
-
-    /**
-     * @param int $seId
-     */
-    public function deletePropertiesFor($seId);
-
-    /**
-     * @param int $seId
-     */
-    public function deleteMethodsFor($seId);
-
-    /**
-     * @param int $seId
-     */
-    public function deleteConstantsFor($seId);
-
-    /**
-     * @param int $seId
-     */
-    public function deleteParentLinksFor($seId);
-
-    /**
-     * @param int $seId
-     */
-    public function deleteInterfaceLinksFor($seId);
-
-    /**
-     * @param int $seId
-     */
-    public function deleteTraitLinksFor($seId);
-
-    /**
-     * Deletes all structural elements with the specified file ID, except those with the listed ID's.
-     *
-     * @param int   $fileId
-     * @param int[] $excludedIds
-     */
-    public function deleteExcludedStructuresByFileId($fileId, array $excludedIds);
+    public function deleteStructure($fqsen);
 
     /**
      * Inserts the specified index item into the storage.

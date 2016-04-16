@@ -98,48 +98,36 @@ CREATE INDEX `structures_fqsen` ON `structures` (`fqsen`);
 
 -- Contains references to parent structural elements for structural elements.
 CREATE TABLE structures_parents_linked(
-    structure_id        integer unsigned NOT NULL,
-    linked_structure_id integer unsigned NOT NULL,
+    structure_id           integer unsigned NOT NULL,
+    linked_structure_fqsen varchar(255) NOT NULL,
 
-    PRIMARY KEY(structure_id, linked_structure_id),
+    PRIMARY KEY(structure_id, linked_structure_fqsen),
 
     FOREIGN KEY(structure_id) REFERENCES structures(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    FOREIGN KEY(linked_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- Contains interfaces implemented by structural elements.
 CREATE TABLE structures_interfaces_linked(
-    structure_id        integer unsigned NOT NULL,
-    linked_structure_id integer unsigned NOT NULL,
+    structure_id           integer unsigned NOT NULL,
+    linked_structure_fqsen varchar(255) NOT NULL,
 
-    PRIMARY KEY(structure_id, linked_structure_id),
+    PRIMARY KEY(structure_id, linked_structure_fqsen),
 
     FOREIGN KEY(structure_id) REFERENCES structures(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    FOREIGN KEY(linked_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- Contains traits used by structural elements.
 CREATE TABLE structures_traits_linked(
-    structure_id        integer unsigned NOT NULL,
-    linked_structure_id integer unsigned NOT NULL,
+    structure_id           integer unsigned NOT NULL,
+    linked_structure_fqsen varchar(255) NOT NULL,
 
-    PRIMARY KEY(structure_id, linked_structure_id),
+    PRIMARY KEY(structure_id, linked_structure_fqsen),
 
     FOREIGN KEY(structure_id) REFERENCES structures(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    FOREIGN KEY(linked_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -149,7 +137,7 @@ CREATE TABLE structures_traits_aliases(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     structure_id               integer unsigned NOT NULL,
-    trait_structure_id         integer unsigned,
+    trait_structure_fqsen      varchar(255),
     access_modifier_id         integer unsigned,
 
     name                       varchar(255) NOT NULL,
@@ -158,10 +146,6 @@ CREATE TABLE structures_traits_aliases(
     FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-
-    FOREIGN KEY(trait_structure_id) REFERENCES structures(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
 
     FOREIGN KEY(access_modifier_id) REFERENCES access_modifiers(id)
         ON DELETE RESTRICT
@@ -173,15 +157,11 @@ CREATE TABLE structures_traits_precedences(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     structure_id               integer unsigned NOT NULL,
-    trait_structure_id         integer unsigned NOT NULL,
+    trait_structure_fqsen      varchar(255) NOT NULL,
 
     name                       varchar(255) NOT NULL,
 
     FOREIGN KEY(structure_id) REFERENCES structures(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    FOREIGN KEY(trait_structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
