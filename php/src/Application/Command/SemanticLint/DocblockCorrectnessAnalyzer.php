@@ -5,6 +5,7 @@ namespace PhpIntegrator\Application\Command\SemanticLint;
 use UnexpectedValueException;
 
 use PhpIntegrator\DocParser;
+use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDatabase;
 
 use PhpIntegrator\Application\Command\ClassInfo;
@@ -37,6 +38,11 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     protected $docParser;
 
     /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
      * @var ClassInfo
      */
     protected $classInfoCommand;
@@ -51,6 +57,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      *
      * @param string        $file
      * @param IndexDatabase $indexDatabase
+     * @param ClassInfo     $classInfoCommand
      */
     public function __construct($file, IndexDatabase $indexDatabase, ClassInfo $classInfoCommand)
     {
@@ -313,9 +320,9 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                     'end'       => $function['startPos'] + 1
                 ];
             } elseif ($parameter['type']) {
-                $docblockParameterTypes = explode(DocParser::TYPE_SPLITTER, $docblockParameters[$dollarName]['type']);
+                $docblockType = $docblockParameters[$dollarName]['type'];
 
-                if (!in_array($parameter['type'], $docblockParameterTypes)) {
+                if (!$this->getTypeAnalyzer()->isTypeConformantWithDocblockType($parameter['type'], $docblockType)) {
                     $docblockIssues['parameterTypeMismatch'][] = [
                         'name'      => $function['name'],
                         'parameter' => $dollarName,
@@ -370,5 +377,17 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         }
 
         return $this->docParser;
+    }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 }

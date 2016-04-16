@@ -233,9 +233,9 @@ class SemanticLintTest extends IndexedTest
         $this->assertEquals([
             [
                 'name'      => 'some_function_parameter_incorrect_type',
-                'line'      => 17,
-                'start'     => 199,
-                'end'       => 200,
+                'line'      => 18,
+                'start'     => 247,
+                'end'       => 248,
                 'parameter' => '$param1'
             ],
         ], $output['warnings']['docblockIssues']['parameterTypeMismatch']);
