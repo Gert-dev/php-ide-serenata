@@ -120,6 +120,7 @@ class Indexer
             $progress = 100;
         }
 
+        // Yes, we abuse the error channel...
         file_put_contents('php://stderr', $progress . PHP_EOL);
     }
 
