@@ -136,21 +136,7 @@ class Indexer
         $this->pruneRemovedFiles();
 
         $this->logMessage('Scanning for files that need (re)indexing...');
-        $fileClassMap = $this->scan($directory);
-
-        foreach ($fileClassMap as $filename => $fqsens) {
-            $this->logMessage('  - ' . $filename);
-
-            foreach ($fqsens as $fqsen => $dependencyFqsens) {
-                $this->logMessage('    - ' . $fqsen);
-
-                foreach ($dependencyFqsens as $dependencyFqsen) {
-                    $this->logMessage('      - ' . $dependencyFqsen);
-                }
-            }
-        }
-
-        $files = array_keys($fileClassMap);
+        $files = $this->scan($directory);
 
         $this->logMessage('Indexing outline...');
 
@@ -229,19 +215,17 @@ class Indexer
     }
 
     /**
-     * Scans the specified directory, returning a mapping of file names to a list of FQSEN's contained in the file, each
-     * of which are then mapped to a list of FQSEN's they depend on. Only files that have actually been updated since
+     * Scans the specified directory, returning a list of file names. Only files that have actually been updated since
      * the previous index will be retrieved by default.
      *
      * @param string $directory
      * @param bool   $isIncremental Whether to only return files modified since their last index (or otherwise: all
      *                              files).
      *
-     * @return array
+     * @return string[]
      */
     protected function scan($directory, $isIncremental = true)
     {
-        $fileClassMap = [];
         $fileModifiedMap = $this->storage->getFileModifiedMap();
 
         $dirIterator = new RecursiveDirectoryIterator(
@@ -255,6 +239,8 @@ class Indexer
             RecursiveIteratorIterator::CATCH_GET_CHILD
         );
 
+        $files = [];
+
         /** @var \DirectoryIterator $fileInfo */
         foreach ($iterator as $filename => $fileInfo) {
             if ($fileInfo->getExtension() !== 'php') {
@@ -265,48 +251,11 @@ class Indexer
              || !isset($fileModifiedMap[$filename])
              || $fileInfo->getMTime() > $fileModifiedMap[$filename]->getTimestamp()
             ) {
-                $dependencies = [];
-
-                try {
-                    $dependencies = $this->getFqsenDependenciesForFile($filename);
-                } catch (Error $e) {
-
-                }
-
-                $fileClassMap[$filename] = $dependencies;
+                $files[] = $filename;
             }
         }
 
-        return $fileClassMap;
-    }
-
-    /**
-     * Retrieves a list of FQSENs in the specified file along with their dependencies.
-     *
-     * @param string $filename
-     *
-     * @throws Error When the file could not be parsed.
-     *
-     * @return array
-     */
-    protected function getFqsenDependenciesForFile($filename)
-    {
-        $nodes = [];
-        $parser = $this->getParser();
-
-        $nodes = $parser->parse(@file_get_contents($filename));
-
-        if ($nodes === null) {
-            throw new Error('Unknown syntax error encountered');
-        }
-
-        $dependencyFetchingVisitor = new Indexer\DependencyFetchingVisitor();
-
-        $traverser = new NodeTraverser(false);
-        $traverser->addVisitor($dependencyFetchingVisitor);
-        $traverser->traverse($nodes);
-
-        return $dependencyFetchingVisitor->getFqsenDependencyMap();
+        return $files;
     }
 
     /**
