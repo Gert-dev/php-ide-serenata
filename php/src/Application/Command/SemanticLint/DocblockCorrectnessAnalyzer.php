@@ -7,6 +7,7 @@ use UnexpectedValueException;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDatabase;
+use PhpIntegrator\DocblockAnalyzer;
 
 use PhpIntegrator\Application\Command\ClassInfo;
 
@@ -41,6 +42,11 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
+
+    /**
+     * @var DocblockAnalyzer
+     */
+    protected $docblockAnalyzer;
 
     /**
      * @var ClassInfo
@@ -299,7 +305,15 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             return $docblockIssues;
         }
 
-        $result = $this->getDocParser()->parse($function['docComment'], [DocParser::PARAM_TYPE], $function['name']);
+        $result = $this->getDocParser()->parse(
+            $function['docComment'],
+            [DocParser::DESCRIPTION, DocParser::PARAM_TYPE],
+            $function['name']
+        );
+
+        if ($this->getDocblockAnalyzer()->isFullInheritDocSyntax($result['descriptions']['short'])) {
+            return $docblockIssues;
+        }
 
         $keysFound = [];
         $docblockParameters = $result['params'];
@@ -389,5 +403,17 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         }
 
         return $this->typeAnalyzer;
+    }
+
+    /**
+     * @return DocblockAnalyzer
+     */
+    protected function getDocblockAnalyzer()
+    {
+        if (!$this->docblockAnalyzer) {
+            $this->docblockAnalyzer = new DocblockAnalyzer();
+        }
+
+        return $this->docblockAnalyzer;
     }
 }

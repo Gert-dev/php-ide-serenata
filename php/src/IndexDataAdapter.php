@@ -19,6 +19,11 @@ class IndexDataAdapter
     protected $storage;
 
     /**
+     * @var DocblockAnalyzer
+     */
+    protected $docblockAnalyzer;
+
+    /**
      * Constructor.
      *
      * @param IndexDataAdapter\ProviderInterface $storage
@@ -696,18 +701,9 @@ class IndexDataAdapter
      */
     protected function isInheritingDocumentation(array $processedData)
     {
-        $specialTags = [
-            // Ticket #86 - Inherit the entire parent docblock if the docblock contains nothing but these tags.
-            // According to draft PSR-5 and phpDocumentor's implementation, these are incorrect. However, some large
-            // frameworks (such as Symfony 2) use these and it thus makes life easier for many  developers.
-            '{@inheritdoc}', '{@inheritDoc}',
-
-            // This tag (without curly braces) is, according to draft PSR-5, a valid way to indicate an entire docblock
-            // should be inherited and to implicitly indicate that documentation was not forgotten.
-            '@inheritDoc'
-        ];
-
-        return !$processedData['hasDocblock'] || in_array($processedData['descriptions']['short'], $specialTags);
+        return
+            !$processedData['hasDocblock'] ||
+            $this->getDocblockAnalyzer()->isFullInheritDocSyntax($processedData['descriptions']['short']);
     }
 
     /**
@@ -780,5 +776,19 @@ class IndexDataAdapter
         }
 
         return $info;
+    }
+
+    /**
+     * Retrieves an instance of DocblockAnalyzer. The object will only be created once if needed.
+     *
+     * @return DocblockAnalyzer
+     */
+    protected function getDocblockAnalyzer()
+    {
+        if (!$this->docblockAnalyzer instanceof DocblockAnalyzer) {
+            $this->docblockAnalyzer = new DocblockAnalyzer();
+        }
+
+        return $this->docblockAnalyzer;
     }
 }
