@@ -286,6 +286,48 @@ class SemanticLintTest extends IndexedTest
         ], $output['warnings']['docblockIssues']['varTagMissing']);
     }
 
+    public function testCorrectlyIdentifiesDeprecatedCategoryTag()
+    {
+        $output = $this->lintFile('DocblockCorrectnessDeprecatedCategoryTag.php');
+
+        $this->assertEquals([
+            [
+                'name'       => 'C',
+                'line'       => 8,
+                'start'      => 47,
+                'end'        => 48
+            ]
+        ], $output['warnings']['docblockIssues']['deprecatedCategoryTag']);
+    }
+
+    public function testCorrectlyIdentifiesDeprecatedSubpackageTag()
+    {
+        $output = $this->lintFile('DocblockCorrectnessDeprecatedSubpackageTag.php');
+
+        $this->assertEquals([
+            [
+                'name'       => 'C',
+                'line'       => 8,
+                'start'      => 49,
+                'end'        => 50
+            ]
+        ], $output['warnings']['docblockIssues']['deprecatedSubpackageTag']);
+    }
+
+    public function testCorrectlyIdentifiesDeprecatedLinkTag()
+    {
+        $output = $this->lintFile('DocblockCorrectnessDeprecatedLinkTag.php');
+
+        $this->assertEquals([
+            [
+                'name'       => 'C',
+                'line'       => 8,
+                'start'      => 63,
+                'end'        => 64
+            ]
+        ], $output['warnings']['docblockIssues']['deprecatedLinkTag']);
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */

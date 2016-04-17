@@ -19,6 +19,10 @@ class DocParser
     const PROPERTY_READ   = '@property-read';
     const PROPERTY_WRITE  = '@property-write';
 
+    const CATEGORY        = '@category';
+    const SUBPACKAGE      = '@subpackage';
+    const LINK            = '@link';
+
     const DESCRIPTION     = 'description';
     const INHERITDOC      = '{@inheritDoc}';
 
@@ -80,7 +84,11 @@ class DocParser
 
             static::PROPERTY       => 'filterProperty',
             static::PROPERTY_READ  => 'filterPropertyRead',
-            static::PROPERTY_WRITE => 'filterPropertyWrite'
+            static::PROPERTY_WRITE => 'filterPropertyWrite',
+
+            static::CATEGORY       => 'filterCategory',
+            static::SUBPACKAGE     => 'filterSubpackage',
+            static::LINK           => 'filterLink'
         ];
 
         foreach ($filters as $filter) {
@@ -483,6 +491,71 @@ class DocParser
     protected function filterPropertyWrite($docblock, $itemName, array $tags)
     {
         return $this->filterPropertyTag(static::PROPERTY_WRITE, 'propertiesWriteOnly', $docblock, $itemName, $tags);
+    }
+
+    /**
+     * @param string $docblock
+     * @param string $itemName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterCategory($docblock, $itemName, array $tags)
+    {
+        $description = null;
+
+        if (isset($tags[static::CATEGORY])) {
+            list($description) = $this->filterParameterTag($tags[static::CATEGORY][0], 1);
+        }
+
+        return [
+            'category' => $description
+        ];
+    }
+
+    /**
+     * @param string $docblock
+     * @param string $itemName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterSubpackage($docblock, $itemName, array $tags)
+    {
+        $name = null;
+
+        if (isset($tags[static::SUBPACKAGE])) {
+            list($name) = $this->filterParameterTag($tags[static::SUBPACKAGE][0], 1);
+        }
+
+        return [
+            'subpackage' => $name
+        ];
+    }
+
+    /**
+     * @param string $docblock
+     * @param string $itemName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterLink($docblock, $itemName, array $tags)
+    {
+        $links = [];
+
+        if (isset($tags[static::LINK])) {
+            list($uri, $description) = $this->filterParameterTag($tags[static::LINK][0], 2);
+
+            $links[] = [
+                'uri'         => $uri,
+                'description' => $description
+            ];
+        }
+
+        return [
+            'link' => $links
+        ];
     }
 
     /**

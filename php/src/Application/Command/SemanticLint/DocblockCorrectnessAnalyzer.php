@@ -90,11 +90,14 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     public function getOutput()
     {
         $docblockIssues = [
-            'varTagMissing'         => [],
-            'missingDocumentation'  => [],
-            'parameterMissing'      => [],
-            'parameterTypeMismatch' => [],
-            'superfluousParameter'  => []
+            'varTagMissing'           => [],
+            'missingDocumentation'    => [],
+            'parameterMissing'        => [],
+            'parameterTypeMismatch'   => [],
+            'superfluousParameter'    => [],
+            'deprecatedCategoryTag'   => [],
+            'deprecatedSubpackageTag' => [],
+            'deprecatedLinkTag'       => []
         ];
 
         $structures = $this->outlineIndexingVisitor->getStructures();
@@ -146,13 +149,49 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      */
     protected function analyzeStructureDocblock(array $structure)
     {
-        if ($structure['docComment']) {
-            return [];
-        }
-
         $docblockIssues = [
-            'missingDocumentation' => []
+            'missingDocumentation'    => [],
+            'deprecatedCategoryTag'   => [],
+            'deprecatedSubpackageTag' => [],
+            'deprecatedLinkTag'       => []
         ];
+
+        if ($structure['docComment']) {
+            $result = $this->getDocParser()->parse($structure['docComment'], [
+                DocParser::CATEGORY,
+                DocParser::SUBPACKAGE,
+                DocParser::LINK
+            ], $structure['name']);
+
+            if ($result['category']) {
+                $docblockIssues['deprecatedCategoryTag'][] = [
+                    'name'  => $structure['name'],
+                    'line'  => $structure['startLine'],
+                    'start' => $structure['startPos'],
+                    'end'   => $structure['startPos'] + 1
+                ];
+            }
+
+            if ($result['subpackage']) {
+                $docblockIssues['deprecatedSubpackageTag'][] = [
+                    'name'  => $structure['name'],
+                    'line'  => $structure['startLine'],
+                    'start' => $structure['startPos'],
+                    'end'   => $structure['startPos'] + 1
+                ];
+            }
+
+            if ($result['link']) {
+                $docblockIssues['deprecatedLinkTag'][] = [
+                    'name'  => $structure['name'],
+                    'line'  => $structure['startLine'],
+                    'start' => $structure['startPos'],
+                    'end'   => $structure['startPos'] + 1
+                ];
+            }
+
+            return $docblockIssues;
+        }
 
         $classInfo = $this->getClassInfo($structure['fqcn']);
 
