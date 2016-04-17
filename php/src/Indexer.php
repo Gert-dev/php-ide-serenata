@@ -3,6 +3,7 @@
 namespace PhpIntegrator;
 
 use DateTime;
+use Exception;
 use ReflectionClass;
 use FilesystemIterator;
 use UnexpectedValueException;
@@ -178,15 +179,21 @@ class Indexer
             throw new Indexer\IndexingFailedException();
         }
 
-        $this->storage->beginTransaction();
-
         try {
-            $this->indexFileOutline($filePath, $code);
+            $nodes = $this->getParser()->parse($code);
 
-            $this->storage->commitTransaction();
+            if ($nodes === null) {
+                throw new Error('Unknown syntax error encountered');
+            }
+
+            $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
+            $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();
+
+            $traverser = new NodeTraverser(false);
+            $traverser->addVisitor($outlineIndexingVisitor);
+            $traverser->addVisitor($useStatementFetchingVisitor);
+            $traverser->traverse($nodes);
         } catch (Error $e) {
-            $this->storage->rollbackTransaction();
-
             throw new Indexer\IndexingFailedException([
                 [
                     'file'        => $filePath,
@@ -198,6 +205,18 @@ class Indexer
                 ]
             ]);
         }
+
+        $this->storage->beginTransaction();
+
+        try {
+            $this->indexVisitorResults($filePath, $outlineIndexingVisitor, $useStatementFetchingVisitor);
+
+            $this->storage->commitTransaction();
+        } catch (Exception $e) {
+            $this->storage->rollbackTransaction();
+
+            throw $e;
+        }
     }
 
     /**
@@ -205,14 +224,24 @@ class Indexer
      */
     public function indexBuiltinItems()
     {
-        $this->logMessage('Indexing built-in constants...');
-        $this->indexBuiltinConstants();
+        $this->storage->beginTransaction();
 
-        $this->logMessage('Indexing built-in functions...');
-        $this->indexBuiltinFunctions();
+        try {
+            $this->logMessage('Indexing built-in constants...');
+            $this->indexBuiltinConstants();
 
-        $this->logMessage('Indexing built-in classes...');
-        $this->indexBuiltinClasses();
+            $this->logMessage('Indexing built-in functions...');
+            $this->indexBuiltinFunctions();
+
+            $this->logMessage('Indexing built-in classes...');
+            $this->indexBuiltinClasses();
+
+            $this->storage->commitTransaction();
+        } catch (Exception $e) {
+            $this->storage->rollbackTransaction();
+
+            throw $e;
+        }
     }
 
     /**
@@ -542,78 +571,64 @@ class Indexer
     }
 
     /**
-     * Indexes the outline of the specified file.
+     * Indexes the results of the visitors (the outline of the specified file).
      *
      * The outline consists of functions, structural elements (classes, interfaces, traits, ...), ... contained within
      * the file. For structural elements, this also includes (direct) members, information about the parent class,
      * used traits, etc.
      *
-     * @param string $fileName
-     * @param string $code
-     *
-     * @throws Error When the file could not be parsed.
+     * @param string                              $fileName
+     * @param Indexer\OutlineIndexingVisitor      $outlineIndexingVisitor
+     * @param Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor
      */
-    protected function indexFileOutline($fileName, $code)
-    {
-        $nodes = $this->getParser()->parse($code);
+    protected function indexVisitorResults(
+        $fileName,
+        Indexer\OutlineIndexingVisitor $outlineIndexingVisitor,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor
+    ) {
+         $this->storage->deleteFile($fileName);
 
-        if ($nodes === null) {
-            throw new Error('Unknown syntax error encountered');
-        }
+         $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
+             'path'         => $fileName,
+             'indexed_time' => (new DateTime())->format('Y-m-d H:i:s')
+         ]);
 
-        $outlineIndexingVisitor = new Indexer\OutlineIndexingVisitor();
-        $useStatementFetchingVisitor = new Indexer\UseStatementFetchingVisitor();
+         foreach ($outlineIndexingVisitor->getStructures() as $fqsen => $structure) {
+             $this->indexStructure(
+                 $structure,
+                 $fileId,
+                 $fqsen,
+                 false,
+                 $useStatementFetchingVisitor
+             );
+         }
 
-        $traverser = new NodeTraverser(false);
-        $traverser->addVisitor($outlineIndexingVisitor);
-        $traverser->addVisitor($useStatementFetchingVisitor);
-        $traverser->traverse($nodes);
+         foreach ($outlineIndexingVisitor->getGlobalFunctions() as $function) {
+             $this->indexFunction($function, $fileId, null, null, false, $useStatementFetchingVisitor);
+         }
 
-        $this->storage->deleteFile($fileName);
+         foreach ($outlineIndexingVisitor->getGlobalConstants() as $constant) {
+             $this->indexConstant($constant, $fileId, null, $useStatementFetchingVisitor);
+         }
 
-        $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
-            'path'         => $fileName,
-            'indexed_time' => (new DateTime())->format('Y-m-d H:i:s')
-        ]);
+         foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
+             $namespaceId = $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES, [
+                 'start_line'  => $namespace['startLine'],
+                 'end_line'    => $namespace['endLine'],
+                 'namespace'   => $namespace['name'],
+                 'file_id'    => $fileId
+             ]);
 
-        $indexedSeIds = [];
-
-        foreach ($outlineIndexingVisitor->getStructures() as $fqsen => $structure) {
-            $indexedSeIds[] = $this->indexStructure(
-                $structure,
-                $fileId,
-                $fqsen,
-                false,
-                $useStatementFetchingVisitor
-            );
-        }
-
-        foreach ($outlineIndexingVisitor->getGlobalFunctions() as $function) {
-            $this->indexFunction($function, $fileId, null, null, false, $useStatementFetchingVisitor);
-        }
-
-        foreach ($outlineIndexingVisitor->getGlobalConstants() as $constant) {
-            $this->indexConstant($constant, $fileId, null, $useStatementFetchingVisitor);
-        }
-
-        foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
-            $namespaceId = $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES, [
-                'start_line'  => $namespace['startLine'],
-                'end_line'    => $namespace['endLine'],
-                'namespace'   => $namespace['name'],
-                'file_id'    => $fileId
-            ]);
-
-            foreach ($namespace['useStatements'] as $useStatement) {
-                $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
-                    'line'               => $useStatement['line'],
-                    'alias'              => $useStatement['alias'] ?: null,
-                    'fqsen'              => $useStatement['fqsen'],
-                    'files_namespace_id' => $namespaceId
-                ]);
-            }
-        }
-    }
+             foreach ($namespace['useStatements'] as $useStatement) {
+                 $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
+                     'line'               => $useStatement['line'],
+                     'alias'              => $useStatement['alias'] ?: null,
+                     'fqsen'              => $useStatement['fqsen'],
+                     'files_namespace_id' => $namespaceId
+                 ]);
+             }
+         }
+     }
 
     /**
      * Indexes the specified structural element.
