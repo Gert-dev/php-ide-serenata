@@ -266,15 +266,11 @@ class Indexer
     {
         $fileModifiedMap = $this->storage->getFileModifiedMap();
 
-        foreach ($this->storage->getFileModifiedMap() as $filename => $indexedTime) {
-            if (!file_exists($filename)) {
-                $this->logMessage('  - ' . $filename);
+        foreach ($this->storage->getFileModifiedMap() as $fileName => $indexedTime) {
+            if (!file_exists($fileName)) {
+                $this->logMessage('  - ' . $fileName);
 
-                $id = $this->storage->getFileId($filename);
-
-                if ($id) {
-                    $this->storage->deleteFile($id);
-                }
+                $this->storage->deleteFile($fileName);
             }
         }
     }
