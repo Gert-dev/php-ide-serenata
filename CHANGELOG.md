@@ -10,6 +10,10 @@
   * When fetching class information, types were sometimes returned without their leading slash.
   * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.
 
+## 0.8.2
+### Bugs fixed
+* Fixed the argument index (used by the call tips package) not being correct for function calls containing SQL strings.
+
 ## 0.8.1
 ### Bugs fixed
 * Fixed infinite loop occurring when assigning variables to an expression containing themselves.
