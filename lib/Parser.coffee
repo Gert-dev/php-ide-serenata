@@ -46,7 +46,7 @@ class Parser
                 scopeDescriptorList = editor.scopeDescriptorForBufferPosition([line, i])
                 scopeDescriptor = scopeDescriptorList.getScopeChain()
 
-                if scopeDescriptor.indexOf('.comment') != -1 or (not not didStartedInsideString and scopeDescriptor.indexOf('.string-contents') != -1)
+                if scopeDescriptor.indexOf('.comment') != -1 or (didStartedInsideString and scopeDescriptor.indexOf('.string-contents') != -1)
                     # Do nothing, we just keep parsing. (Comments can occur inside call stacks.)
 
                 else if lineText[i] == '('
