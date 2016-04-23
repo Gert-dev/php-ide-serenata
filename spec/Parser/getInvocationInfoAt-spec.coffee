@@ -210,6 +210,27 @@ describe "getInvocationInfoAt", ->
         expect(result.type).toEqual('function')
         expect(result.argumentIndex).toEqual(1)
 
+    it "correctly deals with SQL string arguments.", ->
+        source =
+            """
+            <?php
+
+            foo("SELECT a.one, a.two, a.three FROM test", second
+            """
+
+        editor.setText(source)
+
+        row = editor.getLineCount() - 1
+        column = editor.getBuffer().lineLengthForRow(row)
+
+        bufferPosition =
+            row    : row
+            column : column
+
+        result = parser.getInvocationInfoAt(editor, bufferPosition)
+
+        expect(result.argumentIndex).toEqual(1)
+
     it "correctly deals with constructor calls (the new keyword).", ->
         source =
             """

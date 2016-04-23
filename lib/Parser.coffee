@@ -315,7 +315,9 @@ class Parser
                 if lineText[i] in interestingCharacters
                     chain = editor.scopeDescriptorForBufferPosition([line, i]).getScopeChain()
 
-                    if chain.indexOf('.comment') != -1 or chain.indexOf('.string-contents') != -1
+                    if chain.indexOf('.comment') != -1 or
+                       chain.indexOf('.string-contents') != -1 or
+                       chain.indexOf('.source.sql.embedded') != -1
                         continue
 
                     else if lineText[i] == '}'
