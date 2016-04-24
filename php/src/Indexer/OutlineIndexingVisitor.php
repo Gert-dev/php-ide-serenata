@@ -203,7 +203,7 @@ class OutlineIndexingVisitor extends NameResolver
     protected function parseClassPropertyNode(Node\Stmt\Property $node)
     {
         foreach ($node->props as $property) {
-            $this->structures[$this->currentStructure->namespacedName->toString()]['properties'][] = [
+            $this->structures[$this->currentStructure->namespacedName->toString()]['properties'][$property->name] = [
                 'name'        => $property->name,
                 'startLine'   => $node->getLine(),
                 'endLine'     => $node->getAttribute('endLine'),
@@ -274,7 +274,7 @@ class OutlineIndexingVisitor extends NameResolver
             $resolvedType = (string) $nodeType;
         }
 
-        $this->globalFunctions[] = [
+        $this->globalFunctions[$node->name] = [
             'name'           => $node->name,
             'startLine'      => $node->getLine(),
             'endLine'        => $node->getAttribute('endLine'),
@@ -343,7 +343,7 @@ class OutlineIndexingVisitor extends NameResolver
             $resolvedType = (string) $nodeType;
         }
 
-        $this->structures[$this->currentStructure->namespacedName->toString()]['methods'][] = [
+        $this->structures[$this->currentStructure->namespacedName->toString()]['methods'][$node->name] = [
             'name'           => $node->name,
             'startLine'      => $node->getLine(),
             'endLine'        => $node->getAttribute('endLine'),
@@ -367,7 +367,7 @@ class OutlineIndexingVisitor extends NameResolver
     protected function parseClassConstantNode(Node\Stmt\ClassConst $node)
     {
         foreach ($node->consts as $const) {
-            $this->structures[$this->currentStructure->namespacedName->toString()]['constants'][] = [
+            $this->structures[$this->currentStructure->namespacedName->toString()]['constants'][$const->name] = [
                 'name'       => $const->name,
                 'startLine'  => $node->getLine(),
                 'endLine'    => $node->getAttribute('endLine'),
@@ -384,7 +384,7 @@ class OutlineIndexingVisitor extends NameResolver
     protected function parseConstantNode(Node\Stmt\Const_ $node)
     {
         foreach ($node->consts as $const) {
-            $this->globalConstants[] = [
+            $this->globalConstants[$const->name] = [
                 'name'       => $const->name,
                 'startLine'  => $node->getLine(),
                 'endLine'    => $node->getAttribute('endLine'),
