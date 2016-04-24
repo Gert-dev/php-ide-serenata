@@ -223,74 +223,27 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseFunctionNode(Node\Stmt\Function_ $node)
     {
-        $parameters = [];
-
-        foreach ($node->params as $param) {
-            $localType = null;
-
-            if ($param->type instanceof Node\Name) {
-                $localType = $this->fetchClassName($param->type);
-            } else {
-                $localType = (string) $param->type;
-            }
-
-            parent::enterNode($param);
-
-            $resolvedType = null;
-
-            if ($param->type instanceof Node\Name) {
-                $resolvedType = $this->fetchClassName($param->type);
-            } else {
-                $resolvedType = (string) $param->type;
-            }
-
-            $parameters[] = [
-                'name'        => $param->name,
-                'type'        => $localType,
-                'fullType'    => $resolvedType,
-                'isReference' => $param->byRef,
-                'isVariadic'  => $param->variadic,
-                'isOptional'  => $param->default ? true : false
-            ];
-        }
-
-        $localType = null;
-        $nodeType = $node->getReturnType();
-
-        if ($nodeType instanceof Node\Name) {
-            $localType = $this->fetchClassName($nodeType);
-        } else {
-            $localType = (string) $nodeType;
-        }
-
-        parent::enterNode($node);
-
-        $resolvedType = null;
-        $nodeType = $node->getReturnType();
-
-        if ($nodeType instanceof Node\Name) {
-            $resolvedType = $this->fetchClassName($nodeType);
-        } else {
-            $resolvedType = (string) $nodeType;
-        }
-
-        $this->globalFunctions[$node->name] = [
-            'name'           => $node->name,
-            'startLine'      => $node->getLine(),
-            'endLine'        => $node->getAttribute('endLine'),
-            'startPos'       => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
-            'endPos'         => $node->getAttribute('endFilePos') ? $node->getAttribute('endFilePos') : null,
-            'returnType'     => $localType,
-            'fullReturnType' => $resolvedType,
-            'parameters'     => $parameters,
-            'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null
-        ];
+        $this->globalFunctions[$node->name] = $this->extractFunctionLikeNodeData($node);
     }
 
     /**
      * @param Node\Stmt\ClassMethod $node
      */
     protected function parseClassMethodNode(Node\Stmt\ClassMethod $node)
+    {
+        $this->structures[$this->currentStructure->namespacedName->toString()]['methods'][$node->name] = $this->extractFunctionLikeNodeData($node) + [
+            'isPublic'       => $node->isPublic(),
+            'isPrivate'      => $node->isPrivate(),
+            'isProtected'    => $node->isProtected(),
+            'isAbstract'     => $node->isAbstract(),
+            'isStatic'       => $node->isStatic()
+        ];
+    }
+
+    /**
+     * @param Node\FunctionLike $node
+     */
+    protected function extractFunctionLikeNodeData(Node\FunctionLike $node)
     {
         $parameters = [];
 
@@ -343,17 +296,12 @@ class OutlineIndexingVisitor extends NameResolver
             $resolvedType = (string) $nodeType;
         }
 
-        $this->structures[$this->currentStructure->namespacedName->toString()]['methods'][$node->name] = [
+        return [
             'name'           => $node->name,
             'startLine'      => $node->getLine(),
             'endLine'        => $node->getAttribute('endLine'),
             'startPos'       => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
             'endPos'         => $node->getAttribute('endFilePos') ? $node->getAttribute('endFilePos') : null,
-            'isPublic'       => $node->isPublic(),
-            'isPrivate'      => $node->isPrivate(),
-            'isProtected'    => $node->isProtected(),
-            'isAbstract'     => $node->isAbstract(),
-            'isStatic'       => $node->isStatic(),
             'returnType'     => $localType,
             'fullReturnType' => $resolvedType,
             'parameters'     => $parameters,
