@@ -32,6 +32,27 @@ chdir(__DIR__);
 
 require '../vendor/autoload.php';
 
+// Check the SQLite version.
+try {
+    $sqliteTestConnection = Doctrine\DBAL\DriverManager::getConnection([
+        'driver' => 'pdo_sqlite',
+        'path'   => ':memory:'
+    ], new Doctrine\DBAL\Configuration());
+
+    $query = "SELECT sqlite_version()";
+
+    $sqliteVersion = $sqliteTestConnection->query($query)->fetch();
+    $sqliteVersion = array_shift($sqliteVersion);
+
+    $requiredSqliteVersion = '3.7.11';
+
+    if (version_compare($sqliteVersion, $requiredSqliteVersion) === -1) {
+        die("At least SQLite {$requiredSqliteVersion} is required. The detected version was {$sqliteVersion}.");
+    }
+} catch (Exception $e) {
+    die('Connecting using SQLite failed, do you have an extension to support it enabled in php.ini?');
+}
+
 $arguments = $argv;
 
 array_shift($arguments);

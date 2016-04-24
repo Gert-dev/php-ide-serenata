@@ -1,5 +1,6 @@
 ## 0.9.0
 ### Features and enhancements
+* An error will now be shown if your SQLite version is out of date.
 * Indexing performance has been improved, especially the scanning phase (before the progress bar actually started filling) has been improved.
 
 ### Changes for developers
