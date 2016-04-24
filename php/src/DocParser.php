@@ -27,7 +27,12 @@ class DocParser
     const INHERITDOC      = '{@inheritDoc}';
 
     const TYPE_SPLITTER   = '|';
-    const TAG_START_REGEX = '/^\s*(?:\/\*)?\*\s+\@.+(?:\*\/)?$/';
+    const TAG_START_REGEX = '/^\s*(?:\/\*)?\*\s+(\@.+)(?:\*\/)?$/';
+
+    /**
+     * @var DocblockAnalyzer|null
+     */
+    protected $docblockAnalyzer;
 
     /**
      * Parse the comment string to get its elements.
@@ -577,7 +582,9 @@ class DocParser
         $isReadingSummary = true;
 
         foreach ($lines as $i => $line) {
-            if (preg_match(self::TAG_START_REGEX, $line) === 1) {
+            $matches = null;
+
+            if (preg_match(self::TAG_START_REGEX, $line, $matches) === 1 && !$this->getDocblockAnalyzer()->isFullInheritDocSyntax(trim($matches[1]))) {
                 break; // Found the start of a tag, the summary and description are finished.
             }
 
@@ -639,5 +646,19 @@ class DocParser
     protected function normalizeNewlines($string)
     {
         return $this->replaceNewlines($string, "\n");
+    }
+
+    /**
+     * Retrieves an instance of DocblockAnalyzer. The object will only be created once if needed.
+     *
+     * @return DocblockAnalyzer
+     */
+    protected function getDocblockAnalyzer()
+    {
+        if (!$this->docblockAnalyzer instanceof DocblockAnalyzer) {
+            $this->docblockAnalyzer = new DocblockAnalyzer();
+        }
+
+        return $this->docblockAnalyzer;
     }
 }

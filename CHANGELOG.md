@@ -5,6 +5,7 @@
 
 ### Bugs fixed
 * If you (incorrectly) declare or define the same member twice in a class, one of them will now no longer be picked up as an override.
+* The `@inheritDoc` syntax without curly braces wasn't always correctly being handled, resulting in docblocks containing only them still being treated as actual docblocks that weren't inherited.
 
 ### Changes for developers
 * Changes to the service
