@@ -5,6 +5,7 @@ namespace PhpIntegrator;
 use ArrayAccess;
 use ArrayObject;
 use Traversable;
+use UnexpectedValueException;
 
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
@@ -22,6 +23,11 @@ class IndexDataAdapter
      * @var DocblockAnalyzer
      */
     protected $docblockAnalyzer;
+
+    /**
+     * @var array
+     */
+    protected $parentLog = [];
 
     /**
      * Constructor.
@@ -42,6 +48,18 @@ class IndexDataAdapter
      */
     public function getStructureInfo($id)
     {
+        $this->parentLog = [];
+
+        return $this->getDirectStructureInfo($id);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getDirectStructureInfo($id)
+    {
         return $this->resolveStructure(
             $this->storage->getStructureRawInfo($id),
             $this->storage->getStructureRawParents($id),
@@ -54,6 +72,22 @@ class IndexDataAdapter
             $this->storage->getStructureRawProperties($id),
             $this->storage->getStructureRawMethods($id)
         );
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
+    protected function getCheckedParentStructureInfo($id, $fqsen, $originFqsen)
+    {
+        if (isset($this->parentLog[$fqsen][$originFqsen])) {
+            throw new IndexDataAdapter\CircularDependencyException("Circular dependency detected from {$originFqsen} to {$fqsen}!");
+        }
+
+        $this->parentLog[$fqsen][$originFqsen] = true;
+
+        return $this->getDirectStructureInfo($id);
     }
 
     /**
@@ -351,7 +385,7 @@ class IndexDataAdapter
     protected function parseParentData(ArrayObject $result, $parents)
     {
         foreach ($parents as $parent) {
-            $parentInfo = $this->getStructureInfo($parent['id']);
+            $parentInfo = $this->getCheckedParentStructureInfo($parent['id'], $parent['fqsen'], $result['name']);
 
             if ($parentInfo) {
                 if (!$result['descriptions']['short']) {

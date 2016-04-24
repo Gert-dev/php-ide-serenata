@@ -991,4 +991,14 @@ class ClassInfoTest extends IndexedTest
             'description'  => null
         ]);
     }
+
+    /**
+     * @expectedException \PhpIntegrator\IndexDataAdapter\CircularDependencyException
+     */
+    public function testThrowsExceptionOnCircularDependency()
+    {
+        $fileName = 'CircularDependency.php';
+
+        $output = $this->getClassInfo($fileName, 'A\C');
+    }
 }

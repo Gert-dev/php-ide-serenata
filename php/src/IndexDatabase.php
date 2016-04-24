@@ -312,7 +312,7 @@ class IndexDatabase implements
     public function getStructureRawParents($id)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('se.id')
+            ->select('se.id', 'se.fqsen')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.linked_structure_fqsen = se.fqsen')
             ->where('sepl.structure_id = ?')

@@ -17,6 +17,7 @@
 
 ## 0.8.2
 ### Bugs fixed
+* Circular dependencies should no longer freeze but show an error notification instead.
 * Fixed the argument index (used by the call tips package) not being correct for function calls containing SQL strings.
 
 ## 0.8.1
