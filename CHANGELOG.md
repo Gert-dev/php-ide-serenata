@@ -3,6 +3,9 @@
 * An error will now be shown if your SQLite version is out of date.
 * Indexing performance has been improved, especially the scanning phase (before the progress bar actually started filling) has been improved.
 
+### Bugs fixed
+* If you (incorrectly) declare or define the same member twice in a class, one of them will now no longer be picked up as an override.
+
 ### Changes for developers
 * Changes to the service
   * Semantic linting can now lint docblock correctness.
