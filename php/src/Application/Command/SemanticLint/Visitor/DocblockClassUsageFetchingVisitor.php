@@ -45,11 +45,14 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
                 '/@(?:param|throws|return|var)\s+((?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?(?:\|(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?)*)(?:$|\s|\})/',
                 $docblock,
                 $matches,
-                PREG_SET_ORDER
+                PREG_SET_ORDER | PREG_OFFSET_CAPTURE
             );
 
             foreach ($matches as $match) {
-                $types = explode(DocParser::TYPE_SPLITTER, $match[1]);
+                $typeString = $match[1][0];
+                $typeStringOffset = $match[1][1];
+
+                $types = explode(DocParser::TYPE_SPLITTER, $typeString);
 
                 foreach ($types as $type) {
                     if (mb_substr($type, -2) === '[]') {
@@ -67,18 +70,17 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
                             $type = mb_substr($type, 1);
                         }
 
-                        // NOTE: We use the same start position as end position as we can't fetch the location of the
-                        // docblock from the parser.
-                        // TODO: A next release of php-parser will allow for this, see also
-                        // https://github.com/nikic/PHP-Parser/issues/263#issuecomment-204693050
                         $this->classUsageList[] = [
                             'name'             => $type,
                             'firstPart'        => $firstPart,
                             'isFullyQualified' => $isFullyQualified,
                             'namespace'        => $this->lastNamespace,
-                            'line'             => $node->getAttribute('startLine')    ? $node->getAttribute('startLine')        : null,
-                            'start'            => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')     : null,
-                            'end'              => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') + 1 : null
+                            'line'             => $docblock->getLine()    ? $docblock->getLine() : null,
+                            'start'            => $docblock->getFilePos() ?
+                                ($docblock->getFilePos() + $typeStringOffset) : null,
+
+                            'end'              => $docblock->getFilePos() ?
+                                ($docblock->getFilePos() + $typeStringOffset + mb_strlen($typeString)) : null
                         ];
                     }
                 }

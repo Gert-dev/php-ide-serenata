@@ -82,15 +82,15 @@ class SemanticLintTest extends IndexedTest
             [
                 'name'      => 'A\B',
                 'namespace' => 'A',
-                'start'     => 120,
-                'end'       => 121
+                'start'     => 36,
+                'end'       => 56
             ],
 
             [
                 'name'      => 'A\C',
                 'namespace' => 'A',
-                'start'     => 120,
-                'end'       => 121
+                'start'     => 36,
+                'end'       => 56
             ]
         ], $output['errors']['unknownClasses']);
     }

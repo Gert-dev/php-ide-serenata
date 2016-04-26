@@ -1,6 +1,7 @@
 ## 0.9.0
 ### Features and enhancements
 * An error will now be shown if your SQLite version is out of date.
+* Unknown classes in docblocks will now actually be underlined instead of the structural element they were part of.
 * Indexing performance has been improved, especially the scanning phase (before the progress bar actually started filling) has been improved.
 
 ### Bugs fixed
