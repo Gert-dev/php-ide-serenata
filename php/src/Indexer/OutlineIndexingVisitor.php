@@ -223,7 +223,11 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseFunctionNode(Node\Stmt\Function_ $node)
     {
-        $this->globalFunctions[$node->name] = $this->extractFunctionLikeNodeData($node);
+        parent::enterNode($node);
+
+        $this->globalFunctions[$node->name] = $this->extractFunctionLikeNodeData($node) + [
+            'fqsen' => $node->namespacedName->toString()
+        ];
     }
 
     /**
@@ -331,9 +335,12 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseConstantNode(Node\Stmt\Const_ $node)
     {
+        parent::enterNode($node);
+
         foreach ($node->consts as $const) {
             $this->globalConstants[$const->name] = [
                 'name'       => $const->name,
+                'fqsen'      => $node->namespacedName->toString(),
                 'startLine'  => $node->getLine(),
                 'endLine'    => $node->getAttribute('endLine'),
                 'startPos'   => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
