@@ -3,6 +3,7 @@
 * An error will now be shown if your SQLite version is out of date.
 * Unknown classes in docblocks will now actually be underlined instead of the structural element they were part of.
 * Indexing performance has been improved, especially the scanning phase (before the progress bar actually started filling) has been improved.
+* Indexing is now more fault-tolerant: in some cases, indexing will still be able to complete even if there are syntax errors in the file.
 
 ### Bugs fixed
 * If you (incorrectly) declare or define the same member twice in a class, one of them will now no longer be picked up as an override.

@@ -1262,7 +1262,9 @@ class Indexer
                 ]
             ]);
 
-            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer, [
+                'throwOnError' => false
+            ]);
         }
 
         return $this->parser;
