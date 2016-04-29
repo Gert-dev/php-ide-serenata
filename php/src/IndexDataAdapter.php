@@ -128,6 +128,7 @@ class IndexDataAdapter
             'isAbstract'         => !!$element['is_abstract'],
             'isBuiltin'          => !!$element['is_builtin'],
             'isDeprecated'       => !!$element['is_deprecated'],
+            'isAnnotation'       => !!$element['is_annotation'],
             'hasDocblock'        => !!$element['has_docblock'],
             'hasDocumentation'   => !!$element['has_docblock'],
 

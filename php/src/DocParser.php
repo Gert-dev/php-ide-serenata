@@ -7,6 +7,11 @@ namespace PhpIntegrator;
  */
 class DocParser
 {
+    /**
+     * PSR-5 and/or phpDocumentor docblock tags.
+     *
+     * @var string
+     */
     const VAR_TYPE        = '@var';
     const PARAM_TYPE      = '@param';
     const THROWS          = '@throws';
@@ -25,6 +30,13 @@ class DocParser
 
     const DESCRIPTION     = 'description';
     const INHERITDOC      = '{@inheritDoc}';
+
+    /**
+     * Non-standard tags.
+     *
+     * @var string
+     */
+    const ANNOTATION      = '@Annotation';
 
     const TYPE_SPLITTER   = '|';
     const TAG_START_REGEX = '/^\s*(?:\/\*)?\*\s+(\@.+)(?:\*\/)?$/';
@@ -57,7 +69,7 @@ class DocParser
         $docblock = is_string($docblock) ? $docblock : null;
 
         if ($docblock) {
-            preg_match_all('/\*\s+(@[a-z-]+)([^@]*)(?:\n|\*\/)/', $docblock, $matches, PREG_SET_ORDER);
+            preg_match_all('/\*\s+(@[a-zA-Z-][a-z-]*)([^@]*)(?:\n|\*\/)/', $docblock, $matches, PREG_SET_ORDER);
 
             foreach ($matches as $match) {
                 if (!isset($tags[$match[1]])) {
@@ -93,7 +105,9 @@ class DocParser
 
             static::CATEGORY       => 'filterCategory',
             static::SUBPACKAGE     => 'filterSubpackage',
-            static::LINK           => 'filterLink'
+            static::LINK           => 'filterLink',
+
+            static::ANNOTATION     => 'filterAnnotation'
         ];
 
         foreach ($filters as $filter) {
@@ -560,6 +574,22 @@ class DocParser
 
         return [
             'link' => $links
+        ];
+    }
+
+    /**
+     * Filters out annotation information.
+     *
+     * @param string $docblock
+     * @param string $itemName
+     * @param array  $tags
+     *
+     * @return array
+     */
+    protected function filterAnnotation($docblock, $itemName, array $tags)
+    {
+        return [
+            'annotation' => isset($tags[static::ANNOTATION])
         ];
     }
 

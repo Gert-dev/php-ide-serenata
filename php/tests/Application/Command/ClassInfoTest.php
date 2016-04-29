@@ -57,6 +57,7 @@ class ClassInfoTest extends IndexedTest
             'isAbstract'         => false,
             'isBuiltin'          => false,
             'isDeprecated'       => false,
+            'isAnnotation'       => false,
             'hasDocblock'        => true,
             'hasDocumentation'   => true,
 
@@ -78,6 +79,15 @@ class ClassInfoTest extends IndexedTest
             'properties'         => [],
             'methods'            => []
         ]);
+    }
+
+    public function testAnnotationClassIsCorrectlyPickedUp()
+    {
+        $fileName = 'AnnotationClass.php';
+
+        $output = $this->getClassInfo($fileName, 'A\AnnotationClass');
+
+        $this->assertTrue($output['isAnnotation']);
     }
 
     public function testDataIsCorrectForClassProperties()

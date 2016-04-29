@@ -652,6 +652,7 @@ class Indexer
 
         $documentation = $this->getDocParser()->parse($rawData['docComment'], [
             DocParser::DEPRECATED,
+            DocParser::ANNOTATION,
             DocParser::DESCRIPTION,
             DocParser::METHOD,
             DocParser::PROPERTY,
@@ -668,6 +669,7 @@ class Indexer
             'structure_type_id' => $structureTypeMap[$rawData['type']],
             'is_abstract'       => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
             'is_deprecated'     => $documentation['deprecated'] ? 1 : 0,
+            'is_annotation'     => $documentation['annotation'] ? 1 : 0,
             'is_builtin'        => $isBuiltin ? 1 : 0,
             'has_docblock'      => empty($rawData['docComment']) ? 0 : 1,
             'short_description' => $documentation['descriptions']['short'],

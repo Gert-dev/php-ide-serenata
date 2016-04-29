@@ -13,6 +13,7 @@
   * Semantic linting can now lint docblock correctness.
   * Support for calling most methods synchronously has been removed.
   * Classes didn't return information about whether they have a docblock or documentation.
+  * Classes will now return information about whether they are usable as annotatino or not (determined by an `@Annotation` tag in their docblock). This is non-standard, but is becoming more and more commonly used in the PHP world (e.g. Symfony and Doctrine).
   * When fetching class information, types were sometimes returned without their leading slash.
   * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.
 
