@@ -86,24 +86,40 @@ class SemanticLint extends BaseCommand
         $analyzeDocblockCorrectness = true,
         $retrieveUnusedUseStatements = true
     ) {
-        $fileId = $this->indexDatabase->getFileId($file);
-
-        if (!$fileId) {
-            throw new UnexpectedValueException('The specified file is not present in the index!');
-        }
-
         // Parse the file to fetch the information we need.
         $nodes = [];
         $parser = $this->getParser();
 
+        $syntaxError = null;
+
         try {
             $nodes = $parser->parse($code);
+
+            if ($nodes === null) {
+                throw new Error('Unknown syntax error encountered');
+            }
         } catch (Error $e) {
-            throw new UnexpectedValueException('Parsing the file failed!');
+            $syntaxError = [
+                'startLine'   => $e->getStartLine() >= 0 ? $e->getStartLine() : null,
+                'endLine'     => $e->getEndLine() >= 0 ? $e->getEndLine() : null,
+                'startColumn' => $e->hasColumnInfo() ? $e->getStartColumn($code) : null,
+                'endColumn'   => $e->hasColumnInfo() ? $e->getEndColumn($code) : null,
+                'message'     => $e->getMessage()
+            ];
         }
 
-        if ($nodes === null) {
-            throw new UnexpectedValueException('Parsing the file failed!');
+        $output = [
+            'errors'   => [
+                'syntaxErrors' => []
+            ],
+
+            'warnings' => []
+        ];
+
+        if ($syntaxError) {
+            $output['errors']['syntaxErrors'][] = $syntaxError;
+
+            return $output;
         }
 
         $traverser = new NodeTraverser(false);
@@ -133,6 +149,12 @@ class SemanticLint extends BaseCommand
         $docblockCorrectnessAnalyzer = null;
 
         if ($analyzeDocblockCorrectness) {
+            $fileId = $this->indexDatabase->getFileId($file);
+
+            if (!$fileId) {
+                throw new UnexpectedValueException('The specified file is not present in the index!');
+            }
+
             // This analyzer needs to traverse the nodes separately as it modifies them.
             $traverser = new NodeTraverser(false);
 
@@ -154,11 +176,6 @@ class SemanticLint extends BaseCommand
                 $docblockCorrectnessAnalyzer = null;
             }
         }
-
-        $output = [
-            'errors'   => [],
-            'warnings' => []
-        ];
 
         if ($unknownClassAnalyzer) {
             $output['errors']['unknownClasses'] = $unknownClassAnalyzer->getOutput();
@@ -208,7 +225,7 @@ class SemanticLint extends BaseCommand
         if (!$this->parser) {
             $lexer = new Lexer([
                 'usedAttributes' => [
-                    'comments', 'startLine', 'startFilePos', 'endFilePos'
+                    'comments', 'startLine', 'endLine', 'startFilePos', 'endFilePos'
                 ]
             ]);
 

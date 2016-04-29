@@ -12,7 +12,7 @@ use PhpIntegrator\Application\Command;
  */
 abstract class IndexedTest extends \PHPUnit_Framework_TestCase
 {
-    protected function getDatabaseForTestFile($testPath)
+    protected function getDatabaseForTestFile($testPath, $mayFail = false)
     {
         $indexDatabase = new IndexDatabase(':memory:', 1);
 
@@ -29,7 +29,10 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
         $reindexOutput = json_decode($reindexOutput, true);
 
         $this->assertNotNull($reindexOutput);
-        $this->assertTrue($reindexOutput['success']);
+
+        if (!$mayFail) {
+            $this->assertTrue($reindexOutput['success']);
+        }
 
         return $indexDatabase;
     }

@@ -7,16 +7,23 @@ use PhpIntegrator\IndexDatabase;
 
 class SemanticLintTest extends IndexedTest
 {
-    protected function lintFile($file)
+    protected function lintFile($file, $indexingMayFail = false)
     {
         $path = __DIR__ . '/SemanticLintTest/' . $file;
 
-        $indexDatabase = $this->getDatabaseForTestFile($path);
+        $indexDatabase = $this->getDatabaseForTestFile($path, $indexingMayFail);
 
         $command = new SemanticLint();
         $command->setIndexDatabase($indexDatabase);
 
         return $command->semanticLint($path, file_get_contents($path));
+    }
+
+    public function testCorrectlyIdentifiesSyntaxErrors()
+    {
+        $output = $this->lintFile('SyntaxError.php', true);
+
+        $this->assertEquals(1, count($output['errors']['syntaxErrors']));
     }
 
     public function testReportsUnknownClassesWithNoNamespace()

@@ -11,8 +11,11 @@
 ### Changes for developers
 * Changes to the service
   * Semantic linting can now lint docblock correctness.
+  * Semantic linting will now also return syntax errors.
   * Support for calling most methods synchronously has been removed.
   * Classes didn't return information about whether they have a docblock or documentation.
+  * Because of semantic linting now supporting syntax errors, the reindex command will no longer return them.
+  * The reindex command did not return false when indexing failed and the promise was, by consequence, not rejected.
   * Classes will now return information about whether they are usable as annotatino or not (determined by an `@Annotation` tag in their docblock). This is non-standard, but is becoming more and more commonly used in the PHP world (e.g. Symfony and Doctrine).
   * When fetching class information, types were sometimes returned without their leading slash.
   * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.

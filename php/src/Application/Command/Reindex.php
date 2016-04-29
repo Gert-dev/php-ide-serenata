@@ -80,9 +80,9 @@ class Reindex extends BaseCommand
         }
 
         if (is_dir($path)) {
-            $errors = $indexer->indexDirectory($path);
+            $indexer->indexDirectory($path);
 
-            return $this->outputJson(true, ['errors' => $errors]);
+            return $this->outputJson(true, []);
         } elseif (is_file($path) || $useStdin) {
             $code = null;
 
@@ -103,19 +103,17 @@ class Reindex extends BaseCommand
                 flock($f, LOCK_EX);
             }
 
-            $errors = [];
-
             try {
                 $indexer->indexFile($path, $code ?: null);
             } catch (Indexer\IndexingFailedException $e) {
-                $errors = $e->getErrors();
+                return $this->outputJson(false, []);
             }
 
             if (!$isInMemoryDatabase) {
                 flock($f, LOCK_UN);
             }
 
-            return $this->outputJson(true, ['errors' => $errors]);
+            return $this->outputJson(true, []);
         }
 
         throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
