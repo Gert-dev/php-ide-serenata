@@ -23,7 +23,7 @@ class SemanticLintTest extends IndexedTest
     {
         $output = $this->lintFile('SyntaxError.php', true);
 
-        $this->assertEquals(1, count($output['errors']['syntaxErrors']));
+        $this->assertEquals(2, count($output['errors']['syntaxErrors']));
     }
 
     public function testReportsUnknownClassesWithNoNamespace()
