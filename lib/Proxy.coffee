@@ -177,7 +177,7 @@ class Proxy
      * Resolves a local type in the specified file, based on use statements and the namespace.
      *
      * @param {string}  file
-     * @param {number}  line   The line the type is located at. The first line is 1, not 0.
+     * @param {number}  line The line the type is located at. The first line is 1, not 0.
      * @param {string}  type
      *
      * @return {Promise}
@@ -196,7 +196,7 @@ class Proxy
      * null is returned.
      *
      * @param {string}  file
-     * @param {number}  line   The line the type is located at. The first line is 1, not 0.
+     * @param {number}  line The line the type is located at. The first line is 1, not 0.
      * @param {string}  type
      *
      * @return {Promise}
