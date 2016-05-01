@@ -43,4 +43,7 @@ As the service allows fetching information about the code base, other packages c
 * An (UML?) class diagram builder that creates a visual representation of the relations between all classes in a code base (i.e. their implemented interfaces, base classes and traits).
 * Most of the existing packages could use new improvements, contributions are most welcome.
 
+## Can I use this for other editors?
+Well, yes and no: the packages themselves are dependent on Atom, of course, but the PHP side is not dependent on Atom at all. In theory it is possible to just extract out the PHP source and build a plugin or extension for another editor around it.
+
 ![GPLv3 Logo](http://gplv3.fsf.org/gplv3-127x51.png)
