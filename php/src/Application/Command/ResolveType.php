@@ -9,7 +9,6 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeResolver;
-use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Application\Command as BaseCommand;
 
