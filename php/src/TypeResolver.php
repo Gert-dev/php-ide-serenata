@@ -122,8 +122,6 @@ class TypeResolver
             if (mb_strpos($typeFqcn, $importFqcn) === 0) {
                 $localizedType = $import['alias'] . mb_substr($typeFqcn, mb_strlen($importFqcn));
 
-                // die(var_dump(__FILE__ . ':' . __LINE__, $localizedType));
-
                 // It is possible that there are multiple use statements the FQCN could be made relative to (e.g.
                 // if a namespace as well as one of its classes is imported), select the closest one in that case.
                 if (!$bestLocalizedType || mb_strlen($localizedType) < mb_strlen($bestLocalizedType)) {
