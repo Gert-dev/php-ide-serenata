@@ -192,6 +192,25 @@ class Proxy
         )
 
     ###*
+     * Localizes a type to the specified file, making it relative to local use statements, if possible. If not possible,
+     * null is returned.
+     *
+     * @param {string}  file
+     * @param {number}  line   The line the type is located at. The first line is 1, not 0.
+     * @param {string}  type
+     *
+     * @return {Promise}
+    ###
+    localizeType: (file, line, type) ->
+        throw new Error('No file passed!') if not file
+        throw new Error('No line passed!') if not line
+        throw new Error('No type passed!') if not type
+
+        return @performRequest(
+            ['--localize-type', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--line=' + line, '--type=' + type]
+        )
+
+    ###*
      * Performs a semantic lint of the specified file.
      *
      * @param {string}      file

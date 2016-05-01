@@ -8,7 +8,7 @@ namespace PhpIntegrator;
 class TypeResolver
 {
     /**
-     * @var string
+     * @var string|null
      */
     protected $namespace;
 
@@ -18,9 +18,14 @@ class TypeResolver
     protected $imports;
 
     /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
      * Constructor.
      *
-     * @param string $namespace The current namespace.
+     * @param string|null $namespace The current namespace.
      * @param array {
      *     @param string|null $fqsen
      *     @param string      $alias
@@ -77,5 +82,68 @@ class TypeResolver
         $fullName .= $type;
 
         return $fullName;
+    }
+
+    /**
+     * "Unresolves" a FQSEN, turning it back into a name relative to local use statements. If no local type could be
+     * determined, null is returned.
+     *
+     * @param string $type
+     *
+     * @example With use statement "use A\B as AliasB", unresolving "A\B\C\D" will yield "AliasB\C\D".
+     *
+     * @return string|null
+     */
+    public function localize($type)
+    {
+        $bestLocalizedType = null;
+
+        if (!$type) {
+            return null;
+        }
+
+        $imports = $this->imports;
+
+        if ($this->namespace) {
+            $namespaceParts = explode('\\', $this->namespace);
+
+            // The namespace is also acts as a "use statement".
+            $imports[] = [
+                'fqsen' => $this->namespace,
+                'alias' => array_pop($namespaceParts)
+            ];
+        }
+
+        $typeFqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($type);
+
+        foreach ($imports as $import) {
+            $importFqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($import['fqsen']);
+
+            if (mb_strpos($typeFqcn, $importFqcn) === 0) {
+                $localizedType = $import['alias'] . mb_substr($typeFqcn, mb_strlen($importFqcn));
+
+                // die(var_dump(__FILE__ . ':' . __LINE__, $localizedType));
+
+                // It is possible that there are multiple use statements the FQCN could be made relative to (e.g.
+                // if a namespace as well as one of its classes is imported), select the closest one in that case.
+                if (!$bestLocalizedType || mb_strlen($localizedType) < mb_strlen($bestLocalizedType)) {
+                    $bestLocalizedType = $localizedType;
+                }
+            }
+        }
+
+        return $bestLocalizedType;
+    }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 }

@@ -86,6 +86,12 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    localizeType: (file, line, type) ->
+        return @wrapCachedRequestToParent("localizeType-#{file}-#{line}-#{type}", 'localizeType', arguments)
+
+    ###*
+     * @inherited
+    ###
     semanticLint: (file, source, options) ->
         # md5 may sound expensive, but it's not as expensive as spawning an extra process that parses PHP code.
         sourceKey = if source? then md5(source) else null

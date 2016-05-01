@@ -46,6 +46,22 @@ class TypeAnalyzer
     }
 
     /**
+     * Normalizes an FQCN, removing its leading slash, if any.
+     *
+     * @param string $fqcn
+     *
+     * @return string
+     */
+    public function getNormalizedFqcn($fqcn)
+    {
+        if ($fqcn && $fqcn[0] === '\\') {
+            return mb_substr($fqcn, 1);
+        }
+
+        return $fqcn;
+    }
+
+    /**
      * Returns a boolean indicating if the specified type (i.e. from a type hint) is valid according to the passed
      * docblock type identifier.
      *

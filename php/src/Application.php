@@ -29,6 +29,7 @@ class Application
             '--constants'           => 'GlobalConstants',
             '--reindex'             => 'Reindex',
             '--resolve-type'        => 'ResolveType',
+            '--localize-type'        => 'LocalizeType',
             '--semantic-lint'       => 'SemanticLint',
             '--available-variables' => 'AvailableVariables',
             '--variable-type'       => 'VariableType',
