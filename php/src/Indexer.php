@@ -659,7 +659,7 @@ class Indexer
             'long_description'  => $documentation['descriptions']['long']
         ];
 
-        $this->storage->deleteStructure($this->getNormalizedFqcn($fqsen));
+        $this->storage->deleteStructure($this->getTypeAnalyzer()->getNormalizedFqcn($fqsen));
 
         $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, $seData);
 
@@ -669,7 +669,7 @@ class Indexer
             foreach ($rawData['parents'] as $parent) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
                     'structure_id'           => $seId,
-                    'linked_structure_fqsen' => $this->getNormalizedFqcn($parent)
+                    'linked_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($parent)
                 ]);
             }
         }
@@ -678,7 +678,7 @@ class Indexer
             foreach ($rawData['interfaces'] as $interface) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
                     'structure_id'           => $seId,
-                    'linked_structure_fqsen' => $this->getNormalizedFqcn($interface)
+                    'linked_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($interface)
                 ]);
             }
         }
@@ -687,7 +687,7 @@ class Indexer
             foreach ($rawData['traits'] as $trait) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
                     'structure_id'           => $seId,
-                    'linked_structure_fqsen' => $this->getNormalizedFqcn($trait)
+                    'linked_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($trait)
                 ]);
             }
         }
@@ -698,7 +698,7 @@ class Indexer
 
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_ALIASES, [
                     'structure_id'          => $seId,
-                    'trait_structure_fqsen' => $this->getNormalizedFqcn($traitAlias['trait']),
+                    'trait_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($traitAlias['trait']),
                     'access_modifier_id'    => $accessModifier ? $accessModifierMap[$accessModifier] : null,
                     'name'                  => $traitAlias['name'],
                     'alias'                 => $traitAlias['alias']
@@ -710,7 +710,7 @@ class Indexer
             foreach ($rawData['traitPrecedences'] as $traitPrecedence) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, [
                     'structure_id'          => $seId,
-                    'trait_structure_fqsen' => $this->getNormalizedFqcn($traitPrecedence['trait']),
+                    'trait_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($traitPrecedence['trait']),
                     'name'                  => $traitPrecedence['name']
                 ]);
             }
@@ -1210,20 +1210,6 @@ class Indexer
         }
 
         return null;
-    }
-
-    /**
-     * @param string $fqcn
-     *
-     * @return string
-     */
-    protected function getNormalizedFqcn($fqcn)
-    {
-        if ($fqcn && $fqcn[0] === '\\') {
-            return mb_substr($fqcn, 1);
-        }
-
-        return $fqcn;
     }
 
     /**
