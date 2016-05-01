@@ -226,7 +226,7 @@ class OutlineIndexingVisitor extends NameResolver
         parent::enterNode($node);
 
         $this->globalFunctions[$node->name] = $this->extractFunctionLikeNodeData($node) + [
-            'fqsen' => $node->namespacedName ? $node->namespacedName->toString() : $node->name
+            'fqsen' => isset($node->namespacedName) ? $node->namespacedName->toString() : $node->name
         ];
     }
 
@@ -340,7 +340,7 @@ class OutlineIndexingVisitor extends NameResolver
         foreach ($node->consts as $const) {
             $this->globalConstants[$const->name] = [
                 'name'       => $const->name,
-                'fqsen'      => $node->namespacedName ? $node->namespacedName->toString() : $const->name,
+                'fqsen'      => isset($node->namespacedName) ? $node->namespacedName->toString() : $const->name,
                 'startLine'  => $node->getLine(),
                 'endLine'    => $node->getAttribute('endLine'),
                 'startPos'   => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
