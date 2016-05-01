@@ -16,13 +16,13 @@ class ResolveTypeTest extends IndexedTest
         $command = new ResolveType();
         $command->setIndexDatabase($indexDatabase);
 
-        $this->assertEquals($command->resolveType('C', $path, 1), 'C');
-        $this->assertEquals($command->resolveType('C', $path, 5), 'A\C');
-        $this->assertEquals($command->resolveType('C', $path, 10), 'B\C');
-        $this->assertEquals($command->resolveType('DateTime', $path, 10), 'B\DateTime');
-        $this->assertEquals($command->resolveType('DateTime', $path, 11), 'DateTime');
-        $this->assertEquals($command->resolveType('DateTime', $path, 12), 'DateTime');
-        $this->assertEquals($command->resolveType('D\Test', $path, 13), 'C\D\Test');
+        $this->assertEquals('C', $command->resolveType('C', $path, 1));
+        $this->assertEquals('A\C', $command->resolveType('C', $path, 5));
+        $this->assertEquals('B\C', $command->resolveType('C', $path, 10));
+        $this->assertEquals('B\DateTime', $command->resolveType('DateTime', $path, 10));
+        $this->assertEquals('DateTime', $command->resolveType('DateTime', $path, 11));
+        $this->assertEquals('DateTime', $command->resolveType('DateTime', $path, 12));
+        $this->assertEquals('C\D\Test', $command->resolveType('D\Test', $path, 13));
     }
 
     /**
