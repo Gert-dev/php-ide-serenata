@@ -251,7 +251,7 @@ class OutlineIndexingVisitor extends NameResolver
     {
         $parameters = [];
 
-        foreach ($node->params as $param) {
+        foreach ($node->getParams() as $param) {
             $localType = null;
 
             if ($param->type instanceof Node\Name) {
