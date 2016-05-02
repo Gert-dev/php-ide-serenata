@@ -261,7 +261,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                     'name'  => $property['name'],
                     'line'  => $property['startLine'],
                     'start' => $property['startPos'],
-                    'end'   => $property['startPos'] + 1
+                    'end'   => $property['endPos'] + 1
                 ];
             }
         } else {
@@ -275,7 +275,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                     'name'  => $property['name'],
                     'line'  => $property['startLine'],
                     'start' => $property['startPos'],
-                    'end'   => $property['startPos'] + 1
+                    'end'   => $property['endPos'] + 1
                 ];
             }
         }
@@ -304,7 +304,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                     'name'  => $constant['name'],
                     'line'  => $constant['startLine'],
                     'start' => $constant['startPos'],
-                    'end'   => $constant['startPos'] + 1
+                    'end'   => $constant['endPos'] + 1
                 ];
             }
         } else {
@@ -312,7 +312,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                 'name'  => $constant['name'],
                 'line'  => $constant['startLine'],
                 'start' => $constant['startPos'],
-                'end'   => $constant['startPos'] + 1
+                'end'   => $constant['endPos'] + 1
             ];
         }
 

@@ -174,14 +174,14 @@ class SemanticLintTest extends IndexedTest
                 'name'  => 'someProperty',
                 'line'  => 33,
                 'start' => 331,
-                'end'   => 332
+                'end'   => 344
             ],
 
             [
                 'name'  => 'SOME_CONST',
                 'line'  => 31,
                 'start' => 300,
-                'end'   => 301
+                'end'   => 314
             ],
 
             [
@@ -281,14 +281,14 @@ class SemanticLintTest extends IndexedTest
                 'name'       => 'property',
                 'line'       => 15,
                 'start'      => 116,
-                'end'        => 117
+                'end'        => 125
             ],
 
             [
                 'name'       => 'CONSTANT',
                 'line'       => 10,
                 'start'      => 64,
-                'end'        => 65
+                'end'        => 76
             ]
         ], $output['warnings']['docblockIssues']['varTagMissing']);
     }
