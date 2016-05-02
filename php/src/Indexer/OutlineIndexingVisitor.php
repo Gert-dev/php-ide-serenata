@@ -205,10 +205,10 @@ class OutlineIndexingVisitor extends NameResolver
         foreach ($node->props as $property) {
             $this->structures[$this->currentStructure->namespacedName->toString()]['properties'][$property->name] = [
                 'name'        => $property->name,
-                'startLine'   => $node->getLine(),
-                'endLine'     => $node->getAttribute('endLine'),
-                'startPos'    => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
-                'endPos'      => $node->getAttribute('endFilePos') ? $node->getAttribute('endFilePos') : null,
+                'startLine'   => $property->getLine(),
+                'endLine'     => $property->getAttribute('endLine'),
+                'startPos'    => $property->getAttribute('startFilePos') ? $property->getAttribute('startFilePos') : null,
+                'endPos'      => $property->getAttribute('endFilePos') ? $property->getAttribute('endFilePos') : null,
                 'isPublic'    => $node->isPublic(),
                 'isPrivate'   => $node->isPrivate(),
                 'isStatic'    => $node->isStatic(),
@@ -321,10 +321,10 @@ class OutlineIndexingVisitor extends NameResolver
         foreach ($node->consts as $const) {
             $this->structures[$this->currentStructure->namespacedName->toString()]['constants'][$const->name] = [
                 'name'       => $const->name,
-                'startLine'  => $node->getLine(),
-                'endLine'    => $node->getAttribute('endLine'),
-                'startPos'   => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
-                'endPos'     => $node->getAttribute('endFilePos') ? $node->getAttribute('endFilePos') : null,
+                'startLine'  => $const->getLine(),
+                'endLine'    => $const->getAttribute('endLine'),
+                'startPos'   => $const->getAttribute('startFilePos') ? $const->getAttribute('startFilePos') : null,
+                'endPos'     => $const->getAttribute('endFilePos') ? $const->getAttribute('endFilePos') : null,
                 'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null
             ];
         }
@@ -341,10 +341,10 @@ class OutlineIndexingVisitor extends NameResolver
             $this->globalConstants[$const->name] = [
                 'name'       => $const->name,
                 'fqsen'      => isset($const->namespacedName) ? $const->namespacedName->toString() : $const->name,
-                'startLine'  => $node->getLine(),
-                'endLine'    => $node->getAttribute('endLine'),
-                'startPos'   => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
-                'endPos'     => $node->getAttribute('endFilePos') ? $node->getAttribute('endFilePos') : null,
+                'startLine'  => $const->getLine(),
+                'endLine'    => $const->getAttribute('endLine'),
+                'startPos'   => $const->getAttribute('startFilePos') ? $const->getAttribute('startFilePos') : null,
+                'endPos'     => $const->getAttribute('endFilePos') ? $const->getAttribute('endFilePos') : null,
                 'docComment' => $node->getDocComment() ? $node->getDocComment()->getText() : null
             ];
         }
