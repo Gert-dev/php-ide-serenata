@@ -340,7 +340,7 @@ class OutlineIndexingVisitor extends NameResolver
         foreach ($node->consts as $const) {
             $this->globalConstants[$const->name] = [
                 'name'       => $const->name,
-                'fqsen'      => isset($node->namespacedName) ? $node->namespacedName->toString() : $const->name,
+                'fqsen'      => isset($const->namespacedName) ? $const->namespacedName->toString() : $const->name,
                 'startLine'  => $node->getLine(),
                 'endLine'    => $node->getAttribute('endLine'),
                 'startPos'   => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,

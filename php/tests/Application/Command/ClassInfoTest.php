@@ -150,6 +150,7 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($output['methods']['testMethod'], [
             'name'               => 'testMethod',
+            'fqsen'              => null,
             'isBuiltin'          => false,
             'startLine'          => 19,
             'endLine'            => 22,
@@ -244,6 +245,7 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($output['constants']['TEST_CONSTANT'], [
             'name'               => 'TEST_CONSTANT',
+            'fqsen'              => null,
             'isBuiltin'          => false,
             'startLine'          => 14,
             'endLine'            => 14,

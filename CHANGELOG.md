@@ -17,6 +17,7 @@
   * Classes didn't return information about whether they have a docblock or documentation.
   * When fetching class information, types were sometimes returned without their leading slash.
   * Because of semantic linting now supporting syntax errors, the reindex command will no longer return them.
+  * Global constants and functions will now also return an FQSEN so you can deduce in what namespace they are located.
   * The reindex command did not return false when indexing failed and the promise was, by consequence, not rejected.
   * Added a new command to `localizeType` localize FQCN's based on use statements, turning them back into relative class names.
   * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.

@@ -630,6 +630,7 @@ class IndexDataAdapter
 
         return [
             'name'             => $rawInfo['name'],
+            'fqsen'            => $rawInfo['fqsen'],
             'isBuiltin'        => !!$rawInfo['is_builtin'],
             'startLine'        => (int) $rawInfo['start_line'],
             'endLine'          => (int) $rawInfo['end_line'],
@@ -700,6 +701,7 @@ class IndexDataAdapter
     {
         return [
             'name'             => $rawInfo['name'],
+            'fqsen'            => $rawInfo['fqsen'],
             'isBuiltin'        => !!$rawInfo['is_builtin'],
             'startLine'        => (int) $rawInfo['start_line'],
             'endLine'          => (int) $rawInfo['end_line'],

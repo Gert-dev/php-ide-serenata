@@ -172,6 +172,7 @@ CREATE TABLE functions(
     id                    integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                  varchar(255) NOT NULL,
+    fqsen                 varchar(255),
     file_id               integer,
     start_line            integer unsigned,
     end_line              integer unsigned,
@@ -294,6 +295,7 @@ CREATE TABLE constants(
     id                    integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                  varchar(255) NOT NULL,
+    fqsen                 varchar(255),
     file_id               integer,
     start_line            integer unsigned,
     end_line              integer unsigned,

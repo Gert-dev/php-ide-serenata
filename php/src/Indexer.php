@@ -904,6 +904,7 @@ class Indexer
 
         $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'                  => $rawData['name'],
+            'fqsen'                 => isset($rawData['fqsen']) ? $rawData['fqsen'] : null,
             'file_id'               => $fileId,
             'start_line'            => $rawData['startLine'],
             'end_line'              => $rawData['endLine'],
@@ -1032,6 +1033,7 @@ class Indexer
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
             'name'                  => $rawData['name'],
+            'fqsen'                 => isset($rawData['fqsen']) ? $rawData['fqsen'] : null,
             'file_id'               => $fileId,
             'start_line'            => $rawData['startLine'],
             'end_line'              => $rawData['endLine'],
