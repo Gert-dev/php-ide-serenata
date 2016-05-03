@@ -167,8 +167,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                 $docblockIssues['deprecatedCategoryTag'][] = [
                     'name'  => $structure['name'],
                     'line'  => $structure['startLine'],
-                    'start' => $structure['startPos'],
-                    'end'   => $structure['startPos'] + 1
+                    'start' => $structure['startPosName'],
+                    'end'   => $structure['endPosName']
                 ];
             }
 
@@ -176,8 +176,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                 $docblockIssues['deprecatedSubpackageTag'][] = [
                     'name'  => $structure['name'],
                     'line'  => $structure['startLine'],
-                    'start' => $structure['startPos'],
-                    'end'   => $structure['startPos'] + 1
+                    'start' => $structure['startPosName'],
+                    'end'   => $structure['endPosName']
                 ];
             }
 
@@ -185,8 +185,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                 $docblockIssues['deprecatedLinkTag'][] = [
                     'name'  => $structure['name'],
                     'line'  => $structure['startLine'],
-                    'start' => $structure['startPos'],
-                    'end'   => $structure['startPos'] + 1
+                    'start' => $structure['startPosName'],
+                    'end'   => $structure['endPosName']
                 ];
             }
 
@@ -199,8 +199,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             $docblockIssues['missingDocumentation'][] = [
                 'name'  => $structure['name'],
                 'line'  => $structure['startLine'],
-                'start' => $structure['startPos'],
-                'end'   => $structure['startPos'] + 1
+                'start' => $structure['startPosName'],
+                'end'   => $structure['endPosName']
             ];
         }
 
@@ -232,8 +232,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             $docblockIssues['missingDocumentation'][] = [
                 'name'  => $method['name'],
                 'line'  => $method['startLine'],
-                'start' => $method['startPos'],
-                'end'   => $method['startPos'] + 1
+                'start' => $method['startPosName'],
+                'end'   => $method['endPosName']
             ];
         }
 
@@ -260,8 +260,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                 $docblockIssues['varTagMissing'][] = [
                     'name'  => $property['name'],
                     'line'  => $property['startLine'],
-                    'start' => $property['startPos'],
-                    'end'   => $property['endPos'] + 1
+                    'start' => $property['startPosName'],
+                    'end'   => $property['endPosName']
                 ];
             }
         } else {
@@ -274,8 +274,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                 $docblockIssues['missingDocumentation'][] = [
                     'name'  => $property['name'],
                     'line'  => $property['startLine'],
-                    'start' => $property['startPos'],
-                    'end'   => $property['endPos'] + 1
+                    'start' => $property['startPosName'],
+                    'end'   => $property['endPosName']
                 ];
             }
         }
@@ -303,16 +303,16 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                 $docblockIssues['varTagMissing'][] = [
                     'name'  => $constant['name'],
                     'line'  => $constant['startLine'],
-                    'start' => $constant['startPos'],
-                    'end'   => $constant['endPos'] + 1
+                    'start' => $constant['startPosName'],
+                    'end'   => $constant['endPosName'] + 1
                 ];
             }
         } else {
             $docblockIssues['missingDocumentation'][] = [
                 'name'  => $constant['name'],
                 'line'  => $constant['startLine'],
-                'start' => $constant['startPos'],
-                'end'   => $constant['endPos'] + 1
+                'start' => $constant['startPosName'],
+                'end'   => $constant['endPosName']
             ];
         }
 
@@ -337,8 +337,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             $docblockIssues['missingDocumentation'][] = [
                 'name'  => $function['name'],
                 'line'  => $function['startLine'],
-                'start' => $function['startPos'],
-                'end'   => $function['startPos'] + 1
+                'start' => $function['startPosName'],
+                'end'   => $function['endPosName']
             ];
 
             return $docblockIssues;
@@ -369,8 +369,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                     'name'      => $function['name'],
                     'parameter' => $dollarName,
                     'line'      => $function['startLine'],
-                    'start'     => $function['startPos'],
-                    'end'       => $function['startPos'] + 1
+                    'start'     => $function['startPosName'],
+                    'end'       => $function['endPosName']
                 ];
             } elseif ($parameter['type']) {
                 $docblockType = $docblockParameters[$dollarName]['type'];
@@ -380,8 +380,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                         'name'      => $function['name'],
                         'parameter' => $dollarName,
                         'line'      => $function['startLine'],
-                        'start'     => $function['startPos'],
-                        'end'       => $function['startPos'] + 1
+                        'start'     => $function['startPosName'],
+                        'end'       => $function['endPosName']
                     ];
                 }
             }
@@ -394,8 +394,8 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
                 'name'       => $function['name'],
                 'parameters' => $superfluousParameterNames,
                 'line'       => $function['startLine'],
-                'start'      => $function['startPos'],
-                'end'        => $function['startPos'] + 1
+                'start'      => $function['startPosName'],
+                'end'        => $function['endPosName']
             ];
         }
 
