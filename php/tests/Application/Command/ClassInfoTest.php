@@ -1004,6 +1004,19 @@ class ClassInfoTest extends IndexedTest
         ]);
     }
 
+    public function testMethodDocblockParameterTypesGetPrecedenceOverTypeHints()
+    {
+        $fileName = 'ClassMethodPrecedence.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertEquals('string[]', $output['methods']['testMethod']['parameters'][0]['type']);
+        $this->assertEquals('string[]', $output['methods']['testMethod']['parameters'][0]['fullType']);
+        $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['type']);
+        $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['fullType']);
+
+    }
+
     /**
      * @expectedException \PhpIntegrator\IndexDataAdapter\CircularDependencyException
      */

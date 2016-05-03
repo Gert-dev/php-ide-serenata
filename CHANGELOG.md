@@ -4,6 +4,17 @@
 * Unknown classes in docblocks will now actually be underlined instead of the structural element they were part of.
 * Indexing performance has been improved, especially the scanning phase (before the progress bar actually started filling) has been improved.
 * Indexing is now more fault-tolerant: in some cases, indexing will still be able to complete even if there are syntax errors in the file.
+* Docblock types now take precedence over type hints. The reason for this is that docblock types are optional and they can be more specific. Take for example, the fluent interface for setters, PHP does not allow specifying `static` or `$this` as a return type using scalar type hinting, but you may still want to automatically resolve to child classes when the setter is inherited:
+
+```php
+/**
+ * @return static
+ */
+public function setFoo(string $foo): self
+{
+
+}
+```
 
 ### Bugs fixed
 * If you (incorrectly) declare or define the same member twice in a class, one of them will now no longer be picked up as an override.
@@ -18,6 +29,7 @@
   * When fetching class information, types were sometimes returned without their leading slash.
   * Because of semantic linting now supporting syntax errors, the reindex command will no longer return them.
   * Global constants and functions will now also return an FQSEN so you can deduce in what namespace they are located.
+  * When returning types such as `string[]`, the `fullType` was still trying to resolve the type as if it were a class type.
   * The reindex command did not return false when indexing failed and the promise was, by consequence, not rejected.
   * Added a new command to `localizeType` localize FQCN's based on use statements, turning them back into relative class names.
   * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.

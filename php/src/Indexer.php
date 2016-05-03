@@ -956,10 +956,13 @@ class Indexer
             }
         }
 
-        $returnType = isset($rawData['returnType']) ? $rawData['returnType'] : null;
-        $returnType = $returnType ?: ($documentation ? $documentation['var']['type'] : null);
-
-        $fullReturnType = isset($rawData['fullReturnType']) ? $rawData['fullReturnType'] : null;
+        if ($documentation && $documentation['var']['type']) {
+            $returnType = $documentation['var']['type'];
+            $fullReturnType = null;
+        } else {
+            $returnType = isset($rawData['returnType']) ? $rawData['returnType'] : null;
+            $fullReturnType = isset($rawData['fullReturnType']) ? $rawData['fullReturnType'] : null;
+        }
 
         if (!$fullReturnType) {
             $fullReturnType = $this->getFullTypeForDocblockType(
@@ -1014,8 +1017,13 @@ class Indexer
             DocParser::RETURN_VALUE
         ], $rawData['name']);
 
-        $returnType = $rawData['returnType'] ?: ($documentation ? $documentation['return']['type'] : null);
-        $fullReturnType = $rawData['fullReturnType'];
+        if ($documentation && $documentation['return']['type']) {
+            $returnType = $documentation['return']['type'];
+            $fullReturnType = null;
+        } else {
+            $returnType = $rawData['returnType'];
+            $fullReturnType = $rawData['fullReturnType'];
+        }
 
         if (!$fullReturnType) {
             $fullReturnType = $this->getFullTypeForDocblockType(
@@ -1059,8 +1067,13 @@ class Indexer
             $parameterDoc = isset($documentation['params'][$parameterKey]) ?
                 $documentation['params'][$parameterKey] : null;
 
-            $type = $parameter['type'] ?: ($parameterDoc ? $parameterDoc['type'] : null);
-            $fullType = $parameter['fullType'];
+            if ($parameterDoc) {
+                $type = $parameterDoc['type'];
+                $fullType = null;
+            } else {
+                $type = $parameter['type'];
+                $fullType = $parameter['fullType'];
+            }
 
             if (!$fullType) {
                 $fullType = $this->getFullTypeForDocblockType(

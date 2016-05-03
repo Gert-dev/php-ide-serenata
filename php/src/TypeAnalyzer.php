@@ -24,7 +24,7 @@ class TypeAnalyzer
      */
     public function isSpecialType($type)
     {
-        return in_array($type, [
+        $isReservedKeyword = in_array($type, [
             'string',
             'int',
             'bool',
@@ -43,6 +43,8 @@ class TypeAnalyzer
             'parent',
             '$this'
         ]);
+
+        return $isReservedKeyword || $this->isArraySyntaxTypeHint($type);
     }
 
     /**
@@ -90,12 +92,20 @@ class TypeAnalyzer
         if (!$isPresent && $type === 'array') {
             foreach ($docblockTypes as $docblockType) {
                 // The 'type[]' syntax is also valid for the 'array' type hint.
-                if (preg_match('/^.+\[\]$/', $docblockType) === 1) {
+                if ($this->isArraySyntaxTypeHint($docblockType)) {
                     return true;
                 }
             }
         }
 
         return $isPresent;
+    }
+
+    /**
+     * @param string $type
+     */
+    protected function isArraySyntaxTypeHint($type)
+    {
+        return (preg_match('/^.+\[\]$/', $type) === 1);
     }
 }
