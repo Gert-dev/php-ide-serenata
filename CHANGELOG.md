@@ -32,7 +32,7 @@ public function setFoo(string $foo): self
   * Global constants and functions will now also return an FQSEN so you can deduce in what namespace they are located.
   * When returning types such as `string[]`, the `fullType` was still trying to resolve the type as if it were a class type.
   * The reindex command did not return false when indexing failed and the promise was, by consequence, not rejected.
-  * Added a new command to `localizeType` localize FQCN's based on use statements, turning them back into relative class names.
+  * Added a new command `localizeType` to localize FQCN's based on use statements, turning them back into relative class names.
   * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.
   * Classes will now return information about whether they are usable as annotation or not (determined by an `@Annotation` tag in their docblock). This is non-standard, but is becoming more and more commonly used in the PHP world (e.g. Symfony and Doctrine).
 
