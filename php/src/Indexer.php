@@ -334,7 +334,7 @@ class Indexer
 
                 // Requires PHP >= 7.
                 if (method_exists($function, 'getReturnType')) {
-                    $returnTYpe = $function->getReturnType();
+                    $returnType = $function->getReturnType();
                 }
 
                 $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
