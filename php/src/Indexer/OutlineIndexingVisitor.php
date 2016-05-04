@@ -256,7 +256,7 @@ class OutlineIndexingVisitor extends NameResolver
 
             if ($param->type instanceof Node\Name) {
                 $localType = $this->fetchClassName($param->type);
-            } else {
+            } elseif ($param->type) {
                 $localType = (string) $param->type;
             }
 
@@ -266,7 +266,7 @@ class OutlineIndexingVisitor extends NameResolver
 
             if ($param->type instanceof Node\Name) {
                 $resolvedType = $this->fetchClassName($param->type);
-            } else {
+            } elseif ($param->type) {
                 $resolvedType = (string) $param->type;
             }
 
@@ -285,7 +285,7 @@ class OutlineIndexingVisitor extends NameResolver
 
         if ($nodeType instanceof Node\Name) {
             $localType = $this->fetchClassName($nodeType);
-        } else {
+        } elseif ($nodeType) {
             $localType = (string) $nodeType;
         }
 
@@ -296,7 +296,7 @@ class OutlineIndexingVisitor extends NameResolver
 
         if ($nodeType instanceof Node\Name) {
             $resolvedType = $this->fetchClassName($nodeType);
-        } else {
+        } elseif ($nodeType) {
             $resolvedType = (string) $nodeType;
         }
 
