@@ -17,7 +17,7 @@ public function setFoo(string $foo): self
 ```
 
 ### Bugs fixed
-* The return type of PHP 7 methods was not properly used as fall back.
+* The return type of PHP 7 methods was not properly used as fallback.
 * If you (incorrectly) declare or define the same member twice in a class, one of them will now no longer be picked up as an override.
 * The `@inheritDoc` syntax without curly braces wasn't always correctly being handled, resulting in docblocks containing only them still being treated as actual docblocks that weren't inherited.
 
