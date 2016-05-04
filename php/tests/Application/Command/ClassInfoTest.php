@@ -1014,7 +1014,22 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals('string[]', $output['methods']['testMethod']['parameters'][0]['fullType']);
         $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['type']);
         $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['fullType']);
+    }
 
+    public function testMethodWithoutDocblockHasNullReturnType()
+    {
+        $fileName = 'ClassMethodNoDocblock.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertNull($output['methods']['testMethod']['parameters'][0]['type']);
+        $this->assertNull($output['methods']['testMethod']['parameters'][0]['fullType']);
+        $this->assertNull($output['methods']['testMethod']['return']['type']);
+        $this->assertNull($output['methods']['testMethod']['return']['resolvedType']);
+        $this->assertNull($output['properties']['testProperty']['return']['type']);
+        $this->assertNull($output['properties']['testProperty']['return']['resolvedType']);
+        $this->assertNull($output['constants']['TEST_CONSTANT']['return']['type']);
+        $this->assertNull($output['constants']['TEST_CONSTANT']['return']['resolvedType']);
     }
 
     /**
