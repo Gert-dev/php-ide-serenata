@@ -22,7 +22,7 @@ improvements as well as separation of the various components into separate packa
 ## What do I need to do to make it work?
 Currently the following is required in order to get the package up and running:
   * **PHP** - To run this package properly, you need at least PHP 5.4. The code you're actually writing can be anything ranging from PHP 5.2 up to (and including) PHP 7.0.
-    * **php-sqlite** and SQLite >= 3.7.0 - Required as back end for the indexing database.
+    * **php-sqlite** and SQLite >= 3.7.11 - Required as back end for the indexing database.
   * **PSR-compliant code** - Write code that follows the PSR standards, especially regarding namespacing.
   * **Documentation** and **type hinting** - Write proper docblocks that follow the draft PSR-5 standard (inspired by phpDocumentor's implementation) or use type hinting as much as possible:
     * Docblocks with a `@var` tag for properties.
