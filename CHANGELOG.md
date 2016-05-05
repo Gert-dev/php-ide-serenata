@@ -1,3 +1,7 @@
+## 0.9.2
+### Bugs fixed
+* (Attempt to) fix indexing for built-in classes returning malformed method parameters.
+
 ## 0.9.1
 ### Bugs fixed
 * Fixed variables used in closure use statements not having their type resolved from the parent scope, for example:
