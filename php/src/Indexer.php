@@ -496,7 +496,7 @@ class Indexer
                     $type = $param->getType();
                 }
 
-                $parameters[] = [
+                $parameterData = [
                     'name'        => $param->getName(),
                     'type'        => (string) $type,
                     'fullType'    => (string) $type,
@@ -504,6 +504,18 @@ class Indexer
                     'isVariadic'  => $isVariadic,
                     'isOptional'  => $param->isOptional()
                 ];
+
+                if (!isset($parameterData['name'])) {
+                    $this->logMessage(
+                        '  - WARNING: Ignoring malformed method parameters for ' . $method->getName()
+                    );
+
+                    // Some PHP classes somehow contain parameters that have no name. An example of this is P4, which
+                    // contains methods such as __get and __set that have parameters without a name. Ignore these.
+                    continue;
+                }
+
+                $parameters[] = $parameterData;
             }
 
             // Requires PHP >= 7.0.
