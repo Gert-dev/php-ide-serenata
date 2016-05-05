@@ -185,6 +185,7 @@ class QueryingVisitor extends NodeVisitorAbstract
                     foreach ($node->uses as $closureUse) {
                         if ($closureUse->var === $this->name) {
                             $variableIsOutsideCurrentScope = true;
+                            break;
                         }
                     }
                 }
