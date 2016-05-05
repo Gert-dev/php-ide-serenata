@@ -177,7 +177,21 @@ class QueryingVisitor extends NodeVisitorAbstract
 
                 $this->resetStateForNewScope();
             } elseif ($node instanceof Node\FunctionLike) {
-                $this->resetStateForNewScope();
+                $variableIsOutsideCurrentScope = false;
+
+                // If the variable is in a use() statement of a closure, we can't reset the state as we still need to
+                // examine the parent scope of the closure where the variable is defined.
+                if ($node instanceof Node\Expr\Closure) {
+                    foreach ($node->uses as $closureUse) {
+                        if ($closureUse->var === $this->name) {
+                            $variableIsOutsideCurrentScope = true;
+                        }
+                    }
+                }
+
+                if (!$variableIsOutsideCurrentScope) {
+                    $this->resetStateForNewScope();
+                }
 
                 $this->lastFunctionLikeNode = $node;
             }

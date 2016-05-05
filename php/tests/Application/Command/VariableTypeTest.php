@@ -94,6 +94,13 @@ class VariableTypeTest extends IndexedTest
         $this->assertEquals('\A\B', $output);
     }
 
+    public function testCorrectlyMovesBeyondClosureScopeForVariableUses()
+    {
+        $output = $this->getVariableType('ClosureVariableUseStatement.php', '$b');
+
+        $this->assertEquals('\A\B', $output);
+    }
+
     public function testCorrectlyAnalyzesCatchBlockTypeHints()
     {
         $output = $this->getVariableType('CatchBlockTypeHint.php', '$e');
