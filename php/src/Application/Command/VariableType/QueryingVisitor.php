@@ -192,9 +192,8 @@ class QueryingVisitor extends NodeVisitorAbstract
 
                 if (!$variableIsOutsideCurrentScope) {
                     $this->resetStateForNewScope();
+                    $this->lastFunctionLikeNode = $node;
                 }
-
-                $this->lastFunctionLikeNode = $node;
             }
         }
     }

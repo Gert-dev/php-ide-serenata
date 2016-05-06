@@ -99,6 +99,18 @@ class VariableTypeTest extends IndexedTest
         $output = $this->getVariableType('ClosureVariableUseStatement.php', '$b');
 
         $this->assertEquals('\A\B', $output);
+
+        $output = $this->getVariableType('ClosureVariableUseStatement.php', '$c');
+
+        $this->assertEquals('\A\C', $output);
+
+        $output = $this->getVariableType('ClosureVariableUseStatement.php', '$d');
+
+        $this->assertEquals('\A\D', $output);
+
+        $output = $this->getVariableType('ClosureVariableUseStatement.php', '$e');
+
+        $this->assertNull($output);
     }
 
     public function testCorrectlyAnalyzesCatchBlockTypeHints()
