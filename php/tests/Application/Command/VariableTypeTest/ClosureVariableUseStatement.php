@@ -2,9 +2,17 @@
 
 namespace A;
 
-$a = 5;
-$b = new B();
+function test(D $d)
+{
+    $a = 5;
+    $b = new B();
+    $e = new E();
 
-$test = function () use ($b) {
-    // <MARKER>
-};
+    $closure = function () use ($b, $d, $e) {
+        $c = new C();
+
+        $test = function () use ($b, $c, $d) {
+            // <MARKER>
+        };
+    };
+}
