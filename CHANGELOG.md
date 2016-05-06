@@ -1,3 +1,7 @@
+## 0.9.3
+### Bugs fixed
+* Fixed variables nclosure use statements not having their type resolved properly in some corner cases.
+
 ## 0.9.2
 ### Bugs fixed
 * (Attempt to) fix indexing for built-in classes returning malformed method parameters.
