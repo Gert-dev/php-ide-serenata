@@ -1,3 +1,8 @@
+## 0.10.0
+### Changes for developers
+* Changes to the service
+  * Return types for functions and types for function parameters will now also include a `typeHint` property that is set to the actual type hint that was specified (the type and resolvedType fall back to the docblock if it is present).
+
 ## 0.9.3
 ### Bugs fixed
 * Fixed variables nclosure use statements not having their type resolved properly in some corner cases.

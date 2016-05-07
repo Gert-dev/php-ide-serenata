@@ -160,6 +160,7 @@ class ClassInfoTest extends IndexedTest
                 [
                     'name'        => 'firstParameter',
                     'type'        => '\DateTime',
+                    'typeHint'    => '\DateTime',
                     'fullType'    => '\DateTime',
                     'description' => 'First parameter description.',
                     'isReference' => false,
@@ -170,6 +171,7 @@ class ClassInfoTest extends IndexedTest
                 [
                     'name'        => 'secondParameter',
                     'type'        => null,
+                    'typeHint'    => null,
                     'fullType'    => null,
                     'description' => null,
                     'isReference' => true,
@@ -180,6 +182,7 @@ class ClassInfoTest extends IndexedTest
                 [
                     'name'        => 'thirdParameter',
                     'type'        => null,
+                    'typeHint'    => null,
                     'fullType'    => null,
                     'description' => null,
                     'isReference' => false,
@@ -204,6 +207,7 @@ class ClassInfoTest extends IndexedTest
 
             'return'             => [
                 'type'         => 'mixed',
+                'typeHint'     => null,
                 'resolvedType' => 'mixed',
                 'description'  => null
             ],
@@ -713,6 +717,7 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['return'], [
             'type'         => 'void',
+            'typeHint'     => 'void',
             'resolvedType' => 'void',
             'description'  => null
         ]);
@@ -731,6 +736,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'name'        => 'a',
                 'type'        => null,
+                'typeHint'    => null,
                 'fullType'    => null,
                 'description' => null,
                 'isReference' => false,
@@ -741,6 +747,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'name'        => 'b',
                 'type'        => null,
+                'typeHint'    => null,
                 'fullType'    => null,
                 'description' => null,
                 'isReference' => false,
@@ -751,6 +758,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'name'        => 'c',
                 'type'        => 'array',
+                'typeHint'    => 'array',
                 'fullType'    => 'array',
                 'description' => null,
                 'isReference' => false,
@@ -761,6 +769,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'name'        => 'd',
                 'type'        => 'Type',
+                'typeHint'    => 'Type',
                 'fullType'    => 'A\Type',
                 'description' => null,
                 'isReference' => false,
@@ -776,6 +785,7 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['return'], [
             'type'         => 'TestClass',
+            'typeHint'     => 'TestClass',
             'resolvedType' => 'A\TestClass',
             'description'  => null
         ]);
@@ -799,6 +809,7 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['return'], [
             'type'         => 'void',
+            'typeHint'     => 'void',
             'resolvedType' => 'void',
             'description'  => null
         ]);
@@ -925,42 +936,49 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($output['methods']['baseMethodSelf']['return'], [
             'type'         => 'self',
+            'typeHint'     => null,
             'resolvedType' => 'A\ParentClass',
             'description'  => null
         ]);
 
         $this->assertEquals($output['methods']['baseMethodStatic']['return'], [
             'type'         => 'static',
+            'typeHint'     => null,
             'resolvedType' => 'A\childClass',
             'description'  => null
         ]);
 
         $this->assertEquals($output['methods']['baseMethodThis']['return'], [
             'type'         => '$this',
+            'typeHint'     => null,
             'resolvedType' => 'A\childClass',
             'description'  => null
         ]);
 
         $this->assertEquals($output['methods']['methodSelf']['return'], [
             'type'         => 'self',
+            'typeHint'     => null,
             'resolvedType' => 'A\childClass',
             'description'  => null
         ]);
 
         $this->assertEquals($output['methods']['methodStatic']['return'], [
             'type'         => 'static',
+            'typeHint'     => null,
             'resolvedType' => 'A\childClass',
             'description'  => null
         ]);
 
         $this->assertEquals($output['methods']['methodThis']['return'], [
             'type'         => '$this',
+            'typeHint'     => null,
             'resolvedType' => 'A\childClass',
             'description'  => null
         ]);
 
         $this->assertEquals($output['methods']['methodOwnClassName']['return'], [
             'type'         => 'childClass',
+            'typeHint'     => null,
             'resolvedType' => 'A\childClass',
             'description'  => null
         ]);
@@ -987,18 +1005,21 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($output['methods']['baseMethodSelf']['return'], [
             'type'         => 'self',
+            'typeHint'     => null,
             'resolvedType' => 'A\ParentClass',
             'description'  => null
         ]);
 
         $this->assertEquals($output['methods']['baseMethodStatic']['return'], [
             'type'         => 'static',
+            'typeHint'     => null,
             'resolvedType' => 'A\ParentClass',
             'description'  => null
         ]);
 
         $this->assertEquals($output['methods']['baseMethodThis']['return'], [
             'type'         => '$this',
+            'typeHint'     => null,
             'resolvedType' => 'A\ParentClass',
             'description'  => null
         ]);

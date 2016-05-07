@@ -347,6 +347,7 @@ class Indexer
                     'short_description'     => null,
                     'long_description'      => null,
                     'return_type'           => $returnType,
+                    'return_type_hint'      => null,
                     'full_return_type'      => $returnType,
                     'return_description'    => null
                 ]);
@@ -373,6 +374,7 @@ class Indexer
                         'function_id'  => $functionId,
                         'name'         => $parameter->getName(),
                         'type'         => $type ? ((string) $type) : null,
+                        'type_hint'    => null,
                         'full_type'    => $type ? ((string) $type) : null,
                         'description'  => null,
                         'is_reference' => $parameter->isPassedByReference() ? 1 : 0,
@@ -847,6 +849,7 @@ class Indexer
             $parameters[] = [
                 'name'        => mb_substr($parameterName, 1), // Strip off the dollar sign.
                 'type'        => $parameter['type'],
+                'typeHint'    => null,
                 'fullType'    => null,                         // Determine automatically.
                 'isReference' => false,
                 'isVariadic'  => false,
@@ -858,6 +861,7 @@ class Indexer
             $parameters[] = [
                 'name'        => mb_substr($parameterName, 1), // Strip off the dollar sign.
                 'type'        => $parameter['type'],
+                'typeHint'    => null,
                 'fullType'    => null,                         // Determine automatically.
                 'isReference' => false,
                 'isVariadic'  => false,
@@ -870,6 +874,7 @@ class Indexer
             'startLine'        => null,
             'endLine'          => null,
             'returnType'       => $data['type'],
+            'returnTypeHint'   => null,
             'fullReturnType'   => null,                       // Determine automatically.
             'parameters'       => $parameters,
             'shortDescription' => $data['description'],
@@ -1063,6 +1068,7 @@ class Indexer
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
             'return_type'           => $returnType,
+            'return_type_hint'      => $rawData['returnType'],
             'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['return']['description'],
             'structure_id'          => $seId,
@@ -1099,6 +1105,7 @@ class Indexer
                 'function_id'  => $functionId,
                 'name'         => $parameter['name'],
                 'type'         => $type,
+                'type_hint'    => $parameter['type'],
                 'full_type'    => $fullType,
                 'description'  => $parameterDoc ? $parameterDoc['description'] : null,
                 'is_reference' => $parameter['isReference'] ? 1 : 0,

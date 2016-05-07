@@ -185,6 +185,7 @@ CREATE TABLE functions(
     long_description      text,
 
     return_type           varchar(255),
+    return_type_hint      varchar(255),
     full_return_type      varchar(255),
     return_description    text,
 
@@ -224,6 +225,7 @@ CREATE TABLE functions_parameters(
 
     name         varchar(255) NOT NULL,
     type         varchar(255),
+    type_hint    varchar(255),
     full_type    varchar(255),
 
     description  text,

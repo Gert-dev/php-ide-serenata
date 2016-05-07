@@ -612,6 +612,7 @@ class IndexDataAdapter
             $parameters[] = [
                 'name'        => $rawParameter['name'],
                 'type'        => $rawParameter['type'],
+                'typeHint'    => $rawParameter['type_hint'],
                 'fullType'    => $rawParameter['full_type'],
                 'description' => $rawParameter['description'],
                 'isReference' => !!$rawParameter['is_reference'],
@@ -649,6 +650,7 @@ class IndexDataAdapter
 
             'return'        => [
                 'type'         => $rawInfo['return_type'],
+                'typeHint'     => $rawInfo['return_type_hint'],
                 'resolvedType' => $rawInfo['full_return_type'],
                 'description'  => $rawInfo['return_description']
             ]
