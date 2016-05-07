@@ -372,8 +372,8 @@ class Indexer
                     $parameterData = [
                         'function_id'  => $functionId,
                         'name'         => $parameter->getName(),
-                        'type'         => (string) $type,
-                        'full_type'    => (string) $type,
+                        'type'         => $type ? ((string) $type) : null,
+                        'full_type'    => $type ? ((string) $type) : null,
                         'description'  => null,
                         'is_reference' => $parameter->isPassedByReference() ? 1 : 0,
                         'is_optional'  => $parameter->isOptional() ? 1 : 0,
