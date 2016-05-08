@@ -48,6 +48,16 @@ class TypeAnalyzer
     }
 
     /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function isClassType($type)
+    {
+        return !$this->isSpecialType($type);
+    }
+
+    /**
      * Normalizes an FQCN, removing its leading slash, if any.
      *
      * @param string $fqcn
@@ -64,17 +74,31 @@ class TypeAnalyzer
     }
 
     /**
+     * Splits a docblock type specification up into different (docblock) types.
+     *
+     * @param string $typeSpecification
+     *
+     * @example "int|string" becomes ["int", "string"].
+     *
+     * @return string[]
+     */
+    public function getTypesForTypeSpecification($typeSpecification)
+    {
+        return explode(self::TYPE_SPLITTER, $typeSpecification);
+    }
+
+    /**
      * Returns a boolean indicating if the specified type (i.e. from a type hint) is valid according to the passed
      * docblock type identifier.
      *
      * @param string $type
-     * @param string $docblockType
+     * @param string $typeSpecification
      *
      * @return bool
      */
-    public function isTypeConformantWithDocblockType($type, $docblockType)
+    public function isTypeConformantWithDocblockType($type, $typeSpecification)
     {
-        $docblockTypes = explode(self::TYPE_SPLITTER, $docblockType);
+        $docblockTypes = $this->getDocblockTypesForTypeSpecification($typeSpecification);
 
         return $this->isTypeConformantWithDocblockTypes($type, $docblockTypes);
     }
