@@ -169,40 +169,39 @@ CREATE TABLE structures_traits_precedences(
 
 --
 CREATE TABLE functions(
-    id                    integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id                      integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
-    name                  varchar(255) NOT NULL,
-    fqsen                 varchar(255),
-    file_id               integer,
-    start_line            integer unsigned,
-    end_line              integer unsigned,
+    name                    varchar(255) NOT NULL,
+    fqsen                   varchar(255),
+    file_id                 integer,
+    start_line              integer unsigned,
+    end_line                integer unsigned,
 
-    is_builtin            tinyint(1) NOT NULL DEFAULT 0,
-    is_abstract           tinyint(1) NOT NULL DEFAULT 0,
-    is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
+    is_builtin              tinyint(1) NOT NULL DEFAULT 0,
+    is_abstract             tinyint(1) NOT NULL DEFAULT 0,
+    is_deprecated           tinyint(1) NOT NULL DEFAULT 0,
 
-    short_description     text,
-    long_description      text,
+    short_description       text,
+    long_description        text,
+    return_description      text,
 
-    return_type           varchar(255),
-    return_type_hint      varchar(255),
-    full_return_type      varchar(255),
-    return_description    text,
+    return_type_hint        varchar(255),
 
     -- Specific to members.
-    structure_id          integer unsigned,
-    access_modifier_id    integer unsigned,
+    structure_id            integer unsigned,
+    access_modifier_id      integer unsigned,
 
-    is_magic              tinyint(1),
-    is_static             tinyint(1),
-    has_docblock          tinyint(1) NOT NULL DEFAULT 0,
+    is_magic                tinyint(1),
+    is_static               tinyint(1),
+    has_docblock            tinyint(1) NOT NULL DEFAULT 0,
 
     -- Holds data that is added to link tables in a serialized format. This allows very fast access
     -- to them without having to perform JOINs or queries inside a loop. This can save half a second
     -- on a large class info fetch that normally takes about 750 milliseconds, which can make all
     -- the difference in snappiness when requesting autocompletion.
-    throws_serialized     text,
-    parameters_serialized text,
+    throws_serialized       text NOT NULL,
+    parameters_serialized   text NOT NULL,
+    return_types_serialized text NOT NULL,
 
     FOREIGN KEY(file_id) REFERENCES files(id)
         ON DELETE CASCADE
@@ -219,20 +218,21 @@ CREATE TABLE functions(
 
 -- Contains parameters for functions and methods.
 CREATE TABLE functions_parameters(
-    id           integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id                 integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
-    function_id  integer unsigned,
+    function_id        integer unsigned,
 
-    name         varchar(255) NOT NULL,
-    type         varchar(255),
-    type_hint    varchar(255),
-    full_type    varchar(255),
+    name               varchar(255) NOT NULL,
 
-    description  text,
+    type_hint          varchar(255),
+    types_serialized   text NOT NULL,
 
-    is_reference tinyint(1) NOT NULL DEFAULT 0,
-    is_optional  tinyint(1) NOT NULL DEFAULT 0,
-    is_variadic  tinyint(1) NOT NULL DEFAULT 0,
+    description        text,
+
+    is_nullable        tinyint(1) NOT NULL DEFAULT 0,
+    is_reference       tinyint(1) NOT NULL DEFAULT 0,
+    is_optional        tinyint(1) NOT NULL DEFAULT 0,
+    is_variadic        tinyint(1) NOT NULL DEFAULT 0,
 
     FOREIGN KEY(function_id) REFERENCES functions(id)
         ON DELETE CASCADE
@@ -264,20 +264,18 @@ CREATE TABLE properties(
     end_line              integer unsigned,
 
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
+    is_magic              tinyint(1) NOT NULL DEFAULT 0,
+    is_static             tinyint(1) NOT NULL DEFAULT 0,
+    has_docblock          tinyint(1) NOT NULL DEFAULT 0,
 
     short_description     text,
     long_description      text,
-
-    return_type           varchar(255),
-    full_return_type      varchar(255),
     return_description    text,
 
     structure_id          integer unsigned NOT NULL,
     access_modifier_id    integer unsigned NOT NULL,
 
-    is_magic              tinyint(1) NOT NULL DEFAULT 0,
-    is_static             tinyint(1) NOT NULL DEFAULT 0,
-    has_docblock          tinyint(1) NOT NULL DEFAULT 0,
+    types_serialized      text NOT NULL,
 
     FOREIGN KEY(file_id) REFERENCES files(id)
         ON DELETE CASCADE
@@ -308,10 +306,9 @@ CREATE TABLE constants(
 
     short_description     text,
     long_description      text,
-
-    return_type           varchar(255),
-    full_return_type      varchar(255),
     return_description    text,
+
+    types_serialized      text NOT NULL,
 
     -- Specific to member constants.
     structure_id integer unsigned,

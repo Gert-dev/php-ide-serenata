@@ -5,9 +5,13 @@ namespace PhpIntegrator;
 use DateTime;
 use Exception;
 use ReflectionClass;
+use ReflectionMethod;
+use ReflectionProperty;
+use ReflectionFunction;
 use FilesystemIterator;
 use UnexpectedValueException;
 use RecursiveIteratorIterator;
+use ReflectionFunctionAbstract;
 use RecursiveDirectoryIterator;
 
 use PhpParser\Lexer;
@@ -232,7 +236,7 @@ class Indexer
             $this->indexBuiltinFunctions();
 
             $this->logMessage('Indexing built-in classes...');
-            $this->indexBuiltinClasses();
+            $this->indexBuiltinStructures();
 
             $this->storage->commitTransaction();
         } catch (Exception $e) {
@@ -315,21 +319,32 @@ class Indexer
             // NOTE: Be very careful if you want to pass back the value, there are also escaped paths, newlines
             // (PHP_EOL), etc. in there.
             foreach ($constantList as $name => $value) {
-                $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
-                    'name'                  => $name,
-                    'file_id'               => null,
-                    'start_line'            => null,
-                    'end_line'              => null,
-                    'is_builtin'            => 1, // ($namespace !== 'user' ? 1 : 0)
-                    'is_deprecated'         => false,
-                    'short_description'     => null,
-                    'long_description'      => null,
-                    'return_type'           => null,
-                    'full_return_type'      => null,
-                    'return_description'    => null
-                ]);
+                $this->indexBuiltinConstant($name);
             }
         }
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return int
+     */
+    protected function indexBuiltinConstant($name)
+    {
+        return $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
+            'name'               => $name,
+            'fqsen'              => $name,
+            'file_id'            => null,
+            'start_line'         => null,
+            'end_line'           => null,
+            'is_builtin'         => 1,
+            'is_deprecated'      => 0,
+            'has_docblock'       => 0,
+            'short_description'  => null,
+            'long_description'   => null,
+            'return_description' => null,
+            'types_serialized'   => serialize([])
+        ]);
     }
 
     /**
@@ -339,92 +354,127 @@ class Indexer
     {
         foreach (get_defined_functions() as $group => $functions) {
             foreach ($functions as $functionName) {
+                $function = null;
+
                 try {
-                    $function = new \ReflectionFunction($functionName);
+                    $function = new ReflectionFunction($functionName);
                 } catch (\Exception $e) {
                     continue;
                 }
 
-                $returnType = null;
-
-                // Requires PHP >= 7.
-                if (method_exists($function, 'getReturnType')) {
-                    $returnType = $function->getReturnType();
-                }
-
-                $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
-                    'name'                  => $functionName,
-                    'file_id'               => null,
-                    'start_line'            => null,
-                    'end_line'              => null,
-                    'is_builtin'            => 1,
-                    'is_deprecated'         => $function->isDeprecated() ? 1 : 0,
-                    'short_description'     => null,
-                    'long_description'      => null,
-                    'return_type'           => $returnType,
-                    'return_type_hint'      => null,
-                    'full_return_type'      => $returnType,
-                    'return_description'    => null
-                ]);
-
-                $parameters = [];
-
-                foreach ($function->getParameters() as $parameter) {
-                    $isVariadic = false;
-
-                    // Requires PHP >= 5.6.
-                    if (method_exists($parameter, 'isVariadic')) {
-                        $isVariadic = $parameter->isVariadic();
-                    }
-
-                    $type = null;
-
-                    // Requires PHP >= 7, good thing this only affects built-in functions, which don't have any type
-                    // hinting yet anyways (at least in PHP < 7).
-                    if (method_exists($function, 'getType')) {
-                        $type = $function->getType();
-                    }
-
-                    $parameterData = [
-                        'function_id'  => $functionId,
-                        'name'         => $parameter->getName(),
-                        'type'         => $type ? ((string) $type) : null,
-                        'type_hint'    => null,
-                        'full_type'    => $type ? ((string) $type) : null,
-                        'description'  => null,
-                        'is_reference' => $parameter->isPassedByReference() ? 1 : 0,
-                        'is_optional'  => $parameter->isOptional() ? 1 : 0,
-                        'is_variadic'  => $isVariadic ? 1 : 0
-                    ];
-
-                    if (!isset($parameterData['name'])) {
-                        $this->logMessage(
-                            '  - WARNING: Ignoring malformed function parameters for ' . $function->getName()
-                        );
-
-                        // Some PHP extensions somehow contain parameters that have no name. An example of this is
-                        // ssh2_poll (from the ssh2 extension). Strangely enough this mystery function also can't be
-                        // found in the documentation. (Perhaps a bug in the extension?) Ignore these.
-                        continue;
-                    }
-
-                    $parameters[] = $parameterData;
-
-                    $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameterData);
-                }
-
-                $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
-                    'throws_serialized'     => serialize([]),
-                    'parameters_serialized' => serialize($parameters)
-                ]);
+                $this->indexBuiltinFunctionLike($function);
             }
         }
     }
 
     /**
-     * Indexes built-in PHP classes.
+     * @param ReflectionFunctionAbstract $function
+     *
+     * @return int
      */
-    protected function indexBuiltinClasses()
+    protected function indexBuiltinFunctionLike(ReflectionFunctionAbstract $function)
+    {
+        $returnTypes = [];
+
+        // Requires PHP >= 7.
+        if (method_exists($function, 'getReturnType')) {
+            $returnType = $function->getReturnType();
+
+            if ($returnType) {
+                $returnTypes[] = [
+                    'type'        => (string) $returnType,
+                    'fqcn'        => (string) $returnType
+                ];
+            }
+        }
+
+        $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
+            'name'                    => $function->getName(),
+            'fqsen'                   => null,
+            'file_id'                 => null,
+            'start_line'              => null,
+            'end_line'                => null,
+            'is_builtin'              => 1,
+            'is_deprecated'           => $function->isDeprecated() ? 1 : 0,
+            'short_description'       => null,
+            'long_description'        => null,
+            'return_description'      => null,
+            'return_type_hint'        => null,
+            'structure_id'            => null,
+            'access_modifier_id'      => null,
+            'is_magic'                => 0,
+            'is_static'               => 0,
+            'has_docblock'            => 0,
+            'throws_serialized'       => serialize([]),
+            'parameters_serialized'   => serialize([]),
+            'return_types_serialized' => serialize($returnTypes)
+        ]);
+
+        $parameters = [];
+
+        foreach ($function->getParameters() as $parameter) {
+            $isVariadic = false;
+
+            // Requires PHP >= 5.6.
+            if (method_exists($parameter, 'isVariadic')) {
+                $isVariadic = $parameter->isVariadic();
+            }
+
+            $types = [];
+
+            // Requires PHP >= 7, good thing this only affects built-in functions, which don't have any type
+            // hinting yet anyways (at least in PHP < 7).
+            if (method_exists($parameter, 'getType')) {
+                $type = $parameter->getType();
+
+                if ($type) {
+                    $types[] = [
+                        'type' => (string) $type,
+                        'fqcn' => (string) $type
+                    ];
+                }
+            }
+
+            $parameterData = [
+                'function_id'      => $functionId,
+                'name'             => $parameter->getName(),
+                'type_hint'        => null,
+                'types_serialized' => serialize($types),
+                'description'      => null,
+                'is_nullable'      => $type && $type->allowsNull() ? 1 : 0,
+                'is_reference'     => $parameter->isPassedByReference() ? 1 : 0,
+                'is_optional'      => $parameter->isOptional() ? 1 : 0,
+                'is_variadic'      => $isVariadic ? 1 : 0
+            ];
+
+            if (!isset($parameterData['name'])) {
+                $this->logMessage(
+                    '  - WARNING: Ignoring malformed function parameters for ' . $function->getName()
+                );
+
+                // Some PHP extensions somehow contain parameters that have no name. An example of this is
+                // ssh2_poll (from the ssh2 extension). Strangely enough this mystery function also can't be
+                // found in the documentation. (Perhaps a bug in the extension?) Ignore these.
+                continue;
+            }
+
+            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameterData);
+
+            $parameters[] = $parameterData;
+        }
+
+        $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
+            'throws_serialized'     => serialize([]),
+            'parameters_serialized' => serialize($parameters)
+        ]);
+
+        return $functionId;
+    }
+
+    /**
+     * Indexes built-in PHP classes, interfaces and traits.
+     */
+    protected function indexBuiltinStructures()
     {
         foreach (get_declared_traits() as $trait) {
             $element = new ReflectionClass($trait);
@@ -452,7 +502,7 @@ class Indexer
     }
 
     /**
-     * Indexes the specified built-in structural element.
+     * Indexes the specified built-in class, interface or trait.
      *
      * @param ReflectionClass $element
      */
@@ -461,6 +511,7 @@ class Indexer
         $type = null;
         $parents = [];
         $interfaces = [];
+        $traits = $element->getTraitNames();
 
         if ($element->isTrait()) {
             $type = 'trait';
@@ -479,107 +530,132 @@ class Indexer
             $parents = $element->getParentClass() ? [$element->getParentClass()->getName()] : [];
         }
 
-        // Adapt the data from the ReflectionClass to the data from the OutlineIndexingVisitor.
-        $rawData = [
-            'name'       => $element->getName(),
-            'type'       => $type,
-            'startLine'  => null,
-            'endLine'    => null,
-            'isAbstract' => $element->isAbstract(),
-            'docComment' => null,
-            'parents'    => $parents,
-            'interfaces' => $interfaces,
-            'traits'     => $element->getTraitNames(),
-            'methods'    => [],
-            'properties' => [],
-            'constants'  => []
-        ];
+        $structureTypeMap = $this->getStructureTypeMap();
+
+        $structureId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, [
+            'name'              => $element->getShortName(),
+            'fqsen'             => $element->getName(),
+            'file_id'           => null,
+            'start_line'        => null,
+            'end_line'          => null,
+            'structure_type_id' => $structureTypeMap[$type],
+            'short_description' => null,
+            'long_description'  => null,
+            'is_builtin'        => 1,
+            'is_abstract'       => $element->isAbstract() ? 1 : 0,
+            'is_annotation'     => 0,
+            'is_deprecated'     => 0,
+            'has_docblock'      => 0
+        ]);
+
+        foreach ($parents as $parent) {
+            $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
+                'structure_id'           => $structureId,
+                'linked_structure_fqsen' => $parent
+            ]);
+        }
+
+        foreach ($interfaces as $interface) {
+            $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
+                'structure_id'           => $structureId,
+                'linked_structure_fqsen' => $interface
+            ]);
+        }
+
+        foreach ($traits as $trait) {
+            $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
+                'structure_id'           => $structureId,
+                'linked_structure_fqsen' => $trait
+            ]);
+        }
 
         foreach ($element->getMethods() as $method) {
-            $parameters = [];
-
-            /** @var \ReflectionParameter $param */
-            foreach ($method->getParameters() as $param) {
-                $type = null;
-                $isVariadic = false;
-
-                // Requires PHP >= 5.6.
-                if (method_exists($param, 'isVariadic')) {
-                    $isVariadic = $param->isVariadic();
-                }
-
-                // Requires PHP >= 7.0.
-                if (method_exists($param, 'getType')) {
-                    $type = $param->getType();
-                }
-
-                $parameterData = [
-                    'name'        => $param->getName(),
-                    'type'        => (string) $type,
-                    'fullType'    => (string) $type,
-                    'isReference' => $param->isPassedByReference(),
-                    'isVariadic'  => $isVariadic,
-                    'isOptional'  => $param->isOptional()
-                ];
-
-                if (!isset($parameterData['name'])) {
-                    $this->logMessage(
-                        '  - WARNING: Ignoring malformed method parameters for ' . $method->getName()
-                    );
-
-                    // Some PHP classes somehow contain parameters that have no name. An example of this is P4, which
-                    // contains methods such as __get and __set that have parameters without a name. Ignore these.
-                    continue;
-                }
-
-                $parameters[] = $parameterData;
-            }
-
-            // Requires PHP >= 7.0.
-            $returnType = null;
-
-            if (method_exists($method, 'getReturnType')) {
-                $returnType = $method->getReturnType();
-            }
-
-            $rawData['methods'][$method->getName()] = [
-                'name'           => $method->getName(),
-                'startLine'      => null,
-                'endLine'        => null,
-                'isPublic'       => $method->isPublic(),
-                'isPrivate'      => $method->isPrivate(),
-                'isProtected'    => $method->isProtected(),
-                'isStatic'       => $method->isStatic(),
-                'returnType'     => $returnType,
-                'fullReturnType' => $returnType,
-                'parameters'     => $parameters,
-                'docComment'     => null
-            ];
+            $this->indexBuiltinMethod($method, $structureId);
         }
 
         foreach ($element->getProperties() as $property) {
-            $rawData['properties'][$property->getName()] = [
-                'name'        => $property->getName(),
-                'startLine'   => null,
-                'endLine'     => null,
-                'isPublic'    => $property->isPublic(),
-                'isPrivate'   => $property->isPrivate(),
-                'isStatic'    => $property->isStatic(),
-                'isProtected' => $property->isProtected(),
-                'docComment'  => null
-            ];
+            $this->indexBuiltinProperty($property, $structureId);
         }
 
         foreach ($element->getConstants() as $constantName => $constantValue) {
-            $rawData['constants'][$constantName] = [
-                'name'       => $constantName,
-                'startLine'  => null,
-                'endLine'    => null,
-                'docComment' => null
-            ];
+            $this->indexBuiltinClassConstant($constantName, $structureId);
+        }
+    }
+
+    /**
+     * @param ReflectionMethod $method
+     * @param int              $structureId
+     */
+    protected function indexBuiltinMethod(ReflectionMethod $method, $structureId)
+    {
+        $functionId = $this->indexBuiltinFunctionLike($method);
+
+        $accessModifierName = null;
+
+        if ($method->isPublic()) {
+            $accessModifierName = 'public';
+        } elseif ($method->isProtected()) {
+            $accessModifierName = 'public';
+        } else/*if ($method->isPrivate())*/ {
+            $accessModifierName = 'private';
         }
 
-        $this->indexStructure($rawData, null, $element->getName(), true);
+        $accessModifierMap = $this->getAccessModifierMap();
+
+        $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
+            'structure_id'       => $structureId,
+            'access_modifier_id' => $accessModifierMap[$accessModifierName],
+            'is_static'          => $method->isStatic()
+        ]);
+    }
+
+    /**
+     * @param ReflectionProperty $property
+     * @param int                $structureId
+     */
+    protected function indexBuiltinProperty(ReflectionProperty $property, $structureId)
+    {
+        $accessModifierName = null;
+
+        if ($property->isPublic()) {
+            $accessModifierName = 'public';
+        } elseif ($property->isProtected()) {
+            $accessModifierName = 'public';
+        } else/*if ($property->isPrivate())*/ {
+            $accessModifierName = 'private';
+        }
+
+        $accessModifierMap = $this->getAccessModifierMap();
+
+        $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
+            'name'               => $property->getName(),
+            'file_id'            => null,
+            'start_line'         => null,
+            'end_line'           => null,
+            'is_deprecated'      => 0,
+            'is_magic'           => 0,
+            'is_static'          => $property->isStatic(),
+            'has_docblock'       => 0,
+            'short_description'  => null,
+            'long_description'   => null,
+            'return_description' => null,
+            'structure_id'       => $structureId,
+            'access_modifier_id' => $accessModifierMap[$accessModifierName],
+            'types_serialized'   => serialize([])
+        ]);
+    }
+
+    /**
+     * @param string $name
+     * @param int    $structureId
+     */
+    protected function indexBuiltinClassConstant($name, $structureId)
+    {
+        $constantId = $this->indexBuiltinConstant($name);
+
+        $this->storage->update(IndexStorageItemEnum::CONSTANTS, $constantId, [
+            'structure_id' => $structureId
+        ]);
     }
 
     /**
@@ -902,6 +978,37 @@ class Indexer
     }
 
     /**
+     * @param string                              $typeSpecification
+     * @param int                                 $line
+     * @param Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor
+     *
+     * @return array[]
+     */
+    protected function getTypeDataForTypeSpecification(
+        $typeSpecification,
+        $line,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor
+    ) {
+        $types = [];
+        $typeList = $this->typeAnalyzer->getTypesForTypeSpecification($typeSpecification);
+
+        foreach ($typeList as $type) {
+            $fqcn = $type;
+
+            if ($this->typeAnalyzer->isClassType($type)) {
+                $fqcn = $this->getFqcnForLocalType($type, $line, $useStatementFetchingVisitor);
+            }
+
+            $types[] = [
+                'type' => $type,
+                'fqcn' => $fqcn
+            ];
+        }
+
+        return $types;
+    }
+
+    /**
      * Indexes the specified constant.
      *
      * @param array                                    $rawData
@@ -921,20 +1028,17 @@ class Indexer
             DocParser::DESCRIPTION
         ], $rawData['name']);
 
-        $returnType = null;
-        $fullReturnType = null;
+        $types = [];
 
         if ($documentation['var']['type']) {
-            $returnType = $documentation['var']['type'];
-
-            $fullReturnType = $this->getFullTypeForDocblockType(
-                $returnType,
+            $types = $this->getTypeDataForTypeSpecification(
+                $documentation['var']['type'],
                 $rawData['startLine'],
                 $useStatementFetchingVisitor
             );
         }
 
-        $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
+        $constantId = $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'                  => $rawData['name'],
             'fqsen'                 => isset($rawData['fqsen']) ? $rawData['fqsen'] : null,
             'file_id'               => $fileId,
@@ -942,13 +1046,12 @@ class Indexer
             'end_line'              => $rawData['endLine'],
             'is_builtin'            => 0,
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+            'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'short_description'     => $documentation['descriptions']['short'],
             'long_description'      => $documentation['descriptions']['long'],
-            'return_type'           => $returnType,
-            'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
-            'structure_id'          => $seId,
-            'has_docblock'          => empty($rawData['docComment']) ? 0 : 1
+            'types_serialized'      => serialize($types),
+            'structure_id'          => $seId
         ]);
     }
 
@@ -988,38 +1091,38 @@ class Indexer
             }
         }
 
-        if ($documentation && $documentation['var']['type']) {
-            $returnType = $documentation['var']['type'];
-            $fullReturnType = null;
-        } else {
-            $returnType = isset($rawData['returnType']) ? $rawData['returnType'] : null;
-            $fullReturnType = isset($rawData['fullReturnType']) ? $rawData['fullReturnType'] : null;
-        }
+        $types = [];
 
-        if (!$fullReturnType) {
-            $fullReturnType = $this->getFullTypeForDocblockType(
-                $returnType,
+        if ($documentation && $documentation['var']['type']) {
+            $types = $this->getTypeDataForTypeSpecification(
+                $documentation['var']['type'],
                 $rawData['startLine'],
                 $useStatementFetchingVisitor
             );
+        } elseif (isset($rawData['returnType'])) {
+            $types = [
+                [
+                    'type' => $rawData['returnType'],
+                    'fqcn' => isset($rawData['fullReturnType']) ? $rawData['fullReturnType'] : $rawData['returnType']
+                ]
+            ];
         }
 
-        $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
+        $propertyId = $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
             'name'                  => $rawData['name'],
             'file_id'               => $fileId,
             'start_line'            => $rawData['startLine'],
             'end_line'              => $rawData['endLine'],
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
+            'is_magic'              => $isMagic ? 1 : 0,
+            'is_static'             => $rawData['isStatic'] ? 1 : 0,
+            'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
-            'return_type'           => $returnType,
-            'full_return_type'      => $fullReturnType,
             'return_description'    => $documentation['var']['description'],
             'structure_id'          => $seId,
             'access_modifier_id'    => $amId,
-            'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
-            'is_magic'              => $isMagic ? 1 : 0,
-            'is_static'             => $rawData['isStatic'] ? 1 : 0
+            'types_serialized'      => serialize($types)
         ]);
     }
 
@@ -1049,88 +1152,27 @@ class Indexer
             DocParser::RETURN_VALUE
         ], $rawData['name']);
 
-        if ($documentation && $documentation['return']['type']) {
-            $returnType = $documentation['return']['type'];
-            $fullReturnType = null;
-        } else {
-            $returnType = $rawData['returnType'];
-            $fullReturnType = $rawData['fullReturnType'];
-        }
+        $returnTypes = [];
 
-        if (!$fullReturnType) {
-            $fullReturnType = $this->getFullTypeForDocblockType(
-                $returnType,
+        if ($documentation && $documentation['return']['type']) {
+            $returnTypes = $this->getTypeDataForTypeSpecification(
+                $documentation['return']['type'],
                 $rawData['startLine'],
                 $useStatementFetchingVisitor
             );
+        } elseif (isset($rawData['returnType'])) {
+            $returnTypes = [
+                [
+                    'type' => $rawData['returnType'],
+                    'fqcn' => isset($rawData['fullReturnType']) ? $rawData['fullReturnType'] : $rawData['returnType']
+                ]
+            ];
         }
 
         $shortDescription = isset($rawData['shortDescription']) ? $rawData['shortDescription'] : null;
 
         if ($shortDescription === null) {
             $shortDescription = $documentation['descriptions']['short'];
-        }
-
-        $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
-            'name'                  => $rawData['name'],
-            'fqsen'                 => isset($rawData['fqsen']) ? $rawData['fqsen'] : null,
-            'file_id'               => $fileId,
-            'start_line'            => $rawData['startLine'],
-            'end_line'              => $rawData['endLine'],
-            'is_builtin'            => 0,
-            'is_abstract'           => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
-            'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-            'short_description'     => $shortDescription,
-            'long_description'      => $documentation['descriptions']['long'],
-            'return_type'           => $returnType,
-            'return_type_hint'      => $rawData['returnType'],
-            'full_return_type'      => $fullReturnType,
-            'return_description'    => $documentation['return']['description'],
-            'structure_id'          => $seId,
-            'access_modifier_id'    => $amId,
-            'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
-            'is_magic'              => $isMagic ? 1 : 0,
-            'is_static'             => isset($rawData['isStatic']) ? ($rawData['isStatic'] ? 1 : 0) : 0
-        ]);
-
-        $parameters = [];
-
-        foreach ($rawData['parameters'] as $parameter) {
-            $parameterKey = '$' . $parameter['name'];
-            $parameterDoc = isset($documentation['params'][$parameterKey]) ?
-                $documentation['params'][$parameterKey] : null;
-
-            if ($parameterDoc) {
-                $type = $parameterDoc['type'];
-                $fullType = null;
-            } else {
-                $type = $parameter['type'];
-                $fullType = $parameter['fullType'];
-            }
-
-            if (!$fullType) {
-                $fullType = $this->getFullTypeForDocblockType(
-                    $type,
-                    $rawData['startLine'],
-                    $useStatementFetchingVisitor
-                );
-            }
-
-            $parameterData = [
-                'function_id'  => $functionId,
-                'name'         => $parameter['name'],
-                'type'         => $type,
-                'type_hint'    => $parameter['type'],
-                'full_type'    => $fullType,
-                'description'  => $parameterDoc ? $parameterDoc['description'] : null,
-                'is_reference' => $parameter['isReference'] ? 1 : 0,
-                'is_optional'  => $parameter['isOptional'] ? 1 : 0,
-                'is_variadic'  => $parameter['isVariadic'] ? 1 : 0
-            ];
-
-            $parameters[] = $parameterData;
-
-            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameterData);
         }
 
         $throws = [];
@@ -1144,14 +1186,74 @@ class Indexer
             ];
 
             $throws[] = $throwsData;
-
-            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, $throwsData);
         }
 
-        $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
-            'throws_serialized'     => serialize($throws),
-            'parameters_serialized' => serialize($parameters)
+        $parameters = [];
+
+        foreach ($rawData['parameters'] as $parameter) {
+            $parameterKey = '$' . $parameter['name'];
+            $parameterDoc = isset($documentation['params'][$parameterKey]) ?
+                $documentation['params'][$parameterKey] : null;
+
+            $types = [];
+
+            if ($parameterDoc) {
+                $types = $this->getTypeDataForTypeSpecification(
+                    $parameterDoc['type'],
+                    $rawData['startLine'],
+                    $useStatementFetchingVisitor
+                );
+            } elseif (isset($parameter['type'])) {
+                $types = [
+                    [
+                        'type' => $parameter['type'],
+                        'fqcn' => isset($parameter['fullType']) ? $parameter['fullType'] : $parameter['type']
+                    ]
+                ];
+            }
+
+            $parameters[] = [
+                'name'             => $parameter['name'],
+                'type_hint'        => $parameter['type'],
+                'types_serialized' => serialize($types),
+                'description'      => $parameterDoc ? $parameterDoc['description'] : null,
+                'is_nullable'      => 0, // TODO
+                'is_reference'     => $parameter['isReference'] ? 1 : 0,
+                'is_optional'      => $parameter['isOptional'] ? 1 : 0,
+                'is_variadic'      => $parameter['isVariadic'] ? 1 : 0
+            ];
+        }
+
+        $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
+            'name'                    => $rawData['name'],
+            'fqsen'                   => isset($rawData['fqsen']) ? $rawData['fqsen'] : null,
+            'file_id'                 => $fileId,
+            'start_line'              => $rawData['startLine'],
+            'end_line'                => $rawData['endLine'],
+            'is_builtin'              => 0,
+            'is_abstract'             => (isset($rawData['isAbstract']) && $rawData['isAbstract']) ? 1 : 0,
+            'is_deprecated'           => $documentation['deprecated'] ? 1 : 0,
+            'short_description'       => $shortDescription,
+            'long_description'        => $documentation['descriptions']['long'],
+            'return_description'      => $documentation['return']['description'],
+            'return_type_hint'        => $rawData['returnType'],
+            'structure_id'            => $seId,
+            'access_modifier_id'      => $amId,
+            'is_magic'                => $isMagic ? 1 : 0,
+            'is_static'               => isset($rawData['isStatic']) ? ($rawData['isStatic'] ? 1 : 0) : 0,
+            'has_docblock'            => empty($rawData['docComment']) ? 0 : 1,
+            'throws_serialized'       => serialize($throws),
+            'parameters_serialized'   => serialize($parameters),
+            'return_types_serialized' => serialize($returnTypes)
         ]);
+
+        foreach ($parameters as $parameter) {
+            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameter);
+        }
+
+        foreach ($throws as $throw) {
+            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, $throw);
+        }
     }
 
     /**
@@ -1186,7 +1288,7 @@ class Indexer
      *
      * @return string|null
      */
-    protected function getFullTypeForDocblockType(
+    protected function getFqcnForLocalType(
         $type,
         $line,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
@@ -1219,46 +1321,7 @@ class Indexer
 
         $typeResolver = new TypeResolver($namespaceName, $useStatements);
 
-        $soleType = $this->getSoleClassNameForTypeSpecification($type);
-
-        if (!$soleType) {
-            return $type;
-        }
-
-        return $typeResolver->resolve($soleType);
-    }
-
-    /**
-     * Retrieves the sole class name for the specified type specification.
-     *
-     * @example "null" returns null.
-     * @example "FooClass" returns "FooClass".
-     * @example "FooClass|null" returns "FooClass".
-     * @example "FooClass|BarClass|null" returns null (there is no single type).
-     *
-     * @param string $typeSpecification
-     *
-     * @return string|null
-     */
-    public function getSoleClassNameForTypeSpecification($typeSpecification)
-    {
-        if ($typeSpecification) {
-            $types = explode(DocParser::TYPE_SPLITTER, $typeSpecification);
-
-            $classTypes = [];
-
-            foreach ($types as $type) {
-                if (!$this->typeAnalyzer->isSpecialType($type)) {
-                    $classTypes[] = $type;
-                }
-            }
-
-            if (count($classTypes) === 1) {
-                return $classTypes[0];
-            }
-        }
-
-        return null;
+        return $typeResolver->resolve($type);
     }
 
     /**

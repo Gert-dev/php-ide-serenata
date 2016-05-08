@@ -251,9 +251,9 @@ class IndexDataAdapter
                 ]
             ]);
 
-            if ($resultingProperty['return']['type'] === 'self') {
-                $resultingProperty['return']['resolvedType'] = $element['fqsen'];
-            }
+            // if ($resultingProperty['return']['type'] === 'self') {
+                // $resultingProperty['return']['resolvedType'] = $element['fqsen'];
+            // }
 
             if ($existingProperty) {
                 $resultingProperty['descriptions']['long'] = $this->resolveInheritDoc(
@@ -329,14 +329,14 @@ class IndexDataAdapter
                 ]
             ]);
 
-            if ($resultingMethod['return']['type'] === 'self') {
-                $resultingMethod['return']['resolvedType'] = $element['fqsen'];
-            }
+            // if ($resultingMethod['returnType'] === 'self') {
+                // $resultingMethod['referencedType'] = $element['fqsen'];
+            // }
 
             if ($existingMethod) {
-                $resultingMethod['descriptions']['long'] = $this->resolveInheritDoc(
-                    $resultingMethod['descriptions']['long'],
-                    $existingMethod['descriptions']['long']
+                $resultingMethod['longDescription'] = $this->resolveInheritDoc(
+                    $resultingMethod['longDescription'],
+                    $existingMethod['longDescription']
                 );
             }
 
@@ -558,18 +558,26 @@ class IndexDataAdapter
     protected function resolveReturnTypes(ArrayObject $result, $elementFqsen)
     {
         foreach ($result['methods'] as $name => &$method) {
-            if ($method['return']['type'] === '$this' || $method['return']['type'] === 'static') {
-                $method['return']['resolvedType'] = $elementFqsen;
-            } elseif (!isset($method['return']['resolvedType'])) {
-                $method['return']['resolvedType'] = $method['return']['type'];
+            foreach ($method['parameters'] as &$parameter) {
+                foreach ($parameter['types'] as &$type) {
+                    if ($type['type'] === '$this' || $type['type'] === 'static') {
+                        $type['referencedType'] = $elementFqsen;
+                    }
+                }
+            }
+
+            foreach ($method['returnTypes'] as &$returnType) {
+                if ($returnType['type'] === '$this' || $returnType['type'] === 'static') {
+                    $returnType['referencedType'] = $elementFqsen;
+                }
             }
         }
 
         foreach ($result['properties'] as $name => &$property) {
-            if ($property['return']['type'] === '$this' || $property['return']['type'] === 'static') {
-                $property['return']['resolvedType'] = $elementFqsen;
-            } elseif (!isset($property['return']['resolvedType'])) {
-                $property['return']['resolvedType'] = $property['return']['type'];
+            foreach ($property['types'] as &$type) {
+                if ($type['type'] === '$this' || $type['type'] === 'static') {
+                    $type['referencedType'] = $elementFqsen;
+                }
             }
         }
     }
@@ -611,9 +619,8 @@ class IndexDataAdapter
         foreach ($rawParameters as $rawParameter) {
             $parameters[] = [
                 'name'        => $rawParameter['name'],
-                'type'        => $rawParameter['type'],
                 'typeHint'    => $rawParameter['type_hint'],
-                'fullType'    => $rawParameter['full_type'],
+                'types'       => $this->getReturnTypeDataForSerializedTypes($rawParameter['types_serialized']),
                 'description' => $rawParameter['description'],
                 'isReference' => !!$rawParameter['is_reference'],
                 'isVariadic'  => !!$rawParameter['is_variadic'],
@@ -630,30 +637,25 @@ class IndexDataAdapter
         }
 
         return [
-            'name'             => $rawInfo['name'],
-            'fqsen'            => $rawInfo['fqsen'],
-            'isBuiltin'        => !!$rawInfo['is_builtin'],
-            'startLine'        => (int) $rawInfo['start_line'],
-            'endLine'          => (int) $rawInfo['end_line'],
-            'filename'         => $rawInfo['path'],
+            'name'              => $rawInfo['name'],
+            'fqsen'             => $rawInfo['fqsen'],
+            'isBuiltin'         => !!$rawInfo['is_builtin'],
+            'startLine'         => (int) $rawInfo['start_line'],
+            'endLine'           => (int) $rawInfo['end_line'],
+            'filename'          => $rawInfo['path'],
 
-            'parameters'       => $parameters,
-            'throws'           => $throwsAssoc,
-            'isDeprecated'     => !!$rawInfo['is_deprecated'],
-            'hasDocblock'      => !!$rawInfo['has_docblock'],
-            'hasDocumentation' => !!$rawInfo['has_docblock'],
+            'parameters'        => $parameters,
+            'throws'            => $throwsAssoc,
+            'isDeprecated'      => !!$rawInfo['is_deprecated'],
+            'hasDocblock'       => !!$rawInfo['has_docblock'],
+            'hasDocumentation'  => !!$rawInfo['has_docblock'],
 
-            'descriptions'  => [
-                'short' => $rawInfo['short_description'],
-                'long'  => $rawInfo['long_description']
-            ],
+            'shortDescription'  => $rawInfo['short_description'],
+            'longDescription'   => $rawInfo['long_description'],
+            'returnDescription' => $rawInfo['return_description'],
 
-            'return'        => [
-                'type'         => $rawInfo['return_type'],
-                'typeHint'     => $rawInfo['return_type_hint'],
-                'resolvedType' => $rawInfo['full_return_type'],
-                'description'  => $rawInfo['return_description']
-            ]
+            'returnTypeHint'    => $rawInfo['return_type_hint'],
+            'returnTypes'       => $this->getReturnTypeDataForSerializedTypes($rawInfo['return_types_serialized'])
         ];
     }
 
@@ -677,16 +679,11 @@ class IndexDataAdapter
             'hasDocblock'        => !!$rawInfo['has_docblock'],
             'hasDocumentation'   => !!$rawInfo['has_docblock'],
 
-            'descriptions'  => [
-                'short' => $rawInfo['short_description'],
-                'long'  => $rawInfo['long_description']
-            ],
+            'shortDescription'  => $rawInfo['short_description'],
+            'longDescription'   => $rawInfo['long_description'],
+            'returnDescription' => $rawInfo['return_description'],
 
-            'return'        => [
-                'type'         => $rawInfo['return_type'],
-                'resolvedType' => $rawInfo['full_return_type'],
-                'description'  => $rawInfo['return_description']
-            ],
+            'types'             => $this->getReturnTypeDataForSerializedTypes($rawInfo['types_serialized']),
 
             'override'           => null,
             'declaringClass'     => null,
@@ -702,32 +699,49 @@ class IndexDataAdapter
     public function getConstantInfo(array $rawInfo)
     {
         return [
-            'name'             => $rawInfo['name'],
-            'fqsen'            => $rawInfo['fqsen'],
-            'isBuiltin'        => !!$rawInfo['is_builtin'],
-            'startLine'        => (int) $rawInfo['start_line'],
-            'endLine'          => (int) $rawInfo['end_line'],
-            'filename'         => $rawInfo['path'],
+            'name'              => $rawInfo['name'],
+            'fqsen'             => $rawInfo['fqsen'],
+            'isBuiltin'         => !!$rawInfo['is_builtin'],
+            'startLine'         => (int) $rawInfo['start_line'],
+            'endLine'           => (int) $rawInfo['end_line'],
+            'filename'          => $rawInfo['path'],
 
-            'isPublic'         => true,
-            'isProtected'      => false,
-            'isPrivate'        => false,
-            'isStatic'         => true,
-            'isDeprecated'     => !!$rawInfo['is_deprecated'],
-            'hasDocblock'      => !!$rawInfo['has_docblock'],
-            'hasDocumentation' => !!$rawInfo['has_docblock'],
+            'isPublic'          => true,
+            'isProtected'       => false,
+            'isPrivate'         => false,
+            'isStatic'          => true,
+            'isDeprecated'      => !!$rawInfo['is_deprecated'],
+            'hasDocblock'       => !!$rawInfo['has_docblock'],
+            'hasDocumentation'  => !!$rawInfo['has_docblock'],
 
-            'descriptions'  => [
-                'short' => $rawInfo['short_description'],
-                'long'  => $rawInfo['long_description']
-            ],
+            'shortDescription'  => $rawInfo['short_description'],
+            'longDescription'   => $rawInfo['long_description'],
+            'returnDescription' => $rawInfo['return_description'],
 
-            'return'        => [
-                'type'         => $rawInfo['return_type'],
-                'resolvedType' => $rawInfo['full_return_type'],
-                'description'  => $rawInfo['return_description']
-            ],
+            'types'             => $this->getReturnTypeDataForSerializedTypes($rawInfo['types_serialized'])
         ];
+    }
+
+    /**
+     * @param array[] $serializedTypes
+     *
+     * @return array[]
+     */
+    protected function getReturnTypeDataForSerializedTypes($serializedTypes)
+    {
+        $types = [];
+
+        $rawTypes = unserialize($serializedTypes);
+
+        foreach ($rawTypes as $rawType) {
+            $types[] = [
+                'type'           => $rawType['type'],
+                'fqcn'           => $rawType['fqcn'],
+                'referencedType' => null
+            ];
+        }
+
+        return $types;
     }
 
     /**
@@ -775,7 +789,9 @@ class IndexDataAdapter
         $inheritedKeys = [
             'hasDocumentation',
             'isDeprecated',
-            'descriptions',
+            'shortDescription',
+            'longDescription',
+            'returnDescription',
             'return'
         ];
 
@@ -802,8 +818,10 @@ class IndexDataAdapter
         $inheritedKeys = [
             'hasDocumentation',
             'isDeprecated',
-            'descriptions',
-            'return',
+            'shortDescription',
+            'longDescription',
+            'returnDescription',
+            'returnTypes',
             'parameters',
             'throws'
         ];
