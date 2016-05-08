@@ -98,7 +98,7 @@ class TypeAnalyzer
      */
     public function isTypeConformantWithDocblockType($type, $typeSpecification)
     {
-        $docblockTypes = $this->getDocblockTypesForTypeSpecification($typeSpecification);
+        $docblockTypes = $this->getTypesForTypeSpecification($typeSpecification);
 
         return $this->isTypeConformantWithDocblockTypes($type, $docblockTypes);
     }
