@@ -1178,10 +1178,13 @@ class Indexer
         $throws = [];
 
         foreach ($documentation['throws'] as $type => $description) {
+            $typeData = $this->getTypeDataForTypeSpecification($type, $rawData['startLine'], $useStatementFetchingVisitor);
+            $typeData = array_shift($typeData);
+
             $throwsData = [
                 'function_id' => $functionId,
-                'type'        => $type,
-                'full_type'   => $this->getFullTypeForDocblockType($type, $rawData['startLine'], $useStatementFetchingVisitor),
+                'type'        => $typeData['type'],
+                'full_type'   => $typeData['fqcn'],
                 'description' => $description ?: null
             ];
 
