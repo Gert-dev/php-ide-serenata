@@ -37,27 +37,32 @@ class Indexer
     protected $storage;
 
     /**
-     * @var DocParser|null
+     * @var DocParser
      */
     protected $docParser;
 
     /**
-     * @var TypeAnalyzer|null
+     * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
 
     /**
-     * @var Parser|null
+     * @var ParserFactory
+     */
+    protected $parserFactory;
+
+    /**
+     * @var Parser
      */
     protected $parser;
 
     /**
-     * @var array|null
+     * @var array
      */
     protected $accessModifierMap;
 
     /**
-     * @var array|null
+     * @var array
      */
     protected $structureTypeMap;
 
@@ -76,15 +81,25 @@ class Indexer
     protected $streamProgress;
 
     /**
-     * Constructor.
-     *
      * @param Indexer\StorageInterface $storage
+     * @param TypeAnalyzer             $typeAnalyzer
+     * @param DocParser                $docParser
+     * @param ParserFactory            $parserFactory
      * @param bool                     $showOutput
      * @param bool                     $streamProgress
      */
-    public function __construct(Indexer\StorageInterface $storage, $showOutput = false, $streamProgress = false)
-    {
+    public function __construct(
+        Indexer\StorageInterface $storage,
+        TypeAnalyzer $typeAnalyzer,
+        DocParser $docParser,
+        ParserFactory $parserFactory,
+        $showOutput,
+        $streamProgress
+    ) {
         $this->storage = $storage;
+        $this->typeAnalyzer = $typeAnalyzer;
+        $this->docParser = $docParser;
+        $this->parserFactory = $parserFactory;
         $this->showOutput = $showOutput;
         $this->streamProgress = $streamProgress;
     }
@@ -647,7 +662,7 @@ class Indexer
     ) {
         $structureTypeMap = $this->getStructureTypeMap();
 
-        $documentation = $this->getDocParser()->parse($rawData['docComment'], [
+        $documentation = $this->docParser->parse($rawData['docComment'], [
             DocParser::DEPRECATED,
             DocParser::ANNOTATION,
             DocParser::DESCRIPTION,
@@ -673,7 +688,7 @@ class Indexer
             'long_description'  => $documentation['descriptions']['long']
         ];
 
-        $this->storage->deleteStructure($this->getTypeAnalyzer()->getNormalizedFqcn($fqsen));
+        $this->storage->deleteStructure($this->typeAnalyzer->getNormalizedFqcn($fqsen));
 
         $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, $seData);
 
@@ -683,7 +698,7 @@ class Indexer
             foreach ($rawData['parents'] as $parent) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
                     'structure_id'           => $seId,
-                    'linked_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($parent)
+                    'linked_structure_fqsen' => $this->typeAnalyzer->getNormalizedFqcn($parent)
                 ]);
             }
         }
@@ -692,7 +707,7 @@ class Indexer
             foreach ($rawData['interfaces'] as $interface) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
                     'structure_id'           => $seId,
-                    'linked_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($interface)
+                    'linked_structure_fqsen' => $this->typeAnalyzer->getNormalizedFqcn($interface)
                 ]);
             }
         }
@@ -701,7 +716,7 @@ class Indexer
             foreach ($rawData['traits'] as $trait) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
                     'structure_id'           => $seId,
-                    'linked_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($trait)
+                    'linked_structure_fqsen' => $this->typeAnalyzer->getNormalizedFqcn($trait)
                 ]);
             }
         }
@@ -712,7 +727,7 @@ class Indexer
 
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_ALIASES, [
                     'structure_id'          => $seId,
-                    'trait_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($traitAlias['trait']),
+                    'trait_structure_fqsen' => $this->typeAnalyzer->getNormalizedFqcn($traitAlias['trait']),
                     'access_modifier_id'    => $accessModifier ? $accessModifierMap[$accessModifier] : null,
                     'name'                  => $traitAlias['name'],
                     'alias'                 => $traitAlias['alias']
@@ -724,7 +739,7 @@ class Indexer
             foreach ($rawData['traitPrecedences'] as $traitPrecedence) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, [
                     'structure_id'          => $seId,
-                    'trait_structure_fqsen' => $this->getTypeAnalyzer()->getNormalizedFqcn($traitPrecedence['trait']),
+                    'trait_structure_fqsen' => $this->typeAnalyzer->getNormalizedFqcn($traitPrecedence['trait']),
                     'name'                  => $traitPrecedence['name']
                 ]);
             }
@@ -900,7 +915,7 @@ class Indexer
         $seId = null,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        $documentation = $this->getDocParser()->parse($rawData['docComment'], [
+        $documentation = $this->docParser->parse($rawData['docComment'], [
             DocParser::VAR_TYPE,
             DocParser::DEPRECATED,
             DocParser::DESCRIPTION
@@ -955,7 +970,7 @@ class Indexer
         $isMagic = false,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        $documentation = $this->getDocParser()->parse($rawData['docComment'], [
+        $documentation = $this->docParser->parse($rawData['docComment'], [
             DocParser::VAR_TYPE,
             DocParser::DEPRECATED,
             DocParser::DESCRIPTION
@@ -1026,7 +1041,7 @@ class Indexer
         $isMagic = false,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        $documentation = $this->getDocParser()->parse($rawData['docComment'], [
+        $documentation = $this->docParser->parse($rawData['docComment'], [
             DocParser::THROWS,
             DocParser::PARAM_TYPE,
             DocParser::DEPRECATED,
@@ -1233,7 +1248,7 @@ class Indexer
             $classTypes = [];
 
             foreach ($types as $type) {
-                if (!$this->getTypeAnalyzer()->isSpecialType($type)) {
+                if (!$this->typeAnalyzer->isSpecialType($type)) {
                     $classTypes[] = $type;
                 }
             }
@@ -1282,35 +1297,11 @@ class Indexer
                 ]
             ]);
 
-            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer, [
+            $this->parser = $this->parserFactory->create(ParserFactory::PREFER_PHP7, $lexer, [
                 'throwOnError' => false
             ]);
         }
 
         return $this->parser;
-    }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
-    }
-
-    /**
-     * @return DocParser
-     */
-    protected function getDocParser()
-    {
-        if (!$this->docParser) {
-            $this->docParser = new DocParser();
-        }
-
-        return $this->docParser;
     }
 }

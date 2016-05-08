@@ -8,16 +8,34 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Indexer;
-use PhpIntegrator\IndexDataAdapter;
+use PhpIntegrator\DocParser;
+use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexStorageItemEnum;
 
 use PhpIntegrator\Application\Command as BaseCommand;
+
+use PhpParser\ParserFactory;
 
 /**
  * Command that reindexes a file or folder.
  */
 class Reindex extends BaseCommand
 {
+    /**
+     * @var DocParser
+     */
+    protected $docParser;
+
+    /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
+     * @var ParserFactory
+     */
+    protected $parserFactory;
+
     /**
      * @inheritDoc
      */
@@ -54,7 +72,14 @@ class Reindex extends BaseCommand
      */
     public function reindex($path, $useStdin, $showOutput, $doStreamProgress)
     {
-        $indexer = new Indexer($this->indexDatabase, $showOutput, $doStreamProgress);
+        $indexer = new Indexer(
+            $this->indexDatabase,
+            $this->getTypeAnalyzer(),
+            $this->getDocParser(),
+            $this->getParserFactory(),
+            $showOutput,
+            $doStreamProgress
+        );
 
         $hasIndexedBuiltin = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('id', 'value')
@@ -117,5 +142,41 @@ class Reindex extends BaseCommand
         }
 
         throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
+    }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
+    }
+
+    /**
+     * @return DocParser
+     */
+    protected function getDocParser()
+    {
+        if (!$this->docParser) {
+            $this->docParser = new DocParser();
+        }
+
+        return $this->docParser;
+    }
+
+    /**
+     * @return DocParser
+     */
+    protected function getParserFactory()
+    {
+        if (!$this->parserFactory) {
+            $this->parserFactory = new ParserFactory();
+        }
+
+        return $this->parserFactory;
     }
 }
