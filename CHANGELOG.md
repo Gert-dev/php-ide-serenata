@@ -1,4 +1,7 @@
 ## 0.10.0
+### Features and enhancements
+* Minor performance improvements when calculating the global class list.
+
 ### Changes for developers
 * Changes to the service
   * Return types for functions and types for function parameters will now also include a `typeHint` property that is set to the actual type hint that was specified (the type and resolvedType fall back to the docblock if it is present).

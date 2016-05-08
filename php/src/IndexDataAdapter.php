@@ -453,7 +453,7 @@ class IndexDataAdapter
      *
      * @return array
      */
-    protected function parseTraitData(ArrayObject $result, Traversable $traits, $element)
+    protected function parseTraitData(ArrayObject $result, $traits, $element)
     {
         $traitAliases = $this->storage->getStructureTraitAliasesAssoc($element['id']);
         $traitPrecedences = $this->storage->getStructureTraitPrecedencesAssoc($element['id']);

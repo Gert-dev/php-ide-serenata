@@ -2,8 +2,6 @@
 
 namespace PhpIntegrator\Application\Command\ClassList;
 
-use ArrayIterator;
-
 use PhpIntegrator\IndexDataAdapter\ProviderInterface;
 
 /**
@@ -64,7 +62,7 @@ class ProxyProvider implements ProviderInterface
      */
     public function getStructureRawParents($id)
     {
-        return new ArrayIterator([]);
+        return [];
     }
 
     /**
@@ -72,7 +70,7 @@ class ProxyProvider implements ProviderInterface
      */
     public function getStructureRawChildren($id)
     {
-        return new ArrayIterator([]);
+        return [];
     }
 
     /**
@@ -80,7 +78,7 @@ class ProxyProvider implements ProviderInterface
      */
     public function getStructureRawInterfaces($id)
     {
-        return new ArrayIterator([]);
+        return [];
     }
 
     /**
@@ -88,7 +86,7 @@ class ProxyProvider implements ProviderInterface
      */
     public function getStructureRawImplementors($id)
     {
-        return new ArrayIterator([]);
+        return [];
     }
 
     /**
@@ -96,7 +94,7 @@ class ProxyProvider implements ProviderInterface
      */
     public function getStructureRawTraits($id)
     {
-        return new ArrayIterator([]);
+        return [];
     }
 
     /**
@@ -104,7 +102,7 @@ class ProxyProvider implements ProviderInterface
      */
     public function getStructureRawTraitUsers($id)
     {
-        return new ArrayIterator([]);
+        return [];
     }
 
     /**
@@ -112,7 +110,7 @@ class ProxyProvider implements ProviderInterface
      */
     public function getStructureRawConstants($id)
     {
-        return new ArrayIterator([]);
+        return [];
     }
 
     /**
@@ -120,7 +118,7 @@ class ProxyProvider implements ProviderInterface
      */
     public function getStructureRawProperties($id)
     {
-        return new ArrayIterator([]);
+        return [];
     }
 
     /**
