@@ -1182,7 +1182,6 @@ class Indexer
             $typeData = array_shift($typeData);
 
             $throwsData = [
-                'function_id' => $functionId,
                 'type'        => $typeData['type'],
                 'full_type'   => $typeData['fqcn'],
                 'description' => $description ?: null
