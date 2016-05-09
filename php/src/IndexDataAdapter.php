@@ -790,7 +790,7 @@ class IndexDataAdapter
             'shortDescription',
             'longDescription',
             'returnDescription',
-            'return'
+            'types'
         ];
 
         foreach ($processedData as $key => $value) {
