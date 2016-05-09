@@ -132,10 +132,8 @@ class IndexDataAdapter
             'hasDocblock'        => !!$element['has_docblock'],
             'hasDocumentation'   => !!$element['has_docblock'],
 
-            'descriptions'       => [
-                'short' => $element['short_description'],
-                'long'  => $element['long_description']
-            ],
+            'shortDescription'   => $element['short_description'],
+            'longDescription'    => $element['long_description'],
 
             'parents'            => [],
             'interfaces'         => [],
@@ -256,9 +254,9 @@ class IndexDataAdapter
             // }
 
             if ($existingProperty) {
-                $resultingProperty['descriptions']['long'] = $this->resolveInheritDoc(
-                    $resultingProperty['descriptions']['long'],
-                    $existingProperty['descriptions']['long']
+                $resultingProperty['longDescription'] = $this->resolveInheritDoc(
+                    $resultingProperty['longDescription'],
+                    $existingProperty['longDescription']
                 );
             }
 
@@ -389,16 +387,16 @@ class IndexDataAdapter
             $parentInfo = $this->getCheckedParentStructureInfo($parent['id'], $parent['fqsen'], $result['name']);
 
             if ($parentInfo) {
-                if (!$result['descriptions']['short']) {
-                    $result['descriptions']['short'] = $parentInfo['descriptions']['short'];
+                if (!$result['shortDescription']) {
+                    $result['shortDescription'] = $parentInfo['shortDescription'];
                 }
 
-                if (!$result['descriptions']['long']) {
-                    $result['descriptions']['long'] = $parentInfo['descriptions']['long'];
+                if (!$result['longDescription']) {
+                    $result['longDescription'] = $parentInfo['longDescription'];
                 } else {
-                    $result['descriptions']['long'] = $this->resolveInheritDoc(
-                        $result['descriptions']['long'],
-                        $parentInfo['descriptions']['long']
+                    $result['longDescription'] = $this->resolveInheritDoc(
+                        $result['longDescription'],
+                        $parentInfo['longDescription']
                     );
                 }
 
@@ -487,9 +485,9 @@ class IndexDataAdapter
                 ]);
 
                 if ($existingProperty) {
-                    $resultingProperty['descriptions']['long'] = $this->resolveInheritDoc(
-                        $resultingProperty['descriptions']['long'],
-                        $existingProperty['descriptions']['long']
+                    $resultingProperty['longDescription'] = $this->resolveInheritDoc(
+                        $resultingProperty['longDescription'],
+                        $existingProperty['longDescription']
                     );
                 }
 
@@ -540,9 +538,9 @@ class IndexDataAdapter
                 ]);
 
                 if ($existingMethod) {
-                    $resultingMethod['descriptions']['long'] = $this->resolveInheritDoc(
-                        $resultingMethod['descriptions']['long'],
-                        $existingMethod['descriptions']['long']
+                    $resultingMethod['longDescription'] = $this->resolveInheritDoc(
+                        $resultingMethod['longDescription'],
+                        $existingMethod['longDescription']
                     );
                 }
 
@@ -756,7 +754,7 @@ class IndexDataAdapter
     {
         return
             !$processedData['hasDocblock'] ||
-            $this->getDocblockAnalyzer()->isFullInheritDocSyntax($processedData['descriptions']['short']);
+            $this->getDocblockAnalyzer()->isFullInheritDocSyntax($processedData['shortDescription']);
     }
 
     /**
