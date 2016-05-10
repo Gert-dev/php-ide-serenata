@@ -113,6 +113,12 @@ class ClassInfoTest extends IndexedTest
                     'type'         => 'MyType',
                     'fqcn'         => 'A\MyType',
                     'resolvedType' => 'A\MyType'
+                ],
+
+                [
+                    'type'         => 'string',
+                    'fqcn'         => 'string',
+                    'resolvedType' => 'string'
                 ]
             ],
 

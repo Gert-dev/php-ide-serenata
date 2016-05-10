@@ -9,7 +9,7 @@ class TestClass
      *
      * This is a long description.
      *
-     * @var MyType
+     * @var MyType|string
      */
     protected $testProperty;
 }
