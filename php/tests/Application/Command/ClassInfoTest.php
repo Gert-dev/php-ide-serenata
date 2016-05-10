@@ -624,10 +624,12 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['longDescription'], '');
         $this->assertEquals($data['returnDescription'], null);
 
-        $this->assertEquals($data['types'][0], [
-            'type'           => 'Type1',
-            'fqcn'           => 'A\Type1',
-            'referencedType' => null
+        $this->assertEquals($data['types'], [
+            [
+                'type'           => 'Type1',
+                'fqcn'           => 'A\Type1',
+                'referencedType' => null
+            ]
         ]);
 
         $data = $output['properties']['prop2'];
@@ -643,10 +645,12 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['shortDescription'], 'Description 2.');
         $this->assertEquals($data['longDescription'], '');
 
-        $this->assertEquals($data['return'], [
-            'type'         => 'Type2',
-            'resolvedType' => 'A\Type2',
-            'description'  => null
+        $this->assertEquals($data['types'], [
+            [
+                'type'           => 'Type2',
+                'fqcn'           => 'A\Type2',
+                'referencedType' => null
+            ]
         ]);
 
         $data = $output['properties']['prop3'];
@@ -662,10 +666,12 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['shortDescription'], 'Description 3.');
         $this->assertEquals($data['longDescription'], '');
 
-        $this->assertEquals($data['return'], [
-            'type'         => 'Type3',
-            'resolvedType' => 'A\Type3',
-            'description'  => null
+        $this->assertEquals($data['types'], [
+            [
+                'type'           => 'Type3',
+                'fqcn'           => 'A\Type3',
+                'referencedType' => null
+            ]
         ]);
 
         $data = $output['properties']['prop4'];
@@ -681,10 +687,12 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['shortDescription'], 'Description 4.');
         $this->assertEquals($data['longDescription'], '');
 
-        $this->assertEquals($data['return'], [
-            'type'         => 'Type4',
-            'resolvedType' => 'A\Type4',
-            'description'  => null
+        $this->assertEquals($data['types'], [
+            [
+                'type'           => 'Type4',
+                'fqcn'           => 'A\Type4',
+                'referencedType' => null
+            ]
         ]);
     }
 
@@ -703,17 +711,20 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], false);
+        $this->assertNull($data['returnTypeHint']);
 
         $this->assertEquals($data['parameters'], []);
 
         $this->assertNull($data['shortDescription']);
         $this->assertNull($data['longDescription']);
+        $this->assertNull($data['returnDescription']);
 
-        $this->assertEquals($data['return'], [
-            'type'         => 'void',
-            'typeHint'     => 'void',
-            'resolvedType' => 'void',
-            'description'  => null
+        $this->assertEquals($data['returnTypes'], [
+            [
+                'type'           => 'void',
+                'fqcn'           => 'void',
+                'referencedType' => null
+            ]
         ]);
 
         $data = $output['methods']['someMethod'];
@@ -725,61 +736,72 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], false);
+        $this->assertNull($data['returnTypeHint']);
 
         $this->assertEquals($data['parameters'], [
             [
                 'name'        => 'a',
-                'type'        => null,
                 'typeHint'    => null,
-                'fullType'    => null,
                 'description' => null,
                 'isReference' => false,
                 'isVariadic'  => false,
-                'isOptional'  => false
+                'isOptional'  => false,
+                'types'       => []
             ],
 
             [
                 'name'        => 'b',
-                'type'        => null,
                 'typeHint'    => null,
-                'fullType'    => null,
                 'description' => null,
                 'isReference' => false,
                 'isVariadic'  => false,
-                'isOptional'  => false
+                'isOptional'  => false,
+                'types'       => []
             ],
 
             [
                 'name'        => 'c',
-                'type'        => 'array',
-                'typeHint'    => 'array',
-                'fullType'    => 'array',
+                'typeHint'    => null,
                 'description' => null,
                 'isReference' => false,
                 'isVariadic'  => false,
-                'isOptional'  => true
+                'isOptional'  => true,
+                'types'       => [
+                    [
+                        'type'           => 'array',
+                        'fqcn'           => 'array',
+                        'referencedType' => null
+                    ]
+                ]
             ],
 
             [
                 'name'        => 'd',
-                'type'        => 'Type',
-                'typeHint'    => 'Type',
-                'fullType'    => 'A\Type',
+                'typeHint'    => null,
                 'description' => null,
                 'isReference' => false,
                 'isVariadic'  => false,
-                'isOptional'  => true
+                'isOptional'  => true,
+                'types'       => [
+                    [
+                        'type'           => 'Type',
+                        'fqcn'           => 'A\Type',
+                        'referencedType' => null
+                    ]
+                ]
             ]
         ]);
 
         $this->assertEquals($data['shortDescription'], 'Description of method Test second line.');
         $this->assertEquals($data['longDescription'], '');
+        $this->assertNull($data['returnDescription']);
 
-        $this->assertEquals($data['return'], [
-            'type'         => 'TestClass',
-            'typeHint'     => 'TestClass',
-            'resolvedType' => 'A\TestClass',
-            'description'  => null
+        $this->assertEquals($data['returnTypes'], [
+            [
+                'type'           => 'TestClass',
+                'fqcn'           => 'A\TestClass',
+                'referencedType' => null
+            ]
         ]);
 
         $data = $output['methods']['magicFooStatic'];
@@ -791,17 +813,20 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['hasDocblock'], false);
         $this->assertEquals($data['hasDocumentation'], false);
         $this->assertEquals($data['isStatic'], true);
+        $this->assertNull($data['returnTypeHint']);
 
         $this->assertEquals($data['parameters'], []);
 
         $this->assertNull($data['shortDescription']);
         $this->assertNull($data['longDescription']);
+        $this->assertNull($data['returnDescription']);
 
-        $this->assertEquals($data['return'], [
-            'type'         => 'void',
-            'typeHint'     => 'void',
-            'resolvedType' => 'void',
-            'description'  => null
+        $this->assertEquals($data['returnTypes'], [
+            [
+                'type'           => 'void',
+                'fqcn'           => 'void',
+                'referencedType' => null
+            ]
         ]);
     }
 

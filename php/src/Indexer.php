@@ -829,7 +829,6 @@ class Indexer
                 $fileId,
                 $seId,
                 $accessModifierMap[$accessModifier],
-                false,
                 $useStatementFetchingVisitor
             );
         }
@@ -864,30 +863,27 @@ class Indexer
         );
 
         foreach ($magicProperties as $propertyName => $propertyData) {
-            $data = $this->adaptMagicPropertyData($propertyName, $propertyData);
-
             // Use the same line as the class definition, it matters for e.g. type resolution.
-            $data['startLine'] = $data['endLine'] = $rawData['startLine'];
+            $propertyData['name'] = mb_substr($propertyName, 1);
+            $propertyData['startLine'] = $propertyData['endLine'] = $rawData['startLine'];
 
-            $this->indexProperty(
-                $data,
+            $this->indexMagicProperty(
+                $propertyData,
                 $fileId,
                 $seId,
                 $accessModifierMap['public'],
-                true,
                 $useStatementFetchingVisitor
             );
         }
 
         // Index magic methods.
         foreach ($documentation['methods'] as $methodName => $methodData) {
-            $data = $this->adaptMagicMethodData($methodName, $methodData);
-
             // Use the same line as the class definition, it matters for e.g. type resolution.
-            $data['startLine'] = $data['endLine'] = $rawData['startLine'];
+            $methodData['name'] = $methodName;
+            $methodData['startLine'] = $methodData['endLine'] = $rawData['startLine'];
 
-            $this->indexFunction(
-                $data,
+            $this->indexMagicMethod(
+                $methodData,
                 $fileId,
                 $seId,
                 $accessModifierMap['public'],
@@ -897,84 +893,6 @@ class Indexer
         }
 
         return $seId;
-    }
-
-    /**
-     * Adapts data about the specified magic property to be in the same format returned by the outline indexer.
-     *
-     * @param string $name
-     * @param array  $data
-     *
-     * @return array
-     */
-    protected function adaptMagicPropertyData($name, array $data)
-    {
-        return [
-            'name'             => mb_substr($name, 1), // Strip off the dollar sign.
-            'startLine'        => null,
-            'endLine'          => null,
-            'isPublic'         => true,
-            'isPrivate'        => false,
-            'isProtected'      => false,
-            'isStatic'         => $data['isStatic'],
-            'returnType'       => $data['type'],
-            'fullReturnType'   => null,                // Determine automatically.
-            'shortDescription' => $data['description'],
-            'docComment'       => null
-        ];
-    }
-
-    /**
-     * Adapts data about the specified magic method to be in the same format returned by the outline indexer.
-     *
-     * @param string $name
-     * @param array  $data
-     *
-     * @return array
-     */
-    protected function adaptMagicMethodData($name, array $data)
-    {
-        $parameters = [];
-
-        foreach ($data['requiredParameters'] as $parameterName => $parameter) {
-            $parameters[] = [
-                'name'        => mb_substr($parameterName, 1), // Strip off the dollar sign.
-                'type'        => $parameter['type'],
-                'typeHint'    => null,
-                'fullType'    => null,                         // Determine automatically.
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => false
-            ];
-        }
-
-        foreach ($data['optionalParameters'] as $parameterName => $parameter) {
-            $parameters[] = [
-                'name'        => mb_substr($parameterName, 1), // Strip off the dollar sign.
-                'type'        => $parameter['type'],
-                'typeHint'    => null,
-                'fullType'    => null,                         // Determine automatically.
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true
-            ];
-        }
-
-        return [
-            'name'             => $name,
-            'startLine'        => null,
-            'endLine'          => null,
-            'returnType'       => $data['type'],
-            'returnTypeHint'   => null,
-            'fullReturnType'   => null,                       // Determine automatically.
-            'parameters'       => $parameters,
-            'shortDescription' => $data['description'],
-            'docComment'       => null,
-            'isPublic'         => true,
-            'isPrivate'        => false,
-            'isProtected'      => false,
-            'isStatic'         => $data['isStatic']
-        ];
     }
 
     /**
@@ -1062,7 +980,6 @@ class Indexer
      * @param int                                      $fileId
      * @param int                                      $seId
      * @param int                                      $amId
-     * @param bool                                     $isMagic
      * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
     protected function indexProperty(
@@ -1070,7 +987,6 @@ class Indexer
         $fileId,
         $seId,
         $amId,
-        $isMagic = false,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
         $documentation = $this->docParser->parse($rawData['docComment'], [
@@ -1114,12 +1030,54 @@ class Indexer
             'start_line'            => $rawData['startLine'],
             'end_line'              => $rawData['endLine'],
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
-            'is_magic'              => $isMagic ? 1 : 0,
+            'is_magic'              => 0,
             'is_static'             => $rawData['isStatic'] ? 1 : 0,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
             'return_description'    => $documentation['var']['description'],
+            'structure_id'          => $seId,
+            'access_modifier_id'    => $amId,
+            'types_serialized'      => serialize($types)
+        ]);
+    }
+
+    /**
+     * @param array                                    $rawData
+     * @param int                                      $fileId
+     * @param int                                      $seId
+     * @param int                                      $amId
+     * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     */
+    protected function indexMagicProperty(
+        array $rawData,
+        $fileId,
+        $seId,
+        $amId,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+    ) {
+        $types = [];
+
+        if ($rawData['type']) {
+            $types = $this->getTypeDataForTypeSpecification(
+                $rawData['type'],
+                $rawData['startLine'],
+                $useStatementFetchingVisitor
+            );
+        }
+
+        $propertyId = $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
+            'name'                  => $rawData['name'],
+            'file_id'               => $fileId,
+            'start_line'            => $rawData['startLine'],
+            'end_line'              => $rawData['endLine'],
+            'is_deprecated'         => 0,
+            'is_magic'              => 1,
+            'is_static'             => $rawData['isStatic'] ? 1 : 0,
+            'has_docblock'          => 0,
+            'short_description'     => $rawData['description'],
+            'long_description'      => null,
+            'return_description'    => null,
             'structure_id'          => $seId,
             'access_modifier_id'    => $amId,
             'types_serialized'      => serialize($types)
@@ -1255,6 +1213,108 @@ class Indexer
 
         foreach ($throws as $throw) {
             $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, $throw);
+        }
+    }
+
+    /**
+     * @param array                                    $rawData
+     * @param int                                      $fileId
+     * @param int|null                                 $seId
+     * @param int|null                                 $amId
+     * @param bool                                     $isMagic
+     * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     */
+    protected function indexMagicMethod(
+        array $rawData,
+        $fileId,
+        $seId = null,
+        $amId = null,
+        $isMagic = false,
+        Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+    ) {
+        $returnTypes = [];
+
+        if ($rawData['type']) {
+            $returnTypes = $this->getTypeDataForTypeSpecification(
+                $rawData['type'],
+                $rawData['startLine'],
+                $useStatementFetchingVisitor
+            );
+        }
+
+        $parameters = [];
+
+        foreach ($rawData['requiredParameters'] as $parameterName => $parameter) {
+            $types = [];
+
+            if ($parameter['type']) {
+                $types = $this->getTypeDataForTypeSpecification(
+                    $parameter['type'],
+                    $rawData['startLine'],
+                    $useStatementFetchingVisitor
+                );
+            }
+
+            $parameters[] = [
+                'name'             => mb_substr($parameterName, 1),
+                'type_hint'        => null,
+                'types_serialized' => serialize($types),
+                'description'      => null,
+                'is_nullable'      => 0,
+                'is_reference'     => 0,
+                'is_optional'      => 0,
+                'is_variadic'      => 0
+            ];
+        }
+
+        foreach ($rawData['optionalParameters'] as $parameterName => $parameter) {
+            $types = [];
+
+            if ($parameter['type']) {
+                $types = $this->getTypeDataForTypeSpecification(
+                    $parameter['type'],
+                    $rawData['startLine'],
+                    $useStatementFetchingVisitor
+                );
+            }
+
+            $parameters[] = [
+                'name'             => mb_substr($parameterName, 1),
+                'type_hint'        => null,
+                'types_serialized' => serialize($types),
+                'description'      => null,
+                'is_nullable'      => 1,
+                'is_reference'     => 0,
+                'is_optional'      => 1,
+                'is_variadic'      => 0
+            ];
+        }
+
+        $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
+            'name'                    => $rawData['name'],
+            'fqsen'                   => null,
+            'file_id'                 => $fileId,
+            'start_line'              => $rawData['startLine'],
+            'end_line'                => $rawData['endLine'],
+            'is_builtin'              => 0,
+            'is_abstract'             => 0,
+            'is_deprecated'           => 0,
+            'short_description'       => $rawData['description'],
+            'long_description'        => null,
+            'return_description'      => null,
+            'return_type_hint'        => null,
+            'structure_id'            => $seId,
+            'access_modifier_id'      => $amId,
+            'is_magic'                => 1,
+            'is_static'               => $rawData['isStatic'] ? 1 : 0,
+            'has_docblock'            => 0,
+            'throws_serialized'       => serialize([]),
+            'parameters_serialized'   => serialize($parameters),
+            'return_types_serialized' => serialize($returnTypes)
+        ]);
+
+        foreach ($parameters as $parameter) {
+            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameter);
         }
     }
 
