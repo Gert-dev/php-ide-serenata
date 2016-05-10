@@ -549,12 +549,15 @@ class IndexDataAdapter
     {
         $doResolveTypes = function (array &$type) use ($elementFqsen) {
             if ($type['type'] === 'self') {
-                // self takes the type from the classlike it is first resolved in, ensure it doesn't get overwritten.
-                if ($type['resolvedType'] === null) {
+                // self takes the type from the classlike it is first resolved in, so only resolve it once to ensure
+                // that it doesn't get overwritten.
+                if ($type['resolvedType'] === 'self') {
                     $type['resolvedType'] = $elementFqsen;
                 }
             } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
                 $type['resolvedType'] = $elementFqsen;
+            } else {
+                $type['resolvedType'] = $type['fqcn'];
             }
         };
 
