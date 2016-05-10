@@ -548,12 +548,15 @@ class IndexDataAdapter
     protected function resolveTypes(ArrayObject $result, $elementFqsen)
     {
         $doResolveTypes = function (array &$type) use ($elementFqsen) {
-            if ($type['type'] === 'self' && $type['resolvedType'] === null) {
-                $type['resolvedType'] = $elementFqsen;
+            if ($type['type'] === 'self') {
+                // self takes the type from the classlike it is first resolved in, ensure it doesn't get overwritten.
+                if ($type['resolvedType'] === null) {
+                    $type['resolvedType'] = $elementFqsen;
+                }
             } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
                 $type['resolvedType'] = $elementFqsen;
             } else {
-                // $type['resolvedType'] = $type['fqcn'];
+                $type['resolvedType'] = $type['fqcn'];
             }
         };
 
@@ -571,6 +574,12 @@ class IndexDataAdapter
 
         foreach ($result['properties'] as $name => &$property) {
             foreach ($property['types'] as &$type) {
+                $doResolveTypes($type);
+            }
+        }
+
+        foreach ($result['constants'] as $name => &$constants) {
+            foreach ($constants['types'] as &$type) {
                 $doResolveTypes($type);
             }
         }

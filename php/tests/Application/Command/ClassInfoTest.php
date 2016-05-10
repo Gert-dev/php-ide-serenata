@@ -112,7 +112,7 @@ class ClassInfoTest extends IndexedTest
                 [
                     'type'         => 'MyType',
                     'fqcn'         => 'A\MyType',
-                    'resolvedType' => null
+                    'resolvedType' => 'A\MyType'
                 ]
             ],
 
@@ -165,7 +165,7 @@ class ClassInfoTest extends IndexedTest
                         [
                             'type'         => '\DateTime',
                             'fqcn'         => '\DateTime',
-                            'resolvedType' => null
+                            'resolvedType' => '\DateTime'
                         ]
                     ]
                 ],
@@ -209,7 +209,7 @@ class ClassInfoTest extends IndexedTest
                 [
                     'type'         => 'mixed',
                     'fqcn'         => 'mixed',
-                    'resolvedType' => null
+                    'resolvedType' => 'mixed'
                 ]
             ],
 
@@ -271,7 +271,7 @@ class ClassInfoTest extends IndexedTest
                 [
                     'type'         => 'MyType',
                     'fqcn'         => 'A\MyType',
-                    'resolvedType' => null
+                    'resolvedType' => 'A\MyType'
                 ]
             ],
 
@@ -628,7 +628,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'Type1',
                 'fqcn'         => 'A\Type1',
-                'resolvedType' => null
+                'resolvedType' => 'A\Type1'
             ]
         ]);
 
@@ -649,7 +649,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'Type2',
                 'fqcn'         => 'A\Type2',
-                'resolvedType' => null
+                'resolvedType' => 'A\Type2'
             ]
         ]);
 
@@ -670,7 +670,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'Type3',
                 'fqcn'         => 'A\Type3',
-                'resolvedType' => null
+                'resolvedType' => 'A\Type3'
             ]
         ]);
 
@@ -691,7 +691,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'Type4',
                 'fqcn'         => 'A\Type4',
-                'resolvedType' => null
+                'resolvedType' => 'A\Type4'
             ]
         ]);
     }
@@ -723,7 +723,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'void',
                 'fqcn'         => 'void',
-                'resolvedType' => null
+                'resolvedType' => 'void'
             ]
         ]);
 
@@ -770,7 +770,7 @@ class ClassInfoTest extends IndexedTest
                     [
                         'type'         => 'array',
                         'fqcn'         => 'array',
-                        'resolvedType' => null
+                        'resolvedType' => 'array'
                     ]
                 ]
             ],
@@ -786,7 +786,7 @@ class ClassInfoTest extends IndexedTest
                     [
                         'type'         => 'Type',
                         'fqcn'         => 'A\Type',
-                        'resolvedType' => null
+                        'resolvedType' => 'A\Type'
                     ]
                 ]
             ]
@@ -800,7 +800,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'TestClass',
                 'fqcn'         => 'A\TestClass',
-                'resolvedType' => null
+                'resolvedType' => 'A\TestClass'
             ]
         ]);
 
@@ -825,7 +825,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'void',
                 'fqcn'         => 'void',
-                'resolvedType' => null
+                'resolvedType' => 'void'
             ]
         ]);
     }
@@ -1013,7 +1013,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'childClass',
                 'fqcn'         => 'A\childClass',
-                'resolvedType' => null
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['methods']['methodOwnClassName']['returnTypes']);
 
