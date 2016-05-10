@@ -967,7 +967,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => 'self',
                 'referencedType' => 'A\ParentClass'
             ]
-        ], $output['methods']['baseMethodSelf']['types']);
+        ], $output['methods']['baseMethodSelf']['returnTypes']);
 
         $this->assertEquals([
             [
@@ -975,7 +975,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => 'static',
                 'referencedType' => 'A\childClass'
             ]
-        ], $output['methods']['baseMethodStatic']['types']);
+        ], $output['methods']['baseMethodStatic']['returnTypes']);
 
         $this->assertEquals([
             [
@@ -983,7 +983,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => '$this',
                 'referencedType' => 'A\childClass'
             ]
-        ], $output['methods']['baseMethodThis']['types']);
+        ], $output['methods']['baseMethodThis']['returnTypes']);
 
         $this->assertEquals([
             [
@@ -991,7 +991,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => 'self',
                 'referencedType' => 'A\childClass'
             ]
-        ], $output['methods']['methodSelf']['types']);
+        ], $output['methods']['methodSelf']['returnTypes']);
 
         $this->assertEquals([
             [
@@ -999,7 +999,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => 'static',
                 'referencedType' => 'A\childClass'
             ]
-        ], $output['methods']['methodStatic']['types']);
+        ], $output['methods']['methodStatic']['returnTypes']);
 
         $this->assertEquals([
             [
@@ -1007,7 +1007,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => '$this',
                 'referencedType' => 'A\childClass'
             ]
-        ], $output['methods']['methodThis']['types']);
+        ], $output['methods']['methodThis']['returnTypes']);
 
         $this->assertEquals([
             [
@@ -1015,15 +1015,15 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => 'A\childClass',
                 'referencedType' => null
             ]
-        ], $output['methods']['methodOwnClassName']['types']);
+        ], $output['methods']['methodOwnClassName']['returnTypes']);
 
         $output = $this->getClassInfo($fileName, 'A\ParentClass');
 
         $this->assertEquals([
             [
                 'type'           => 'self',
-                'fqcn'           => 'A\ParentClass',
-                'referencedType' => null
+                'fqcn'           => 'self',
+                'referencedType' => 'A\ParentClass'
             ]
         ], $output['properties']['basePropSelf']['types']);
 
@@ -1049,7 +1049,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => 'self',
                 'referencedType' => 'A\ParentClass'
             ]
-        ], $output['methods']['baseMethodSelf']['types']);
+        ], $output['methods']['baseMethodSelf']['returnTypes']);
 
         $this->assertEquals([
             [
@@ -1057,7 +1057,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => 'static',
                 'referencedType' => 'A\ParentClass'
             ]
-        ], $output['methods']['baseMethodStatic']['types']);
+        ], $output['methods']['baseMethodStatic']['returnTypes']);
 
         $this->assertEquals([
             [
@@ -1065,7 +1065,7 @@ class ClassInfoTest extends IndexedTest
                 'fqcn'           => '$this',
                 'referencedType' => 'A\ParentClass'
             ]
-        ], $output['methods']['baseMethodThis']['types']);
+        ], $output['methods']['baseMethodThis']['returnTypes']);
     }
 
     public function testMethodDocblockParameterTypesGetPrecedenceOverTypeHints()
