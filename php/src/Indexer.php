@@ -382,8 +382,8 @@ class Indexer
 
             if ($returnType) {
                 $returnTypes[] = [
-                    'type'        => (string) $returnType,
-                    'fqcn'        => (string) $returnType
+                    'type' => (string) $returnType,
+                    'fqcn' => (string) $returnType
                 ];
             }
         }
