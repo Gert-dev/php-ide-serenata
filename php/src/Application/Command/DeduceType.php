@@ -160,7 +160,11 @@ class DeduceType extends BaseCommand
             $globalFunctions = $this->getGlobalFunctionsCommand()->getGlobalFunctions();
 
             if (isset($globalFunctions[$matches[1]])) {
-                $className = $globalFunctions[$matches[1]]['return']['type'];
+                $returnTypes = $globalFunctions[$matches[1]]['returnTypes'];
+
+                if (count($returnTypes) === 1) {
+                    $className = $returnTypes[0]['resolvedType'];
+                }
             }
         } elseif (preg_match("/((${classRegexPart}))/", $firstElement, $matches) === 1) {
             // Static class name.
@@ -212,12 +216,24 @@ class DeduceType extends BaseCommand
 
             if ($isMethod) {
                 if (isset($info['methods'][$element])) {
-                    $className = $info['methods'][$element]['return']['resolvedType'];
+                    $returnTypes = $info['methods'][$element]['returnTypes'];
+
+                    if (count($returnTypes) === 1) {
+                        $className = $returnTypes[0]['resolvedType'];
+                    }
                 }
             } elseif (isset($info['constants'][$element])) {
-                $className = $info['constants'][$element]['return']['resolvedType'];
+                $types = $info['constants'][$element]['types'];
+
+                if (count($types) === 1) {
+                    $className = $types[0]['resolvedType'];
+                }
             } elseif ($isValidPropertyAccess && isset($info['properties'][$element])) {
-                $className = $info['properties'][$element]['return']['resolvedType'];
+                $types = $info['properties'][$element]['types'];
+
+                if (count($types) === 1) {
+                    $className = $types[0]['resolvedType'];
+                }
             }
 
             $propertyAccessNeedsDollarSign = false;

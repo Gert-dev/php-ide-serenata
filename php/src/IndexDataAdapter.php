@@ -163,7 +163,7 @@ class IndexDataAdapter
         $this->parsePropertyData($result, $properties, $element);
         $this->parseMethodData($result, $methods, $element);
 
-        $this->resolveTypes($result, $element['fqsen']);
+        $this->resolveSpecialTypes($result, $element['fqsen']);
 
         return $result->getArrayCopy();
     }
@@ -545,7 +545,7 @@ class IndexDataAdapter
      * @param ArrayObject $result
      * @param string      $elementFqsen
      */
-    protected function resolveTypes(ArrayObject $result, $elementFqsen)
+    protected function resolveSpecialTypes(ArrayObject $result, $elementFqsen)
     {
         $doResolveTypes = function (array &$type) use ($elementFqsen) {
             if ($type['type'] === 'self') {
@@ -555,8 +555,6 @@ class IndexDataAdapter
                 }
             } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
                 $type['resolvedType'] = $elementFqsen;
-            } else {
-                $type['resolvedType'] = $type['fqcn'];
             }
         };
 
