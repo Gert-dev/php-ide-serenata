@@ -5,7 +5,6 @@ namespace PhpIntegrator;
 use ArrayAccess;
 use ArrayObject;
 use Traversable;
-use UnexpectedValueException;
 
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
@@ -75,7 +74,9 @@ class IndexDataAdapter
     }
 
     /**
-     * @param int $id
+     * @param int    $id
+     * @param string $fqsen
+     * @param string $originFqsen
      *
      * @return array
      */
