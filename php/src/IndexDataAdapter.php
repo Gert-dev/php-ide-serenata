@@ -738,9 +738,9 @@ class IndexDataAdapter
 
         foreach ($rawTypes as $rawType) {
             $types[] = [
-                'type'           => $rawType['type'],
-                'fqcn'           => $rawType['fqcn'],
-                'resolvedType' => null
+                'type'         => $rawType['type'],
+                'fqcn'         => $rawType['fqcn'],
+                'resolvedType' => $rawType['fqcn']
             ];
         }
 
