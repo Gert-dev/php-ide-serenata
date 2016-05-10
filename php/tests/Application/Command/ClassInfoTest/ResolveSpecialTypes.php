@@ -42,6 +42,16 @@ class ParentClass
     {
 
     }
+
+    /**
+     * @param self   $param1
+     * @param static $param2
+     * @param $this  $param3
+     */
+    public function baseMethodWithParameters($param1, $param2, $param3)
+    {
+
+    }
 }
 
 // NOTE: Deliberately started with a lower case character here.

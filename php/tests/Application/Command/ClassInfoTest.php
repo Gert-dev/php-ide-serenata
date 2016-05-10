@@ -1041,6 +1041,30 @@ class ClassInfoTest extends IndexedTest
             ]
         ], $output['methods']['methodOwnClassName']['returnTypes']);
 
+        $this->assertEquals([
+            [
+                'type'         => 'self',
+                'fqcn'         => 'self',
+                'resolvedType' => 'A\ParentClass'
+            ]
+        ], $output['methods']['baseMethodWithParameters']['parameters'][0]['types']);
+
+        $this->assertEquals([
+            [
+                'type'         => 'static',
+                'fqcn'         => 'static',
+                'resolvedType' => 'A\childClass'
+            ]
+        ], $output['methods']['baseMethodWithParameters']['parameters'][1]['types']);
+
+        $this->assertEquals([
+            [
+                'type'         => '$this',
+                'fqcn'         => '$this',
+                'resolvedType' => 'A\childClass'
+            ]
+        ], $output['methods']['baseMethodWithParameters']['parameters'][2]['types']);
+
         $output = $this->getClassInfo($fileName, 'A\ParentClass');
 
         $this->assertEquals([
