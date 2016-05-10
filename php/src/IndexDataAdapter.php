@@ -547,33 +547,31 @@ class IndexDataAdapter
      */
     protected function resolveTypes(ArrayObject $result, $elementFqsen)
     {
+        $doResolveTypes = function (array &$type) use ($elementFqsen) {
+            if ($type['type'] === 'self' && $type['resolvedType'] === null) {
+                $type['resolvedType'] = $elementFqsen;
+            } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
+                $type['resolvedType'] = $elementFqsen;
+            } else {
+                // $type['resolvedType'] = $type['fqcn'];
+            }
+        };
+
         foreach ($result['methods'] as $name => &$method) {
             foreach ($method['parameters'] as &$parameter) {
                 foreach ($parameter['types'] as &$type) {
-                    if ($type['type'] === 'self' && $type['resolvedType'] === null) {
-                        $type['resolvedType'] = $elementFqsen;
-                    } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
-                        $type['resolvedType'] = $elementFqsen;
-                    }
+                    $doResolveTypes($type);
                 }
             }
 
             foreach ($method['returnTypes'] as &$returnType) {
-                if ($returnType['type'] === 'self' && $returnType['resolvedType'] === null) {
-                    $returnType['resolvedType'] = $elementFqsen;
-                } elseif ($returnType['type'] === '$this' || $returnType['type'] === 'static') {
-                    $returnType['resolvedType'] = $elementFqsen;
-                }
+                $doResolveTypes($returnType);
             }
         }
 
         foreach ($result['properties'] as $name => &$property) {
             foreach ($property['types'] as &$type) {
-                if ($type['type'] === 'self' && $type['resolvedType'] === null) {
-                    $type['resolvedType'] = $elementFqsen;
-                } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
-                    $type['resolvedType'] = $elementFqsen;
-                }
+                $doResolveTypes($type);
             }
         }
     }
