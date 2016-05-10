@@ -1049,26 +1049,22 @@ class ClassInfoTest extends IndexedTest
 
         $output = $this->getClassInfo($fileName, 'A\TestClass');
 
-        $this->assertEquals('string[]', $output['methods']['testMethod']['parameters'][0]['type']);
-        $this->assertEquals('string[]', $output['methods']['testMethod']['parameters'][0]['fullType']);
-        $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['type']);
-        $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['fullType']);
+        $this->assertEquals('string[]', $output['methods']['testMethod']['parameters'][0]['types'][0]['type']);
+        $this->assertEquals('string[]', $output['methods']['testMethod']['parameters'][0]['types'][0]['fqcn']);
+        $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['types'][0]['type']);
+        $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['types'][0]['fqcn']);
     }
 
-    public function testMethodWithoutDocblockHasNullReturnType()
+    public function testItemsWithoutDocblockHaveNoTypes()
     {
         $fileName = 'ClassMethodNoDocblock.php';
 
         $output = $this->getClassInfo($fileName, 'A\TestClass');
 
-        $this->assertNull($output['methods']['testMethod']['parameters'][0]['type']);
-        $this->assertNull($output['methods']['testMethod']['parameters'][0]['fullType']);
-        $this->assertNull($output['methods']['testMethod']['return']['type']);
-        $this->assertNull($output['methods']['testMethod']['return']['resolvedType']);
-        $this->assertNull($output['properties']['testProperty']['return']['type']);
-        $this->assertNull($output['properties']['testProperty']['return']['resolvedType']);
-        $this->assertNull($output['constants']['TEST_CONSTANT']['return']['type']);
-        $this->assertNull($output['constants']['TEST_CONSTANT']['return']['resolvedType']);
+        $this->assertEmpty($output['methods']['testMethod']['parameters'][0]['types']);
+        $this->assertEmpty($output['methods']['testMethod']['returnTypes']);
+        $this->assertEmpty($output['properties']['testProperty']['types']);
+        $this->assertEmpty($output['constants']['TEST_CONSTANT']['types']);
     }
 
     /**
