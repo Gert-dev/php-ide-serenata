@@ -155,13 +155,19 @@ class ClassInfoTest extends IndexedTest
             'parameters'         => [
                 [
                     'name'        => 'firstParameter',
-                    'typeHint'    => '\DateTime',
+                    'typeHint'    => '\DateTimeInterface',
                     'description' => 'First parameter description.',
                     'isReference' => false,
                     'isVariadic'  => false,
                     'isOptional'  => false,
 
                     'types' => [
+                        [
+                            'type'         => '\DateTimeInterface',
+                            'fqcn'         => '\DateTimeInterface',
+                            'resolvedType' => '\DateTimeInterface'
+                        ],
+
                         [
                             'type'         => '\DateTime',
                             'fqcn'         => '\DateTime',
@@ -210,6 +216,12 @@ class ClassInfoTest extends IndexedTest
                     'type'         => 'mixed',
                     'fqcn'         => 'mixed',
                     'resolvedType' => 'mixed'
+                ],
+
+                [
+                    'type'         => 'bool',
+                    'fqcn'         => 'bool',
+                    'resolvedType' => 'bool'
                 ]
             ],
 
