@@ -550,29 +550,29 @@ class IndexDataAdapter
         foreach ($result['methods'] as $name => &$method) {
             foreach ($method['parameters'] as &$parameter) {
                 foreach ($parameter['types'] as &$type) {
-                    if ($type['type'] === 'self' && $type['referencedType'] === null) {
-                        $type['referencedType'] = $elementFqsen;
+                    if ($type['type'] === 'self' && $type['resolvedType'] === null) {
+                        $type['resolvedType'] = $elementFqsen;
                     } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
-                        $type['referencedType'] = $elementFqsen;
+                        $type['resolvedType'] = $elementFqsen;
                     }
                 }
             }
 
             foreach ($method['returnTypes'] as &$returnType) {
-                if ($returnType['type'] === 'self' && $returnType['referencedType'] === null) {
-                    $returnType['referencedType'] = $elementFqsen;
+                if ($returnType['type'] === 'self' && $returnType['resolvedType'] === null) {
+                    $returnType['resolvedType'] = $elementFqsen;
                 } elseif ($returnType['type'] === '$this' || $returnType['type'] === 'static') {
-                    $returnType['referencedType'] = $elementFqsen;
+                    $returnType['resolvedType'] = $elementFqsen;
                 }
             }
         }
 
         foreach ($result['properties'] as $name => &$property) {
             foreach ($property['types'] as &$type) {
-                if ($type['type'] === 'self' && $type['referencedType'] === null) {
-                    $type['referencedType'] = $elementFqsen;
+                if ($type['type'] === 'self' && $type['resolvedType'] === null) {
+                    $type['resolvedType'] = $elementFqsen;
                 } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
-                    $type['referencedType'] = $elementFqsen;
+                    $type['resolvedType'] = $elementFqsen;
                 }
             }
         }
@@ -733,7 +733,7 @@ class IndexDataAdapter
             $types[] = [
                 'type'           => $rawType['type'],
                 'fqcn'           => $rawType['fqcn'],
-                'referencedType' => null
+                'resolvedType' => null
             ];
         }
 

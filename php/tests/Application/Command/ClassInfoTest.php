@@ -110,15 +110,15 @@ class ClassInfoTest extends IndexedTest
 
             'types'             => [
                 [
-                    'type'           => 'MyType',
-                    'fqcn'           => 'A\MyType',
-                    'referencedType' => null
+                    'type'         => 'MyType',
+                    'fqcn'         => 'A\MyType',
+                    'resolvedType' => null
                 ]
             ],
 
             'override'           => null,
 
-            'declaringClass'     => [
+            'declaringClass' => [
                 'name'      => 'A\TestClass',
                 'filename'  => $this->getPathFor($fileName),
                 'startLine' => 5,
@@ -161,11 +161,11 @@ class ClassInfoTest extends IndexedTest
                     'isVariadic'  => false,
                     'isOptional'  => false,
 
-                    'types'       => [
+                    'types' => [
                         [
-                            'type'           => '\DateTime',
-                            'fqcn'           => '\DateTime',
-                            'referencedType' => null
+                            'type'         => '\DateTime',
+                            'fqcn'         => '\DateTime',
+                            'resolvedType' => null
                         ]
                     ]
                 ],
@@ -205,11 +205,11 @@ class ClassInfoTest extends IndexedTest
             'returnDescription'  => null,
             'returnTypeHint'     => null,
 
-            'returnTypes'             => [
+            'returnTypes' => [
                 [
-                    'type'           => 'mixed',
-                    'fqcn'           => 'mixed',
-                    'referencedType' => null
+                    'type'         => 'mixed',
+                    'fqcn'         => 'mixed',
+                    'resolvedType' => null
                 ]
             ],
 
@@ -269,9 +269,9 @@ class ClassInfoTest extends IndexedTest
 
             'types'             => [
                 [
-                    'type'           => 'MyType',
-                    'fqcn'           => 'A\MyType',
-                    'referencedType' => null
+                    'type'         => 'MyType',
+                    'fqcn'         => 'A\MyType',
+                    'resolvedType' => null
                 ]
             ],
 
@@ -626,9 +626,9 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['types'], [
             [
-                'type'           => 'Type1',
-                'fqcn'           => 'A\Type1',
-                'referencedType' => null
+                'type'         => 'Type1',
+                'fqcn'         => 'A\Type1',
+                'resolvedType' => null
             ]
         ]);
 
@@ -647,9 +647,9 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['types'], [
             [
-                'type'           => 'Type2',
-                'fqcn'           => 'A\Type2',
-                'referencedType' => null
+                'type'         => 'Type2',
+                'fqcn'         => 'A\Type2',
+                'resolvedType' => null
             ]
         ]);
 
@@ -668,9 +668,9 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['types'], [
             [
-                'type'           => 'Type3',
-                'fqcn'           => 'A\Type3',
-                'referencedType' => null
+                'type'         => 'Type3',
+                'fqcn'         => 'A\Type3',
+                'resolvedType' => null
             ]
         ]);
 
@@ -689,9 +689,9 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['types'], [
             [
-                'type'           => 'Type4',
-                'fqcn'           => 'A\Type4',
-                'referencedType' => null
+                'type'         => 'Type4',
+                'fqcn'         => 'A\Type4',
+                'resolvedType' => null
             ]
         ]);
     }
@@ -721,9 +721,9 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['returnTypes'], [
             [
-                'type'           => 'void',
-                'fqcn'           => 'void',
-                'referencedType' => null
+                'type'         => 'void',
+                'fqcn'         => 'void',
+                'resolvedType' => null
             ]
         ]);
 
@@ -768,9 +768,9 @@ class ClassInfoTest extends IndexedTest
                 'isOptional'  => true,
                 'types'       => [
                     [
-                        'type'           => 'array',
-                        'fqcn'           => 'array',
-                        'referencedType' => null
+                        'type'         => 'array',
+                        'fqcn'         => 'array',
+                        'resolvedType' => null
                     ]
                 ]
             ],
@@ -784,9 +784,9 @@ class ClassInfoTest extends IndexedTest
                 'isOptional'  => true,
                 'types'       => [
                     [
-                        'type'           => 'Type',
-                        'fqcn'           => 'A\Type',
-                        'referencedType' => null
+                        'type'         => 'Type',
+                        'fqcn'         => 'A\Type',
+                        'resolvedType' => null
                     ]
                 ]
             ]
@@ -798,9 +798,9 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['returnTypes'], [
             [
-                'type'           => 'TestClass',
-                'fqcn'           => 'A\TestClass',
-                'referencedType' => null
+                'type'         => 'TestClass',
+                'fqcn'         => 'A\TestClass',
+                'resolvedType' => null
             ]
         ]);
 
@@ -823,9 +823,9 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['returnTypes'], [
             [
-                'type'           => 'void',
-                'fqcn'           => 'void',
-                'referencedType' => null
+                'type'         => 'void',
+                'fqcn'         => 'void',
+                'resolvedType' => null
             ]
         ]);
     }
@@ -915,105 +915,105 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'type'           => 'self',
-                'fqcn'           => 'self',
-                'referencedType' => 'A\ParentClass'
+                'type'         => 'self',
+                'fqcn'         => 'self',
+                'resolvedType' => 'A\ParentClass'
             ]
         ], $output['properties']['basePropSelf']['types']);
 
         $this->assertEquals([
             [
-                'type'           => 'static',
-                'fqcn'           => 'static',
-                'referencedType' => 'A\childClass'
+                'type'         => 'static',
+                'fqcn'         => 'static',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['properties']['basePropStatic']['types']);
 
         $this->assertEquals([
             [
-                'type'           => '$this',
-                'fqcn'           => '$this',
-                'referencedType' => 'A\childClass'
+                'type'         => '$this',
+                'fqcn'         => '$this',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['properties']['basePropThis']['types']);
 
         $this->assertEquals([
             [
-                'type'           => 'self',
-                'fqcn'           => 'self',
-                'referencedType' => 'A\childClass'
+                'type'         => 'self',
+                'fqcn'         => 'self',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['properties']['propSelf']['types']);
 
         $this->assertEquals([
             [
-                'type'           => 'static',
-                'fqcn'           => 'static',
-                'referencedType' => 'A\childClass'
+                'type'         => 'static',
+                'fqcn'         => 'static',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['properties']['propStatic']['types']);
 
         $this->assertEquals([
             [
-                'type'           => '$this',
-                'fqcn'           => '$this',
-                'referencedType' => 'A\childClass'
+                'type'         => '$this',
+                'fqcn'         => '$this',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['properties']['propThis']['types']);
 
         $this->assertEquals([
             [
-                'type'           => 'self',
-                'fqcn'           => 'self',
-                'referencedType' => 'A\ParentClass'
+                'type'         => 'self',
+                'fqcn'         => 'self',
+                'resolvedType' => 'A\ParentClass'
             ]
         ], $output['methods']['baseMethodSelf']['returnTypes']);
 
         $this->assertEquals([
             [
-                'type'           => 'static',
-                'fqcn'           => 'static',
-                'referencedType' => 'A\childClass'
+                'type'         => 'static',
+                'fqcn'         => 'static',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['methods']['baseMethodStatic']['returnTypes']);
 
         $this->assertEquals([
             [
-                'type'           => '$this',
-                'fqcn'           => '$this',
-                'referencedType' => 'A\childClass'
+                'type'         => '$this',
+                'fqcn'         => '$this',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['methods']['baseMethodThis']['returnTypes']);
 
         $this->assertEquals([
             [
-                'type'           => 'self',
-                'fqcn'           => 'self',
-                'referencedType' => 'A\childClass'
+                'type'         => 'self',
+                'fqcn'         => 'self',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['methods']['methodSelf']['returnTypes']);
 
         $this->assertEquals([
             [
-                'type'           => 'static',
-                'fqcn'           => 'static',
-                'referencedType' => 'A\childClass'
+                'type'         => 'static',
+                'fqcn'         => 'static',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['methods']['methodStatic']['returnTypes']);
 
         $this->assertEquals([
             [
-                'type'           => '$this',
-                'fqcn'           => '$this',
-                'referencedType' => 'A\childClass'
+                'type'         => '$this',
+                'fqcn'         => '$this',
+                'resolvedType' => 'A\childClass'
             ]
         ], $output['methods']['methodThis']['returnTypes']);
 
         $this->assertEquals([
             [
-                'type'           => 'childClass',
-                'fqcn'           => 'A\childClass',
-                'referencedType' => null
+                'type'         => 'childClass',
+                'fqcn'         => 'A\childClass',
+                'resolvedType' => null
             ]
         ], $output['methods']['methodOwnClassName']['returnTypes']);
 
@@ -1021,49 +1021,49 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'type'           => 'self',
-                'fqcn'           => 'self',
-                'referencedType' => 'A\ParentClass'
+                'type'         => 'self',
+                'fqcn'         => 'self',
+                'resolvedType' => 'A\ParentClass'
             ]
         ], $output['properties']['basePropSelf']['types']);
 
         $this->assertEquals([
             [
-                'type'           => 'static',
-                'fqcn'           => 'static',
-                'referencedType' => 'A\ParentClass'
+                'type'         => 'static',
+                'fqcn'         => 'static',
+                'resolvedType' => 'A\ParentClass'
             ]
         ], $output['properties']['basePropStatic']['types']);
 
         $this->assertEquals([
             [
-                'type'           => '$this',
-                'fqcn'           => '$this',
-                'referencedType' => 'A\ParentClass'
+                'type'         => '$this',
+                'fqcn'         => '$this',
+                'resolvedType' => 'A\ParentClass'
             ]
         ], $output['properties']['basePropThis']['types']);
 
         $this->assertEquals([
             [
-                'type'           => 'self',
-                'fqcn'           => 'self',
-                'referencedType' => 'A\ParentClass'
+                'type'         => 'self',
+                'fqcn'         => 'self',
+                'resolvedType' => 'A\ParentClass'
             ]
         ], $output['methods']['baseMethodSelf']['returnTypes']);
 
         $this->assertEquals([
             [
-                'type'           => 'static',
-                'fqcn'           => 'static',
-                'referencedType' => 'A\ParentClass'
+                'type'         => 'static',
+                'fqcn'         => 'static',
+                'resolvedType' => 'A\ParentClass'
             ]
         ], $output['methods']['baseMethodStatic']['returnTypes']);
 
         $this->assertEquals([
             [
-                'type'           => '$this',
-                'fqcn'           => '$this',
-                'referencedType' => 'A\ParentClass'
+                'type'         => '$this',
+                'fqcn'         => '$this',
+                'resolvedType' => 'A\ParentClass'
             ]
         ], $output['methods']['baseMethodThis']['returnTypes']);
     }
