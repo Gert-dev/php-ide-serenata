@@ -163,7 +163,7 @@ class IndexDataAdapter
         $this->parsePropertyData($result, $properties, $element);
         $this->parseMethodData($result, $methods, $element);
 
-        $this->resolveReturnTypes($result, $element['fqsen']);
+        $this->resolveTypes($result, $element['fqsen']);
 
         return $result->getArrayCopy();
     }
@@ -249,10 +249,6 @@ class IndexDataAdapter
                 ]
             ]);
 
-            // if ($resultingProperty['return']['type'] === 'self') {
-                // $resultingProperty['return']['resolvedType'] = $element['fqsen'];
-            // }
-
             if ($existingProperty) {
                 $resultingProperty['longDescription'] = $this->resolveInheritDoc(
                     $resultingProperty['longDescription'],
@@ -326,10 +322,6 @@ class IndexDataAdapter
                     'endLineMember'   => (int) $rawMethodData['end_line']
                 ]
             ]);
-
-            // if ($resultingMethod['returnType'] === 'self') {
-                // $resultingMethod['referencedType'] = $element['fqsen'];
-            // }
 
             if ($existingMethod) {
                 $resultingMethod['longDescription'] = $this->resolveInheritDoc(
@@ -553,19 +545,23 @@ class IndexDataAdapter
      * @param ArrayObject $result
      * @param string      $elementFqsen
      */
-    protected function resolveReturnTypes(ArrayObject $result, $elementFqsen)
+    protected function resolveTypes(ArrayObject $result, $elementFqsen)
     {
         foreach ($result['methods'] as $name => &$method) {
             foreach ($method['parameters'] as &$parameter) {
                 foreach ($parameter['types'] as &$type) {
-                    if ($type['type'] === '$this' || $type['type'] === 'static') {
+                    if ($type['type'] === 'self' && $type['referencedType'] === null) {
+                        $type['referencedType'] = $elementFqsen;
+                    } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
                         $type['referencedType'] = $elementFqsen;
                     }
                 }
             }
 
             foreach ($method['returnTypes'] as &$returnType) {
-                if ($returnType['type'] === '$this' || $returnType['type'] === 'static') {
+                if ($returnType['type'] === 'self' && $returnType['referencedType'] === null) {
+                    $returnType['referencedType'] = $elementFqsen;
+                } elseif ($returnType['type'] === '$this' || $returnType['type'] === 'static') {
                     $returnType['referencedType'] = $elementFqsen;
                 }
             }
@@ -573,7 +569,9 @@ class IndexDataAdapter
 
         foreach ($result['properties'] as $name => &$property) {
             foreach ($property['types'] as &$type) {
-                if ($type['type'] === '$this' || $type['type'] === 'static') {
+                if ($type['type'] === 'self' && $type['referencedType'] === null) {
+                    $type['referencedType'] = $elementFqsen;
+                } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
                     $type['referencedType'] = $elementFqsen;
                 }
             }
