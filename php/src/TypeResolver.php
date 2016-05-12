@@ -85,8 +85,8 @@ class TypeResolver
     }
 
     /**
-     * "Unresolves" a FQSEN, turning it back into a name relative to local use statements. If no local type could be
-     * determined, null is returned.
+     * "Unresolves" a FQCN, turning it back into a name relative to local use statements. If no local type could be
+     * determined, the FQCN is returned (as that is the only way the type can be referenced locally).
      *
      * @param string $type
      *
@@ -130,7 +130,7 @@ class TypeResolver
             }
         }
 
-        return $bestLocalizedType;
+        return $bestLocalizedType ?: ('\\' . $type);
     }
 
     /**
