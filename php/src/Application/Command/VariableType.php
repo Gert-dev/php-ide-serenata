@@ -87,6 +87,8 @@ class VariableType extends BaseCommand
      * @param string $code
      * @param string $name
      * @param int    $offset
+     *
+     * @return string[]
      */
     public function getVariableType($file, $code, $name, $offset)
     {
