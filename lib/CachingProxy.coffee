@@ -111,15 +111,15 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    getVariableType: (name, file, source, offset) ->
+    getVariableTypes: (name, file, source, offset) ->
         sourceKey = if source? then md5(source) else null
 
-        return @wrapCachedRequestToParent("getVariableType-#{name}-#{file}-#{sourceKey}-#{offset}", 'getVariableType', arguments)
+        return @wrapCachedRequestToParent("getVariableTypes-#{name}-#{file}-#{sourceKey}-#{offset}", 'getVariableTypes', arguments)
 
     ###*
      * @inherited
     ###
-    deduceType: (parts, file, source, offset) ->
+    deduceTypes: (parts, file, source, offset) ->
         sourceKey = if source? then md5(source) else null
 
         partsKey = ''
@@ -127,7 +127,7 @@ class CachingProxy extends Proxy
         for part in parts
             partsKey += part
 
-        return @wrapCachedRequestToParent("deduceType-#{partsKey}#{file}-#{sourceKey}-#{offset}", 'deduceType', arguments)
+        return @wrapCachedRequestToParent("deduceTypes-#{partsKey}#{file}-#{sourceKey}-#{offset}", 'deduceTypes', arguments)
 
     ###*
      * @inherited

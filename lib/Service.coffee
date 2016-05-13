@@ -134,7 +134,7 @@ class Service
         return @proxy.getAvailableVariables(file, source, offset)
 
     ###*
-     * Fetches the type of the specified variable at the specified location.
+     * Fetches the types of the specified variable at the specified location.
      *
      * @param {string}      name   The variable to fetch, including its leading dollar sign.
      * @param {string}      file   The path to the file to examine.
@@ -143,11 +143,11 @@ class Service
      *
      * @return {Promise}
     ###
-    getVariableTypeByOffset: (name, file, source, offset) ->
-        return @proxy.getVariableType(name, file, source, offset)
+    getVariableTypesByOffset: (name, file, source, offset) ->
+        return @proxy.getVariableTypes(name, file, source, offset)
 
     ###*
-     * Deduces the resulting type of an expression based on its parts.
+     * Deduces the resulting types of an expression based on its parts.
      *
      * @param {array}       parts  One or more strings that are part of the expression, e.g. ['$this', 'foo()'].
      * @param {string}      file   The path to the file to examine.
@@ -156,8 +156,8 @@ class Service
      *
      * @return {Promise}
     ###
-    deduceType: (parts, file, source, offset) ->
-        return @proxy.deduceType(parts, file, source, offset)
+    deduceTypes: (parts, file, source, offset) ->
+        return @proxy.deduceTypes(parts, file, source, offset)
 
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
@@ -261,8 +261,8 @@ class Service
         return @getAvailableVariablesByOffset(editor.getPath(), editor.getBuffer().getText(), offset)
 
     ###*
-     * Retrieves the type of a variable, relative to the context at the specified buffer location. Class names will
-     * be returned in their full form (full class name, but not necessarily with a leading slash).
+     * Retrieves the types of a variable, relative to the context at the specified buffer location. Class names will
+     * be returned in their full form (full class name, with a leading slash).
      *
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition
@@ -270,19 +270,16 @@ class Service
      *
      * @return {Promise}
     ###
-    getVariableType: (editor, bufferPosition, name) ->
+    getVariableTypes: (editor, bufferPosition, name) ->
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
         bufferText = editor.getBuffer().getText()
 
-        result = @getVariableTypeByOffset(name, editor.getPath(), bufferText, offset)
-
-        return null if not result
-        return result
+        return @getVariableTypesByOffset(name, editor.getPath(), bufferText, offset)
 
     ###*
-     * Retrieves the class that is being used (called) at the specified location in the buffer. Note that this does not
-     * guarantee that the returned class actually exists. You can use {@see getClassInfo} on the returned class name
+     * Retrieves the types that are being used (called) at the specified location in the buffer. Note that this does not
+     * guarantee that the returned types actually exist. You can use {@see getClassInfo} on the returned class name
      * to check for this instead.
      *
      * @param {TextEditor} editor            The text editor to use.
@@ -295,15 +292,12 @@ class Service
      *                                       type (class) of 'b', as it is the last element, but as the user is still
      *                                       writing code, you may instead be interested in the type of 'foo()' instead.
      *
-     * @throws an error if one of the elements in the call stack does not exist, which can happen if the user is writing
-     *         invalid code.
-     *
      * @return {Promise}
      *
-     * @example Invoking it on MyMethod::foo()->bar() will ask what class 'bar' is invoked on, which will whatever type
+     * @example Invoking it on MyMethod::foo()->bar() will ask what class 'bar' is invoked on, which will whatever types
      *          foo returns.
     ###
-    getResultingTypeAt: (editor, bufferPosition, ignoreLastElement) ->
+    getResultingTypesAt: (editor, bufferPosition, ignoreLastElement) ->
         callStack = @parser.retrieveSanitizedCallStackAt(editor, bufferPosition)
 
         if ignoreLastElement
@@ -319,7 +313,7 @@ class Service
 
             return promise
 
-        return @deduceType(callStack, editor.getPath(), bufferText, offset)
+        return @deduceTypes(callStack, editor.getPath(), bufferText, offset)
 
     ###*
      * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be

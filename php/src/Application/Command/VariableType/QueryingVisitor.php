@@ -5,7 +5,7 @@ namespace PhpIntegrator\Application\Command\VariableType;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
 
-use PhpIntegrator\Application\Command\DeduceType;
+use PhpIntegrator\Application\Command\DeduceTypes;
 use PhpIntegrator\Application\Command\ResolveType;
 
 use PhpParser\Node;
@@ -48,9 +48,9 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $resolveTypeCommand;
 
     /**
-     * @var DeduceType
+     * @var DeduceTypes
      */
-    protected $deduceTypeCommand;
+    protected $deduceTypesCommand;
 
     /**
      * @var TypeAnalyzer
@@ -92,7 +92,7 @@ class QueryingVisitor extends NodeVisitorAbstract
      * @param string       $name
      * @param TypeAnalyzer $typeAnalyzer
      * @param ResolveType  $resolveTypeCommand
-     * @param DeduceType   $deduceTypeCommand
+     * @param DeduceTypes   $deduceTypesCommand
      */
     public function __construct(
         $file,
@@ -102,7 +102,7 @@ class QueryingVisitor extends NodeVisitorAbstract
         $name,
         TypeAnalyzer $typeAnalyzer,
         ResolveType $resolveTypeCommand,
-        DeduceType $deduceTypeCommand
+        DeduceTypes $deduceTypesCommand
     ) {
         $this->name = $name;
         $this->line = $line;
@@ -110,7 +110,7 @@ class QueryingVisitor extends NodeVisitorAbstract
         $this->code = $code;
         $this->position = $position;
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->deduceTypeCommand = $deduceTypeCommand;
+        $this->deduceTypesCommand = $deduceTypesCommand;
         $this->resolveTypeCommand = $resolveTypeCommand;
     }
 
@@ -249,35 +249,39 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @var string|null
+     * @var string[]
      */
-    protected function getType()
+    protected function getTypes()
     {
         if ($this->bestTypeOverrideMatch) {
-            return $this->bestTypeOverrideMatch;
+            return $this->bestTypeOverrideMatch ? [$this->bestTypeOverrideMatch] : [];
         } elseif ($this->name === 'this') {
-            return $this->currentClassName;
+            return $this->currentClassName ? [$this->currentClassName] : [];
         } elseif ($this->bestMatch) {
             if ($this->bestMatch instanceof Node\Expr\Assign) {
-                return $this->deduceTypeCommand->deduceTypeFromNode(
+                return $this->deduceTypesCommand->deduceTypesFromNode(
                     $this->file,
                     $this->code,
                     $this->bestMatch->expr,
                     $this->bestMatch->getAttribute('startFilePos')
                 );
             } elseif ($this->bestMatch instanceof Node\Stmt\Foreach_) {
-                $listType = $this->deduceTypeCommand->deduceTypeFromNode(
+                $types = $this->deduceTypesCommand->deduceTypesFromNode(
                     $this->file,
                     $this->code,
                     $this->bestMatch->expr,
                     $this->bestMatch->getAttribute('startFilePos')
                 );
 
-                if ($listType && mb_strpos($listType, '[]') !== false) {
-                    return mb_substr($listType, 0, -2);
+                foreach ($types as $type) {
+                    if ($type && mb_strpos($type, '[]') !== false) {
+                        $type = mb_substr($type, 0, -2);
+
+                        return $type ? [$type] : [];
+                    }
                 }
             } else {
-                return $this->bestMatch;
+                return $this->bestMatch ? [$this->bestMatch] : [];
             }
         } elseif ($this->lastFunctionLikeNode) {
             foreach ($this->lastFunctionLikeNode->getParams() as $param) {
@@ -285,10 +289,12 @@ class QueryingVisitor extends NodeVisitorAbstract
                     if ($param->type) {
                         // Found a type hint.
                         if ($param->type instanceof Node\Name) {
-                            return $this->fetchClassName($param->type);
+                            $type = $this->fetchClassName($param->type);
+
+                            return $type ? [$type] : [];
                         }
 
-                        return $param->type;
+                        return $param->type ? [$param->type] : [];
                     }
 
                     $docBlock = $this->lastFunctionLikeNode->getDocComment();
@@ -313,7 +319,9 @@ class QueryingVisitor extends NodeVisitorAbstract
                     ], $name, true);
 
                     if (isset($result['params']['$' . $this->name])) {
-                        return $result['params']['$' . $this->name]['type'];
+                        return $this->typeAnalyzer->getTypesForTypeSpecification(
+                            $result['params']['$' . $this->name]['type']
+                        );
                     }
 
                     break;
@@ -321,32 +329,34 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
         }
 
-        return null;
+        return [];
     }
 
     /**
      * @param string $file
      *
-     * @return string|null
+     * @return string[]
      */
-    public function getResolvedType($file)
+    public function getResolvedTypes($file)
     {
-        $type = $this->getType();
+        $resolvedTypes = [];
 
-        if (!$type || $this->typeAnalyzer->isSpecialType($type)) {
-            return $type;
+        $types = $this->getTypes();
+
+        foreach ($types as $type) {
+            if ($this->typeAnalyzer->isClassType($type) && $type[0] !== "\\") {
+                $type = $this->resolveTypeCommand->resolveType(
+                    $type,
+                    $file,
+                    $this->bestTypeOverrideMatchLine ?: $this->line
+                );
+
+                $type = "\\" . $type;
+            }
+
+            $resolvedTypes[] = $type;
         }
 
-        if ($type[0] !== "\\") {
-            $type = $this->resolveTypeCommand->resolveType(
-                $type,
-                $file,
-                $this->bestTypeOverrideMatchLine ?: $this->line
-            );
-
-            return "\\" . $type;
-        }
-
-        return $type;
+        return $resolvedTypes;
     }
 }

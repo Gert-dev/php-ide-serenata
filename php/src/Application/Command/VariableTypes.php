@@ -19,9 +19,9 @@ use PhpParser\ParserFactory;
 use PhpParser\NodeTraverser;
 
 /**
- * Command that retrieves information about the type of a variable.
+ * Command that retrieves information about the types of a variable.
  */
-class VariableType extends BaseCommand
+class VariableTypes extends BaseCommand
 {
     /**
      * @var Parser
@@ -34,9 +34,9 @@ class VariableType extends BaseCommand
     protected $resolveTypeCommand;
 
     /**
-     * @var DeduceTypeCommand
+     * @var DeduceTypesCommand
      */
-    protected $deduceTypeCommand;
+    protected $deduceTypesCommand;
 
     /**
      * @var TypeAnalyzer
@@ -72,7 +72,7 @@ class VariableType extends BaseCommand
             isset($arguments['stdin']) && $arguments['stdin']->value
         );
 
-        $result = $this->getVariableType(
+        $result = $this->getVariableTypes(
            isset($arguments['file']) ? $arguments['file']->value : null,
            $code,
            $arguments['name']->value,
@@ -90,7 +90,7 @@ class VariableType extends BaseCommand
      *
      * @return string[]
      */
-    public function getVariableType($file, $code, $name, $offset)
+    public function getVariableTypes($file, $code, $name, $offset)
     {
         if (empty($name) || $name[0] !== '$') {
             throw new UnexpectedValueException('The variable name must start with a dollar sign!');
@@ -118,7 +118,7 @@ class VariableType extends BaseCommand
             mb_substr($name, 1),
             $this->getTypeAnalyzer(),
             $this->getResolveTypeCommand(),
-            $this->getDeduceTypeCommand()
+            $this->getDeduceTypesCommand()
         );
 
         $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
@@ -128,7 +128,7 @@ class VariableType extends BaseCommand
         $traverser->addVisitor($queryingVisitor);
         $traverser->traverse($nodes);
 
-        return $queryingVisitor->getResolvedType($file);
+        return $queryingVisitor->getResolvedTypes($file);
     }
 
     /**
@@ -137,7 +137,7 @@ class VariableType extends BaseCommand
     public function setIndexDatabase(IndexDatabase $indexDatabase)
     {
         if ($this->resolveTypeCommand) {
-            $this->getDeduceTypeCommand()->setIndexDatabase($indexDatabase);
+            $this->getDeduceTypesCommand()->setIndexDatabase($indexDatabase);
             $this->getResolveTypeCommand()->setIndexDatabase($indexDatabase);
         }
 
@@ -160,14 +160,14 @@ class VariableType extends BaseCommand
     /**
      * @return ResolveType
      */
-    protected function getDeduceTypeCommand()
+    protected function getDeduceTypesCommand()
     {
-        if (!$this->deduceTypeCommand) {
-            $this->deduceTypeCommand = new DeduceType();
-            $this->deduceTypeCommand->setIndexDatabase($this->indexDatabase);
+        if (!$this->deduceTypesCommand) {
+            $this->deduceTypesCommand = new DeduceTypes();
+            $this->deduceTypesCommand->setIndexDatabase($this->indexDatabase);
         }
 
-        return $this->deduceTypeCommand;
+        return $this->deduceTypesCommand;
     }
 
     /**

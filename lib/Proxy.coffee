@@ -266,7 +266,7 @@ class Proxy
         )
 
     ###*
-     * Fetches the type of the specified variable at the specified location.
+     * Fetches the types of the specified variable at the specified location.
      *
      * @param {string}      name   The variable to fetch, including its leading dollar sign.
      * @param {string}      file   The path to the file to examine.
@@ -275,11 +275,11 @@ class Proxy
      *
      * @return {Promise}
     ###
-    getVariableType: (name, file, source, offset) ->
+    getVariableTypes: (name, file, source, offset) ->
         if not file?
             throw 'A path to a file must be passed!'
 
-        parameters = ['--variable-type', '--database=' + @getIndexDatabasePath(), '--name=' + name, '--offset=' + offset]
+        parameters = ['--variable-types', '--database=' + @getIndexDatabasePath(), '--name=' + name, '--offset=' + offset]
 
         if file?
             parameters.push('--file=' + file)
@@ -294,7 +294,7 @@ class Proxy
         )
 
     ###*
-     * Deduces the resulting type of an expression based on its parts.
+     * Deduces the resulting types of an expression based on its parts.
      *
      * @param {array}       parts  One or more strings that are part of the expression, e.g. ['$this', 'foo()'].
      * @param {string}      file   The path to the file to examine.
@@ -303,11 +303,11 @@ class Proxy
      *
      * @return {Promise}
     ###
-    deduceType: (parts, file, source, offset) ->
+    deduceTypes: (parts, file, source, offset) ->
         if not file?
             throw 'A path to a file must be passed!'
 
-        parameters = ['--deduce-type', '--database=' + @getIndexDatabasePath(), '--offset=' + offset]
+        parameters = ['--deduce-types', '--database=' + @getIndexDatabasePath(), '--offset=' + offset]
 
         if file?
             parameters.push('--file=' + file)

@@ -16,14 +16,14 @@ use PhpIntegrator\Application\Command as BaseCommand;
 use PhpParser\Node;
 
 /**
- * Allows deducing the type of an expression (e.g. a call chain, a simple string, ...).
+ * Allows deducing the types of an expression (e.g. a call chain, a simple string, ...).
  */
-class DeduceType extends BaseCommand
+class DeduceTypes extends BaseCommand
 {
     /**
-     * @var VariableType
+     * @var VariableTypes
      */
-    protected $variableTypeCommand;
+    protected $variableTypesCommand;
 
     /**
      * @var ClassList
@@ -79,7 +79,7 @@ class DeduceType extends BaseCommand
             isset($arguments['stdin']) && $arguments['stdin']->value
         );
 
-        $result = $this->deduceType(
+        $result = $this->deduceTypes(
            isset($arguments['file']) ? $arguments['file']->value : null,
            $code,
            $arguments['part']->value,
@@ -95,19 +95,18 @@ class DeduceType extends BaseCommand
      * @param string[] $expressionParts
      * @param int      $offset
      *
-     * @return string|null
+     * @return string[]
      */
-    public function deduceType($file, $code, array $expressionParts, $offset)
+    public function deduceTypes($file, $code, array $expressionParts, $offset)
     {
         // TODO: Using regular expressions here is kind of silly. We should refactor this to actually analyze php-parser
         // nodes at a later stage. At the moment this is just a one-to-one translation of the original CoffeeScript
         // method.
 
-        $i = 0;
-        $className = null;
+        $types = [];
 
         if (empty($expressionParts)) {
-            return null;
+            return $types;
         }
 
         $propertyAccessNeedsDollarSign = false;
@@ -116,43 +115,43 @@ class DeduceType extends BaseCommand
         $classRegexPart = "?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*";
 
         if ($firstElement[0] === '$') {
-            $className = $this->getVariableTypeCommand()->getVariableType($file, $code, $firstElement, $offset);
+            $types = $this->getVariableTypesCommand()->getVariableTypes($file, $code, $firstElement, $offset);
         } elseif ($firstElement === 'static' or $firstElement === 'self') {
             $propertyAccessNeedsDollarSign = true;
 
-            $className = $this->getCurrentClassAt($file, $code, $offset);
+            $types = [$this->getCurrentClassAt($file, $code, $offset)];
         } elseif ($firstElement === 'parent') {
             $propertyAccessNeedsDollarSign = true;
 
-            $className = $this->getCurrentClassAt($file, $code, $offset);
+            $currentClassName = $this->getCurrentClassAt($file, $code, $offset);
 
-            if ($className) {
-                $classInfo = $this->getClassInfoCommand()->getClassInfo($className);
+            if ($currentClassName) {
+                $classInfo = $this->getClassInfoCommand()->getClassInfo($currentClassName);
 
                 if ($classInfo && !empty($classInfo['parents'])) {
-                    $className = $classInfo['parents'][0];
+                    $types = [$classInfo['parents'][0]];
                 }
             }
         } elseif ($firstElement[0] === '[') {
-            $className = 'array';
+            $types = ['array'];
         } elseif (preg_match('/^(0x)?\d+$/', $firstElement) === 1) {
-            $className = 'int';
+            $types = ['int'];
         } elseif (preg_match('/^\d+.\d+$/', $firstElement) === 1) {
-            $className = 'float';
+            $types = ['float'];
         } elseif (preg_match('/^(true|false)$/', $firstElement) === 1) {
-            $className = 'bool';
+            $types = ['bool'];
         } elseif (preg_match('/^"(.|\n)*"$/', $firstElement) === 1) {
-            $className = 'string';
+            $types = ['string'];
         } elseif (preg_match('/^\'(.|\n)*\'$/', $firstElement) === 1) {
-            $className = 'string';
+            $types = ['string'];
         } elseif (preg_match('/^array\s*\(/', $firstElement) === 1) {
-            $className = 'array';
+            $types = ['array'];
         } elseif (preg_match('/^function\s*\(/', $firstElement) === 1) {
-            $className = '\\Closure';
+            $types = ['\\Closure'];
         } elseif (preg_match("/^new\s+((${classRegexPart}))(?:\(\))?/", $firstElement, $matches) === 1) {
-            $className = $this->deduceType($file, $code, [$matches[1]], $offset);
+            $types = $this->deduceTypes($file, $code, [$matches[1]], $offset);
         } elseif (preg_match('/^clone\s+(\$[a-zA-Z0-9_]+)/', $firstElement, $matches) === 1) {
-            $className = $this->deduceType($file, $code, [$matches[1]], $offset);
+            $types = $this->deduceTypes($file, $code, [$matches[1]], $offset);
         } elseif (preg_match('/^(.*?)\(\)$/', $firstElement, $matches) === 1) {
             // Global PHP function.
 
@@ -163,7 +162,7 @@ class DeduceType extends BaseCommand
                 $returnTypes = $globalFunctions[$matches[1]]['returnTypes'];
 
                 if (count($returnTypes) === 1) {
-                    $className = $returnTypes[0]['resolvedType'];
+                    $types = $this->fetchResolvedTypesFromTypeArrays($returnTypes);
                 }
             }
         } elseif (preg_match("/((${classRegexPart}))/", $firstElement, $matches) === 1) {
@@ -172,26 +171,15 @@ class DeduceType extends BaseCommand
 
             $line = $this->calculateLineByOffset($code, $offset);
 
-            $className = $this->getResolveTypeCommand()->resolveType($matches[1], $file, $line);
-        } else {
-            $className = null; // No idea what this is.
+            $types = [$this->getResolveTypeCommand()->resolveType($matches[1], $file, $line)];
         }
 
-        if (!$className) {
-            return null;
-        }
-
-        // We now know what class we need to start from, now it's just a matter of fetching the return types of members
+        // We now know what types we need to start from, now it's just a matter of fetching the return types of members
         // in the call stack.
         $storageProxy = new DeduceType\IndexDataAdapterProvider($this->indexDatabase, null);
         $dataAdapter = new IndexDataAdapter($storageProxy);
 
         foreach ($expressionParts as $element) {
-            if ($this->getTypeAnalyzer()->isSpecialType($className)) {
-                $className = null;
-                break;
-            }
-
             $isMethod = false;
             $isValidPropertyAccess = false;
 
@@ -205,45 +193,74 @@ class DeduceType extends BaseCommand
                 $isValidPropertyAccess = true;
             }
 
-            $classNameToSearch = ($className && $className[0] === '\\' ? mb_substr($className, 1) : $className);
+            $newTypes = [];
 
-            $id = $this->indexDatabase->getStructureId($classNameToSearch);
+            foreach ($types as $type) {
+                if (!$this->getTypeAnalyzer()->isClassType($type)) {
+                    continue; // Can't fetch members of non-class type.
+                }
 
-            $storageProxy->setMemberFilter($element);
-            $info = $dataAdapter->getStructureInfo($id);
+                $classNameToSearch = ($type && $type[0] === '\\' ? mb_substr($type, 1) : $type);
 
-            $className = null;
+                $id = $this->indexDatabase->getStructureId($classNameToSearch);
 
-            if ($isMethod) {
-                if (isset($info['methods'][$element])) {
-                    $returnTypes = $info['methods'][$element]['returnTypes'];
+                $storageProxy->setMemberFilter($element);
+                $info = $dataAdapter->getStructureInfo($id);
 
-                    if (count($returnTypes) === 1) {
-                        $className = $returnTypes[0]['resolvedType'];
+                $fetchedTypes = [];
+
+                if ($isMethod) {
+                    if (isset($info['methods'][$element])) {
+                        $fetchedTypes = $this->fetchResolvedTypesFromTypeArrays($info['methods'][$element]['returnTypes']);
                     }
+                } elseif (isset($info['constants'][$element])) {
+                    $fetchedTypes = $this->fetchResolvedTypesFromTypeArrays($info['constants'][$element]['types']);
+                } elseif ($isValidPropertyAccess && isset($info['properties'][$element])) {
+                    $fetchedTypes = $this->fetchResolvedTypesFromTypeArrays($info['properties'][$element]['types']);
                 }
-            } elseif (isset($info['constants'][$element])) {
-                $types = $info['constants'][$element]['types'];
 
-                if (count($types) === 1) {
-                    $className = $types[0]['resolvedType'];
-                }
-            } elseif ($isValidPropertyAccess && isset($info['properties'][$element])) {
-                $types = $info['properties'][$element]['types'];
-
-                if (count($types) === 1) {
-                    $className = $types[0]['resolvedType'];
+                if (!empty($fetchedTypes)) {
+                    $newTypes += array_combine($fetchedTypes, array_fill(0, count($fetchedTypes), true));
                 }
             }
+
+            $types = $newTypes;
 
             $propertyAccessNeedsDollarSign = false;
         }
 
-        if ($className && !$this->getTypeAnalyzer()->isSpecialType($className) && $className[0] !== "\\") {
-            $className = "\\" . $className;
+        if (!empty($expressionParts)) {
+            // We use an associative array so we automatically avoid duplicate types.
+            $types = array_keys($types);
         }
 
-        return $className;
+        foreach ($types as &$type) {
+            if ($this->getTypeAnalyzer()->isClassType($type) && $type[0] !== "\\") {
+                $type = "\\" . $type;
+            }
+        }
+
+        return $types;
+    }
+
+    /**
+     * @param array $typeArray
+     *
+     * @return string
+     */
+    protected function fetchResolvedTypeFromTypeArray(array $typeArray)
+    {
+        return $typeArray['resolvedType'];
+    }
+
+    /**
+     * @param array $typeArrays
+     *
+     * @return string[]
+     */
+    protected function fetchResolvedTypesFromTypeArrays(array $typeArrays)
+    {
+        return array_map([$this, 'fetchResolvedTypeFromTypeArray'], $typeArrays);
     }
 
     /**
@@ -252,13 +269,13 @@ class DeduceType extends BaseCommand
      * @param Node\Expr   $expression
      * @param int         $offset
      *
-     * @return string|null
+     * @return string[]
      */
-    public function deduceTypeFromNode($file, $code, Node\Expr $expression, $offset)
+    public function deduceTypesFromNode($file, $code, Node\Expr $expression, $offset)
     {
         $expressionParts = $this->convertExpressionToStringParts($expression);
 
-        return $expressionParts ? $this->deduceType($file, $code, $expressionParts, $offset) : null;
+        return $expressionParts ? $this->deduceTypes($file, $code, $expressionParts, $offset) : [];
     }
 
     /**
@@ -364,8 +381,8 @@ class DeduceType extends BaseCommand
      */
     public function setIndexDatabase(IndexDatabase $indexDatabase)
     {
-        if ($this->variableTypeCommand) {
-            $this->getVariableTypeCommand()->setIndexDatabase($indexDatabase);
+        if ($this->variableTypesCommand) {
+            $this->getVariableTypesCommand()->setIndexDatabase($indexDatabase);
         }
 
         if ($this->classListCommand) {
@@ -388,16 +405,16 @@ class DeduceType extends BaseCommand
     }
 
     /**
-     * @return VariableType
+     * @return VariableTypes
      */
-    protected function getVariableTypeCommand()
+    protected function getVariableTypesCommand()
     {
-        if (!$this->variableTypeCommand) {
-            $this->variableTypeCommand = new VariableType();
-            $this->variableTypeCommand->setIndexDatabase($this->indexDatabase);
+        if (!$this->variableTypesCommand) {
+            $this->variableTypesCommand = new VariableTypes();
+            $this->variableTypesCommand->setIndexDatabase($this->indexDatabase);
         }
 
-        return $this->variableTypeCommand;
+        return $this->variableTypesCommand;
     }
 
     /**
