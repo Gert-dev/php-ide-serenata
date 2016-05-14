@@ -50,7 +50,7 @@ class Service
     ###*
      * Retrieves a list of available classes in the specified file.
      *
-     * @param {string} file
+     * @param {String} file
      *
      * @return {Promise}
     ###
@@ -76,7 +76,7 @@ class Service
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
      *
-     * @param {string} className
+     * @param {String} className
      *
      * @return {Promise}
     ###
@@ -86,9 +86,9 @@ class Service
     ###*
      * Resolves a local type in the specified file, based on use statements and the namespace.
      *
-     * @param {string}  file
-     * @param {number}  line The line the type is located at. The first line is 1, not 0.
-     * @param {string}  type
+     * @param {String}  file
+     * @param {Number}  line The line the type is located at. The first line is 1, not 0.
+     * @param {String}  type
      *
      * @return {Promise}
     ###
@@ -99,9 +99,9 @@ class Service
      * Localizes a type to the specified file, making it relative to local use statements, if possible. If not possible,
      * null is returned.
      *
-     * @param {string}  file
-     * @param {number}  line The line the type is located at. The first line is 1, not 0.
-     * @param {string}  type
+     * @param {String}  file
+     * @param {Number}  line The line the type is located at. The first line is 1, not 0.
+     * @param {String}  type
      *
      * @return {Promise}
     ###
@@ -111,8 +111,8 @@ class Service
     ###*
      * Performs a semantic lint of the specified file.
      *
-     * @param {string}      file
-     * @param {string|null} source The source code of the file to index. May be null if a directory is passed instead.
+     * @param {String}      file
+     * @param {String|null} source The source code of the file to index. May be null if a directory is passed instead.
      * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses,
      *                              noDocblockCorrectness and noUnusedUseStatements are supported.
      *
@@ -124,9 +124,9 @@ class Service
     ###*
      * Fetches all available variables at a specific location.
      *
-     * @param {string|null} file   The path to the file to examine. May be null if the source parameter is passed.
-     * @param {string|null} source The source code to search. May be null if a file is passed instead.
-     * @param {number}      offset The character offset into the file to examine.
+     * @param {String|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
      *
      * @return {Promise}
     ###
@@ -136,10 +136,10 @@ class Service
     ###*
      * Fetches the types of the specified variable at the specified location.
      *
-     * @param {string}      name   The variable to fetch, including its leading dollar sign.
-     * @param {string}      file   The path to the file to examine.
-     * @param {string|null} source The source code to search. May be null if a file is passed instead.
-     * @param {number}      offset The character offset into the file to examine.
+     * @param {String}      name   The variable to fetch, including its leading dollar sign.
+     * @param {String}      file   The path to the file to examine.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
      *
      * @return {Promise}
     ###
@@ -149,10 +149,10 @@ class Service
     ###*
      * Deduces the resulting types of an expression based on its parts.
      *
-     * @param {array}       parts  One or more strings that are part of the expression, e.g. ['$this', 'foo()'].
-     * @param {string}      file   The path to the file to examine.
-     * @param {string|null} source The source code to search. May be null if a file is passed instead.
-     * @param {number}      offset The character offset into the file to examine.
+     * @param {Array}       parts  One or more strings that are part of the expression, e.g. ['$this', 'foo()'].
+     * @param {String}      file   The path to the file to examine.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
      *
      * @return {Promise}
     ###
@@ -162,8 +162,8 @@ class Service
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {string}      path                   The full path to the file  or folder to refresh.
-     * @param {string|null} source                 The source code of the file to index. May be null if a directory is
+     * @param {String}      path                   The full path to the file  or folder to refresh.
+     * @param {String|null} source                 The source code of the file to index. May be null if a directory is
      *                                             passed instead.
      * @param {Callback}    progressStreamCallback A method to invoke each time progress streaming data is received.
      *
@@ -238,7 +238,7 @@ class Service
      *
      * @param {TextEditor} editor         The editor.
      * @param {Point}      bufferPosition The location of the type.
-     * @param {string}     type           The (local) type to resolve.
+     * @param {String}     type           The (local) type to resolve.
      *
      * @return {Promise}
      *
@@ -266,7 +266,7 @@ class Service
      *
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition
-     * @param {string}     name
+     * @param {String}     name
      *
      * @return {Promise}
     ###
@@ -349,7 +349,7 @@ class Service
     ###*
      * Indicates if the specified type is a basic type (e.g. int, array, object, etc.).
      *
-     * @param {string} type
+     * @param {String} type
      *
      * @return {boolean}
     ###
