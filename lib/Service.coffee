@@ -309,7 +309,7 @@ class Service
 
         if not callStack or callStack.length == 0
             promise = new Promise (resolve, reject) ->
-                resolve(null)
+                resolve([])
 
             return promise
 
