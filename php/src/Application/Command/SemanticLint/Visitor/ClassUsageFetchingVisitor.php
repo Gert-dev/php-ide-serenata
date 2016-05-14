@@ -55,8 +55,8 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Name) {
-            // TODO: Constants and functions can also have a fully qualified name, but these are not indexed at the
-            // moment. See also https://secure.php.net/manual/en/language.namespaces.importing.php .
+            // TODO: Constants and functions can also have a fully qualified name.
+            // See also https://secure.php.net/manual/en/language.namespaces.importing.php .
             if (!$this->lastNode instanceof Node\Expr\FuncCall &&
                 !$this->lastNode instanceof Node\Expr\ConstFetch &&
                 !$this->lastNode instanceof Node\Stmt\Namespace_
