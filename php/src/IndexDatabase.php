@@ -6,6 +6,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
 
+/**
+ * Represents that database that is used for indexing.
+ */
 class IndexDatabase implements
     Indexer\StorageInterface,
     IndexDataAdapter\ProviderInterface
