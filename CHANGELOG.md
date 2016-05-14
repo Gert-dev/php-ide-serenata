@@ -3,9 +3,8 @@
 * Minor performance improvements when calculating the global class list.
 
 ### Changes for developers
-* Changes to the service
-  * `localizeType` will now return the FQCN instead of null if it couldn't localize a type based on use statements. The reasoning behind this is that you want a localized version of the type you pass, if there are no use statements to localize it, the FQCN is the only way to address the type locally.
-  * Return types for functions and types for function parameters will now also include a `typeHint` property that is set to the actual type hint that was specified (the type and resolvedType fall back to the docblock if it is present).
+* `localizeType` will now return the FQCN instead of null if it couldn't localize a type based on use statements. The reasoning behind this is that you want a localized version of the type you pass, if there are no use statements to localize it, the FQCN is the only way to address the type locally.
+* Return types for functions and types for function parameters will now also include a `typeHint` property that is set to the actual type hint that was specified (the type and resolvedType fall back to the docblock if it is present).
 
 ## 0.9.3
 ### Bugs fixed
@@ -51,19 +50,18 @@ public function setFoo(string $foo): self
 * The `@inheritDoc` syntax without curly braces wasn't always correctly being handled, resulting in docblocks containing only them still being treated as actual docblocks that weren't inherited.
 
 ### Changes for developers
-* Changes to the service
-  * Semantic linting can now lint docblock correctness.
-  * Semantic linting will now also return syntax errors.
-  * Support for calling most methods synchronously has been removed.
-  * Classes didn't return information about whether they have a docblock or documentation.
-  * When fetching class information, types were sometimes returned without their leading slash.
-  * Because of semantic linting now supporting syntax errors, the reindex command will no longer return them.
-  * Global constants and functions will now also return an FQSEN so you can deduce in what namespace they are located.
-  * When returning types such as `string[]`, the `fullType` was still trying to resolve the type as if it were a class type.
-  * The reindex command did not return false when indexing failed and the promise was, by consequence, not rejected.
-  * Added a new command `localizeType` to localize FQCN's based on use statements, turning them back into relative class names.
-  * The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.
-  * Classes will now return information about whether they are usable as annotation or not (determined by an `@Annotation` tag in their docblock). This is non-standard, but is becoming more and more commonly used in the PHP world (e.g. Symfony and Doctrine).
+* Semantic linting can now lint docblock correctness.
+* Semantic linting will now also return syntax errors.
+* Support for calling most methods synchronously has been removed.
+* Classes didn't return information about whether they have a docblock or documentation.
+* When fetching class information, types were sometimes returned without their leading slash.
+* Because of semantic linting now supporting syntax errors, the reindex command will no longer return them.
+* Global constants and functions will now also return an FQSEN so you can deduce in what namespace they are located.
+* When returning types such as `string[]`, the `fullType` was still trying to resolve the type as if it were a class type.
+* The reindex command did not return false when indexing failed and the promise was, by consequence, not rejected.
+* Added a new command `localizeType` to localize FQCN's based on use statements, turning them back into relative class names.
+* The `semanticLint` method now takes an `options` object that allows you to disable certain parts of the linting process.
+* Classes will now return information about whether they are usable as annotation or not (determined by an `@Annotation` tag in their docblock). This is non-standard, but is becoming more and more commonly used in the PHP world (e.g. Symfony and Doctrine).
 
 ## 0.8.2
 ### Bugs fixed
@@ -90,22 +88,21 @@ public function setFoo(string $foo): self
 
 ### Changes for developers
 * Almost all service methods now have an async parameter. It is recommended that you always use this functionality as it will ensure the editor remains responsive for the end user. In a future release, support for synchronous calls **will _probably_ be removed**.
-* Changes to the service
-  * A new method `deduceType` has been added.
-  * A new method `getVariableTypeByOffset` has been added.
-  * `getVariableType`, `getResultingTypeAt`, `resolveTypeAt` and `getInvocationInfoAt` have received an additional parameter, `async`, that will make them (mostly) asynchronous.
-  * `getVariableType` and `getResultingTypeAt` have been rewritten in PHP. Class types returned by these methods will now _always_ be absolute and _always_ include a leading slash. Previously the returned type was _sometimes_ relative to the current file and _sometimes_ absolute. To make things worse, absolute types _sometimes_ contained a leading slash, leading to confusion. (Scalar types will still not include a leading slash.)
-  * A new property `hasDocumentation` is now returned for items already having the `hasDocblock` property. The latter will still return false if the docblock is inherited from the parent, but the former will return true in that case.
-  * The following methods have been removed, they were barely used and just provided very thin wrappers over existing functionality:
-    * `getClassMember`
-    * `getClassMemberAt`
-    * `getClassConstant`
-    * `getClassConstantAt`
-    * `getClassMethod`
-    * `getClassMethodAt`
-    * `getClassProperty`
-    * `getClassPropertyAt`
-    * `getClassSelectorFromEvent` (didn't really belong in the base package).
+* A new method `deduceType` has been added.
+* A new method `getVariableTypeByOffset` has been added.
+* `getVariableType`, `getResultingTypeAt`, `resolveTypeAt` and `getInvocationInfoAt` have received an additional parameter, `async`, that will make them (mostly) asynchronous.
+* `getVariableType` and `getResultingTypeAt` have been rewritten in PHP. Class types returned by these methods will now _always_ be absolute and _always_ include a leading slash. Previously the returned type was _sometimes_ relative to the current file and _sometimes_ absolute. To make things worse, absolute types _sometimes_ contained a leading slash, leading to confusion. (Scalar types will still not include a leading slash.)
+* A new property `hasDocumentation` is now returned for items already having the `hasDocblock` property. The latter will still return false if the docblock is inherited from the parent, but the former will return true in that case.
+* The following methods have been removed, they were barely used and just provided very thin wrappers over existing functionality:
+  * `getClassMember`
+  * `getClassMemberAt`
+  * `getClassConstant`
+  * `getClassConstantAt`
+  * `getClassMethod`
+  * `getClassMethodAt`
+  * `getClassProperty`
+  * `getClassPropertyAt`
+  * `getClassSelectorFromEvent` (didn't really belong in the base package).
 
 ## 0.7.2
 ### Bugs fixed
@@ -119,9 +116,8 @@ public function setFoo(string $foo): self
 * Fixed semantic linting marking use statements as unused whilst they were being used inside function calls or in class constant fetching.
 
 ### Changes for developers
-* Changes to the service
-  * Methods will now contain information about whether they are abstract or not.
-  * Methods will now contain information about whether the method they override was abstract or not.
+* Methods will now contain information about whether they are abstract or not.
+* Methods will now contain information about whether the method they override was abstract or not.
 
 ## 0.7.0
 ### Features and enhancements
@@ -150,13 +146,12 @@ public function setFoo(string $foo): self
   * Properties inside interfaces will not be "inherited" anymore (PHP error).
 
 ### Changes for developers
-* Changes to the service
-  * Magic properties and methods will no longer return true for `hasDocblock`.
-  * `getAvailableVariables` received an extra (optional) `async` parameter.
-  * `determineCurrentClassName` received an extra (optional) `async` parameter.
-  * Magic properties and methods now return the class start line as their end line.
-  * A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
-  * A new method `getAvailableVariablesByOffset` has been added that allows fetching available variables via an offset in a file. This method is implemented in PHP, supports asynchronous operation and the existing `getAvailableVariables` has been rewritten to use this method.
+* Magic properties and methods will no longer return true for `hasDocblock`.
+* `getAvailableVariables` received an extra (optional) `async` parameter.
+* `determineCurrentClassName` received an extra (optional) `async` parameter.
+* Magic properties and methods now return the class start line as their end line.
+* A new method `semanticLint` is now available that can semantically lint files and return various issues with it.
+* A new method `getAvailableVariablesByOffset` has been added that allows fetching available variables via an offset in a file. This method is implemented in PHP, supports asynchronous operation and the existing `getAvailableVariables` has been rewritten to use this method.
 
 ## 0.6.10
 ### Bugs fixed
@@ -251,15 +246,14 @@ public function incorrectInheritanceButCommonlyUsed()
 * Resolving types is now more correct, taking multiple namespaces per file into account as well as only utilizing use statements that actually apply for a specific line.
 
 ### Changes for developers
-* Changes to the service
-  * A new call `getClassListForFile` takes a file path to filter the class list by.
-  * `getClassSelectorFromEvent` will no longer return null for built-in classes (you can still easily check this yourself).
-  * Next to `startLine` information, `endLine` information will now also be returned.
-  * Fetching class information will now also return information about direct and indirect implemented interfaces and used traits via the properties `parents`, `directParents`, `interfaces`, `directInterfaces`, `traits` and `directTraits`.
-  * Fetching class information will now also return information about direct children, direct implementors (if it's an interface) and direct users (if it's a trait).
-  * `determineFullClassName` was split up into two methods (separation of concerns):
-    * `determineCurrentClassName` - Takes an editor and a buffer position and returns the FQCN of the class the location is in. The buffer position is now required as a file can contain multiple classes, which were not retrievable before.
-    * `resolveType` (with accompanying convenience method `resolveTypeAt`) - Takes an editor, a line, and a type name and resolves that type to its FQCN based on local use statements and namespace rules.
+* A new call `getClassListForFile` takes a file path to filter the class list by.
+* `getClassSelectorFromEvent` will no longer return null for built-in classes (you can still easily check this yourself).
+* Next to `startLine` information, `endLine` information will now also be returned.
+* Fetching class information will now also return information about direct and indirect implemented interfaces and used traits via the properties `parents`, `directParents`, `interfaces`, `directInterfaces`, `traits` and `directTraits`.
+* Fetching class information will now also return information about direct children, direct implementors (if it's an interface) and direct users (if it's a trait).
+* `determineFullClassName` was split up into two methods (separation of concerns):
+  * `determineCurrentClassName` - Takes an editor and a buffer position and returns the FQCN of the class the location is in. The buffer position is now required as a file can contain multiple classes, which were not retrievable before.
+  * `resolveType` (with accompanying convenience method `resolveTypeAt`) - Takes an editor, a line, and a type name and resolves that type to its FQCN based on local use statements and namespace rules.
 
 ## 0.5.4
 ### Features and enhancements
@@ -313,11 +307,10 @@ moreCode();
 ```
 
 ### Changes for developers
-* Changes to the service
-  * Popovers will, by default, no longer catch pointer events (making them click-through).
-  * You can now listen to indexing succeeding or failing using `onDidFinishIndexing` and `onDidFailIndexing`. (thanks to [@tocjent](https://github.com/tocjent))
-  * The type for parameters of methods will now return the type as it was found in the file. If you wish to access the full resolved class type, you can use the new `fullType` property instead.
-  * A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
+* Popovers will, by default, no longer catch pointer events (making them click-through).
+* You can now listen to indexing succeeding or failing using `onDidFinishIndexing` and `onDidFailIndexing`. (thanks to [@tocjent](https://github.com/tocjent))
+* The type for parameters of methods will now return the type as it was found in the file. If you wish to access the full resolved class type, you can use the new `fullType` property instead.
+* A new method `getInvocationInfoAt` is now available that allows fetching information about the function or method being invoked at the specified cursor position in an editor.
 
 ## 0.4.9
 ### Bugs fixed
@@ -394,18 +387,17 @@ class Foo
 * Project and file paths that contain spaces should no longer pose a problem (thanks to [@wcatron](https://github.com/wcatron)).
 
 ### Changes for developers
-* Changes to the service
-  * Constants and class properties will now retrieve their start line as well. These items not being available was previously manually worked around in the php-integrator-navigation package. This manual workaround is now present in the base package as CoffeeScript should not have to bend itself backwards to get this information because PHP Reflection didn't offer it.
-  * `declaringStructure` will now also contain a `startLineMember` property that indicates the start line of the member in the structural element.
-  * Retrieving types for the list of local variables has been disabled for now as the performance impact is too large in longer functions. It may be reactivated in a future release.
-  * Constructor information is no longer retrieved when fetching the class list as the performance hit is too large. In fact, this was also the case before the new indexer, but then a cache file was used, which was never properly updated with new classes and was the result of the very long indexing process at start-up.
-  * `deprecated` was renamed to `isDeprecated` for consistency.
-  * `wasFound` was removed when fetching class (structural element) information as a failure status is now returned instead.
-  * `class` was removed when fetching class (structural element) information as this information is already available in the `name` property.
-  * `isMethod` and `isProperty` were removed as they are no longer necessary since members are now in separate associative arrays.
-  * Added the more specific convenience methods `getClassMethodAt`, `getClassPropertyAt` and `getClassConstantAt`.
-  * `isTrait`, `isInterface` and `isClass` were replaced with a single string `type` property.
-  * Functions and methods no longer return a separate `parameters` and `optionals` property. The two have now been merged and provide more information (such as whether the parameters are a reference, variadic, optional, ...).
+* Constants and class properties will now retrieve their start line as well. These items not being available was previously manually worked around in the php-integrator-navigation package. This manual workaround is now present in the base package as CoffeeScript should not have to bend itself backwards to get this information because PHP Reflection didn't offer it.
+* `declaringStructure` will now also contain a `startLineMember` property that indicates the start line of the member in the structural element.
+* Retrieving types for the list of local variables has been disabled for now as the performance impact is too large in longer functions. It may be reactivated in a future release.
+* Constructor information is no longer retrieved when fetching the class list as the performance hit is too large. In fact, this was also the case before the new indexer, but then a cache file was used, which was never properly updated with new classes and was the result of the very long indexing process at start-up.
+* `deprecated` was renamed to `isDeprecated` for consistency.
+* `wasFound` was removed when fetching class (structural element) information as a failure status is now returned instead.
+* `class` was removed when fetching class (structural element) information as this information is already available in the `name` property.
+* `isMethod` and `isProperty` were removed as they are no longer necessary since members are now in separate associative arrays.
+* Added the more specific convenience methods `getClassMethodAt`, `getClassPropertyAt` and `getClassConstantAt`.
+* `isTrait`, `isInterface` and `isClass` were replaced with a single string `type` property.
+* Functions and methods no longer return a separate `parameters` and `optionals` property. The two have now been merged and provide more information (such as whether the parameters are a reference, variadic, optional, ...).
 
 ## 0.3.1
 ### Bugs fixed
@@ -468,12 +460,11 @@ class MyClass
 * Support for the short annotation style, `/** @var FooClass */`, was dropped. The reason for this is that it's not supported by any IDE and is very specific to this package. It's also completely inflexible because it needs to be directly above the last assignment or other type deduction (such as a catch block) for it to be picked up incorrectly. The other annotation styles have none of these restrictions and also work in IDE's such as PHPStorm.
 
 ### Changes for developers
-* Changes to the service
-  * `determineFullClassName` will now return basic types as is, without prefixing them with the current namespace.
-  * A new method `isBasicType` has been introduced, that will return true for basic types such as "int", "BOOL", "array", "string", ...
-  * The `getDocParams` method has been removed. It was obsolete as the same information is already returned by `getClassInfo`. Also more caches can be reused by using `getClassInfo`.
-  * The `autocomplete` method has been removed. It was confusing and also mostly obsolete as its functionality can already be mimicked through other methods (it was only internally used).
-  * Data returned about methods, constants, functions and structures will no longer have an 'args' property containing information such as descriptions. Instead these were moved up one level (in other words you can just replace the `.args.property` with just `.property` everywhere). It wasn't clear what exactly belonged in `args` and what didn't, hence its entire removal.
+* `determineFullClassName` will now return basic types as is, without prefixing them with the current namespace.
+* A new method `isBasicType` has been introduced, that will return true for basic types such as "int", "BOOL", "array", "string", ...
+* The `getDocParams` method has been removed. It was obsolete as the same information is already returned by `getClassInfo`. Also more caches can be reused by using `getClassInfo`.
+* The `autocomplete` method has been removed. It was confusing and also mostly obsolete as its functionality can already be mimicked through other methods (it was only internally used).
+* Data returned about methods, constants, functions and structures will no longer have an 'args' property containing information such as descriptions. Instead these were moved up one level (in other words you can just replace the `.args.property` with just `.property` everywhere). It wasn't clear what exactly belonged in `args` and what didn't, hence its entire removal.
 
 ## 0.2.0
 ### Features and enhancements
@@ -511,15 +502,14 @@ foo()-> // Autocompletion for DateTime.
   * `getClassMethod` - Retrieves information about a specific class method.
   * `getClassProperty` - Retrieves information about a specific class property.
   * `getClassConstant` - Retrieves information about a specific class constant.
-* Changes to the service:
-  * Previously, `getCalledClass` always ignored the last element in a call stack, causing `$this->foo->b` to return the type of `foo` instead of `b`. Because this behavior is unexpected and undocumented, this no longer happens. To maintain this 'feature', a new parameter `ignoreLastElement` has been added that can be set to true to restore this behavior (i.e. it will return the type of `foo`). Setting it to false will return the type of `b` instead.
-  * `getGlobalFunctions` will now also return user-defined global functions (i.e. non-internal global functions).
-  * `getGlobalConstants` will now also return information about if a constant is built-in or not (as opposed to user defined).
-  * `getAvailableVariables` now returns an object with variable names mapped to information such as their type (if found).
-  * `getClassMemberAt` will now return the correct member if a structure has a property and a method with the same name.
-  * `getCalledClass` is now called `getResultingTypeAt` to better indicate what it does and that it needs a buffer position.
-  * Class constants will now contain information about their declaring class and declaring structure, just like other members.
-  * Several methods such as `getClassInfo` now take an additional parameter to make them execute asynchronously (a promise will be returned instead of the actual results).
+* Previously, `getCalledClass` always ignored the last element in a call stack, causing `$this->foo->b` to return the type of `foo` instead of `b`. Because this behavior is unexpected and undocumented, this no longer happens. To maintain this 'feature', a new parameter `ignoreLastElement` has been added that can be set to true to restore this behavior (i.e. it will return the type of `foo`). Setting it to false will return the type of `b` instead.
+* `getGlobalFunctions` will now also return user-defined global functions (i.e. non-internal global functions).
+* `getGlobalConstants` will now also return information about if a constant is built-in or not (as opposed to user defined).
+* `getAvailableVariables` now returns an object with variable names mapped to information such as their type (if found).
+* `getClassMemberAt` will now return the correct member if a structure has a property and a method with the same name.
+* `getCalledClass` is now called `getResultingTypeAt` to better indicate what it does and that it needs a buffer position.
+* Class constants will now contain information about their declaring class and declaring structure, just like other members.
+* Several methods such as `getClassInfo` now take an additional parameter to make them execute asynchronously (a promise will be returned instead of the actual results).
 
 ## 0.1.0
 * Initial release.
