@@ -87,7 +87,7 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
      */
      protected function isValidType($type)
      {
-         return !$this->getTypeAnalyzer()->isSpecialType($type);
+         return $this->getTypeAnalyzer()->isClassType($type);
      }
 
     /**
