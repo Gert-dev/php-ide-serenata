@@ -497,19 +497,6 @@ class IndexDatabase implements
     /**
      * @inheritDoc
      */
-    public function getFunctionThrows($functionId)
-    {
-        return $this->getConnection()->createQueryBuilder()
-            ->select('*')
-            ->from(IndexStorageItemEnum::FUNCTIONS_THROWS)
-            ->where('function_id = ?')
-            ->setParameter(0, $functionId)
-            ->execute();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function insert($indexStorageItem, array $data)
     {
         $this->getConnection()->insert($indexStorageItem, $data);

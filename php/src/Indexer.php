@@ -1210,10 +1210,6 @@ class Indexer
         foreach ($parameters as $parameter) {
             $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameter);
         }
-
-        foreach ($throws as $throw) {
-            $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_THROWS, $throw);
-        }
     }
 
     /**

@@ -239,21 +239,6 @@ CREATE TABLE functions_parameters(
         ON UPDATE CASCADE
 );
 
--- Contains a list of exceptions that can be thrown (specified through the docblock) for a function or method.
-CREATE TABLE functions_throws(
-    id          integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-
-    function_id integer unsigned,
-
-    type        varchar(255) NOT NULL,
-    full_type   varchar(255) NOT NULL,
-    description text,
-
-    FOREIGN KEY(function_id) REFERENCES functions(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
 --
 CREATE TABLE properties(
     id                    integer NOT NULL PRIMARY KEY AUTOINCREMENT,

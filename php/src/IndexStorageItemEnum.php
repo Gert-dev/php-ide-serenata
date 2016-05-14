@@ -21,7 +21,6 @@ class IndexStorageItemEnum
     const STRUCTURES_TRAITS_PRECEDENCES = 'structures_traits_precedences';
     const FUNCTIONS                     = 'functions';
     const FUNCTIONS_PARAMETERS          = 'functions_parameters';
-    const FUNCTIONS_THROWS              = 'functions_throws';
     const PROPERTIES                    = 'properties';
     const CONSTANTS                     = 'constants';
 }
