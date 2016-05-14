@@ -257,8 +257,6 @@ class IndexDatabase implements
     /**
      * Retrieves a query builder that fetches raw information about all structural elements.
      *
-     * @param int $id
-     *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     protected function getStructureRawInfoQueryBuilder()
