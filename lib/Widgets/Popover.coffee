@@ -40,7 +40,7 @@ class Popover extends Disposable
     ###*
      * sets the text to display.
      *
-     * @param {string} text
+     * @param {String} text
     ###
     setText: (text) ->
         @$('.tooltip-inner', @element).html(
@@ -50,9 +50,9 @@ class Popover extends Disposable
     ###*
      * Shows a popover at the specified location with the specified text and fade in time.
      *
-     * @param {number} x          The X coordinate to show the popover at (left).
-     * @param {number} y          The Y coordinate to show the popover at (top).
-     * @param {number} fadeInTime The amount of time to take to fade in the tooltip.
+     * @param {Number} x          The X coordinate to show the popover at (left).
+     * @param {Number} y          The Y coordinate to show the popover at (top).
+     * @param {Number} fadeInTime The amount of time to take to fade in the tooltip.
     ###
     show: (x, y, fadeInTime = 100) ->
         @$(@element).css('left', x + 'px')

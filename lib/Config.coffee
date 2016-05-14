@@ -59,7 +59,7 @@ class Config
     ###*
      * Retrieves the config setting with the specified name.
      *
-     * @param {string} name
+     * @param {String} name
      * @param {mixed}  value
     ###
     set: (name, value) ->

@@ -106,7 +106,7 @@ module.exports =
     ###*
      * Indexes a list of directories.
      *
-     * @param {array}    directories
+     * @param {Array}    directories
      * @param {Callback} progressStreamCallback
      *
      * @return {Promise}
@@ -214,8 +214,8 @@ module.exports =
     ###*
      * Indexes a file aynschronously.
      *
-     * @param {string}      fileName The file to index.
-     * @param {string|null} source   The source code of the file to index.
+     * @param {String}      fileName The file to index.
+     * @param {String|null} source   The source code of the file to index.
      *
      * @return {Promise}
     ###
@@ -231,8 +231,8 @@ module.exports =
     ###*
      * Performs a file index, but only if the file is not currently already being indexed (otherwise silently returns).
      *
-     * @param {string}      fileName The file to index.
-     * @param {string|null} source   The source code of the file to index.
+     * @param {String}      fileName The file to index.
+     * @param {String|null} source   The source code of the file to index.
      *
      * @return {Promise|null}
     ###
@@ -271,7 +271,7 @@ module.exports =
     ###*
      * Fetches a list of current project directories (root folders).
      *
-     * @return {array}
+     * @return {Array}
     ###
     fetchProjectDirectories: () ->
         directories = atom.project.getDirectories()

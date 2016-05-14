@@ -24,7 +24,7 @@ class AttachedPopover extends Popover
      * Constructor.
      *
      * @param {HTMLElement} elementToAttachTo The element to show the popover over.
-     * @param {number}      delay             How long the mouse has to hover over the elment before the popover shows
+     * @param {Number}      delay             How long the mouse has to hover over the elment before the popover shows
      *                                        up (in miliiseconds).
     ###
     constructor: (@elementToAttachTo, delay = 500) ->
@@ -43,7 +43,7 @@ class AttachedPopover extends Popover
     ###*
      * Shows the popover with the specified text.
      *
-     * @param {number} fadeInTime The amount of time to take to fade in the tooltip.
+     * @param {Number} fadeInTime The amount of time to take to fade in the tooltip.
     ###
     show: (fadeInTime = 100) ->
         coordinates = @elementToAttachTo.getBoundingClientRect();
@@ -59,8 +59,8 @@ class AttachedPopover extends Popover
      * Shows the popover with the specified text after the specified delay (in miliiseconds). Calling this method
      * multiple times will cancel previous show requests and restart.
      *
-     * @param {number} delay      The delay before the tooltip shows up (in milliseconds).
-     * @param {number} fadeInTime The amount of time to take to fade in the tooltip.
+     * @param {Number} delay      The delay before the tooltip shows up (in milliseconds).
+     * @param {Number} fadeInTime The amount of time to take to fade in the tooltip.
     ###
     showAfter: (delay, fadeInTime = 100) ->
         @timeoutId = setTimeout(() =>

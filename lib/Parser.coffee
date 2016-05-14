@@ -176,11 +176,11 @@ class Parser
     ###*
      * Removes content inside the specified open and close character pairs (including nested pairs).
      *
-     * @param {string} text           String to analyze.
-     * @param {string} openCharacter  The character that opens the pair.
-     * @param {string} closeCharacter The character that closes the pair.
+     * @param {String} text           String to analyze.
+     * @param {String} openCharacter  The character that opens the pair.
+     * @param {String} closeCharacter The character that closes the pair.
      *
-     * @return {string}
+     * @return {String}
     ###
     stripPairContent: (text, openCharacter, closeCharacter) ->
         i = 0
@@ -216,9 +216,9 @@ class Parser
      *
      * @example Passing A::b(complex_arguments)->c will retrieve ['A', 'b()', 'c'].
      *
-     * @param {string} text
+     * @param {String} text
      *
-     * @return {array}
+     * @return {Array}
     ###
     retrieveSanitizedCallStack: (text) ->
         text = text.trim()

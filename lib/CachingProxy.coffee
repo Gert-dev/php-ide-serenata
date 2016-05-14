@@ -30,9 +30,9 @@ class CachingProxy extends Proxy
     ###*
      * Internal convenience method that wraps a call to a parent method.
      *
-     * @param {string}  cacheKey
-     * @param {string}  parentMethodName
-     * @param {array}   parameters
+     * @param {String}  cacheKey
+     * @param {String}  parentMethodName
+     * @param {Array}   parameters
      *
      * @return {Promise|Object}
     ###

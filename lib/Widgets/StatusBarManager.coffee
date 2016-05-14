@@ -67,7 +67,7 @@ class StatusBarManager
     ###*
      * Sets the text to show in the label.
      *
-     * @param {string} label
+     * @param {String} label
     ###
     setLabel: (@label) ->
         @labelElement.innerHTML = @label
@@ -110,8 +110,8 @@ class StatusBarManager
     ###*
      * Shows the specified message in the status area.
      *
-     * @param {string} label
-     * @param {string} className
+     * @param {String} label
+     * @param {String} className
     ###
     showMessage: (label, className = '') ->
         @setLabel(label)
