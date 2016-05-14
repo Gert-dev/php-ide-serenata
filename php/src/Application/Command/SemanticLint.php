@@ -7,6 +7,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDatabase;
 
 use PhpIntegrator\Application\Command as BaseCommand;
@@ -32,6 +33,11 @@ class SemanticLint extends BaseCommand
      * @var ClassInfo
      */
     protected $classInfoCommand;
+
+    /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
 
     /**
      * @inheritDoc
@@ -116,7 +122,11 @@ class SemanticLint extends BaseCommand
             $unknownClassAnalyzer = null;
 
             if ($retrieveUnknownClasses) {
-                $unknownClassAnalyzer = new SemanticLint\UnknownClassAnalyzer($file, $this->indexDatabase);
+                $unknownClassAnalyzer = new SemanticLint\UnknownClassAnalyzer(
+                    $file,
+                    $this->indexDatabase,
+                    $this->getTypeAnalyzer()
+                );
 
                 foreach ($unknownClassAnalyzer->getVisitors() as $visitor) {
                     $traverser->addVisitor($visitor);
@@ -205,6 +215,18 @@ class SemanticLint extends BaseCommand
         }
 
         return $this->classInfoCommand;
+    }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 
     /**

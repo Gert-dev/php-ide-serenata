@@ -2,6 +2,7 @@
 
 namespace PhpIntegrator\Application\Command\SemanticLint;
 
+use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDatabase;
 
 use PhpIntegrator\Application\Command\ResolveType;
@@ -32,14 +33,20 @@ class UnknownClassAnalyzer implements AnalyzerInterface
     protected $indexDatabase;
 
     /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
      * Constructor.
      *
      * @param string        $file
      * @param IndexDatabase $indexDatabase
      */
-    public function __construct($file, IndexDatabase $indexDatabase)
+    public function __construct($file, IndexDatabase $indexDatabase, TypeAnalyzer $typeAnalyzer)
     {
         $this->file = $file;
+        $this->typeAnalyzer = $typeAnalyzer;
         $this->indexDatabase = $indexDatabase;
 
         $this->classUsageFetchingVisitor = new Visitor\ClassUsageFetchingVisitor();
@@ -82,16 +89,18 @@ class UnknownClassAnalyzer implements AnalyzerInterface
 
         foreach ($classUsages as $classUsage) {
             if ($classUsage['isFullyQualified']) {
-                $fqsen = $classUsage['name'];
+                $fqcn = $classUsage['name'];
             } else {
-                $fqsen = $resolveTypeCommand->resolveType(
+                $fqcn = $resolveTypeCommand->resolveType(
                     $classUsage['name'],
                     $this->file,
                     $classUsage['line']
                 );
             }
 
-            if (!isset($classMap[$fqsen])) {
+            $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn);
+
+            if (!isset($classMap[$fqcn])) {
                 unset($classUsage['line'], $classUsage['firstPart'], $classUsage['isFullyQualified']);
 
                 $unknownClasses[] = $classUsage;
