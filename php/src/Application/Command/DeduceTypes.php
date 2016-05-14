@@ -119,7 +119,9 @@ class DeduceTypes extends BaseCommand
         } elseif ($firstElement === 'static' or $firstElement === 'self') {
             $propertyAccessNeedsDollarSign = true;
 
-            $types = [$this->getCurrentClassAt($file, $code, $offset)];
+            $currentClass = $this->getCurrentClassAt($file, $code, $offset);
+
+            $types = [$this->getTypeAnalyzer()->getNormalizedFqcn($currentClass, true)];
         } elseif ($firstElement === 'parent') {
             $propertyAccessNeedsDollarSign = true;
 
@@ -129,7 +131,9 @@ class DeduceTypes extends BaseCommand
                 $classInfo = $this->getClassInfoCommand()->getClassInfo($currentClassName);
 
                 if ($classInfo && !empty($classInfo['parents'])) {
-                    $types = [$classInfo['parents'][0]];
+                    $type = $classInfo['parents'][0];
+
+                    $types = [$this->getTypeAnalyzer()->getNormalizedFqcn($type, true)];
                 }
             }
         } elseif ($firstElement[0] === '[') {
@@ -229,13 +233,7 @@ class DeduceTypes extends BaseCommand
 
             $propertyAccessNeedsDollarSign = false;
         }
-
-        foreach ($types as &$type) {
-            if ($this->getTypeAnalyzer()->isClassType($type) && $type[0] !== "\\") {
-                $type = "\\" . $type;
-            }
-        }
-
+        
         return $types;
     }
 
