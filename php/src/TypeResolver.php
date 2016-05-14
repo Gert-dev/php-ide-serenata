@@ -38,7 +38,7 @@ class TypeResolver
     }
 
     /**
-     * Resolves and determines the FQSEN of the specified type.
+     * Resolves and determines the FQCN of the specified type.
      *
      * @param string $type
      *
