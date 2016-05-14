@@ -255,7 +255,7 @@ CREATE TABLE properties(
 
     short_description     text,
     long_description      text,
-    return_description    text,
+    type_description      text,
 
     structure_id          integer unsigned NOT NULL,
     access_modifier_id    integer unsigned NOT NULL,
@@ -291,7 +291,7 @@ CREATE TABLE constants(
 
     short_description     text,
     long_description      text,
-    return_description    text,
+    type_description      text,
 
     types_serialized      text NOT NULL,
 

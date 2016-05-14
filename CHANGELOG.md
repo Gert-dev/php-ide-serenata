@@ -14,6 +14,7 @@
 * `resolveType` will now also return types with a leading slash, consistent with other commands.
 * Return types for functions and types for function parameters will now also include a `typeHint` property that is set to the actual type hint that was specified (the type and resolvedType fall back to the docblock if it is present).
 * `localizeType` will now return the FQCN instead of null if it couldn't localize a type based on use statements. The reasoning behind this is that you want a localized version of the type you pass, if there are no use statements to localize it, the FQCN is the only way to address the type locally.
+* The format the descriptions are returned in has changed; there is no more `descriptions` property that has a `short` and `long` property. Instead, there is now the `shortDescription` and `longDescription` property. Similarly, the description of the return value of functions and methods has moved to `returnDescription` and the description of the type of properties and constants to `typeDescription`.
 
 ## 0.9.3
 ### Bugs fixed

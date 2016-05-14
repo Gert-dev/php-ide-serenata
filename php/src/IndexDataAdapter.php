@@ -695,7 +695,7 @@ class IndexDataAdapter
 
             'shortDescription'  => $rawInfo['short_description'],
             'longDescription'   => $rawInfo['long_description'],
-            'returnDescription' => $rawInfo['return_description'],
+            'typeDescription'   => $rawInfo['type_description'],
 
             'types'             => $this->getReturnTypeDataForSerializedTypes($rawInfo['types_serialized']),
 
@@ -730,7 +730,7 @@ class IndexDataAdapter
 
             'shortDescription'  => $rawInfo['short_description'],
             'longDescription'   => $rawInfo['long_description'],
-            'returnDescription' => $rawInfo['return_description'],
+            'typeDescription'   => $rawInfo['type_description'],
 
             'types'             => $this->getReturnTypeDataForSerializedTypes($rawInfo['types_serialized'])
         ];

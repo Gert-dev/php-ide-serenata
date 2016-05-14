@@ -342,7 +342,7 @@ class Indexer
             'has_docblock'       => 0,
             'short_description'  => null,
             'long_description'   => null,
-            'return_description' => null,
+            'type_description'   => null,
             'types_serialized'   => serialize([])
         ]);
     }
@@ -638,7 +638,7 @@ class Indexer
             'has_docblock'       => 0,
             'short_description'  => null,
             'long_description'   => null,
-            'return_description' => null,
+            'type_description'   => null,
             'structure_id'       => $structureId,
             'access_modifier_id' => $accessModifierMap[$accessModifierName],
             'types_serialized'   => serialize([])
@@ -967,7 +967,7 @@ class Indexer
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'short_description'     => $documentation['descriptions']['short'],
             'long_description'      => $documentation['descriptions']['long'],
-            'return_description'    => $documentation['var']['description'],
+            'type_description'      => $documentation['var']['description'],
             'types_serialized'      => serialize($types),
             'structure_id'          => $seId
         ]);
@@ -1035,7 +1035,7 @@ class Indexer
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
             'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
-            'return_description'    => $documentation['var']['description'],
+            'type_description'      => $documentation['var']['description'],
             'structure_id'          => $seId,
             'access_modifier_id'    => $amId,
             'types_serialized'      => serialize($types)
@@ -1077,7 +1077,7 @@ class Indexer
             'has_docblock'          => 0,
             'short_description'     => $rawData['description'],
             'long_description'      => null,
-            'return_description'    => null,
+            'type_description'      => null,
             'structure_id'          => $seId,
             'access_modifier_id'    => $amId,
             'types_serialized'      => serialize($types)
