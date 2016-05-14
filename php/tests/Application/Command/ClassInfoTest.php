@@ -111,8 +111,8 @@ class ClassInfoTest extends IndexedTest
             'types'             => [
                 [
                     'type'         => 'MyType',
-                    'fqcn'         => 'A\MyType',
-                    'resolvedType' => 'A\MyType'
+                    'fqcn'         => '\A\MyType',
+                    'resolvedType' => '\A\MyType'
                 ],
 
                 [
@@ -288,8 +288,8 @@ class ClassInfoTest extends IndexedTest
             'types'             => [
                 [
                     'type'         => 'MyType',
-                    'fqcn'         => 'A\MyType',
-                    'resolvedType' => 'A\MyType'
+                    'fqcn'         => '\A\MyType',
+                    'resolvedType' => '\A\MyType'
                 ],
 
                 [
@@ -651,8 +651,8 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['types'], [
             [
                 'type'         => 'Type1',
-                'fqcn'         => 'A\Type1',
-                'resolvedType' => 'A\Type1'
+                'fqcn'         => '\A\Type1',
+                'resolvedType' => '\A\Type1'
             ]
         ]);
 
@@ -672,8 +672,8 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['types'], [
             [
                 'type'         => 'Type2',
-                'fqcn'         => 'A\Type2',
-                'resolvedType' => 'A\Type2'
+                'fqcn'         => '\A\Type2',
+                'resolvedType' => '\A\Type2'
             ]
         ]);
 
@@ -693,8 +693,8 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['types'], [
             [
                 'type'         => 'Type3',
-                'fqcn'         => 'A\Type3',
-                'resolvedType' => 'A\Type3'
+                'fqcn'         => '\A\Type3',
+                'resolvedType' => '\A\Type3'
             ]
         ]);
 
@@ -714,8 +714,8 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['types'], [
             [
                 'type'         => 'Type4',
-                'fqcn'         => 'A\Type4',
-                'resolvedType' => 'A\Type4'
+                'fqcn'         => '\A\Type4',
+                'resolvedType' => '\A\Type4'
             ]
         ]);
     }
@@ -809,8 +809,8 @@ class ClassInfoTest extends IndexedTest
                 'types'       => [
                     [
                         'type'         => 'Type',
-                        'fqcn'         => 'A\Type',
-                        'resolvedType' => 'A\Type'
+                        'fqcn'         => '\A\Type',
+                        'resolvedType' => '\A\Type'
                     ]
                 ]
             ]
@@ -823,8 +823,8 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals($data['returnTypes'], [
             [
                 'type'         => 'TestClass',
-                'fqcn'         => 'A\TestClass',
-                'resolvedType' => 'A\TestClass'
+                'fqcn'         => '\A\TestClass',
+                'resolvedType' => '\A\TestClass'
             ]
         ]);
 
@@ -941,7 +941,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'self',
                 'fqcn'         => 'self',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['properties']['basePropSelf']['types']);
 
@@ -949,7 +949,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'static',
                 'fqcn'         => 'static',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['properties']['basePropStatic']['types']);
 
@@ -957,7 +957,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => '$this',
                 'fqcn'         => '$this',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['properties']['basePropThis']['types']);
 
@@ -965,7 +965,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'self',
                 'fqcn'         => 'self',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['properties']['propSelf']['types']);
 
@@ -973,7 +973,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'static',
                 'fqcn'         => 'static',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['properties']['propStatic']['types']);
 
@@ -981,7 +981,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => '$this',
                 'fqcn'         => '$this',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['properties']['propThis']['types']);
 
@@ -989,7 +989,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'self',
                 'fqcn'         => 'self',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['methods']['baseMethodSelf']['returnTypes']);
 
@@ -997,7 +997,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'static',
                 'fqcn'         => 'static',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['methods']['baseMethodStatic']['returnTypes']);
 
@@ -1005,7 +1005,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => '$this',
                 'fqcn'         => '$this',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['methods']['baseMethodThis']['returnTypes']);
 
@@ -1013,7 +1013,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'self',
                 'fqcn'         => 'self',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['methods']['methodSelf']['returnTypes']);
 
@@ -1021,7 +1021,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'static',
                 'fqcn'         => 'static',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['methods']['methodStatic']['returnTypes']);
 
@@ -1029,15 +1029,15 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => '$this',
                 'fqcn'         => '$this',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['methods']['methodThis']['returnTypes']);
 
         $this->assertEquals([
             [
                 'type'         => 'childClass',
-                'fqcn'         => 'A\childClass',
-                'resolvedType' => 'A\childClass'
+                'fqcn'         => '\A\childClass',
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['methods']['methodOwnClassName']['returnTypes']);
 
@@ -1045,7 +1045,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'self',
                 'fqcn'         => 'self',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['methods']['baseMethodWithParameters']['parameters'][0]['types']);
 
@@ -1053,7 +1053,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'static',
                 'fqcn'         => 'static',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['methods']['baseMethodWithParameters']['parameters'][1]['types']);
 
@@ -1061,7 +1061,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => '$this',
                 'fqcn'         => '$this',
-                'resolvedType' => 'A\childClass'
+                'resolvedType' => '\A\childClass'
             ]
         ], $output['methods']['baseMethodWithParameters']['parameters'][2]['types']);
 
@@ -1071,7 +1071,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'self',
                 'fqcn'         => 'self',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['properties']['basePropSelf']['types']);
 
@@ -1079,7 +1079,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'static',
                 'fqcn'         => 'static',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['properties']['basePropStatic']['types']);
 
@@ -1087,7 +1087,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => '$this',
                 'fqcn'         => '$this',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['properties']['basePropThis']['types']);
 
@@ -1095,7 +1095,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'self',
                 'fqcn'         => 'self',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['methods']['baseMethodSelf']['returnTypes']);
 
@@ -1103,7 +1103,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => 'static',
                 'fqcn'         => 'static',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['methods']['baseMethodStatic']['returnTypes']);
 
@@ -1111,7 +1111,7 @@ class ClassInfoTest extends IndexedTest
             [
                 'type'         => '$this',
                 'fqcn'         => '$this',
-                'resolvedType' => 'A\ParentClass'
+                'resolvedType' => '\A\ParentClass'
             ]
         ], $output['methods']['baseMethodThis']['returnTypes']);
     }

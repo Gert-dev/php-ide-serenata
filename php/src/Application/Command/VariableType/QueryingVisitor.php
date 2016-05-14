@@ -350,8 +350,6 @@ class QueryingVisitor extends NodeVisitorAbstract
                     $file,
                     $this->bestTypeOverrideMatchLine ?: $this->line
                 );
-
-                $type = "\\" . $type;
             }
 
             $resolvedTypes[] = $type;

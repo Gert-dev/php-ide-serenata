@@ -24,6 +24,11 @@ class IndexDataAdapter
     protected $docblockAnalyzer;
 
     /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
      * @var array
      */
     protected $parentLog = [];
@@ -548,15 +553,19 @@ class IndexDataAdapter
      */
     protected function resolveSpecialTypes(ArrayObject $result, $elementFqsen)
     {
-        $doResolveTypes = function (array &$type) use ($elementFqsen) {
+        $typeAnalyzer = $this->getTypeAnalyzer();
+
+        $doResolveTypes = function (array &$type) use ($elementFqsen, $typeAnalyzer) {
             if ($type['type'] === 'self') {
                 // self takes the type from the classlike it is first resolved in, so only resolve it once to ensure
                 // that it doesn't get overwritten.
                 if ($type['resolvedType'] === 'self') {
-                    $type['resolvedType'] = $elementFqsen;
+                    $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqsen, true);
                 }
             } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
-                $type['resolvedType'] = $elementFqsen;
+                $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqsen, true);
+            } elseif ($typeAnalyzer->isClassType($type['fqcn'])) {
+                $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($type['fqcn'], true);
             } else {
                 $type['resolvedType'] = $type['fqcn'];
             }
@@ -852,5 +861,19 @@ class IndexDataAdapter
         }
 
         return $this->docblockAnalyzer;
+    }
+
+    /**
+     * Retrieves an instance of TypeAnalyzer. The object will only be created once if needed.
+     *
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer instanceof TypeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 }

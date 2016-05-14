@@ -52,6 +52,7 @@ class TypeResolver
             return $type;
         }
 
+        $fullName = null;
         $typeParts = explode('\\', $type);
 
         foreach ($this->imports as $import) {
@@ -73,15 +74,17 @@ class TypeResolver
                     $fullName .= '\\' . implode('\\', $typeParts);
                 }
 
-                return $fullName;
+                break;
             }
         }
 
-        // Still here? There must be no explicit use statement, default to the current namespace.
-        $fullName = $this->namespace ? ($this->namespace . '\\') : '';
-        $fullName .= $type;
+        if (!$fullName) {
+            // Still here? There must be no explicit use statement, default to the current namespace.
+            $fullName = $this->namespace ? ($this->namespace . '\\') : '';
+            $fullName .= $type;
+        }
 
-        return $fullName;
+        return $this->getTypeAnalyzer()->getNormalizedFqcn($fullName, true);
     }
 
     /**
