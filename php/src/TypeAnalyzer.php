@@ -58,16 +58,21 @@ class TypeAnalyzer
     }
 
     /**
-     * Normalizes an FQCN, removing its leading slash, if any.
+     * Normalizes an FQCN, consistently removing or adding a leading slash.
      *
      * @param string $fqcn
+     * @param bool   $withLeadingSlash
      *
      * @return string
      */
-    public function getNormalizedFqcn($fqcn)
+    public function getNormalizedFqcn($fqcn, $withLeadingSlash = false)
     {
-        if ($fqcn && $fqcn[0] === '\\') {
-            return mb_substr($fqcn, 1);
+        if ($fqcn) {
+            if (!$withLeadingSlash && $fqcn[0] === '\\') {
+                return mb_substr($fqcn, 1);
+            } elseif ($withLeadingSlash && $fqcn[0] !== '\\') {
+                return '\\' . $fqcn;
+            }
         }
 
         return $fqcn;
