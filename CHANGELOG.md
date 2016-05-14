@@ -2,9 +2,17 @@
 ### Features and enhancements
 * Minor performance improvements when calculating the global class list.
 
+### Bugs fixed
+* The type of global built-in function parameters was not getting analyzed correctly.
+
 ### Changes for developers
-* `localizeType` will now return the FQCN instead of null if it couldn't localize a type based on use statements. The reasoning behind this is that you want a localized version of the type you pass, if there are no use statements to localize it, the FQCN is the only way to address the type locally.
+* All structural elements that involve types will now return arrays of type objects instead of a single type object. The following methods have been renamed to reflect this change:
+  * `deduceType` -> `deduceTypes`.
+  * `getVariableType` -> `getVariableTypes`.
+  * `getResultingTypeAt` -> `getResultingTypesAt`.
+  * `getVariableTypeByOffset` -> `getVariableTypesByOffset`.
 * Return types for functions and types for function parameters will now also include a `typeHint` property that is set to the actual type hint that was specified (the type and resolvedType fall back to the docblock if it is present).
+* `localizeType` will now return the FQCN instead of null if it couldn't localize a type based on use statements. The reasoning behind this is that you want a localized version of the type you pass, if there are no use statements to localize it, the FQCN is the only way to address the type locally.
 
 ## 0.9.3
 ### Bugs fixed
