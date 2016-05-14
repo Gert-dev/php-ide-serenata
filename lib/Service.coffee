@@ -303,8 +303,6 @@ class Service
         if ignoreLastElement
             callStack.pop()
 
-        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
-
         bufferText = editor.getBuffer().getText()
 
         if not callStack or callStack.length == 0
@@ -312,6 +310,8 @@ class Service
                 resolve([])
 
             return promise
+
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
         return @deduceTypes(callStack, editor.getPath(), bufferText, offset)
 
