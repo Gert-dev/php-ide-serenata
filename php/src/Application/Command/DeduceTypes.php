@@ -147,7 +147,7 @@ class DeduceTypes extends BaseCommand
         } elseif (preg_match('/^array\s*\(/', $firstElement) === 1) {
             $types = ['array'];
         } elseif (preg_match('/^function\s*\(/', $firstElement) === 1) {
-            $types = ['\\Closure'];
+            $types = ['\Closure'];
         } elseif (preg_match("/^new\s+((${classRegexPart}))(?:\(\))?/", $firstElement, $matches) === 1) {
             $types = $this->deduceTypes($file, $code, [$matches[1]], $offset);
         } elseif (preg_match('/^clone\s+(\$[a-zA-Z0-9_]+)/', $firstElement, $matches) === 1) {
