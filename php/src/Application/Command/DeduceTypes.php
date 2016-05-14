@@ -224,14 +224,10 @@ class DeduceTypes extends BaseCommand
                 }
             }
 
-            $types = $newTypes;
+            // We use an associative array so we automatically avoid duplicate types.
+            $types = array_keys($newTypes);
 
             $propertyAccessNeedsDollarSign = false;
-        }
-
-        if (!empty($expressionParts)) {
-            // We use an associative array so we automatically avoid duplicate types.
-            $types = array_keys($types);
         }
 
         foreach ($types as &$type) {
