@@ -15,18 +15,18 @@ class TypeResolverTest extends \PHPUnit_Framework_TestCase
     {
         $object = new TypeResolver(null, []);
 
-        $this->assertEquals($object->resolve('\A\B'), '\A\B');
+        $this->assertEquals('\A\B', $object->resolve('\A\B'));
     }
 
     public function testRelativeTypeIsRelativeToNamespace()
     {
         $object = new TypeResolver(null, []);
 
-        $this->assertEquals($object->resolve('A'), 'A');
+        $this->assertEquals('\A', $object->resolve('A'));
 
         $object = new TypeResolver('A', []);
 
-        $this->assertEquals($object->resolve('B'), 'A\B');
+        $this->assertEquals('\A\B', $object->resolve('B'));
     }
 
     public function testRelativeTypeIsRelativeToUseStatements()
@@ -43,9 +43,9 @@ class TypeResolverTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
 
-        $this->assertEquals($object->resolve('Alias'), 'B\C');
-        $this->assertEquals($object->resolve('Alias\E'), 'B\C\E');
-        $this->assertEquals($object->resolve('D'), 'B\C\D');
-        $this->assertEquals($object->resolve('D\E'), 'B\C\D\E');
+        $this->assertEquals('\B\C', $object->resolve('Alias'));
+        $this->assertEquals('\B\C\E', $object->resolve('Alias\E'));
+        $this->assertEquals('\B\C\D', $object->resolve('D'));
+        $this->assertEquals('\B\C\D\E', $object->resolve('D\E'));
     }
 }
