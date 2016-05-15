@@ -233,7 +233,7 @@ class DeduceTypes extends BaseCommand
 
             $propertyAccessNeedsDollarSign = false;
         }
-        
+
         return $types;
     }
 
@@ -361,9 +361,9 @@ class DeduceTypes extends BaseCommand
 
         $classes = $this->getClassListCommand()->getClassList($file);
 
-        foreach ($classes as $fqsen => $class) {
+        foreach ($classes as $fqcn => $class) {
             if ($line >= $class['startLine'] && $line <= $class['endLine']) {
-                return $fqsen;
+                return $fqcn;
             }
         }
 

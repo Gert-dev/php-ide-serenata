@@ -6,7 +6,7 @@ use PhpIntegrator\IndexedTest;
 
 class ClassInfoTest extends IndexedTest
 {
-    protected function getClassInfo($file, $fqsen)
+    protected function getClassInfo($file, $fqcn)
     {
         $path = $this->getPathFor($file);
 
@@ -15,7 +15,7 @@ class ClassInfoTest extends IndexedTest
         $command = new ClassInfo();
         $command->setIndexDatabase($indexDatabase);
 
-        return $command->getClassInfo($fqsen);
+        return $command->getClassInfo($fqcn);
     }
 
     protected function getPathFor($file)

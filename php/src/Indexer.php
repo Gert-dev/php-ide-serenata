@@ -685,11 +685,11 @@ class Indexer
              'indexed_time' => (new DateTime())->format('Y-m-d H:i:s')
          ]);
 
-         foreach ($outlineIndexingVisitor->getStructures() as $fqsen => $structure) {
+         foreach ($outlineIndexingVisitor->getStructures() as $fqcn => $structure) {
              $this->indexStructure(
                  $structure,
                  $fileId,
-                 $fqsen,
+                 $fqcn,
                  false,
                  $useStatementFetchingVisitor
              );
@@ -727,7 +727,7 @@ class Indexer
      *
      * @param array                                    $rawData
      * @param int                                      $fileId
-     * @param string                                   $fqsen
+     * @param string                                   $fqcn
      * @param bool                                     $isBuiltin
      * @param Indexer\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
@@ -736,7 +736,7 @@ class Indexer
     protected function indexStructure(
         array $rawData,
         $fileId,
-        $fqsen,
+        $fqcn,
         $isBuiltin,
         Indexer\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
@@ -754,7 +754,7 @@ class Indexer
 
         $seData = [
             'name'              => $rawData['name'],
-            'fqsen'             => $fqsen,
+            'fqsen'             => $fqcn,
             'file_id'           => $fileId,
             'start_line'        => $rawData['startLine'],
             'end_line'          => $rawData['endLine'],
@@ -768,7 +768,7 @@ class Indexer
             'long_description'  => $documentation['descriptions']['long']
         ];
 
-        $this->storage->deleteStructure($this->typeAnalyzer->getNormalizedFqcn($fqsen));
+        $this->storage->deleteStructure($this->typeAnalyzer->getNormalizedFqcn($fqcn));
 
         $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, $seData);
 

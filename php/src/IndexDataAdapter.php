@@ -80,18 +80,20 @@ class IndexDataAdapter
 
     /**
      * @param int    $id
-     * @param string $fqsen
-     * @param string $originFqsen
+     * @param string $fqcn
+     * @param string $originFqcn
      *
      * @return array
      */
-    protected function getCheckedParentStructureInfo($id, $fqsen, $originFqsen)
+    protected function getCheckedParentStructureInfo($id, $fqcn, $originFqcn)
     {
-        if (isset($this->parentLog[$fqsen][$originFqsen])) {
-            throw new IndexDataAdapter\CircularDependencyException("Circular dependency detected from {$originFqsen} to {$fqsen}!");
+        if (isset($this->parentLog[$fqcn][$originFqcn])) {
+            throw new IndexDataAdapter\CircularDependencyException(
+                "Circular dependency detected from {$originFqcn} to {$fqcn}!"
+            );
         }
 
-        $this->parentLog[$fqsen][$originFqsen] = true;
+        $this->parentLog[$fqcn][$originFqcn] = true;
 
         return $this->getDirectStructureInfo($id);
     }

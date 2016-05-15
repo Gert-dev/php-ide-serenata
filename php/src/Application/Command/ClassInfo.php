@@ -41,20 +41,20 @@ class ClassInfo extends BaseCommand
     }
 
     /**
-     * @param string $fqsen
+     * @param string $fqcn
      *
      * @return array
      */
-    public function getClassInfo($fqsen)
+    public function getClassInfo($fqcn)
     {
-        if ($fqsen[0] === '\\') {
-            $fqsen = mb_substr($fqsen, 1);
+        if ($fqcn[0] === '\\') {
+            $fqcn = mb_substr($fqcn, 1);
         }
 
-        $id = $this->indexDatabase->getStructureId($fqsen);
+        $id = $this->indexDatabase->getStructureId($fqcn);
 
         if (!$id) {
-            throw new UnexpectedValueException('The structural element "' . $fqsen . '" was not found!');
+            throw new UnexpectedValueException('The structural element "' . $fqcn . '" was not found!');
         }
 
         return $this->getIndexDataAdapter()->getStructureInfo($id);

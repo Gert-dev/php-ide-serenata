@@ -41,11 +41,11 @@ interface StorageInterface
     /**
      * Retrieves the ID of the structural element with the specified FQSEN.
      *
-     * @param string $fqsen
+     * @param string $fqcn
      *
      * @return int|null
      */
-    public function getStructureId($fqsen);
+    public function getStructureId($fqcn);
 
     /**
      * @param string $path
@@ -53,9 +53,9 @@ interface StorageInterface
     public function deleteFile($path);
 
     /**
-     * @param string $fqsen
+     * @param string $fqcn
      */
-    public function deleteStructure($fqsen);
+    public function deleteStructure($fqcn);
 
     /**
      * Inserts the specified index item into the storage.

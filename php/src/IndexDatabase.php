@@ -217,13 +217,13 @@ class IndexDatabase implements
     /**
      * @inheritDoc
      */
-    public function getStructureId($fqsen)
+    public function getStructureId($fqcn)
     {
         $result = $this->getConnection()->createQueryBuilder()
             ->select('id')
             ->from(IndexStorageItemEnum::STRUCTURES)
             ->where('fqsen = ?')
-            ->setParameter(0, $fqsen)
+            ->setParameter(0, $fqcn)
             ->execute()
             ->fetchColumn();
 
@@ -245,12 +245,12 @@ class IndexDatabase implements
     /**
      * @inheritDoc
      */
-    public function deleteStructure($fqsen)
+    public function deleteStructure($fqcn)
     {
         $this->getConnection()->createQueryBuilder()
             ->delete(IndexStorageItemEnum::STRUCTURES)
             ->where('fqsen = ?')
-            ->setParameter(0, $fqsen)
+            ->setParameter(0, $fqcn)
             ->execute();
     }
 
