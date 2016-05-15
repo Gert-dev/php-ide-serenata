@@ -73,7 +73,7 @@ class UnknownClassAnalyzer implements AnalyzerInterface
         $classMap = [];
 
         foreach ($this->indexDatabase->getAllStructuresRawInfo(null) as $element) {
-            $classMap[$element['fqsen']] = true;
+            $classMap[$element['fqcn']] = true;
         }
 
         // Cross-reference the found class names against the class map.

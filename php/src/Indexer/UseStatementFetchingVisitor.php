@@ -58,7 +58,7 @@ class UseStatementFetchingVisitor implements NodeVisitor
             foreach ($node->uses as $use) {
                 // NOTE: The namespace may be null here (intended behavior).
                 $this->namespaces[$this->lastNamespace]['useStatements'][] = [
-                    'fqsen' => (string) $use->name,
+                    'fqcn' => (string) $use->name,
                     'alias' => $use->alias,
                     'line'  => $node->getLine()
                 ];

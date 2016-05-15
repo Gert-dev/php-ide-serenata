@@ -56,7 +56,7 @@ class ClassList extends BaseCommand
 
              unset($info['constants'], $info['properties'], $info['methods']);
 
-             $result[$element['fqsen']] = $info;
+             $result[$element['fqcn']] = $info;
          }
 
          return $result;

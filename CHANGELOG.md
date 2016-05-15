@@ -68,7 +68,7 @@ public function setFoo(string $foo): self
 * Classes didn't return information about whether they have a docblock or documentation.
 * When fetching class information, types were sometimes returned without their leading slash.
 * Because of semantic linting now supporting syntax errors, the reindex command will no longer return them.
-* Global constants and functions will now also return an FQSEN so you can deduce in what namespace they are located.
+* Global constants and functions will now also return an FQCN so you can deduce in what namespace they are located.
 * When returning types such as `string[]`, the `fullType` was still trying to resolve the type as if it were a class type.
 * The reindex command did not return false when indexing failed and the promise was, by consequence, not rejected.
 * Added a new command `localizeType` to localize FQCN's based on use statements, turning them back into relative class names.

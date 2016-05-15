@@ -59,7 +59,7 @@ CREATE TABLE files_namespaces_imports(
 
     line                       integer unsigned,
     alias                      varchar(255) NOT NULL,
-    fqsen                      varchar(255) NOT NULL,
+    fqcn                       varchar(255) NOT NULL,
     files_namespace_id         integer,
 
     FOREIGN KEY(files_namespace_id) REFERENCES files_namespaces(id)
@@ -72,7 +72,7 @@ CREATE TABLE structures(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                       varchar(255) NOT NULL,
-    fqsen                      varchar(255) NOT NULL,
+    fqcn                       varchar(255) NOT NULL,
     file_id                    integer,
     start_line                 integer unsigned,
     end_line                   integer unsigned,
@@ -95,14 +95,14 @@ CREATE TABLE structures(
         ON UPDATE RESTRICT
 );
 
-CREATE INDEX `structures_fqsen` ON `structures` (`fqsen`);
+CREATE INDEX `structures_fqcn` ON `structures` (`fqcn`);
 
 -- Contains references to parent structural elements for structural elements.
 CREATE TABLE structures_parents_linked(
-    structure_id           integer unsigned NOT NULL,
-    linked_structure_fqsen varchar(255) NOT NULL,
+    structure_id          integer unsigned NOT NULL,
+    linked_structure_fqcn varchar(255) NOT NULL,
 
-    PRIMARY KEY(structure_id, linked_structure_fqsen),
+    PRIMARY KEY(structure_id, linked_structure_fqcn),
 
     FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
@@ -111,10 +111,10 @@ CREATE TABLE structures_parents_linked(
 
 -- Contains interfaces implemented by structural elements.
 CREATE TABLE structures_interfaces_linked(
-    structure_id           integer unsigned NOT NULL,
-    linked_structure_fqsen varchar(255) NOT NULL,
+    structure_id          integer unsigned NOT NULL,
+    linked_structure_fqcn varchar(255) NOT NULL,
 
-    PRIMARY KEY(structure_id, linked_structure_fqsen),
+    PRIMARY KEY(structure_id, linked_structure_fqcn),
 
     FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
@@ -123,10 +123,10 @@ CREATE TABLE structures_interfaces_linked(
 
 -- Contains traits used by structural elements.
 CREATE TABLE structures_traits_linked(
-    structure_id           integer unsigned NOT NULL,
-    linked_structure_fqsen varchar(255) NOT NULL,
+    structure_id          integer unsigned NOT NULL,
+    linked_structure_fqcn varchar(255) NOT NULL,
 
-    PRIMARY KEY(structure_id, linked_structure_fqsen),
+    PRIMARY KEY(structure_id, linked_structure_fqcn),
 
     FOREIGN KEY(structure_id) REFERENCES structures(id)
         ON DELETE CASCADE
@@ -138,7 +138,7 @@ CREATE TABLE structures_traits_aliases(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     structure_id               integer unsigned NOT NULL,
-    trait_structure_fqsen      varchar(255),
+    trait_structure_fqcn       varchar(255),
     access_modifier_id         integer unsigned,
 
     name                       varchar(255) NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE structures_traits_precedences(
     id                         integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     structure_id               integer unsigned NOT NULL,
-    trait_structure_fqsen      varchar(255) NOT NULL,
+    trait_structure_fqcn       varchar(255) NOT NULL,
 
     name                       varchar(255) NOT NULL,
 
@@ -172,7 +172,7 @@ CREATE TABLE functions(
     id                      integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                    varchar(255) NOT NULL,
-    fqsen                   varchar(255),
+    fqcn                    varchar(255),
     file_id                 integer,
     start_line              integer unsigned,
     end_line                integer unsigned,
@@ -280,7 +280,7 @@ CREATE TABLE constants(
     id                    integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
     name                  varchar(255) NOT NULL,
-    fqsen                 varchar(255),
+    fqcn                  varchar(255),
     file_id               integer,
     start_line            integer unsigned,
     end_line              integer unsigned,

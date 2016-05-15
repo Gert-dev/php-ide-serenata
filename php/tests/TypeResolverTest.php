@@ -33,12 +33,12 @@ class TypeResolverTest extends \PHPUnit_Framework_TestCase
     {
         $object = new TypeResolver('A', [
             [
-                'fqsen' => 'B\C',
+                'fqcn' => 'B\C',
                 'alias' => 'Alias'
             ],
 
             [
-                'fqsen' => 'B\C\D',
+                'fqcn' => 'B\C\D',
                 'alias' => 'D'
             ]
         ]);

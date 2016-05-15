@@ -27,7 +27,7 @@ class TypeResolver
      *
      * @param string|null $namespace The current namespace.
      * @param array {
-     *     @param string|null $fqsen
+     *     @param string|null $fqcn
      *     @param string      $alias
      * } $imports
      */
@@ -59,7 +59,7 @@ class TypeResolver
             if ($import['alias'] === $typeParts[0]) {
                 array_shift($typeParts);
 
-                $fullName = $import['fqsen'];
+                $fullName = $import['fqcn'];
 
                 if (!empty($typeParts)) {
                     /*
@@ -112,7 +112,7 @@ class TypeResolver
 
             // The namespace is also acts as a "use statement".
             $imports[] = [
-                'fqsen' => $this->namespace,
+                'fqcn' => $this->namespace,
                 'alias' => array_pop($namespaceParts)
             ];
         }
@@ -120,7 +120,7 @@ class TypeResolver
         $typeFqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($type);
 
         foreach ($imports as $import) {
-            $importFqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($import['fqsen']);
+            $importFqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($import['fqcn']);
 
             if (mb_strpos($typeFqcn, $importFqcn) === 0) {
                 $localizedType = $import['alias'] . mb_substr($typeFqcn, mb_strlen($importFqcn));

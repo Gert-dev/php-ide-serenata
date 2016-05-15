@@ -222,7 +222,7 @@ class IndexDatabase implements
         $result = $this->getConnection()->createQueryBuilder()
             ->select('id')
             ->from(IndexStorageItemEnum::STRUCTURES)
-            ->where('fqsen = ?')
+            ->where('fqcn = ?')
             ->setParameter(0, $fqcn)
             ->execute()
             ->fetchColumn();
@@ -249,7 +249,7 @@ class IndexDatabase implements
     {
         $this->getConnection()->createQueryBuilder()
             ->delete(IndexStorageItemEnum::STRUCTURES)
-            ->where('fqsen = ?')
+            ->where('fqcn = ?')
             ->setParameter(0, $fqcn)
             ->execute();
     }
@@ -271,7 +271,7 @@ class IndexDatabase implements
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURE_TYPES, 'setype', 'setype.id = se.structure_type_id')
             // ->leftJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.structure_id = se.id')
-            // ->leftJoin('se', IndexStorageItemEnum::STRUCTURES, 'se_parent', 'se_parent.fqsen = sepl.linked_structure_fqsen')
+            // ->leftJoin('se', IndexStorageItemEnum::STRUCTURES, 'se_parent', 'se_parent.fqcn = sepl.linked_structure_fqcn')
             ->leftJoin('se', IndexStorageItemEnum::FILES, 'fi', 'fi.id = se.file_id');
     }
 
@@ -313,9 +313,9 @@ class IndexDatabase implements
     public function getStructureRawParents($id)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('se.id', 'se.fqsen')
+            ->select('se.id', 'se.fqcn')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.linked_structure_fqsen = se.fqsen')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.linked_structure_fqcn = se.fqcn')
             ->where('sepl.structure_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -327,11 +327,11 @@ class IndexDatabase implements
     public function getStructureRawChildren($id)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('se.id', 'se.fqsen')
+            ->select('se.id', 'se.fqcn')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.structure_id = se.id')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
-            ->where('sepl.linked_structure_fqsen = se2.fqsen')
+            ->where('sepl.linked_structure_fqcn = se2.fqcn')
             ->setParameter(0, $id)
             ->execute();
     }
@@ -344,7 +344,7 @@ class IndexDatabase implements
         return $this->getConnection()->createQueryBuilder()
             ->select('se.id')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.linked_structure_fqsen = se.fqsen')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.linked_structure_fqcn = se.fqcn')
             ->where('seil.structure_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -356,11 +356,11 @@ class IndexDatabase implements
     public function getStructureRawImplementors($id)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('se.id', 'se.fqsen')
+            ->select('se.id', 'se.fqcn')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.structure_id = se.id')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
-            ->where('seil.linked_structure_fqsen = se2.fqsen')
+            ->where('seil.linked_structure_fqcn = se2.fqcn')
             ->setParameter(0, $id)
             ->execute();
     }
@@ -373,7 +373,7 @@ class IndexDatabase implements
         return $this->getConnection()->createQueryBuilder()
             ->select('se.id')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
-            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.linked_structure_fqsen = se.fqsen')
+            ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.linked_structure_fqcn = se.fqcn')
             ->where('setl.structure_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -385,11 +385,11 @@ class IndexDatabase implements
     public function getStructureRawTraitUsers($id)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('se.id', 'se.fqsen')
+            ->select('se.id', 'se.fqcn')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.structure_id = se.id')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
-            ->where('setl.linked_structure_fqsen = se2.fqsen')
+            ->where('setl.linked_structure_fqcn = se2.fqcn')
             ->setParameter(0, $id)
             ->execute();
     }
@@ -443,10 +443,10 @@ class IndexDatabase implements
     public function getStructureTraitAliasesAssoc($id)
     {
         $result = $this->getConnection()->createQueryBuilder()
-            ->select('seta.*', 'se.fqsen AS trait_fqsen', 'am.name AS access_modifier')
+            ->select('seta.*', 'se.fqcn AS trait_fqcn', 'am.name AS access_modifier')
             ->from(IndexStorageItemEnum::STRUCTURES_TRAITS_ALIASES, 'seta')
             ->leftJoin('seta', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = seta.access_modifier_id')
-            ->leftJoin('seta', IndexStorageItemEnum::STRUCTURES, 'se', 'se.fqsen = seta.trait_structure_fqsen')
+            ->leftJoin('seta', IndexStorageItemEnum::STRUCTURES, 'se', 'se.fqcn = seta.trait_structure_fqcn')
             ->where('structure_id = ?')
             ->setParameter(0, $id)
             ->execute();
@@ -466,9 +466,9 @@ class IndexDatabase implements
     public function getStructureTraitPrecedencesAssoc($id)
     {
         $result = $this->getConnection()->createQueryBuilder()
-            ->select('setp.*', 'se.fqsen AS trait_fqsen')
+            ->select('setp.*', 'se.fqcn AS trait_fqcn')
             ->from(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, 'setp')
-            ->innerJoin('setp', IndexStorageItemEnum::STRUCTURES, 'se', 'se.fqsen = setp.trait_structure_fqsen')
+            ->innerJoin('setp', IndexStorageItemEnum::STRUCTURES, 'se', 'se.fqcn = setp.trait_structure_fqcn')
             ->where('structure_id = ?')
             ->setParameter(0, $id)
             ->execute();

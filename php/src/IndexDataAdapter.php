@@ -127,7 +127,7 @@ class IndexDataAdapter
         $methods
     ) {
         $result = new ArrayObject([
-            'name'               => $element['fqsen'],
+            'name'               => $element['fqcn'],
             'startLine'          => (int) $element['start_line'],
             'endLine'            => (int) $element['end_line'],
             'shortName'          => $element['name'],
@@ -171,7 +171,7 @@ class IndexDataAdapter
         $this->parsePropertyData($result, $properties, $element);
         $this->parseMethodData($result, $methods, $element);
 
-        $this->resolveSpecialTypes($result, $element['fqsen']);
+        $this->resolveSpecialTypes($result, $element['fqcn']);
 
         return $result->getArrayCopy();
     }
@@ -186,7 +186,7 @@ class IndexDataAdapter
         foreach ($constants as $rawConstantData) {
             $result['constants'][$rawConstantData['name']] = array_merge($this->getConstantInfo($rawConstantData), [
                 'declaringClass' => [
-                    'name'            => $element['fqsen'],
+                    'name'            => $element['fqcn'],
                     'filename'        => $element['path'],
                     'startLine'       => (int) $element['start_line'],
                     'endLine'         => (int) $element['end_line'],
@@ -194,7 +194,7 @@ class IndexDataAdapter
                 ],
 
                 'declaringStructure' => [
-                    'name'            => $element['fqsen'],
+                    'name'            => $element['fqcn'],
                     'filename'        => $element['path'],
                     'startLine'       => (int) $element['start_line'],
                     'endLine'         => (int) $element['end_line'],
@@ -239,7 +239,7 @@ class IndexDataAdapter
                 'override'       => $overriddenPropertyData,
 
                 'declaringClass' => [
-                    'name'            => $element['fqsen'],
+                    'name'            => $element['fqcn'],
                     'filename'        => $element['path'],
                     'startLine'       => (int) $element['start_line'],
                     'endLine'         => (int) $element['end_line'],
@@ -247,7 +247,7 @@ class IndexDataAdapter
                 ],
 
                 'declaringStructure' => [
-                    'name'            => $element['fqsen'],
+                    'name'            => $element['fqcn'],
                     'filename'        => $element['path'],
                     'startLine'       => (int) $element['start_line'],
                     'endLine'         => (int) $element['end_line'],
@@ -313,7 +313,7 @@ class IndexDataAdapter
                 'implementation' => $implementedMethodData,
 
                 'declaringClass' => [
-                    'name'            => $element['fqsen'],
+                    'name'            => $element['fqcn'],
                     'filename'        => $element['path'],
                     'startLine'       => (int) $element['start_line'],
                     'endLine'         => (int) $element['end_line'],
@@ -321,7 +321,7 @@ class IndexDataAdapter
                 ],
 
                 'declaringStructure' => [
-                    'name'            => $element['fqsen'],
+                    'name'            => $element['fqcn'],
                     'filename'        => $element['path'],
                     'startLine'       => (int) $element['start_line'],
                     'endLine'         => (int) $element['end_line'],
@@ -349,7 +349,7 @@ class IndexDataAdapter
     protected function parseChildrenData(ArrayObject $result, $children)
     {
         foreach ($children as $child) {
-            $result['directChildren'][] = $child['fqsen'];
+            $result['directChildren'][] = $child['fqcn'];
         }
     }
 
@@ -360,7 +360,7 @@ class IndexDataAdapter
     protected function parseImplementorsData(ArrayObject $result, $implementors)
     {
         foreach ($implementors as $implementor) {
-            $result['directImplementors'][] = $implementor['fqsen'];
+            $result['directImplementors'][] = $implementor['fqcn'];
         }
     }
 
@@ -371,7 +371,7 @@ class IndexDataAdapter
     protected function parseTraitUsersData(ArrayObject $result, $traitUsers)
     {
         foreach ($traitUsers as $trait) {
-            $result['directTraitUsers'][] = $trait['fqsen'];
+            $result['directTraitUsers'][] = $trait['fqcn'];
         }
     }
 
@@ -384,7 +384,7 @@ class IndexDataAdapter
     protected function parseParentData(ArrayObject $result, $parents)
     {
         foreach ($parents as $parent) {
-            $parentInfo = $this->getCheckedParentStructureInfo($parent['id'], $parent['fqsen'], $result['name']);
+            $parentInfo = $this->getCheckedParentStructureInfo($parent['id'], $parent['fqcn'], $result['name']);
 
             if ($parentInfo) {
                 if (!$result['shortDescription']) {
@@ -476,7 +476,7 @@ class IndexDataAdapter
 
                 $resultingProperty = array_merge($property, $inheritedData, [
                     'declaringClass' => [
-                        'name'            => $element['fqsen'],
+                        'name'            => $element['fqcn'],
                         'filename'        => $element['path'],
                         'startLine'       => (int) $element['start_line'],
                         'endLine'         => (int) $element['end_line'],
@@ -498,7 +498,7 @@ class IndexDataAdapter
                 if (isset($traitAliases[$method['name']])) {
                     $alias = $traitAliases[$method['name']];
 
-                    if ($alias['trait_fqsen'] === null || $alias['trait_fqsen'] === $trait['name']) {
+                    if ($alias['trait_fqcn'] === null || $alias['trait_fqcn'] === $trait['name']) {
                         $method['name']        = $alias['alias'] ?: $method['name'];
                         $method['isPublic']    = ($alias['access_modifier'] === 'public');
                         $method['isProtected'] = ($alias['access_modifier'] === 'protected');
@@ -514,7 +514,7 @@ class IndexDataAdapter
 
                     if ($existingMethod['declaringStructure']['type'] === 'trait') {
                         if (isset($traitPrecedences[$method['name']])) {
-                            if ($traitPrecedences[$method['name']]['trait_fqsen'] !== $trait['name']) {
+                            if ($traitPrecedences[$method['name']]['trait_fqcn'] !== $trait['name']) {
                                 // The method is present in multiple used traits and precedences indicate that the one
                                 // from this trait should not be imported.
                                 continue;
@@ -529,7 +529,7 @@ class IndexDataAdapter
 
                 $resultingMethod = array_merge($method, $inheritedData, [
                     'declaringClass' => [
-                        'name'            => $element['fqsen'],
+                        'name'            => $element['fqcn'],
                         'filename'        => $element['path'],
                         'startLine'       => (int) $element['start_line'],
                         'endLine'         => (int) $element['end_line'],
@@ -551,21 +551,21 @@ class IndexDataAdapter
 
     /**
      * @param ArrayObject $result
-     * @param string      $elementFqsen
+     * @param string      $elementFqcn
      */
-    protected function resolveSpecialTypes(ArrayObject $result, $elementFqsen)
+    protected function resolveSpecialTypes(ArrayObject $result, $elementFqcn)
     {
         $typeAnalyzer = $this->getTypeAnalyzer();
 
-        $doResolveTypes = function (array &$type) use ($elementFqsen, $typeAnalyzer) {
+        $doResolveTypes = function (array &$type) use ($elementFqcn, $typeAnalyzer) {
             if ($type['type'] === 'self') {
                 // self takes the type from the classlike it is first resolved in, so only resolve it once to ensure
                 // that it doesn't get overwritten.
                 if ($type['resolvedType'] === 'self') {
-                    $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqsen, true);
+                    $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqcn, true);
                 }
             } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
-                $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqsen, true);
+                $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqcn, true);
             } elseif ($typeAnalyzer->isClassType($type['fqcn'])) {
                 $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($type['fqcn'], true);
             } else {
@@ -654,7 +654,7 @@ class IndexDataAdapter
 
         return [
             'name'              => $rawInfo['name'],
-            'fqsen'             => $rawInfo['fqsen'],
+            'fqcn'             => $rawInfo['fqcn'],
             'isBuiltin'         => !!$rawInfo['is_builtin'],
             'startLine'         => (int) $rawInfo['start_line'],
             'endLine'           => (int) $rawInfo['end_line'],
@@ -716,7 +716,7 @@ class IndexDataAdapter
     {
         return [
             'name'              => $rawInfo['name'],
-            'fqsen'             => $rawInfo['fqsen'],
+            'fqcn'             => $rawInfo['fqcn'],
             'isBuiltin'         => !!$rawInfo['is_builtin'],
             'startLine'         => (int) $rawInfo['start_line'],
             'endLine'           => (int) $rawInfo['end_line'],
