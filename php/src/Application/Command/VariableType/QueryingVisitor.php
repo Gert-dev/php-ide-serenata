@@ -286,6 +286,31 @@ class QueryingVisitor extends NodeVisitorAbstract
         } elseif ($this->lastFunctionLikeNode) {
             foreach ($this->lastFunctionLikeNode->getParams() as $param) {
                 if ($param->name === $this->name) {
+                    $docBlock = $this->lastFunctionLikeNode->getDocComment();
+
+                    if ($docBlock) {
+                        // Analyze the docblock's @param tags.
+                        $docParser = new DocParser();
+
+                        $name = null;
+
+                        if ($this->lastFunctionLikeNode instanceof Node\Stmt\Function_ ||
+                            $this->lastFunctionLikeNode instanceof Node\Stmt\ClassMethod
+                        ) {
+                            $name = $this->lastFunctionLikeNode->name;
+                        }
+
+                        $result = $docParser->parse((string) $docBlock, [
+                            DocParser::PARAM_TYPE
+                        ], $name, true);
+
+                        if (isset($result['params']['$' . $this->name])) {
+                            return $this->typeAnalyzer->getTypesForTypeSpecification(
+                                $result['params']['$' . $this->name]['type']
+                            );
+                        }
+                    }
+
                     if ($param->type) {
                         // Found a type hint.
                         if ($param->type instanceof Node\Name) {
@@ -295,33 +320,6 @@ class QueryingVisitor extends NodeVisitorAbstract
                         }
 
                         return $param->type ? [$param->type] : [];
-                    }
-
-                    $docBlock = $this->lastFunctionLikeNode->getDocComment();
-
-                    if (!$docBlock) {
-                        break;
-                    }
-
-                    // Analyze the docblock's @param tags.
-                    $docParser = new DocParser();
-
-                    $name = null;
-
-                    if ($this->lastFunctionLikeNode instanceof Node\Stmt\Function_ ||
-                        $this->lastFunctionLikeNode instanceof Node\Stmt\ClassMethod
-                    ) {
-                        $name = $this->lastFunctionLikeNode->name;
-                    }
-
-                    $result = $docParser->parse((string) $docBlock, [
-                        DocParser::PARAM_TYPE
-                    ], $name, true);
-
-                    if (isset($result['params']['$' . $this->name])) {
-                        return $this->typeAnalyzer->getTypesForTypeSpecification(
-                            $result['params']['$' . $this->name]['type']
-                        );
                     }
 
                     break;

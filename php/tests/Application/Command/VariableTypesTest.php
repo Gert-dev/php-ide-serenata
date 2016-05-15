@@ -148,6 +148,13 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\DateTime'], $output);
     }
 
+    public function testDocblockTakesPrecedenceOverTypeHint()
+    {
+        $output = $this->getVariableTypes('DocblockPrecedence.php', '$b');
+
+        $this->assertEquals(['\B'], $output);
+    }
+
     public function testCorrectlyReturnsMultipleTypes()
     {
         $output = $this->getVariableTypes('MultipleTypes.php', '$a');

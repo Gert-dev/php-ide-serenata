@@ -4,6 +4,7 @@
 
 ### Bugs fixed
 * The type of global built-in function parameters was not getting analyzed correctly.
+* Docblock types did not always get precedence over type hints of function or method parameters.
 
 ### Changes for developers
 * All structural elements that involve types will now return arrays of type objects instead of a single type object. The following methods have been renamed to reflect this change:
