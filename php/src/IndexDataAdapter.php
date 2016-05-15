@@ -805,7 +805,7 @@ class IndexDataAdapter
             'isDeprecated',
             'shortDescription',
             'longDescription',
-            'returnDescription',
+            'typeDescription',
             'types'
         ];
 
