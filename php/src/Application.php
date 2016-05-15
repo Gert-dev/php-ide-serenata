@@ -4,8 +4,6 @@ namespace PhpIntegrator;
 
 use Exception;
 
-use Doctrine\DBAL\Exception\DriverException;
-
 /**
  * Main application class.
  */
@@ -44,12 +42,6 @@ class Application
 
             try {
                 return $command->execute($arguments);
-            } catch (DriverException $e) {
-                $message = "A driver exception occurred. Please check if support for sqlite is present.";
-                $message .= "\n \n";
-                $message .= $e->getFile() . ':' . $e->getLine() . ' - ' . $e->getMessage();
-
-                return $message;
             } catch (Exception $e) {
                 return $e->getFile() . ':' . $e->getLine() . ' - ' . $e->getMessage();
             }
