@@ -106,7 +106,7 @@ class ClassInfoTest extends IndexedTest
             'hasDocumentation'   => true,
             'shortDescription'   => 'This is the summary.',
             'longDescription'    => 'This is a long description.',
-            'returnDescription'  => null,
+            'typeDescription'    => null,
 
             'types'             => [
                 [
@@ -283,7 +283,7 @@ class ClassInfoTest extends IndexedTest
 
             'shortDescription'   => 'This is the summary.',
             'longDescription'    => 'This is a long description.',
-            'returnDescription'  => null,
+            'typeDescription'    => null,
 
             'types'             => [
                 [
@@ -401,7 +401,7 @@ class ClassInfoTest extends IndexedTest
             'isDeprecated',
             'shortDescription',
             'longDescription',
-            'returnDescription',
+            'typeDescription',
             'types'
         ];
 
@@ -646,7 +646,7 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['shortDescription'], 'Description 1.');
         $this->assertEquals($data['longDescription'], '');
-        $this->assertEquals($data['returnDescription'], null);
+        $this->assertEquals($data['typeDescription'], null);
 
         $this->assertEquals($data['types'], [
             [
