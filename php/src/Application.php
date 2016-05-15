@@ -40,10 +40,20 @@ class Application
             /** @var \PhpIntegrator\Application\CommandInterface $command */
             $command = new $className();
 
-            try {
-                return $command->execute($arguments);
-            } catch (Exception $e) {
-                return $e->getFile() . ':' . $e->getLine() . ' - ' . $e->getMessage();
+            if (interface_exists('Throwable')) {
+                // PHP >= 7.
+                try {
+                    return $command->execute($arguments);
+                } catch (\Throwable $e) {
+                    return $e->getFile() . ':' . $e->getLine() . ' - ' . $e->getMessage();
+                }
+            } else {
+                // PHP < 7
+                try {
+                    return $command->execute($arguments);
+                } catch (Exception $e) {
+                    return $e->getFile() . ':' . $e->getLine() . ' - ' . $e->getMessage();
+                }
             }
         }
 
