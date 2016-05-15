@@ -211,4 +211,19 @@ class DeduceTypesTest extends IndexedTest
 
         $this->assertEquals([], $result);
     }
+
+    public function testCorrectlyReturnsMultipleTypes()
+    {
+        $result = $this->deduceTypes(
+            'MultipleTypes.php',
+            ['$this', 'testProperty']
+        );
+
+        $this->assertEquals([
+            'string',
+            'int',
+            '\Foo',
+            '\Bar'
+        ], $result);
+    }
 }

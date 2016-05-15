@@ -148,6 +148,18 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\DateTime'], $output);
     }
 
+    public function testCorrectlyReturnsMultipleTypes()
+    {
+        $output = $this->getVariableTypes('MultipleTypes.php', '$a');
+
+        $this->assertEquals([
+            'string',
+            'int',
+            '\Foo',
+            '\Bar'
+        ], $output);
+    }
+
     /**
      * @expectedException \UnexpectedValueException
      */
