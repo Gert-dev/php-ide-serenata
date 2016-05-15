@@ -359,6 +359,10 @@ class Indexer
                 try {
                     $function = new ReflectionFunction($functionName);
                 } catch (\Exception $e) {
+                    $this->logMessage(
+                        '  - WARNING: Could not examine built-in function ' . $function->getName() . ' with Reflection'
+                    );
+
                     continue;
                 }
 
