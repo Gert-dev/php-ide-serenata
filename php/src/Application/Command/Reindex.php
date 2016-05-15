@@ -10,6 +10,7 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\Indexer;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\BuiltinIndexer;
 use PhpIntegrator\IndexStorageItemEnum;
 
 use PhpIntegrator\Application\Command as BaseCommand;
@@ -90,7 +91,9 @@ class Reindex extends BaseCommand
             ->fetch();
 
         if (!$hasIndexedBuiltin || !$hasIndexedBuiltin['value']) {
-            $indexer->indexBuiltinItems();
+            $builtinIndexer = new BuiltinIndexer($this->indexDatabase, $showOutput);
+
+            $builtinIndexer->index();
 
             if ($hasIndexedBuiltin) {
                 $this->indexDatabase->update(IndexStorageItemEnum::SETTINGS, $hasIndexedBuiltin['id'], [
