@@ -342,6 +342,10 @@ class QueryingVisitor extends NodeVisitorAbstract
         $types = $this->getTypes();
 
         foreach ($types as $type) {
+            if (in_array($type, ['self', 'static', '$this'], true) && $this->currentClassName) {
+                $type = $this->currentClassName;
+            }
+
             if ($this->typeAnalyzer->isClassType($type) && $type[0] !== "\\") {
                 $type = $this->resolveTypeCommand->resolveType(
                     $type,

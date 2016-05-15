@@ -155,6 +155,21 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\B'], $output);
     }
 
+    public function testSpecialTypesForParametersResolveCorrectly()
+    {
+        $output = $this->getVariableTypes('FunctionParameterTypeHintSpecial.php', '$a');
+
+        $this->assertEquals(['\A\C'], $output);
+
+        $output = $this->getVariableTypes('FunctionParameterTypeHintSpecial.php', '$b');
+
+        $this->assertEquals(['\A\C'], $output);
+
+        $output = $this->getVariableTypes('FunctionParameterTypeHintSpecial.php', '$c');
+
+        $this->assertEquals(['\A\C'], $output);
+    }
+
     public function testCorrectlyReturnsMultipleTypes()
     {
         $output = $this->getVariableTypes('MultipleTypes.php', '$a');

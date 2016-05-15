@@ -5,6 +5,7 @@
 ### Bugs fixed
 * The type of global built-in function parameters was not getting analyzed correctly.
 * Docblock types did not always get precedence over type hints of function or method parameters.
+* Parameters that have the type `self` (in docblock or type hint), `static` or `$this` (in docblock) will now correctly be examined.
 
 ### Changes for developers
 * All structural elements that involve types will now return arrays of type objects instead of a single type object. The following methods have been renamed to reflect this change:
