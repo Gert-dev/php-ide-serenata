@@ -36,16 +36,33 @@ class BuiltinIndexer
      *
      * @var bool
      */
-    protected $showOutput;
+    protected $showOutput = false;
 
     /**
      * @param Indexer\StorageInterface $storage
-     * @param bool                     $showOutput
      */
-    public function __construct(Indexer\StorageInterface $storage, $showOutput)
+    public function __construct(Indexer\StorageInterface $storage)
     {
         $this->storage = $storage;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShowOutput()
+    {
+        return $this->showOutput;
+    }
+
+    /**
+     * @param bool $showOutput
+     *
+     * @return static
+     */
+    public function setShowOutput($showOutput)
+    {
         $this->showOutput = $showOutput;
+        return $this;
     }
 
     /**

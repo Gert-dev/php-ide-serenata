@@ -4,10 +4,7 @@ namespace PhpIntegrator;
 
 use DateTime;
 use Exception;
-use FilesystemIterator;
 use UnexpectedValueException;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 
 use PhpParser\Lexer;
 use PhpParser\Error;
@@ -26,7 +23,7 @@ use PhpParser\NodeTraverser;
  * The index keeps track of 'outlines' that are confined to a single file. It in itself does not do anything
  * "intelligent" such as automatically inheriting docblocks from overridden methods.
  */
-class Indexer
+class FileIndexer
 {
     /**
      * The storage to use for index data.
@@ -70,105 +67,43 @@ class Indexer
      *
      * @var bool
      */
-    protected $showOutput;
-
-    /**
-     * Whether to stream progress.
-     *
-     * @var bool
-     */
-    protected $streamProgress;
+    protected $showOutput = false;
 
     /**
      * @param Indexer\StorageInterface $storage
      * @param TypeAnalyzer             $typeAnalyzer
      * @param DocParser                $docParser
      * @param ParserFactory            $parserFactory
-     * @param bool                     $showOutput
-     * @param bool                     $streamProgress
      */
     public function __construct(
         Indexer\StorageInterface $storage,
         TypeAnalyzer $typeAnalyzer,
         DocParser $docParser,
-        ParserFactory $parserFactory,
-        $showOutput,
-        $streamProgress
+        ParserFactory $parserFactory
     ) {
         $this->storage = $storage;
         $this->typeAnalyzer = $typeAnalyzer;
         $this->docParser = $docParser;
         $this->parserFactory = $parserFactory;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getShowOutput()
+    {
+        return $this->showOutput;
+    }
+
+    /**
+     * @param bool $showOutput
+     *
+     * @return static
+     */
+    public function setShowOutput($showOutput)
+    {
         $this->showOutput = $showOutput;
-        $this->streamProgress = $streamProgress;
-    }
-
-    /**
-     * Logs a single message for debugging purposes.
-     *
-     * @param string $message
-     */
-    protected function logMessage($message)
-    {
-        if (!$this->showOutput) {
-            return;
-        }
-
-        echo $message . PHP_EOL;
-    }
-
-    /**
-     * Logs progress for streaming progress.
-     *
-     * @param int $itemNumber
-     * @param int $totalItemCount
-     */
-    protected function sendProgress($itemNumber, $totalItemCount)
-    {
-        if (!$this->streamProgress) {
-            return;
-        }
-
-        if ($totalItemCount) {
-            $progress = ($itemNumber / $totalItemCount) * 100;
-        } else {
-            $progress = 100;
-        }
-
-        // Yes, we abuse the error channel...
-        file_put_contents('php://stderr', $progress . PHP_EOL);
-    }
-
-    /**
-     * Indexes the specified project.
-     *
-     * @param string $directory
-     */
-    public function indexDirectory($directory)
-    {
-        $this->logMessage('Pruning removed files...');
-        $this->pruneRemovedFiles();
-
-        $this->logMessage('Scanning for files that need (re)indexing...');
-        $files = $this->scan($directory);
-
-        $this->logMessage('Indexing outline...');
-
-        $totalItems = count($files);
-
-        $this->sendProgress(0, $totalItems);
-
-        foreach ($files as $i => $filePath) {
-            echo $this->logMessage('  - Indexing ' . $filePath);
-
-            try {
-                $this->indexFile($filePath);
-            } catch (Indexer\IndexingFailedException $e) {
-                $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
-            }
-
-            $this->sendProgress($i+1, $totalItems);
-        }
+        return $this;
     }
 
     /**
@@ -177,7 +112,7 @@ class Indexer
      * @param string      $filePath
      * @param string|null $code     The source code of the file. If null, will be fetched automatically.
      */
-    public function indexFile($filePath, $code = null)
+    public function index($filePath, $code = null)
     {
         $code = $code ?: @file_get_contents($filePath);
 
@@ -213,66 +148,6 @@ class Indexer
             $this->storage->rollbackTransaction();
 
             throw $e;
-        }
-    }
-
-    /**
-     * Scans the specified directory, returning a list of file names. Only files that have actually been updated since
-     * the previous index will be retrieved by default.
-     *
-     * @param string $directory
-     * @param bool   $isIncremental Whether to only return files modified since their last index (or otherwise: all
-     *                              files).
-     *
-     * @return string[]
-     */
-    protected function scan($directory, $isIncremental = true)
-    {
-        $fileModifiedMap = $this->storage->getFileModifiedMap();
-
-        $dirIterator = new RecursiveDirectoryIterator(
-            $directory,
-            FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
-        );
-
-        $iterator = new RecursiveIteratorIterator(
-            $dirIterator,
-            RecursiveIteratorIterator::LEAVES_ONLY,
-            RecursiveIteratorIterator::CATCH_GET_CHILD
-        );
-
-        $files = [];
-
-        /** @var \DirectoryIterator $fileInfo */
-        foreach ($iterator as $filename => $fileInfo) {
-            if ($fileInfo->getExtension() !== 'php') {
-                continue;
-            }
-
-            if (!$isIncremental
-             || !isset($fileModifiedMap[$filename])
-             || $fileInfo->getMTime() > $fileModifiedMap[$filename]->getTimestamp()
-            ) {
-                $files[] = $filename;
-            }
-        }
-
-        return $files;
-    }
-
-    /**
-     * Prunes removed files from the index.
-     */
-    protected function pruneRemovedFiles()
-    {
-        $fileModifiedMap = $this->storage->getFileModifiedMap();
-
-        foreach ($this->storage->getFileModifiedMap() as $fileName => $indexedTime) {
-            if (!file_exists($fileName)) {
-                $this->logMessage('  - ' . $fileName);
-
-                $this->storage->deleteFile($fileName);
-            }
         }
     }
 

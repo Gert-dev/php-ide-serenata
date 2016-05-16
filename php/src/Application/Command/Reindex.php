@@ -7,9 +7,11 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Indexer;
+use PhpIntegrator\Scanner;
 use PhpIntegrator\DocParser;
+use PhpIntegrator\FileIndexer;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\ProjectIndexer;
 use PhpIntegrator\BuiltinIndexer;
 use PhpIntegrator\IndexStorageItemEnum;
 
@@ -22,6 +24,31 @@ use PhpParser\ParserFactory;
  */
 class Reindex extends BaseCommand
 {
+    /**
+     * @var ProjectIndexer
+     */
+    protected $projectIndexer;
+
+    /**
+     * @var FileIndexer
+     */
+    protected $fileIndexer;
+
+    /**
+     * @var BuiltinIndexer
+     */
+    protected $builtinIndexer;
+
+    /**
+     * @var Scanner
+     */
+    protected $scanner;
+
+    /**
+     * @var array
+     */
+    protected $fileModifiedMap;
+
     /**
      * @var DocParser
      */
@@ -73,15 +100,6 @@ class Reindex extends BaseCommand
      */
     public function reindex($path, $useStdin, $showOutput, $doStreamProgress)
     {
-        $indexer = new Indexer(
-            $this->indexDatabase,
-            $this->getTypeAnalyzer(),
-            $this->getDocParser(),
-            $this->getParserFactory(),
-            $showOutput,
-            $doStreamProgress
-        );
-
         $hasIndexedBuiltin = $this->indexDatabase->getConnection()->createQueryBuilder()
             ->select('id', 'value')
             ->from(IndexStorageItemEnum::SETTINGS)
@@ -108,7 +126,10 @@ class Reindex extends BaseCommand
         }
 
         if (is_dir($path)) {
-            $indexer->indexDirectory($path);
+            $this->getProjectIndexer()
+                ->setStreamProgress($doStreamProgress)
+                ->setShowOutput($showOutput)
+                ->index($path);
 
             return $this->outputJson(true, []);
         } elseif (is_file($path) || $useStdin) {
@@ -132,7 +153,9 @@ class Reindex extends BaseCommand
             }
 
             try {
-                $indexer->indexFile($path, $code ?: null);
+                $this->getFileIndexer()
+                    ->setShowOutput($showOutput)
+                    ->index($path, $code ?: null);
             } catch (Indexer\IndexingFailedException $e) {
                 return $this->outputJson(false, []);
             }
@@ -145,6 +168,76 @@ class Reindex extends BaseCommand
         }
 
         throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
+    }
+
+    /**
+     * @return ProjectIndexer
+     */
+    protected function getProjectIndexer()
+    {
+        if (!$this->projectIndexer) {
+            $this->projectIndexer = new ProjectIndexer(
+                $this->indexDatabase,
+                $this->getBuiltinIndexer(),
+                $this->getFileIndexer(),
+                $this->getScanner()
+            );
+        }
+
+        return $this->projectIndexer;
+    }
+
+    /**
+     * @return FileIndexer
+     */
+    protected function getFileIndexer()
+    {
+        if (!$this->fileIndexer) {
+            $this->fileIndexer = new FileIndexer(
+                $this->indexDatabase,
+                $this->getTypeAnalyzer(),
+                $this->getDocParser(),
+                $this->getParserFactory()
+            );
+        }
+
+        return $this->fileIndexer;
+    }
+
+    /**
+     * @return BuiltinIndexer
+     */
+    protected function getBuiltinIndexer()
+    {
+        if (!$this->builtinIndexer) {
+            $this->builtinIndexer = new BuiltinIndexer($this->indexDatabase);
+        }
+
+        return $this->builtinIndexer;
+    }
+
+    /**
+     * @return Scanner
+     */
+    protected function getScanner()
+    {
+        if (!$this->scanner) {
+            $this->scanner = new Scanner($this->getFileModifiedMap());
+        }
+
+        return $this->scanner;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFileModifiedMap()
+    {
+        if (!$this->fileModifiedMap) {
+            $this->fileModifiedMap = $this->indexDatabase->getFileModifiedMap();
+        }
+
+        return $this->fileModifiedMap;
     }
 
     /**
