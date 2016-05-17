@@ -2,19 +2,6 @@
 
 namespace PhpIntegrator\Indexing;
 
-use DateTime;
-use Exception;
-use FilesystemIterator;
-use UnexpectedValueException;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
-
-use PhpParser\Lexer;
-use PhpParser\Error;
-use PhpParser\Parser;
-use PhpParser\ParserFactory;
-use PhpParser\NodeTraverser;
-
 /**
  * Handles project and folder indexing.
  */
@@ -55,8 +42,6 @@ class ProjectIndexer
      * @param BuiltinIndexer   $builtinIndexer
      * @param FileIndexer      $fileIndexer
      * @param Scanner          $scanner
-     * @param bool             $showOutput
-     * @param bool             $streamProgress
      */
     public function __construct(
         StorageInterface $storage,
@@ -152,6 +137,8 @@ class ProjectIndexer
      */
     public function index($directory)
     {
+        $this->indexBuiltinItemsIfNecessary();
+
         $this->logMessage('Pruning removed files...');
         $this->pruneRemovedFiles();
 
@@ -174,6 +161,29 @@ class ProjectIndexer
             }
 
             $this->sendProgress($i+1, $totalItems);
+        }
+    }
+
+    /**
+     * Indexes builtin PHP structural elemens when necessary.
+     */
+    protected function indexBuiltinItemsIfNecessary()
+    {
+        $hasIndexedBuiltin = $this->storage->getSetting('has_indexed_builtin');
+
+        if (!$hasIndexedBuiltin || !$hasIndexedBuiltin['value']) {
+            $this->builtinIndexer->index();
+
+            if ($hasIndexedBuiltin) {
+                $this->storage->update(IndexStorageItemEnum::SETTINGS, $hasIndexedBuiltin['id'], [
+                    'value' => 1
+                ]);
+            } else {
+                $this->storage->insert(IndexStorageItemEnum::SETTINGS, [
+                    'name'  => 'has_indexed_builtin',
+                    'value' => 1
+                ]);
+            }
         }
     }
 

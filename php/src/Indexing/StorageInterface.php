@@ -58,6 +58,15 @@ interface StorageInterface
     public function deleteStructure($fqcn);
 
     /**
+     * Retrieves the value of the setting with the specified name.
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getSetting($name);
+
+    /**
      * Inserts the specified index item into the storage.
      *
      * @param string $indexStorageItem

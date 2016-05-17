@@ -102,23 +102,6 @@ class Reindex extends BaseCommand
      */
     public function reindex($path, $useStdin, $showOutput, $doStreamProgress)
     {
-        $hasIndexedBuiltin = $this->indexDatabase->getSetting('has_indexed_builtin');
-
-        if (!$hasIndexedBuiltin || !$hasIndexedBuiltin['value']) {
-            $this->getBuiltinIndexer()->index();
-
-            if ($hasIndexedBuiltin) {
-                $this->indexDatabase->update(IndexStorageItemEnum::SETTINGS, $hasIndexedBuiltin['id'], [
-                    'value' => 1
-                ]);
-            } else {
-                $this->indexDatabase->insert(IndexStorageItemEnum::SETTINGS, [
-                    'name'  => 'has_indexed_builtin',
-                    'value' => 1
-                ]);
-            }
-        }
-
         if (is_dir($path)) {
             // Yes, we abuse the error channel...
             $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
