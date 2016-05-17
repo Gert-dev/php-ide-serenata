@@ -133,7 +133,7 @@ class TypeResolver
             }
         }
 
-        return $bestLocalizedType ?: ('\\' . $type);
+        return $bestLocalizedType ?: $this->getTypeAnalyzer()->getNormalizedFqcn($type, true);
     }
 
     /**
