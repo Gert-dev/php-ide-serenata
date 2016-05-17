@@ -119,10 +119,9 @@ class Reindex extends BaseCommand
             }
         }
 
-        $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
-
         if (is_dir($path)) {
             // Yes, we abuse the error channel...
+            $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
             $progressStream = $doStreamProgress ? fopen('php://stderr', 'w') : null;
 
             $this->getProjectIndexer()
