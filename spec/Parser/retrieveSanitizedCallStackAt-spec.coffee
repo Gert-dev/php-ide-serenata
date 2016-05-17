@@ -316,6 +316,27 @@ describe "retrieveSanitizedCallStackAt", ->
 
         expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
 
+    it "correctly stops at the new keyword.", ->
+        source =
+            """
+            <?php
+
+            $test = new $this->
+            """
+
+        editor.setText(source)
+
+        expectedResult = [
+            '$this',
+            ''
+        ]
+
+        bufferPosition =
+            row: editor.getLineCount() - 1
+            column: 19
+
+        expect(parser.retrieveSanitizedCallStackAt(editor, bufferPosition)).toEqual(expectedResult)
+
     it "correctly stops when the first element is an instantiation wrapped in parentheses.", ->
         source =
             """

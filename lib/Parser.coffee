@@ -132,7 +132,9 @@ class Parser
                             break
 
                     # Stop on keywords such as 'return' or 'echo'.
-                    else if scopeDescriptor.indexOf('.keyword.control') != -1 or scopeDescriptor.indexOf('.support.function.construct') != -1
+                    else if scopeDescriptor.indexOf('.keyword.control') != -1 or
+                            scopeDescriptor.indexOf('.keyword.other.new') != -1 or
+                            scopeDescriptor.indexOf('.support.function.construct') != -1
                         finishedOn = true
                         break
 

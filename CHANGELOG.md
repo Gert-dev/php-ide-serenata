@@ -13,6 +13,12 @@ $foo = \Foo\Bar::method();
 $foo-> // Didn't work, should work now.
 ```
 
+* Fix call stacks not being correctly retrieved after the new keyword, for example:
+
+```php
+$test = new $this-> // Was seen as "new $this" rather than just "$this".
+```
+
 ### Changes for developers
 * All structural elements that involve types will now return arrays of type objects instead of a single type object. The following methods have been renamed to reflect this change:
   * `deduceType` -> `deduceTypes`.
