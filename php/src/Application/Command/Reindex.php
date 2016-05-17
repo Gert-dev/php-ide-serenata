@@ -127,7 +127,7 @@ class Reindex extends BaseCommand
             }
         }
 
-        $loggingStream = fopen('php://stdout', 'w');
+        $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
 
         if (is_dir($path)) {
             $this->getProjectIndexer()
