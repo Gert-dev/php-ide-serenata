@@ -17,12 +17,19 @@ class Scanner
     protected $fileModifiedMap;
 
     /**
-     * @param array $fileModifiedMap A mapping of (absolute) file names to DateTime objects with their last modified
-     *                               timestamp.
+     * @var string[]
      */
-    public function __construct(array $fileModifiedMap)
+    protected $allowedExtensions;
+
+    /**
+     * @param array $fileModifiedMap      A mapping of (absolute) file names to DateTime objects with their last
+     *                                    modified timestamp.
+     * @param string[] $allowedExtensions
+     */
+    public function __construct(array $fileModifiedMap, array $allowedExtensions = ['php'])
     {
         $this->fileModifiedMap = $fileModifiedMap;
+        $this->allowedExtensions = $allowedExtensions;
     }
 
     /**
@@ -52,7 +59,7 @@ class Scanner
 
         /** @var \DirectoryIterator $fileInfo */
         foreach ($iterator as $filename => $fileInfo) {
-            if ($fileInfo->getExtension() !== 'php') {
+            if (!in_array($fileInfo->getExtension(), $this->allowedExtensions, true)) {
                 continue;
             }
 
