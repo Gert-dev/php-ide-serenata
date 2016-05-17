@@ -130,8 +130,11 @@ class Reindex extends BaseCommand
         $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
 
         if (is_dir($path)) {
+            // Yes, we abuse the error channel...
+            $progressStream = $doStreamProgress ? fopen('php://stderr', 'w') : null;
+
             $this->getProjectIndexer()
-                ->setStreamProgress($doStreamProgress)
+                ->setProgressStream($progressStream)
                 ->setLoggingStream($loggingStream)
                 ->index($path);
 

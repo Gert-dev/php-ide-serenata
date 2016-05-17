@@ -46,11 +46,9 @@ class ProjectIndexer
     protected $loggingStream;
 
     /**
-     * Whether to stream progress.
-     *
-     * @var bool
+     * @var resource|null
      */
-    protected $streamProgress = false;
+    protected $progressStream;
 
     /**
      * @param StorageInterface $storage
@@ -94,21 +92,21 @@ class ProjectIndexer
     }
 
     /**
-     * @return bool
+     * @return resource|null
      */
-    public function getStreamProgress()
+    public function getProgressStream()
     {
-        return $this->streamProgress;
+        return $this->progressStream;
     }
 
     /**
-     * @param bool $streamProgress
+     * @param resource|null $progressStream
      *
      * @return static
      */
-    public function setStreamProgress($streamProgress)
+    public function setProgressStream($progressStream)
     {
-        $this->streamProgress = $streamProgress;
+        $this->progressStream = $progressStream;
         return $this;
     }
 
@@ -134,7 +132,7 @@ class ProjectIndexer
      */
     protected function sendProgress($itemNumber, $totalItemCount)
     {
-        if (!$this->streamProgress) {
+        if (!$this->progressStream) {
             return;
         }
 
@@ -144,8 +142,7 @@ class ProjectIndexer
             $progress = 100;
         }
 
-        // Yes, we abuse the error channel...
-        file_put_contents('php://stderr', $progress . PHP_EOL);
+        fwrite($this->progressStream, $progress . PHP_EOL);
     }
 
     /**
