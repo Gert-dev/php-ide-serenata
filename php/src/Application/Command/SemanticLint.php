@@ -8,15 +8,16 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\IndexDatabase;
 
 use PhpIntegrator\Application\Command as BaseCommand;
 
-use PhpParser\Error;
+use PhpIntegrator\Indexing\IndexDatabase;
+
 use PhpParser\Lexer;
+use PhpParser\Error;
 use PhpParser\Parser;
-use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
+use PhpParser\NodeTraverser;
 
 /**
  * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the

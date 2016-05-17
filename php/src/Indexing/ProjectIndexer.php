@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Indexing;
 
 use DateTime;
 use Exception;
@@ -21,7 +21,7 @@ use PhpParser\NodeTraverser;
 class ProjectIndexer
 {
     /**
-     * @var Indexer\StorageInterface
+     * @var StorageInterface
      */
     protected $storage;
 
@@ -55,15 +55,15 @@ class ProjectIndexer
     protected $streamProgress = false;
 
     /**
-     * @param Indexer\StorageInterface $storage
-     * @param BuiltinIndexer           $builtinIndexer
-     * @param FileIndexer              $fileIndexer
-     * @param Scanner                  $scanner
-     * @param bool                     $showOutput
-     * @param bool                     $streamProgress
+     * @param StorageInterface $storage
+     * @param BuiltinIndexer   $builtinIndexer
+     * @param FileIndexer      $fileIndexer
+     * @param Scanner          $scanner
+     * @param bool             $showOutput
+     * @param bool             $streamProgress
      */
     public function __construct(
-        Indexer\StorageInterface $storage,
+        StorageInterface $storage,
         BuiltinIndexer $builtinIndexer,
         FileIndexer $fileIndexer,
         Scanner $scanner
@@ -174,7 +174,7 @@ class ProjectIndexer
 
             try {
                 $this->fileIndexer->index($filePath);
-            } catch (Indexer\IndexingFailedException $e) {
+            } catch (IndexingFailedException $e) {
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
             }
 

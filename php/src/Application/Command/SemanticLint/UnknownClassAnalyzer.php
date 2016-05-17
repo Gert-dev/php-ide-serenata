@@ -3,9 +3,10 @@
 namespace PhpIntegrator\Application\Command\SemanticLint;
 
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\IndexDatabase;
 
 use PhpIntegrator\Application\Command\ResolveType;
+
+use PhpIntegrator\Indexing\IndexDatabase;
 
 /**
  * Looks for unknown class names.

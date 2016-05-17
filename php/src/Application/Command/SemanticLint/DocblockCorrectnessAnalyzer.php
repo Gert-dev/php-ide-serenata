@@ -6,12 +6,13 @@ use UnexpectedValueException;
 
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\IndexDatabase;
 use PhpIntegrator\DocblockAnalyzer;
 
 use PhpIntegrator\Application\Command\ClassInfo;
 
-use PhpIntegrator\Indexer\OutlineIndexingVisitor;
+use PhpIntegrator\Indexing\IndexDatabase;
+
+use PhpIntegrator\Indexing\Visitor\OutlineIndexingVisitor;
 
 /**
  * Analyzes the correctness of docblocks.

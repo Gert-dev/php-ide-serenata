@@ -8,15 +8,16 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\IndexDatabase;
 
 use PhpIntegrator\Application\Command as BaseCommand;
 
-use PhpParser\Lexer;
+use PhpIntegrator\Indexing\IndexDatabase;
+
 use PhpParser\Error;
+use PhpParser\Lexer;
 use PhpParser\Parser;
-use PhpParser\ParserFactory;
 use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
 
 /**
  * Command that retrieves information about the types of a variable.

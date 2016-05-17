@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Indexing;
 
 use FilesystemIterator;
 use RecursiveIteratorIterator;

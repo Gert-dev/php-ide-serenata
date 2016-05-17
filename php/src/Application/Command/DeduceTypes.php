@@ -8,10 +8,11 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\IndexDatabase;
 use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Application\Command as BaseCommand;
+
+use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpParser\Node;
 

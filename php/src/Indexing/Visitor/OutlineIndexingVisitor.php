@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Indexer;
+namespace PhpIntegrator\Indexing\Visitor;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;

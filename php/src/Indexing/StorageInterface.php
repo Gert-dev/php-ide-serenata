@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Indexer;
+namespace PhpIntegrator\Indexing;
 
 /**
  * Defines functionality that must be exposed by classes that can interact with a storage medium for persisting data

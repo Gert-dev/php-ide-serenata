@@ -2,9 +2,9 @@
 
 namespace PhpIntegrator;
 
-use ReflectionClass;
-
 use PhpIntegrator\Application\Command;
+
+use PhpIntegrator\Indexing\IndexDatabase;
 
 /**
  * Abstract base class for tests that need to test functionality that requires an indexing database to be set up with

@@ -7,16 +7,17 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Indexer;
-use PhpIntegrator\Scanner;
+use PhpIntegrator\Indexing;
 use PhpIntegrator\DocParser;
-use PhpIntegrator\FileIndexer;
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\ProjectIndexer;
-use PhpIntegrator\BuiltinIndexer;
-use PhpIntegrator\IndexStorageItemEnum;
 
 use PhpIntegrator\Application\Command as BaseCommand;
+
+use PhpIntegrator\Indexing\Scanner;
+use PhpIntegrator\Indexing\FileIndexer;
+use PhpIntegrator\Indexing\BuiltinIndexer;
+use PhpIntegrator\Indexing\ProjectIndexer;
+use PhpIntegrator\Indexing\IndexStorageItemEnum;
 
 use PhpParser\ParserFactory;
 
@@ -157,7 +158,7 @@ class Reindex extends BaseCommand
                 $this->getFileIndexer()
                     ->setShowOutput($showOutput)
                     ->index($path, $code ?: null);
-            } catch (Indexer\IndexingFailedException $e) {
+            } catch (Indexing\IndexingFailedException $e) {
                 return $this->outputJson(false, []);
             }
 

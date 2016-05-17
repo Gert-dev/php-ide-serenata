@@ -3,7 +3,8 @@
 namespace PhpIntegrator\Application\Command;
 
 use PhpIntegrator\IndexedTest;
-use PhpIntegrator\IndexDatabase;
+
+use PhpIntegrator\Indexing\IndexDatabase;
 
 class VariableTypesTest extends IndexedTest
 {

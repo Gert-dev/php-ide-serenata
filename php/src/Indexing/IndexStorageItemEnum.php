@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Indexing;
 
 /**
  * Defines item types that are present inside the index.

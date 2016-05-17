@@ -1,17 +1,17 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Indexing;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\DriverManager;
+
+use PhpIntegrator\IndexDataAdapter;
 
 /**
  * Represents that database that is used for indexing.
  */
-class IndexDatabase implements
-    Indexer\StorageInterface,
-    IndexDataAdapter\ProviderInterface
+class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterface
 {
     /**
      * @var Connection

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Indexing;
 
 use Exception;
 use ReflectionClass;
@@ -17,7 +17,7 @@ class BuiltinIndexer
     /**
      * The storage to use for index data.
      *
-     * @var Indexer\StorageInterface
+     * @var StorageInterface
      */
     protected $storage;
 
@@ -39,9 +39,9 @@ class BuiltinIndexer
     protected $showOutput = false;
 
     /**
-     * @param Indexer\StorageInterface $storage
+     * @param StorageInterface $storage
      */
-    public function __construct(Indexer\StorageInterface $storage)
+    public function __construct(StorageInterface $storage)
     {
         $this->storage = $storage;
     }

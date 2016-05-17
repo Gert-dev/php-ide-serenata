@@ -9,8 +9,9 @@ use UnexpectedValueException;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\IndexDatabase;
 use PhpIntegrator\IndexDataAdapter;
+
+use PhpIntegrator\Indexing\IndexDatabase;
 
 /**
  * Base class for commands.
