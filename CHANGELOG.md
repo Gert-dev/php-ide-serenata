@@ -13,7 +13,7 @@ $foo = \Foo\Bar::method();
 $foo-> // Didn't work, should work now.
 ```
 
-* Fix call stacks not being correctly retrieved after the new keyword, for example:
+* Fix call stacks not correctly being retrieved after the new keyword, for example:
 
 ```php
 $test = new $this-> // Was seen as "new $this" rather than just "$this".
