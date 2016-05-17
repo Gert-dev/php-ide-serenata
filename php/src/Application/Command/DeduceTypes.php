@@ -327,7 +327,7 @@ class DeduceTypes extends BaseCommand
             }
         } elseif ($node instanceof Node\Expr\StaticCall) {
             if (is_string($node->name) && $node->class instanceof Node\Name) {
-                return [$node->class->toString(), $node->name . '()'];
+                return [$this->fetchClassName($node->class), $node->name . '()'];
             }
         } elseif ($node instanceof Node\Expr\PropertyFetch) {
             if (is_string($node->name)) {
@@ -347,6 +347,24 @@ class DeduceTypes extends BaseCommand
         }
 
         return null;
+    }
+
+    /**
+     * Takes a class name and turns it into a string.
+     *
+     * @param Node\Name $name
+     *
+     * @return string
+     */
+    protected function fetchClassName(Node\Name $name)
+    {
+        $newName = (string) $name;
+
+        if ($name->isFullyQualified() && $newName[0] !== '\\') {
+            $newName = '\\' . $newName;
+        }
+
+        return $newName;
     }
 
     /**

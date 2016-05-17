@@ -213,6 +213,16 @@ class DeduceTypesTest extends IndexedTest
         $this->assertEquals([], $result);
     }
 
+    public function testCorrectlyProcessesStaticMethodCallAssignedToVariableWithFqcnWithLeadingSlash()
+    {
+        $result = $this->deduceTypes(
+            'StaticMethodCallFqcnLeadingSlash.php',
+            ['$data']
+        );
+
+        $this->assertEquals(['\A\B'], $result);
+    }
+
     public function testCorrectlyReturnsMultipleTypes()
     {
         $result = $this->deduceTypes(

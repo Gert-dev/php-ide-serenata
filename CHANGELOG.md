@@ -6,6 +6,12 @@
 * The type of global built-in function parameters was not getting analyzed correctly.
 * Docblock types did not always get precedence over type hints of function or method parameters.
 * Parameters that have the type `self` (in docblock or type hint), `static` or `$this` (in docblock) will now correctly be examined.
+* Static method calls where the class name had a leading slash were not being examined correctly:
+
+```php
+$foo = \Foo\Bar::method();
+$foo-> // Didn't work, should work now.
+```
 
 ### Changes for developers
 * All structural elements that involve types will now return arrays of type objects instead of a single type object. The following methods have been renamed to reflect this change:
