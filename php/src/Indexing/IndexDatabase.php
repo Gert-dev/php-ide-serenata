@@ -52,7 +52,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
      *
      * @return Connection
      */
-    public function getConnection()
+    protected function getConnection()
     {
         if (!$this->connection) {
             $isNewDatabase = !file_exists($this->databasePath);
@@ -575,6 +575,24 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
         }
 
         return $queryBuilder->execute();
+    }
+
+    /**
+     * Retrieves the value of the setting with the specified name.
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getSetting($name)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('id', 'value')
+            ->from(IndexStorageItemEnum::SETTINGS)
+            ->where('name = ?')
+            ->setParameter(0, $name)
+            ->execute()
+            ->fetch();
     }
 
     /**

@@ -102,13 +102,7 @@ class Reindex extends BaseCommand
      */
     public function reindex($path, $useStdin, $showOutput, $doStreamProgress)
     {
-        $hasIndexedBuiltin = $this->indexDatabase->getConnection()->createQueryBuilder()
-            ->select('id', 'value')
-            ->from(IndexStorageItemEnum::SETTINGS)
-            ->where('name = ?')
-            ->setParameter(0, 'has_indexed_builtin')
-            ->execute()
-            ->fetch();
+        $hasIndexedBuiltin = $this->indexDatabase->getSetting('has_indexed_builtin');
 
         if (!$hasIndexedBuiltin || !$hasIndexedBuiltin['value']) {
             $this->getBuiltinIndexer()->index();
