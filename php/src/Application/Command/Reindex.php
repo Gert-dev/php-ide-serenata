@@ -138,6 +138,10 @@ class Reindex extends BaseCommand
                 ->setLoggingStream($loggingStream)
                 ->index($path);
 
+            if ($progressStream) {
+                fclose($progressStream);
+            }
+
             return $this->outputJson(true, []);
         } elseif (is_file($path) || $useStdin) {
             $code = null;
