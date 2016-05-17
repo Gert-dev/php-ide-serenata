@@ -111,9 +111,7 @@ class Reindex extends BaseCommand
             ->fetch();
 
         if (!$hasIndexedBuiltin || !$hasIndexedBuiltin['value']) {
-            $builtinIndexer = new BuiltinIndexer($this->indexDatabase, $showOutput);
-
-            $builtinIndexer->index();
+            $this->getBuiltinIndexer()->index();
 
             if ($hasIndexedBuiltin) {
                 $this->indexDatabase->update(IndexStorageItemEnum::SETTINGS, $hasIndexedBuiltin['id'], [
