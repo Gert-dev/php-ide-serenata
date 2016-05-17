@@ -186,11 +186,11 @@ class IndexDataAdapter
         foreach ($constants as $rawConstantData) {
             $result['constants'][$rawConstantData['name']] = array_merge($this->getConstantInfo($rawConstantData), [
                 'declaringClass' => [
-                    'name'            => $element['fqcn'],
-                    'filename'        => $element['path'],
-                    'startLine'       => (int) $element['start_line'],
-                    'endLine'         => (int) $element['end_line'],
-                    'type'            => $element['type_name'],
+                    'name'      => $element['fqcn'],
+                    'filename'  => $element['path'],
+                    'startLine' => (int) $element['start_line'],
+                    'endLine'   => (int) $element['end_line'],
+                    'type'      => $element['type_name'],
                 ],
 
                 'declaringStructure' => [
@@ -529,11 +529,11 @@ class IndexDataAdapter
 
                 $resultingMethod = array_merge($method, $inheritedData, [
                     'declaringClass' => [
-                        'name'            => $element['fqcn'],
-                        'filename'        => $element['path'],
-                        'startLine'       => (int) $element['start_line'],
-                        'endLine'         => (int) $element['end_line'],
-                        'type'            => $element['type_name'],
+                        'name'      => $element['fqcn'],
+                        'filename'  => $element['path'],
+                        'startLine' => (int) $element['start_line'],
+                        'endLine'   => (int) $element['end_line'],
+                        'type'      => $element['type_name'],
                     ]
                 ]);
 
@@ -654,7 +654,7 @@ class IndexDataAdapter
 
         return [
             'name'              => $rawInfo['name'],
-            'fqcn'             => $rawInfo['fqcn'],
+            'fqcn'              => $rawInfo['fqcn'],
             'isBuiltin'         => !!$rawInfo['is_builtin'],
             'startLine'         => (int) $rawInfo['start_line'],
             'endLine'           => (int) $rawInfo['end_line'],
@@ -716,7 +716,7 @@ class IndexDataAdapter
     {
         return [
             'name'              => $rawInfo['name'],
-            'fqcn'             => $rawInfo['fqcn'],
+            'fqcn'              => $rawInfo['fqcn'],
             'isBuiltin'         => !!$rawInfo['is_builtin'],
             'startLine'         => (int) $rawInfo['start_line'],
             'endLine'           => (int) $rawInfo['end_line'],
