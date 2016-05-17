@@ -7,6 +7,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\Indexer;
 use PhpIntegrator\Scanner;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\FileIndexer;
