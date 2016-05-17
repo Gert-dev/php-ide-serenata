@@ -127,10 +127,12 @@ class Reindex extends BaseCommand
             }
         }
 
+        $loggingStream = fopen('php://stdout', 'w');
+
         if (is_dir($path)) {
             $this->getProjectIndexer()
                 ->setStreamProgress($doStreamProgress)
-                ->setShowOutput($showOutput)
+                ->setLoggingStream($loggingStream)
                 ->index($path);
 
             return $this->outputJson(true, []);
@@ -155,9 +157,7 @@ class Reindex extends BaseCommand
             }
 
             try {
-                $this->getFileIndexer()
-                    ->setShowOutput($showOutput)
-                    ->index($path, $code ?: null);
+                $this->getFileIndexer()->index($path, $code ?: null);
             } catch (Indexing\IndexingFailedException $e) {
                 return $this->outputJson(false, []);
             }

@@ -67,13 +67,6 @@ class FileIndexer
     protected $structureTypeMap;
 
     /**
-     * Whether to display (debug) output.
-     *
-     * @var bool
-     */
-    protected $showOutput = false;
-
-    /**
      * @param StorageInterface $storage
      * @param TypeAnalyzer     $typeAnalyzer
      * @param DocParser        $docParser
@@ -89,25 +82,6 @@ class FileIndexer
         $this->typeAnalyzer = $typeAnalyzer;
         $this->docParser = $docParser;
         $this->parserFactory = $parserFactory;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getShowOutput()
-    {
-        return $this->showOutput;
-    }
-
-    /**
-     * @param bool $showOutput
-     *
-     * @return static
-     */
-    public function setShowOutput($showOutput)
-    {
-        $this->showOutput = $showOutput;
-        return $this;
     }
 
     /**

@@ -32,11 +32,9 @@ class BuiltinIndexer
     protected $structureTypeMap;
 
     /**
-     * Whether to display (debug) output.
-     *
-     * @var bool
+     * @var resource|null
      */
-    protected $showOutput = false;
+    protected $loggingStream;
 
     /**
      * @param StorageInterface $storage
@@ -47,21 +45,21 @@ class BuiltinIndexer
     }
 
     /**
-     * @return bool
+     * @return resource|null
      */
-    public function getShowOutput()
+    public function getLoggingStream()
     {
-        return $this->showOutput;
+        return $this->loggingStream;
     }
 
     /**
-     * @param bool $showOutput
+     * @param resource|null $loggingStream
      *
      * @return static
      */
-    public function setShowOutput($showOutput)
+    public function setLoggingStream($loggingStream)
     {
-        $this->showOutput = $showOutput;
+        $this->loggingStream = $loggingStream;
         return $this;
     }
 
@@ -72,11 +70,11 @@ class BuiltinIndexer
      */
     protected function logMessage($message)
     {
-        if (!$this->showOutput) {
+        if (!$this->loggingStream) {
             return;
         }
 
-        echo $message . PHP_EOL;
+        fwrite($this->loggingStream, $message . PHP_EOL);
     }
 
     /**
