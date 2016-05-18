@@ -251,7 +251,7 @@ class OutlineIndexingVisitor extends NameResolver
     {
         $parameters = [];
 
-        foreach ($node->getParams() as $param) {
+        foreach ($node->getParams() as $i => $param) {
             $localType = null;
 
             if ($param->type instanceof Node\Name) {
@@ -260,20 +260,10 @@ class OutlineIndexingVisitor extends NameResolver
                 $localType = (string) $param->type;
             }
 
-            parent::enterNode($param);
-
-            $resolvedType = null;
-
-            if ($param->type instanceof Node\Name) {
-                $resolvedType = $this->fetchClassName($param->type);
-            } elseif ($param->type) {
-                $resolvedType = (string) $param->type;
-            }
-
-            $parameters[] = [
+            $parameters[$i] = [
                 'name'        => $param->name,
                 'type'        => $localType,
-                'fullType'    => $resolvedType,
+                'fullType'    => null, // Filled in below.
                 'isReference' => $param->byRef,
                 'isVariadic'  => $param->variadic,
                 'isOptional'  => $param->default ? true : false
@@ -290,6 +280,18 @@ class OutlineIndexingVisitor extends NameResolver
         }
 
         parent::enterNode($node);
+
+        foreach ($node->getParams() as $i => $param) {
+            $resolvedType = null;
+
+            if ($param->type instanceof Node\Name) {
+                $resolvedType = $this->fetchClassName($param->type);
+            } elseif ($param->type) {
+                $resolvedType = (string) $param->type;
+            }
+
+            $parameters[$i]['fullType'] = $resolvedType;
+        }
 
         $resolvedType = null;
         $nodeType = $node->getReturnType();
