@@ -14,6 +14,11 @@ class ParentClass
 {
     use ParentTrait;
 
+    public function __construct()
+    {
+
+    }
+
     protected function parentMethod()
     {
 
@@ -34,22 +39,27 @@ class ChildClass extends ParentClass
 {
     use TestTrait;
 
-    protected function parentTraitMethod()
+    public function __construct(Foo $foo)
     {
 
     }
 
-    public function parentMethod()
+    protected function parentTraitMethod(Foo $foo = null)
     {
 
     }
 
-    protected function traitMethod()
+    public function parentMethod(Foo $foo = null)
     {
 
     }
 
-    public function abstractMethod()
+    protected function traitMethod(Foo $foo = null)
+    {
+
+    }
+
+    public function abstractMethod(Foo $foo = null)
     {
 
     }

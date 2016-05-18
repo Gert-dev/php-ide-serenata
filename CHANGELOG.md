@@ -19,6 +19,25 @@ $foo-> // Didn't work, should work now.
 $test = new $this-> // Was seen as "new $this" rather than just "$this".
 ```
 
+* Fix overridden or implemented methods with different parameter lists losing information about their changed parameter list. Whenever such a method now specifies different parameters than the "parent" method, parameters are no longer inherited and a docblock should be specified to document them.
+
+```php
+class A
+{
+    /**
+     * @param Foo $foo
+     */
+    public function __construct($foo) { ... }
+}
+
+class B extends A
+{
+    // Previously, these two parameters would get overwritten and the parameter list would be
+    // just "$foo" as the parent documentation is inherited.
+    public function __construct($bar, $test) { ... }
+}
+```
+
 ### Changes for developers
 * All structural elements that involve types will now return arrays of type objects instead of a single type object. The following methods have been renamed to reflect this change:
   * `deduceType` -> `deduceTypes`.

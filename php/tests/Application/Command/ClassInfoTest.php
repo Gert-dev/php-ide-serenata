@@ -434,7 +434,69 @@ class ClassInfoTest extends IndexedTest
 
         $output = $this->getClassInfo($fileName, 'A\ChildClass');
 
-        $this->assertEquals($output['methods']['parentTraitMethod']['override'], [
+        $this->assertEquals([
+            [
+                'name'        => 'foo',
+                'typeHint'    => 'Foo',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => false,
+
+                'types' => [
+                    [
+                        'type'         => 'Foo',
+                        'fqcn'         => 'Foo',
+                        'resolvedType' => '\Foo'
+                    ]
+                ]
+            ]
+        ], $output['methods']['__construct']['parameters']);
+
+        $this->assertEquals([
+            'startLine'   => 17,
+            'endLine'     => 20,
+            'wasAbstract' => false,
+
+            'declaringClass' => [
+                'name'      => 'A\ParentClass',
+                'filename'  => $this->getPathFor($fileName),
+                'startLine' => 13,
+                'endLine'   => 26,
+                'type'      => 'class'
+            ],
+
+            'declaringStructure' => [
+                'name'            => 'A\ParentClass',
+                'filename'        => $this->getPathFor($fileName),
+                'startLine'       => 13,
+                'endLine'         => 26,
+                'type'            => 'class',
+                'startLineMember' => 17,
+                'endLineMember'   => 20
+            ]
+        ], $output['methods']['__construct']['override']);
+
+        $this->assertEquals([
+            [
+                'name'        => 'foo',
+                'typeHint'    => 'Foo',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true,
+
+                'types' => [
+                    [
+                        'type'         => 'Foo',
+                        'fqcn'         => 'Foo',
+                        'resolvedType' => '\Foo'
+                    ]
+                ]
+            ]
+        ], $output['methods']['parentTraitMethod']['parameters']);
+
+        $this->assertEquals([
             'startLine'   => 7,
             'endLine'     => 10,
             'wasAbstract' => false,
@@ -443,7 +505,7 @@ class ClassInfoTest extends IndexedTest
                 'name'      => 'A\ParentClass',
                 'filename'  => $this->getPathFor($fileName),
                 'startLine' => 13,
-                'endLine'   => 21,
+                'endLine'   => 26,
                 'type'      => 'class'
             ],
 
@@ -456,18 +518,37 @@ class ClassInfoTest extends IndexedTest
                 'startLineMember' => 7,
                 'endLineMember'   => 10
             ]
-        ]);
+        ], $output['methods']['parentTraitMethod']['override']);
 
-        $this->assertEquals($output['methods']['parentMethod']['override'], [
-            'startLine'   => 17,
-            'endLine'     => 20,
+        $this->assertEquals([
+            [
+                'name'        => 'foo',
+                'typeHint'    => 'Foo',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true,
+
+                'types' => [
+                    [
+                        'type'         => 'Foo',
+                        'fqcn'         => 'Foo',
+                        'resolvedType' => '\Foo'
+                    ]
+                ]
+            ]
+        ], $output['methods']['parentMethod']['parameters']);
+
+        $this->assertEquals([
+            'startLine'   => 22,
+            'endLine'     => 25,
             'wasAbstract' => false,
 
             'declaringClass' => [
                 'name'      => 'A\ParentClass',
                 'filename'  => $this->getPathFor($fileName),
                 'startLine' => 13,
-                'endLine'   => 21,
+                'endLine'   => 26,
                 'type'      => 'class'
             ],
 
@@ -475,36 +556,74 @@ class ClassInfoTest extends IndexedTest
                 'name'            => 'A\ParentClass',
                 'filename'        => $this->getPathFor($fileName),
                 'startLine'       => 13,
-                'endLine'         => 21,
+                'endLine'         => 26,
                 'type'            => 'class',
-                'startLineMember' => 17,
-                'endLineMember'   => 20
+                'startLineMember' => 22,
+                'endLineMember'   => 25
             ]
-        ]);
+        ], $output['methods']['parentMethod']['override']);
 
-        $this->assertEquals($output['methods']['traitMethod']['override'], [
-            'startLine'   => 25,
-            'endLine'     => 28,
+        $this->assertEquals([
+            [
+                'name'        => 'foo',
+                'typeHint'    => 'Foo',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true,
+
+                'types' => [
+                    [
+                        'type'         => 'Foo',
+                        'fqcn'         => 'Foo',
+                        'resolvedType' => '\Foo'
+                    ]
+                ]
+            ]
+        ], $output['methods']['traitMethod']['parameters']);
+
+        $this->assertEquals([
+            'startLine'   => 30,
+            'endLine'     => 33,
             'wasAbstract' => false,
 
             'declaringClass' => [
                 'name'      => 'A\ChildClass',
                 'filename'  =>  $this->getPathFor($fileName),
-                'startLine' => 33,
-                'endLine'   => 56,
+                'startLine' => 38,
+                'endLine'   => 66,
                 'type'      => 'class'
             ],
 
             'declaringStructure' => [
                 'name'            => 'A\TestTrait',
                 'filename'        => $this->getPathFor($fileName),
-                'startLine'       => 23,
-                'endLine'         => 31,
+                'startLine'       => 28,
+                'endLine'         => 36,
                 'type'            => 'trait',
-                'startLineMember' => 25,
-                'endLineMember'   => 28
+                'startLineMember' => 30,
+                'endLineMember'   => 33
             ]
-        ]);
+        ], $output['methods']['traitMethod']['override']);
+
+        $this->assertEquals([
+            [
+                'name'        => 'foo',
+                'typeHint'    => 'Foo',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true,
+
+                'types' => [
+                    [
+                        'type'         => 'Foo',
+                        'fqcn'         => 'Foo',
+                        'resolvedType' => '\Foo'
+                    ]
+                ]
+            ]
+        ], $output['methods']['abstractMethod']['parameters']);
 
         $this->assertEquals($output['methods']['abstractMethod']['override']['wasAbstract'], true);
     }
@@ -568,7 +687,26 @@ class ClassInfoTest extends IndexedTest
 
         $output = $this->getClassInfo($fileName, 'A\ChildClass');
 
-        $this->assertEquals($output['methods']['parentInterfaceMethod']['implementation'], [
+        $this->assertEquals([
+            [
+                'name'        => 'foo',
+                'typeHint'    => 'Foo',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true,
+
+                'types' => [
+                    [
+                        'type'         => 'Foo',
+                        'fqcn'         => 'Foo',
+                        'resolvedType' => '\Foo'
+                    ]
+                ]
+            ]
+        ], $output['methods']['parentInterfaceMethod']['parameters']);
+
+        $this->assertEquals([
             'startLine' => 7,
             'endLine'   => 7,
 
@@ -589,9 +727,28 @@ class ClassInfoTest extends IndexedTest
                 'startLineMember' => 7,
                 'endLineMember'   => 7
             ]
-        ]);
+        ], $output['methods']['parentInterfaceMethod']['implementation']);
 
-        $this->assertEquals($output['methods']['interfaceMethod']['implementation'], [
+        $this->assertEquals([
+            [
+                'name'        => 'foo',
+                'typeHint'    => 'Foo',
+                'description' => null,
+                'isReference' => false,
+                'isVariadic'  => false,
+                'isOptional'  => true,
+
+                'types' => [
+                    [
+                        'type'         => 'Foo',
+                        'fqcn'         => 'Foo',
+                        'resolvedType' => '\Foo'
+                    ]
+                ]
+            ]
+        ], $output['methods']['interfaceMethod']['parameters']);
+
+        $this->assertEquals([
             'startLine' => 17,
             'endLine'   => 17,
 
@@ -612,7 +769,7 @@ class ClassInfoTest extends IndexedTest
                 'startLineMember' => 17,
                 'endLineMember'   => 17
             ]
-        ]);
+        ], $output['methods']['interfaceMethod']['implementation']);
     }
 
     public function testMethodParameterTypesFallBackToDocblock()

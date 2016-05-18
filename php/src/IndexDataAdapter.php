@@ -304,7 +304,7 @@ class IndexDataAdapter
                 }
 
                 if ($this->isInheritingDocumentation($method)) {
-                    $inheritedData = $this->extractInheritedMethodInfo($existingMethod);
+                    $inheritedData = $this->extractInheritedMethodInfo($existingMethod, $method);
                 }
             }
 
@@ -523,7 +523,7 @@ class IndexDataAdapter
                     }
 
                     if ($this->isInheritingDocumentation($method)) {
-                        $inheritedData = $this->extractInheritedMethodInfo($existingMethod);
+                        $inheritedData = $this->extractInheritedMethodInfo($existingMethod, $method);
                     }
                 }
 
@@ -824,10 +824,11 @@ class IndexDataAdapter
      * Extracts data from the specified (processed, i.e. already in the output format) method that is inheritable.
      *
      * @param array $processedData
+     * @param array $inheritingMethodData
      *
      * @return array
      */
-    protected function extractInheritedMethodInfo(array $processedData)
+    protected function extractInheritedMethodInfo(array $processedData, array $inheritingMethodData)
     {
         $info = [];
 
@@ -838,9 +839,29 @@ class IndexDataAdapter
             'longDescription',
             'returnDescription',
             'returnTypes',
-            'parameters',
             'throws'
         ];
+
+        // Normally parameters are inherited from the parent docblock. However, this causes problems when an overridden
+        // method adds an additional optional parameter or a subclass constructor uses completely different parameters.
+        // In either of these cases, we don't want to inherit the docblock parameters anymore, because it isn't
+        // correct anymore (and the developer should specify a new docblock specifying the changed parameters).
+        $inheritedMethodParameterNames = array_map(function (array $parameter) {
+            return $parameter['name'];
+        }, $processedData['parameters']);
+
+        $inheritingMethodParameterNames = array_map(function (array $parameter) {
+            return $parameter['name'];
+        }, $inheritingMethodData['parameters']);
+
+        // We need elements that are present in either A or B, but not in both. array_diff only returns items that
+        // are present in A, but not in B.
+        $parameterNameDiff1 = array_diff($inheritedMethodParameterNames, $inheritingMethodParameterNames);
+        $parameterNameDiff2 = array_diff($inheritingMethodParameterNames, $inheritedMethodParameterNames);
+
+        if (empty($parameterNameDiff1) && empty($parameterNameDiff2)) {
+            $inheritedKeys[] = 'parameters';
+        }
 
         foreach ($processedData as $key => $value) {
             if (in_array($key, $inheritedKeys)) {
