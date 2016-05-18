@@ -190,7 +190,7 @@ class BuiltinIndexer
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
             'name'                    => $function->getName(),
-            'fqcn'                   => null,
+            'fqcn'                    => null,
             'file_id'                 => null,
             'start_line'              => null,
             'end_line'                => null,
