@@ -7,7 +7,7 @@ interface ParentInterface
     public function parentInterfaceMethod();
 }
 
-class ParentClass implements ParentInterface
+abstract class ParentClass implements ParentInterface
 {
 
 }
