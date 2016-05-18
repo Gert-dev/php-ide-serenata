@@ -3,6 +3,7 @@
 * Minor performance improvements when calculating the global class list.
 
 ### Bugs fixed
+* Ignore built-in functions that have invalid UTF-8 characters in their name.
 * The type of global built-in function parameters was not getting analyzed correctly.
 * Docblock types did not always get precedence over type hints of function or method parameters.
 * Parameters that have the type `self` (in docblock or type hint), `static` or `$this` (in docblock) will now correctly be examined.
