@@ -188,6 +188,15 @@ class BuiltinIndexer
             }
         }
 
+        if (!mb_check_encoding($function->getName(), 'UTF-8')) {
+            // See also https://github.com/Gert-dev/php-integrator-base/issues/147 .
+            $this->logMessage(
+                '  - WARNING: Ignoring function with non-UTF-8 name ' . $function->getName()
+            );
+
+            return;
+        }
+
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
             'name'                    => $function->getName(),
             'fqcn'                    => null,
