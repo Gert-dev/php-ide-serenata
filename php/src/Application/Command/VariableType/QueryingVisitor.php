@@ -260,12 +260,32 @@ class QueryingVisitor extends NodeVisitorAbstract
             return $this->currentClassName ? [$this->currentClassName] : [];
         } elseif ($this->bestMatch) {
             if ($this->bestMatch instanceof Node\Expr\Assign) {
-                return $this->deduceTypesCommand->deduceTypesFromNode(
-                    $this->file,
-                    $this->code,
-                    $this->bestMatch->expr,
-                    $this->bestMatch->getAttribute('startFilePos')
-                );
+                if ($this->bestMatch->expr instanceof Node\Expr\Ternary) {
+                    $firstOperandType = $this->deduceTypesCommand->deduceTypesFromNode(
+                        $this->file,
+                        $this->code,
+                        $this->bestMatch->expr->if ?: $this->bestMatch->expr->cond,
+                        $this->bestMatch->getAttribute('startFilePos')
+                    );
+
+                    $secondOperandType = $this->deduceTypesCommand->deduceTypesFromNode(
+                        $this->file,
+                        $this->code,
+                        $this->bestMatch->expr->else,
+                        $this->bestMatch->getAttribute('startFilePos')
+                    );
+
+                    if ($firstOperandType === $secondOperandType) {
+                        return $firstOperandType;
+                    }
+                } else {
+                    return $this->deduceTypesCommand->deduceTypesFromNode(
+                        $this->file,
+                        $this->code,
+                        $this->bestMatch->expr,
+                        $this->bestMatch->getAttribute('startFilePos')
+                    );
+                }
             } elseif ($this->bestMatch instanceof Node\Stmt\Foreach_) {
                 $types = $this->deduceTypesCommand->deduceTypesFromNode(
                     $this->file,

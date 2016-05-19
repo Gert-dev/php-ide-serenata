@@ -1,6 +1,23 @@
 ## 0.10.0
 ### Features and enhancements
 * Minor performance improvements when calculating the global class list.
+* Type deduction learned how to deal with ternary expresions:
+
+```php
+$a1 = new A();
+$a2 = new A();
+
+$a = true ? $a1 : $a2;
+
+$a-> // Did not work before. Will now autocomplete A, as the type is guaranteed.
+
+$b1 = new B();
+$b2 = new \B();
+
+$b = $b1 ?: $b2;
+
+$b-> // Did not work before. Will now autocomplete B, for the same reasons.
+```
 
 ### Bugs fixed
 * The type of global built-in function parameters was not getting analyzed correctly.
