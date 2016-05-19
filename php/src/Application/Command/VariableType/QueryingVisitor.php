@@ -145,7 +145,8 @@ class QueryingVisitor extends NodeVisitorAbstract
                     if ($node->cond->class instanceof Node\Name) {
                         $this->bestMatch = $this->fetchClassName($node->cond->class);
                     } else {
-                        // TODO: This is an expression, parse it to retrieve its return value.
+                        // This is an expression, we could fetch its return type, but that still won't tell us what
+                        // the actual class is, so it's useless at the moment.
                     }
                 }
             }
