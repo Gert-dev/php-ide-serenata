@@ -145,13 +145,21 @@ class QueryingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Stmt\ElseIf_ ||
             $node instanceof Node\Expr\Ternary
         ) {
-            if ($node->cond instanceof Node\Expr\Instanceof_) {
-                if ($node->cond->expr instanceof Node\Expr\Variable && $node->cond->expr->name === $this->name) {
-                    if ($node->cond->class instanceof Node\Name) {
-                        $this->bestMatch = $this->fetchClassName($node->cond->class);
-                    } else {
-                        // This is an expression, we could fetch its return type, but that still won't tell us what
-                        // the actual class is, so it's useless at the moment.
+            // There can be conditional expressions inside the current scope (think variables assigned to a ternary
+            // expression). In that case we don't want to actually look at the condition for type deduction unless
+            // we're inside the scope of that conditional.
+            if (
+                $this->position >= $node->getAttribute('startFilePos') &&
+                $this->position <= $node->getAttribute('endFilePos')
+            ) {
+                if ($node->cond instanceof Node\Expr\Instanceof_) {
+                    if ($node->cond->expr instanceof Node\Expr\Variable && $node->cond->expr->name === $this->name) {
+                        if ($node->cond->class instanceof Node\Name) {
+                            $this->bestMatch = $this->fetchClassName($node->cond->class);
+                        } else {
+                            // This is an expression, we could fetch its return type, but that still won't tell us what
+                            // the actual class is, so it's useless at the moment.
+                        }
                     }
                 }
             }

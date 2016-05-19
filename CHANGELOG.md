@@ -1,7 +1,7 @@
 ## 0.10.0
 ### Features and enhancements
 * Minor performance improvements when calculating the global class list.
-* Type deduction learned how to deal with ternary expressions:
+* Type deduction learned how to deal with ternary expressions where both operands have the same resulting type:
 
 ```php
 $a1 = new A();
@@ -17,6 +17,12 @@ $b2 = new \B();
 $b = $b1 ?: $b2;
 
 $b-> // Did not work before. Will now autocomplete B, for the same reasons.
+```
+
+* Type deduction learned how to deal with ternary expressions containing instanceof:
+
+```php
+$a = ($foo instanceof Foo) ? $foo-> // Will now autocomplete Foo.
 ```
 
 ### Bugs fixed
@@ -55,6 +61,16 @@ class B extends A
     // just "$foo" as the parent documentation is inherited.
     public function __construct($bar, $test) { ... }
 }
+```
+
+* Conditionals with instanceof in them will now no longer be examined outside their scope:
+
+```php
+if ($foo instanceof Foo) {
+    $foo-> // Autocompletion for Foo as before.
+}
+
+$foo-> // Worked before, now no longer works.
 ```
 
 ### Changes for developers

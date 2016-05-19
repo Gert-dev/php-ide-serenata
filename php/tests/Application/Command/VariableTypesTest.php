@@ -128,6 +128,13 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B'], $output);
     }
 
+    public function testCorrectlyConfinesTreatsIfConditionAsSeparateScope()
+    {
+        $output = $this->getVariableTypes('InstanceofIfSeparateScope.php', '$b');
+
+        $this->assertEquals([], $output);
+    }
+
     public function testCorrectlyAnalyzesElseIfStatementWithInstanceof()
     {
         $output = $this->getVariableTypes('InstanceofElseIf.php', '$b');
@@ -135,11 +142,25 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B'], $output);
     }
 
+    public function testCorrectlyConfinesTreatsElseIfConditionAsSeparateScope()
+    {
+        $output = $this->getVariableTypes('InstanceofElseIfSeparateScope.php', '$b');
+
+        $this->assertEquals([], $output);
+    }
+
     public function testCorrectlyAnalyzesTernaryExpressionWithInstanceof()
     {
         $output = $this->getVariableTypes('InstanceofTernary.php', '$b');
 
         $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyConfinesTreatsTernaryExpressionConditionAsSeparateScope()
+    {
+        $output = $this->getVariableTypes('InstanceofTernarySeparateScope.php', '$b');
+
+        $this->assertEquals([], $output);
     }
 
     public function testCorrectlyAnalyzesTernaryExpressionWhereBothOperandsResultInTheSameType()
