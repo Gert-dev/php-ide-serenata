@@ -120,6 +120,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         $startFilePos = $node->getAttribute('startFilePos');
+        $endFilePos = $node->getAttribute('endFilePos');
 
         if ($startFilePos >= $this->position) {
             if ($startFilePos == $this->position) {
@@ -170,9 +171,7 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
         }
 
-        if ($node->getAttribute('startFilePos') <= $this->position &&
-            $node->getAttribute('endFilePos') >= $this->position
-        ) {
+        if ($startFilePos <= $this->position && $endFilePos >= $this->position) {
             if ($node instanceof Node\Stmt\ClassLike) {
                 $this->currentClassName = (string) $node->name;
 
