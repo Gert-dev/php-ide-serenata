@@ -123,7 +123,14 @@ class VariableTypesTest extends IndexedTest
 
     public function testCorrectlyAnalyzesIfStatementWithInstanceof()
     {
-        $output = $this->getVariableTypes('Instanceof.php', '$b');
+        $output = $this->getVariableTypes('InstanceofIf.php', '$b');
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesElseIfStatementWithInstanceof()
+    {
+        $output = $this->getVariableTypes('InstanceofElseIf.php', '$b');
 
         $this->assertEquals(['\A\B'], $output);
     }
