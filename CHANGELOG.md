@@ -1,7 +1,7 @@
 ## 0.10.0
 ### Features and enhancements
 * Minor performance improvements when calculating the global class list.
-* Type deduction learned how to deal with ternary expresions:
+* Type deduction learned how to deal with ternary expressions:
 
 ```php
 $a1 = new A();
