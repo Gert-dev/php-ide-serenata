@@ -135,6 +135,13 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B'], $output);
     }
 
+    public function testCorrectlyAnalyzesTernaryExpressionWithInstanceof()
+    {
+        $output = $this->getVariableTypes('InstanceofTernary.php', '$b');
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
     public function testCorrectlyAnalyzesTernaryExpressionWhereBothOperandsResultInTheSameType()
     {
         $output = $this->getVariableTypes('TernarySameResultingType.php', '$a');

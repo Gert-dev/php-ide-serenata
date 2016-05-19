@@ -41,6 +41,7 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Stmt\Function_ ||
             $node instanceof Node\Stmt\ClassMethod ||
             $node instanceof Node\Expr\Closure ||
+            $node instanceof Node\Expr\Ternary ||
             $node instanceof Node\Stmt\If_ ||
             $node instanceof Node\Stmt\TryCatch ||
             $node instanceof Node\Stmt\While_ ||
