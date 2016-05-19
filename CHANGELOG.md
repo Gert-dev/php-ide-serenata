@@ -7,7 +7,7 @@
 * Built-in functions that have invalid UTF-8 characters in their name are now ignored.
 * Docblock types did not always get precedence over type hints of function or method parameters.
 * Parameters that have the type `self` (in docblock or type hint), `static` or `$this` (in docblock) will now correctly be examined.
-* Fixed a classlike suddenly no longer being found if you defined another classlike with the same FQCN in another file (i.e. after copying a file). This happened, most annoyingly, even if you then changed the FQCN in the copied file, until you did a reindex of the original file.
+* Fixed a classlike suddenly no longer being found if you defined another classlike with the same FQCN in another file (i.e. after copying a file). This happened, most annoyingly, even if you then changed the FQCN in the copied file, and couldn't be fixed without reindexing the original file.
 * Static method calls where the class name had a leading slash were not being examined correctly:
 
 ```php
