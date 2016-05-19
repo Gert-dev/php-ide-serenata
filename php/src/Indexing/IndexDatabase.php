@@ -243,18 +243,6 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
     }
 
     /**
-     * @inheritDoc
-     */
-    public function deleteStructure($fqcn)
-    {
-        $this->getConnection()->createQueryBuilder()
-            ->delete(IndexStorageItemEnum::STRUCTURES)
-            ->where('fqcn = ?')
-            ->setParameter(0, $fqcn)
-            ->execute();
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getSetting($name)

@@ -235,8 +235,6 @@ class FileIndexer
             'long_description'  => $documentation['descriptions']['long']
         ];
 
-        $this->storage->deleteStructure($this->typeAnalyzer->getNormalizedFqcn($fqcn));
-
         $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, $seData);
 
         $accessModifierMap = $this->getAccessModifierMap();

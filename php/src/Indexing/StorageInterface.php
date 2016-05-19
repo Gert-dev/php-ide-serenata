@@ -51,12 +51,7 @@ interface StorageInterface
      * @param string $path
      */
     public function deleteFile($path);
-
-    /**
-     * @param string $fqcn
-     */
-    public function deleteStructure($fqcn);
-
+    
     /**
      * Retrieves the value of the setting with the specified name.
      *
