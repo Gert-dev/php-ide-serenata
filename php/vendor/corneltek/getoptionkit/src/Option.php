@@ -113,7 +113,7 @@ class Option
         $long = null;
 
         // check long,short option name.
-        if( strpos($name,'|') !== false ) {
+        if (strpos($name,'|') !== false ) {
             list($short,$long) = explode('|',$name);
         } elseif( strlen($name) === 1 ) {
             $short = $name;
@@ -125,26 +125,21 @@ class Option
         $this->long   = $long;
 
         // option is required.
-        if( strpos($attributes,':') !== false ) {
+        if (strpos($attributes,':') !== false ) {
             $this->required();
-        }
-        // option with multiple value
-        elseif ( strpos($attributes,'+') !== false ) {
+        } else if ( strpos($attributes,'+') !== false ) {
+            // option with multiple value
             $this->multiple();
-        }
-        // option is optional.(zero or one value)
-        elseif ( strpos($attributes,'?') !== false ) {
+        } else if (strpos($attributes,'?') !== false ) {
+            // option is optional.(zero or one value)
             $this->optional();
-        }
-        // option is multiple value and optional (zero or more)
-        elseif( strpos($attributes,'*') !== false ) {
+        } else if(strpos($attributes,'*') !== false) {
+            // option is multiple value and optional (zero or more)
             throw new Exception('not implemented yet');
-        }
-        // is a flag option
-        else {
+        } else {
             $this->flag();
         }
-        if( $type ) {
+        if ($type) {
             $this->isa($type);
         }
     }

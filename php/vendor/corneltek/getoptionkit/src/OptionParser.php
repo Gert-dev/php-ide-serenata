@@ -136,23 +136,28 @@ class OptionParser
         $result = new OptionResult;
         $argv = $this->preprocessingArguments($argv);
 
-
         foreach ($this->specs as $spec) {
             if ($spec->defaultValue !== null) {
                 $result->set($spec->getId() , $spec);
             }
         }
 
-
         $len = count($argv);
-        for ($i = 0; $i < $len; ++$i)
+
+        // some people might still pass only the option names here.
+        $first = new Argument($argv[0]);
+        if ($first->isOption()) {
+            throw new Exception("parse(argv) expects the first argument to be the program name.");
+        }
+
+        for ($i = 1; $i < $len; ++$i)
         {
-            $arg = new Argument( $argv[$i] );
+            $arg = new Argument($argv[$i]);
 
             // if looks like not an option, push it to argument list.
             // TODO: we might want to support argument with preceding dash (?)
             if (! $arg->isOption()) {
-                $result->addArgument( $arg );
+                $result->addArgument($arg);
                 continue;
             }
 
@@ -187,10 +192,10 @@ class OptionParser
                 $result->set($spec->getId(), $spec);
 
             } 
-            elseif ($spec->isMultiple()) 
+            else if ($spec->isMultiple()) 
             {
-                $this->pushOptionValue($spec,$arg,$next);
-                if ($next && $next->isOption()) {
+                $this->pushOptionValue($spec, $arg, $next);
+                if ($next && !$next->isOption()) {
                     $i++;
                 }
                 $result->set($spec->getId(), $spec);

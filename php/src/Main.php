@@ -55,8 +55,6 @@ try {
 
 $arguments = $argv;
 
-array_shift($arguments);
-
 $response = (new Application())->handle($arguments);
 
 echo $response;

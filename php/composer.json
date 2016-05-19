@@ -10,6 +10,6 @@
         "php": ">=5.4.0",
         "nikic/php-parser": "~2.1.0",
         "doctrine/dbal": "~2.5",
-        "corneltek/getoptionkit": "~2.2.0"
+        "corneltek/getoptionkit": "~2.3.0"
     }
 }

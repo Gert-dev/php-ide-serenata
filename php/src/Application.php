@@ -18,7 +18,9 @@ class Application
      */
     public function handle(array $arguments)
     {
+        $programName = array_shift($arguments);
         $command = array_shift($arguments);
+        array_unshift($arguments, $programName);
 
         $commands = [
             '--class-list'          => 'ClassList',

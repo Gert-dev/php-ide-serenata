@@ -1,6 +1,16 @@
 CHANGELOG
 ==================
 
+## v2.3.0 - Thu May 12 10:29:19 2016
+
+- Fixed bugs for multiple value parsing with arguments.
+- OptionParser::parse(argv) now expects the first argument to be the program name,
+  so you can pass argv directly to the parser.
+
+## v2.2.5-6 - Wed May 11 2016
+
+- Fixed bugs for ContinuousOptionParser.
+
 ## v2.2.4 - Fri Oct  2 15:53:33 2015
 
 - ContinuousOptionParser improvements.

@@ -173,9 +173,9 @@ class ContinuousOptionParserTest extends \PHPUnit_Framework_TestCase
         ok( $r->b , 'option b' );
         ok( $r->c , 'option c' );
 
-        is( 'a', $r->a );
-        is( 'b', $r->b );
-        is( 'c', $r->c[0] );
+        $this->assertEquals( 'a', $r->a );
+        $this->assertEquals( 'b', $r->b );
+        $this->assertEquals( 'c', $r->c[0] );
     }
 
     /* test parser without options */
@@ -216,14 +216,45 @@ class ContinuousOptionParserTest extends \PHPUnit_Framework_TestCase
             }
         }
         
-        is( 'arg1', $arguments[0] );
-        is( 'arg2', $arguments[1] );
-        is( 'arg3', $arguments[2] );
+        $this->assertEquals( 'arg1', $arguments[0] );
+        $this->assertEquals( 'arg2', $arguments[1] );
+        $this->assertEquals( 'arg3', $arguments[2] );
         ok( $subcommand_options );
 
-        is( 1, $subcommand_options['subcommand1']->a );
+        $this->assertEquals(1, $subcommand_options['subcommand1']->a);
         ok( 2, $subcommand_options['subcommand2']->a );
         ok( 3, $subcommand_options['subcommand3']->a );
     }
+
+    public function testMultipleShortOption()
+    {
+        $options = new OptionCollection;
+        $options->add("a");
+        $options->add("b");
+        $options->add("c");
+
+        $parser = new ContinuousOptionParser($options);
+
+        $result = $parser->parse(['app', '-ab', 'foo', 'bar']);
+        while (!$parser->isEnd())
+        {
+            $arguments[] = $parser->getCurrentArgument();
+            $parser->advance();
+        }
+
+        $this->assertTrue($result->keys["a"]->value);
+        $this->assertTrue($result->keys["b"]->value);
+    }
+
+    public function testIncrementalValue()
+    {
+        $options = new OptionCollection;
+        $options->add("v|verbose")->incremental();
+        $parser = new ContinuousOptionParser($options);
+        $result = $parser->parse(['app', '-vvv']);
+        $this->assertEquals(3, $result->keys["verbose"]->value);
+    }
+
+
 }
 

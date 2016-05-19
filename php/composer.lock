@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "acfaf5ddeff6f539ac69705af374460e",
-    "content-hash": "6204e8f7dda0e5aebdbb316f40b00e5d",
+    "hash": "115861fcbca0302373e0b4a3a9d94edc",
+    "content-hash": "2ace3744b33c038189b99983e32e140c",
     "packages": [
         {
             "name": "corneltek/getoptionkit",
-            "version": "2.2.5",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/c9s/GetOptionKit.git",
-                "reference": "977b11bf1f44a02398ecfc96cf2fc913cb9f017b"
+                "reference": "4534eeef636ec20efb2908a215ad8481eaba7370"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/c9s/GetOptionKit/zipball/977b11bf1f44a02398ecfc96cf2fc913cb9f017b",
-                "reference": "977b11bf1f44a02398ecfc96cf2fc913cb9f017b",
+                "url": "https://api.github.com/repos/c9s/GetOptionKit/zipball/4534eeef636ec20efb2908a215ad8481eaba7370",
+                "reference": "4534eeef636ec20efb2908a215ad8481eaba7370",
                 "shasum": ""
             },
             "require": {
@@ -29,9 +29,14 @@
                 "satooshi/php-coveralls": "dev-master"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
-                    "GetOptionKit\\": "src/GetOptionKit/"
+                    "GetOptionKit\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -41,13 +46,12 @@
             "authors": [
                 {
                     "name": "Yo-An Lin",
-                    "email": "cornelius.howl@gmail.com",
-                    "homepage": "http://c9s.me"
+                    "email": "cornelius.howl@gmail.com"
                 }
             ],
             "description": "Powerful command-line option toolkit",
             "homepage": "http://github.com/c9s/GetOptionKit",
-            "time": "2016-02-16 10:41:32"
+            "time": "2016-05-12 02:37:54"
         },
         {
             "name": "doctrine/annotations",

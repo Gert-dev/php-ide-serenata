@@ -50,6 +50,11 @@ class OptionResult
 
     public function __get($key)
     {
+        return $this->get($key);
+    }
+
+    public function get($key)
+    {
         if (isset($this->keys[$key])) {
             return $this->keys[$key]->getValue();
         }
@@ -63,6 +68,7 @@ class OptionResult
         if (isset($this->keys[$key])) {
             return $this->keys[$key]->getValue();
         }
+
     }
 
     public function __set($key, $value)
