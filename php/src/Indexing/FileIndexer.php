@@ -118,8 +118,15 @@ class FileIndexer
 
         $this->storage->beginTransaction();
 
+        $this->storage->deleteFile($filePath);
+
+        $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
+            'path'         => $filePath,
+            'indexed_time' => (new DateTime())->format('Y-m-d H:i:s')
+        ]);
+
         try {
-            $this->indexVisitorResults($filePath, $outlineIndexingVisitor, $useStatementFetchingVisitor);
+            $this->indexVisitorResults($fileId, $outlineIndexingVisitor, $useStatementFetchingVisitor);
 
             $this->storage->commitTransaction();
         } catch (Exception $e) {
@@ -136,22 +143,15 @@ class FileIndexer
      * the file. For structural elements, this also includes (direct) members, information about the parent class,
      * used traits, etc.
      *
-     * @param string                              $fileName
+     * @param int                                 $fileId
      * @param Visitor\OutlineIndexingVisitor      $outlineIndexingVisitor
      * @param Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
      */
     protected function indexVisitorResults(
-        $fileName,
+        $fileId,
         Visitor\OutlineIndexingVisitor $outlineIndexingVisitor,
         Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
     ) {
-         $this->storage->deleteFile($fileName);
-
-         $fileId = $this->storage->insert(IndexStorageItemEnum::FILES, [
-             'path'         => $fileName,
-             'indexed_time' => (new DateTime())->format('Y-m-d H:i:s')
-         ]);
-
          foreach ($outlineIndexingVisitor->getStructures() as $fqcn => $structure) {
              $this->indexStructure(
                  $structure,
