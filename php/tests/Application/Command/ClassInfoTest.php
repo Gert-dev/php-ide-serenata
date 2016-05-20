@@ -501,6 +501,12 @@ class ClassInfoTest extends IndexedTest
                         'type'         => 'Foo',
                         'fqcn'         => '\A\Foo',
                         'resolvedType' => '\A\Foo'
+                    ],
+
+                    [
+                        'type'         => 'null',
+                        'fqcn'         => 'null',
+                        'resolvedType' => 'null'
                     ]
                 ]
             ]
@@ -546,6 +552,12 @@ class ClassInfoTest extends IndexedTest
                         'type'         => 'Foo',
                         'fqcn'         => '\A\Foo',
                         'resolvedType' => '\A\Foo'
+                    ],
+
+                    [
+                        'type'         => 'null',
+                        'fqcn'         => 'null',
+                        'resolvedType' => 'null'
                     ]
                 ]
             ]
@@ -591,6 +603,12 @@ class ClassInfoTest extends IndexedTest
                         'type'         => 'Foo',
                         'fqcn'         => '\A\Foo',
                         'resolvedType' => '\A\Foo'
+                    ],
+
+                    [
+                        'type'         => 'null',
+                        'fqcn'         => 'null',
+                        'resolvedType' => 'null'
                     ]
                 ]
             ]
@@ -636,6 +654,12 @@ class ClassInfoTest extends IndexedTest
                         'type'         => 'Foo',
                         'fqcn'         => '\A\Foo',
                         'resolvedType' => '\A\Foo'
+                    ],
+
+                    [
+                        'type'         => 'null',
+                        'fqcn'         => 'null',
+                        'resolvedType' => 'null'
                     ]
                 ]
             ]
@@ -719,6 +743,12 @@ class ClassInfoTest extends IndexedTest
                         'type'         => 'Foo',
                         'fqcn'         => '\A\Foo',
                         'resolvedType' => '\A\Foo'
+                    ],
+
+                    [
+                        'type'         => 'null',
+                        'fqcn'         => 'null',
+                        'resolvedType' => 'null'
                     ]
                 ]
             ]
@@ -763,6 +793,12 @@ class ClassInfoTest extends IndexedTest
                         'type'         => 'Foo',
                         'fqcn'         => '\A\Foo',
                         'resolvedType' => '\A\Foo'
+                    ],
+
+                    [
+                        'type'         => 'null',
+                        'fqcn'         => 'null',
+                        'resolvedType' => 'null'
                     ]
                 ]
             ]

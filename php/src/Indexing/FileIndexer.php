@@ -639,6 +639,13 @@ class FileIndexer
                         'fqcn' => isset($parameter['fullType']) ? $parameter['fullType'] : $parameter['type']
                     ]
                 ];
+
+                if ($parameter['isNullable']) {
+                    $types[] = [
+                        'type' => 'null',
+                        'fqcn' => 'null'
+                    ];
+                }
             }
 
             $parameters[] = [
@@ -656,7 +663,7 @@ class FileIndexer
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
             'name'                    => $rawData['name'],
-            'fqcn'                   => isset($rawData['fqcn']) ? $rawData['fqcn'] : null,
+            'fqcn'                    => isset($rawData['fqcn']) ? $rawData['fqcn'] : null,
             'file_id'                 => $fileId,
             'start_line'              => $rawData['startLine'],
             'end_line'                => $rawData['endLine'],
