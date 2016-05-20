@@ -25,11 +25,6 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     protected $outlineIndexingVisitor;
 
     /**
-     * @var string
-     */
-    protected $file;
-
-    /**
      * @var IndexDatabase
      */
     protected $indexDatabase;
@@ -62,17 +57,16 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     /**
      * Constructor.
      *
-     * @param string        $file
+     * @param string        $code
      * @param IndexDatabase $indexDatabase
      * @param ClassInfo     $classInfoCommand
      */
-    public function __construct($file, IndexDatabase $indexDatabase, ClassInfo $classInfoCommand)
+    public function __construct($code, IndexDatabase $indexDatabase, ClassInfo $classInfoCommand)
     {
-        $this->file = $file;
         $this->indexDatabase = $indexDatabase;
         $this->classInfoCommand = $classInfoCommand;
 
-        $this->outlineIndexingVisitor = new OutlineIndexingVisitor();
+        $this->outlineIndexingVisitor = new OutlineIndexingVisitor($code);
     }
 
     /**

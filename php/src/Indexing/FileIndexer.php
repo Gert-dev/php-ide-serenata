@@ -105,7 +105,7 @@ class FileIndexer
                 throw new Error('Unknown syntax error encountered');
             }
 
-            $outlineIndexingVisitor = new Visitor\OutlineIndexingVisitor();
+            $outlineIndexingVisitor = new Visitor\OutlineIndexingVisitor($code);
             $useStatementFetchingVisitor = new Visitor\UseStatementFetchingVisitor();
 
             $traverser = new NodeTraverser(false);
@@ -646,6 +646,7 @@ class FileIndexer
                 'type_hint'        => $parameter['type'],
                 'types_serialized' => serialize($types),
                 'description'      => $parameterDoc ? $parameterDoc['description'] : null,
+                'default_value'    => $parameter['defaultValue'],
                 'is_nullable'      => $parameter['isNullable'] ? 1 : 0,
                 'is_reference'     => $parameter['isReference'] ? 1 : 0,
                 'is_optional'      => $parameter['isOptional'] ? 1 : 0,
@@ -725,6 +726,7 @@ class FileIndexer
                 'type_hint'        => null,
                 'types_serialized' => serialize($types),
                 'description'      => null,
+                'default_value'    => null,
                 'is_nullable'      => 0,
                 'is_reference'     => 0,
                 'is_optional'      => 0,
@@ -748,10 +750,11 @@ class FileIndexer
                 'type_hint'        => null,
                 'types_serialized' => serialize($types),
                 'description'      => null,
+                'default_value'    => null,
                 'is_nullable'      => 0,
                 'is_reference'     => 0,
                 'is_optional'      => 1,
-                'is_variadic'      => 0
+                'is_variadic'      => 0,
             ];
         }
 

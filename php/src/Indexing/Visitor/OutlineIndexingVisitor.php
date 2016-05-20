@@ -34,6 +34,19 @@ class OutlineIndexingVisitor extends NameResolver
     protected $currentStructure;
 
     /**
+     * @var string
+     */
+    protected $code;
+
+    /**
+     * @param string $code
+     */
+    public function __construct($code)
+    {
+        $this->code = $code;
+    }
+
+    /**
      * @inheritDoc
      */
     public function enterNode(Node $node)
@@ -261,13 +274,24 @@ class OutlineIndexingVisitor extends NameResolver
             }
 
             $parameters[$i] = [
-                'name'        => $param->name,
-                'type'        => $localType,
-                'fullType'    => null, // Filled in below.
-                'isNullable'  => ($param->default instanceof Node\Expr\ConstFetch && $param->default->name->toString() === 'null'),
-                'isReference' => $param->byRef,
-                'isVariadic'  => $param->variadic,
-                'isOptional'  => $param->default ? true : false
+                'name'         => $param->name,
+                'type'         => $localType,
+                'fullType'     => null, // Filled in below.
+                'isReference'  => $param->byRef,
+                'isVariadic'   => $param->variadic,
+                'isOptional'   => $param->default ? true : false,
+
+                'isNullable'   => (
+                    $param->default instanceof Node\Expr\ConstFetch && $param->default->name->toString() === 'null'
+                ),
+
+                'defaultValue' => $param->default ?
+                    mb_substr(
+                        $this->code,
+                        $param->default->getAttribute('startFilePos'),
+                        $param->default->getAttribute('endFilePos') - $param->default->getAttribute('startFilePos') + 1
+                    ) :
+                    null
             ];
         }
 

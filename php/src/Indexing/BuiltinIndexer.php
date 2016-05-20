@@ -250,6 +250,7 @@ class BuiltinIndexer
                 'type_hint'        => null,
                 'types_serialized' => serialize($types),
                 'description'      => null,
+                'default_value'    => null, // Fetching this is not possible due to "implementation details" (PHP docs).
                 'is_nullable'      => $type && $type->allowsNull() ? 1 : 0,
                 'is_reference'     => $parameter->isPassedByReference() ? 1 : 0,
                 'is_optional'      => $parameter->isOptional() ? 1 : 0,

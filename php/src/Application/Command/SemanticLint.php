@@ -159,7 +159,7 @@ class SemanticLint extends BaseCommand
                 $traverser = new NodeTraverser(false);
 
                 $docblockCorrectnessAnalyzer = new SemanticLint\DocblockCorrectnessAnalyzer(
-                    $file,
+                    $code,
                     $this->indexDatabase,
                     $this->getClassInfoCommand()
                 );

@@ -229,6 +229,8 @@ CREATE TABLE functions_parameters(
 
     description        text,
 
+    default_value      varchar(255),
+
     is_nullable        tinyint(1) NOT NULL DEFAULT 0,
     is_reference       tinyint(1) NOT NULL DEFAULT 0,
     is_optional        tinyint(1) NOT NULL DEFAULT 0,

@@ -160,13 +160,14 @@ class ClassInfoTest extends IndexedTest
 
             'parameters'         => [
                 [
-                    'name'        => 'firstParameter',
-                    'typeHint'    => '\DateTimeInterface',
-                    'description' => 'First parameter description.',
-                    'isNullable'  => true,
-                    'isReference' => false,
-                    'isVariadic'  => false,
-                    'isOptional'  => true,
+                    'name'         => 'firstParameter',
+                    'typeHint'     => '\DateTimeInterface',
+                    'description'  => 'First parameter description.',
+                    'defaultValue' => 'null',
+                    'isNullable'   => true,
+                    'isReference'  => false,
+                    'isVariadic'   => false,
+                    'isOptional'   => true,
 
                     'types' => [
                         [
@@ -184,25 +185,27 @@ class ClassInfoTest extends IndexedTest
                 ],
 
                 [
-                    'name'        => 'secondParameter',
-                    'typeHint'    => null,
-                    'description' => null,
-                    'isNullable'  => false,
-                    'isReference' => true,
-                    'isVariadic'  => false,
-                    'isOptional'  => true,
-                    'types'       => []
+                    'name'         => 'secondParameter',
+                    'typeHint'     => null,
+                    'description'  => null,
+                    'defaultValue' => 'true',
+                    'isNullable'   => false,
+                    'isReference'  => true,
+                    'isVariadic'   => false,
+                    'isOptional'   => true,
+                    'types'        => []
                 ],
 
                 [
-                    'name'        => 'thirdParameter',
-                    'typeHint'    => null,
-                    'description' => null,
-                    'isNullable'  => false,
-                    'isReference' => false,
-                    'isVariadic'  => true,
-                    'isOptional'  => false,
-                    'types'       => []
+                    'name'         => 'thirdParameter',
+                    'typeHint'     => null,
+                    'description'  => null,
+                    'defaultValue' => null,
+                    'isNullable'   => false,
+                    'isReference'  => false,
+                    'isVariadic'   => true,
+                    'isOptional'   => false,
+                    'types'        => []
                 ]
             ],
 
@@ -439,13 +442,14 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'        => 'foo',
-                'typeHint'    => 'Foo',
-                'description' => null,
-                'isNullable'  => false,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => false,
+                'name'         => 'foo',
+                'typeHint'     => 'Foo',
+                'description'  => null,
+                'defaultValue' => null,
+                'isNullable'   => false,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => false,
 
                 'types' => [
                     [
@@ -483,13 +487,14 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'        => 'foo',
-                'typeHint'    => 'Foo',
-                'description' => null,
-                'isNullable'  => true,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true,
+                'name'         => 'foo',
+                'typeHint'     => 'Foo',
+                'description'  => null,
+                'defaultValue' => 'null',
+                'isNullable'   => true,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => true,
 
                 'types' => [
                     [
@@ -527,13 +532,14 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'        => 'foo',
-                'typeHint'    => 'Foo',
-                'description' => null,
-                'isNullable'  => true,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true,
+                'name'         => 'foo',
+                'typeHint'     => 'Foo',
+                'description'  => null,
+                'defaultValue' => 'null',
+                'isNullable'   => true,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => true,
 
                 'types' => [
                     [
@@ -571,13 +577,14 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'        => 'foo',
-                'typeHint'    => 'Foo',
-                'description' => null,
-                'isNullable'  => true,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true,
+                'name'         => 'foo',
+                'typeHint'     => 'Foo',
+                'description'  => null,
+                'defaultValue' => 'null',
+                'isNullable'   => true,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => true,
 
                 'types' => [
                     [
@@ -615,13 +622,14 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'        => 'foo',
-                'typeHint'    => 'Foo',
-                'description' => null,
-                'isNullable'  => true,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true,
+                'name'         => 'foo',
+                'typeHint'     => 'Foo',
+                'defaultValue' => 'null',
+                'description'  => null,
+                'isNullable'   => true,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => true,
 
                 'types' => [
                     [
@@ -697,13 +705,14 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'        => 'foo',
-                'typeHint'    => 'Foo',
-                'description' => null,
-                'isNullable'  => true,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true,
+                'name'         => 'foo',
+                'typeHint'     => 'Foo',
+                'defaultValue' => 'null',
+                'description'  => null,
+                'isNullable'   => true,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => true,
 
                 'types' => [
                     [
@@ -740,13 +749,14 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'        => 'foo',
-                'typeHint'    => 'Foo',
-                'description' => null,
-                'isNullable'  => true,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true,
+                'name'         => 'foo',
+                'typeHint'     => 'Foo',
+                'description'  => null,
+                'defaultValue' => 'null',
+                'isNullable'   => true,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => true,
 
                 'types' => [
                     [
@@ -931,36 +941,39 @@ class ClassInfoTest extends IndexedTest
 
         $this->assertEquals($data['parameters'], [
             [
-                'name'        => 'a',
-                'typeHint'    => null,
-                'description' => null,
-                'isNullable'  => false,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => false,
-                'types'       => []
+                'name'         => 'a',
+                'typeHint'     => null,
+                'description'  => null,
+                'defaultValue' => null,
+                'isNullable'   => false,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => false,
+                'types'        => []
             ],
 
             [
-                'name'        => 'b',
-                'typeHint'    => null,
-                'description' => null,
-                'isNullable'  => false,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => false,
-                'types'       => []
+                'name'         => 'b',
+                'typeHint'     => null,
+                'description'  => null,
+                'defaultValue' => null,
+                'isNullable'   => false,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => false,
+                'types'        => []
             ],
 
             [
-                'name'        => 'c',
-                'typeHint'    => null,
-                'description' => null,
-                'isNullable'  => false,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true,
-                'types'       => [
+                'name'         => 'c',
+                'typeHint'     => null,
+                'description'  => null,
+                'defaultValue' => null,
+                'isNullable'   => false,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => true,
+                'types'        => [
                     [
                         'type'         => 'array',
                         'fqcn'         => 'array',
@@ -970,14 +983,15 @@ class ClassInfoTest extends IndexedTest
             ],
 
             [
-                'name'        => 'd',
-                'typeHint'    => null,
-                'description' => null,
-                'isNullable'  => false,
-                'isReference' => false,
-                'isVariadic'  => false,
-                'isOptional'  => true,
-                'types'       => [
+                'name'         => 'd',
+                'typeHint'     => null,
+                'description'  => null,
+                'defaultValue' => null,
+                'isNullable'   => false,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => true,
+                'types'        => [
                     [
                         'type'         => 'Type',
                         'fqcn'         => '\A\Type',
