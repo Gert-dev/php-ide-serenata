@@ -16,7 +16,7 @@ class TestClass
      *
      * @return mixed|bool
      */
-    public function testMethod(\DateTimeInterface $firstParameter, &$secondParameter = true, ...$thirdParameter)
+    public function testMethod(\DateTimeInterface $firstParameter = null, &$secondParameter = true, ...$thirdParameter)
     {
         // NOTE: The second and third parameter descriptions are intentionally missing.
     }

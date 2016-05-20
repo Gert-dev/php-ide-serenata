@@ -264,6 +264,7 @@ class OutlineIndexingVisitor extends NameResolver
                 'name'        => $param->name,
                 'type'        => $localType,
                 'fullType'    => null, // Filled in below.
+                'isNullable'  => ($param->default instanceof Node\Expr\ConstFetch && $param->default->name->toString() === 'null'),
                 'isReference' => $param->byRef,
                 'isVariadic'  => $param->variadic,
                 'isOptional'  => $param->default ? true : false

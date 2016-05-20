@@ -79,6 +79,7 @@ $foo-> // Worked before, now no longer works.
   * `getVariableType` -> `getVariableTypes`.
   * `getResultingTypeAt` -> `getResultingTypesAt`.
   * `getVariableTypeByOffset` -> `getVariableTypesByOffset`.
+* An `isNullable` property is now returned for function and method parameters.
 * `resolveType` will now also return types with a leading slash, consistent with other commands.
 * Return types for functions and types for function parameters will now also include a `typeHint` property that is set to the actual type hint that was specified (the type and resolvedType fall back to the docblock if it is present).
 * `localizeType` will now return the FQCN instead of null if it couldn't localize a type based on use statements. The reasoning behind this is that you want a localized version of the type you pass, if there are no use statements to localize it, the FQCN is the only way to address the type locally.

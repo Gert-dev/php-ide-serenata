@@ -638,6 +638,7 @@ class IndexDataAdapter
                 'typeHint'    => $rawParameter['type_hint'],
                 'types'       => $this->getReturnTypeDataForSerializedTypes($rawParameter['types_serialized']),
                 'description' => $rawParameter['description'],
+                'isNullable'  => !!$rawParameter['is_nullable'],
                 'isReference' => !!$rawParameter['is_reference'],
                 'isVariadic'  => !!$rawParameter['is_variadic'],
                 'isOptional'  => !!$rawParameter['is_optional']

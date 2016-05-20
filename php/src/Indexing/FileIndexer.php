@@ -646,7 +646,7 @@ class FileIndexer
                 'type_hint'        => $parameter['type'],
                 'types_serialized' => serialize($types),
                 'description'      => $parameterDoc ? $parameterDoc['description'] : null,
-                'is_nullable'      => 0, // TODO
+                'is_nullable'      => $parameter['isNullable'] ? 1 : 0,
                 'is_reference'     => $parameter['isReference'] ? 1 : 0,
                 'is_optional'      => $parameter['isOptional'] ? 1 : 0,
                 'is_variadic'      => $parameter['isVariadic'] ? 1 : 0
@@ -748,7 +748,7 @@ class FileIndexer
                 'type_hint'        => null,
                 'types_serialized' => serialize($types),
                 'description'      => null,
-                'is_nullable'      => 1,
+                'is_nullable'      => 0,
                 'is_reference'     => 0,
                 'is_optional'      => 1,
                 'is_variadic'      => 0
