@@ -39,6 +39,13 @@ $foo = \Foo\Bar::method();
 $foo-> // Didn't work, should work now.
 ```
 
+* Type overrides with multiple types were not analyzed properly:
+
+```php
+/** @var Foo|null $foo */
+$foo-> // Did not work, should work now.
+```
+
 * Fix call stacks not correctly being retrieved after the new keyword, for example:
 
 ```php
@@ -111,13 +118,6 @@ protected $testProperty1, $testProperty2;
  * @var Foo1 $testProperty1 A description of the first property. This will be used as the summary of this property.
  */
 protected $testProperty1;
-```
-
-* Type overrides with multiple types were not analyzed properly:
-
-```php
-/** @var Foo|null $foo */
-$foo-> // Did not work, should work now.
 ```
 
 ### Changes for developers
