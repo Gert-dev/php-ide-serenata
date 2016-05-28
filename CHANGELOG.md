@@ -100,7 +100,7 @@ $d-> // Didn't work because a docblock spanning multiple lines was not examined,
 protected $testProperty1, $testProperty2;
 ```
 
-* In property docblocks with ambiguous summary and `@var` descriptions, the more specific `@var` will now take precedence. This more neatly fits in with compound statements described above:
+* In property docblocks with ambiguous summary and `@var` descriptions, the more specific `@var` will now take precedence. This more neatly fits in with the compound statements described above:
 
 ```php
 /**
