@@ -222,18 +222,28 @@ class QueryingVisitor extends NodeVisitorAbstract
     {
         $docblock = $node->getDocComment();
 
+        if (!$docblock) {
+            return;
+        }
+
+        // Check for a reverse type annotation /** @var $someVar FooType */. These aren't correct in the sense that
+        // they aren't consistent with the standard syntax "@var <type> <name>", but they are still used by some IDE's.
+        // For this reason we support them, but only their most elementary form.
         $classRegexPart = "?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*";
+        $reverseRegexTypeAnnotation = "/\/\*\*\s*@var\s+\\\${$this->name}\s+(({$classRegexPart}(?:\[\])?))\s*(\s.*)?\*\//";
 
-        // Check for a type annotation in the style of /** @var FooType $someVar */ or /** @var $someVar FooType */.
-        $regexTypeAnnotation = "/\/\*\*\s*@var\s+(({$classRegexPart}(?:\[\])?))\s+\\\${$this->name}\s*(\s.*)?\*\//";
-        $reversRegexTypeAnnotation = "/\/\*\*\s*@var\s+\\\${$this->name}\s+(({$classRegexPart}(?:\[\])?))\s*(\s.*)?\*\//";
-
-        if (preg_match($regexTypeAnnotation, $docblock, $matches) === 1) {
+        if (preg_match($reverseRegexTypeAnnotation, $docblock, $matches) === 1) {
             $this->bestTypeOverrideMatch = $matches[1];
             $this->bestTypeOverrideMatchLine = $node->getLine();
-        } elseif (preg_match($reversRegexTypeAnnotation, $docblock, $matches) === 1) {
-            $this->bestTypeOverrideMatch = $matches[1];
-            $this->bestTypeOverrideMatchLine = $node->getLine();
+        } else {
+            $docblockData = $this->getDocParser()->parse((string) $docblock, [
+                DocParser::VAR_TYPE
+            ], $this->name);
+
+            if ($docblockData['var']['name'] === $this->name && $docblockData['var']['type']) {
+                $this->bestTypeOverrideMatch = $docblockData['var']['type'];
+                $this->bestTypeOverrideMatchLine = $node->getLine();
+            }
         }
     }
 

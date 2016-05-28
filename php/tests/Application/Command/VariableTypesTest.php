@@ -44,6 +44,10 @@ class VariableTypesTest extends IndexedTest
         $output = $this->getVariableTypes('TypeOverrideAnnotations.php', '$c');
 
         $this->assertEquals(['\A\C'], $output);
+
+        $output = $this->getVariableTypes('TypeOverrideAnnotations.php', '$d');
+
+        $this->assertEquals(['\A\D'], $output);
     }
 
     public function testCorrectlyResolvesThisInClass()

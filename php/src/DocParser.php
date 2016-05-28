@@ -243,33 +243,40 @@ class DocParser
      */
     protected function filterVar($docblock, $itemName, array $tags)
     {
+        $name = null;
         $type = null;
         $description = null;
 
         if (isset($tags[static::VAR_TYPE])) {
-            list($varType, $varName, $varDescription) = $this->filterParameterTag($tags[static::VAR_TYPE][0], 3);
+            foreach ($tags[static::VAR_TYPE] as $tag) {
+                list($varType, $varName, $varDescription) = $this->filterParameterTag($tag, 3);
 
-            if ($varName) {
-                if (mb_substr($varName, 0, 1) === '$') {
-                    // Example: "@var DateTime $foo My description". The tag includes the name of the property it
-                    // documents, it must match the property we're fetching documentation about.
-                    if (mb_substr($varName, 1) === $itemName) {
+                if ($varName) {
+                    if (mb_substr($varName, 0, 1) === '$') {
+                        // Example: "@var DateTime $foo My description". The tag includes the name of the property it
+                        // documents, it must match the property we're fetching documentation about.
+                        if (mb_substr($varName, 1) === $itemName) {
+                            $type = $varType;
+                            $name = $itemName;
+                            $description = $varDescription;
+
+                            break;
+                        }
+                    } else {
+                        // Example: "@var DateTime My description".
                         $type = $varType;
-                        $description = $varDescription;
+                        $description = trim($varName . ' ' . $varDescription);
                     }
-                } else {
-                    // Example: "@var DateTime My description".
+                } else if (!$varName && !$varDescription) {
+                    // Example: "@var DateTime".
                     $type = $varType;
-                    $description = trim($varName . ' ' . $varDescription);
                 }
-            } else if (!$varName && !$varDescription) {
-                // Example: "@var DateTime".
-                $type = $varType;
             }
         }
 
         return [
             'var' => [
+                'name'        => $name,
                 'type'        => $type,
                 'description' => $description
             ]
