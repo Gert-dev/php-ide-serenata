@@ -337,8 +337,6 @@ class QueryingVisitor extends NodeVisitorAbstract
 
                     if ($docBlock) {
                         // Analyze the docblock's @param tags.
-                        $docParser = $this->getDocParser();
-
                         $name = null;
 
                         if ($this->lastFunctionLikeNode instanceof Node\Stmt\Function_ ||
@@ -347,7 +345,7 @@ class QueryingVisitor extends NodeVisitorAbstract
                             $name = $this->lastFunctionLikeNode->name;
                         }
 
-                        $result = $docParser->parse((string) $docBlock, [
+                        $result = $this->getDocParser()->parse((string) $docBlock, [
                             DocParser::PARAM_TYPE
                         ], $name, true);
 
