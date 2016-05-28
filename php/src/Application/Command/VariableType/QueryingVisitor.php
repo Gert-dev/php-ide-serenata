@@ -58,6 +58,11 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $typeAnalyzer;
 
     /**
+     * @var DocParser
+     */
+    protected $docParser;
+
+    /**
      * @var Node\FunctionLike|null
      */
     protected $lastFunctionLikeNode;
@@ -322,7 +327,7 @@ class QueryingVisitor extends NodeVisitorAbstract
 
                     if ($docBlock) {
                         // Analyze the docblock's @param tags.
-                        $docParser = new DocParser();
+                        $docParser = $this->getDocParser();
 
                         $name = null;
 
@@ -390,5 +395,19 @@ class QueryingVisitor extends NodeVisitorAbstract
         }
 
         return $resolvedTypes;
+    }
+
+    /**
+     * Retrieves an instance of DocParser. The object will only be created once if needed.
+     *
+     * @return DocParser
+     */
+    protected function getDocParser()
+    {
+        if (!$this->docParser instanceof DocParser) {
+            $this->docParser = new DocParser();
+        }
+
+        return $this->docParser;
     }
 }
