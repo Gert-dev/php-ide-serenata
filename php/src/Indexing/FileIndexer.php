@@ -592,11 +592,7 @@ class FileIndexer
             ];
         }
 
-        $shortDescription = isset($rawData['shortDescription']) ? $rawData['shortDescription'] : null;
-
-        if ($shortDescription === null) {
-            $shortDescription = $documentation['descriptions']['short'];
-        }
+        $shortDescription = $documentation['descriptions']['short'];
 
         $throws = [];
 
