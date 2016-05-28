@@ -464,11 +464,7 @@ class FileIndexer
             DocParser::DESCRIPTION
         ], $rawData['name']);
 
-        $shortDescription = isset($rawData['shortDescription']) ? $rawData['shortDescription'] : null;
-
-        if ($shortDescription === null) {
-            $shortDescription = $documentation['descriptions']['short'];
-        }
+        $shortDescription = $documentation['descriptions']['short'];
 
         // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
         // from the latter to the former.
