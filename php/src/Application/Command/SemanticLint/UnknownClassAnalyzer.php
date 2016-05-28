@@ -39,15 +39,27 @@ class UnknownClassAnalyzer implements AnalyzerInterface
     protected $typeAnalyzer;
 
     /**
+     * @var ResolveType
+     */
+    protected $resolveType;
+
+    /**
      * Constructor.
      *
      * @param string        $file
      * @param IndexDatabase $indexDatabase
+     * @param ResolveType   $resolveType
+     * @param TypeAnalyzer  $typeAnalyzer
      */
-    public function __construct($file, IndexDatabase $indexDatabase, TypeAnalyzer $typeAnalyzer)
-    {
+    public function __construct(
+        $file,
+        IndexDatabase $indexDatabase,
+        ResolveType $resolveType,
+        TypeAnalyzer $typeAnalyzer
+    ) {
         $this->file = $file;
         $this->typeAnalyzer = $typeAnalyzer;
+        $this->resolveType = $resolveType;
         $this->indexDatabase = $indexDatabase;
 
         $this->classUsageFetchingVisitor = new Visitor\ClassUsageFetchingVisitor();
@@ -80,9 +92,6 @@ class UnknownClassAnalyzer implements AnalyzerInterface
         // Cross-reference the found class names against the class map.
         $unknownClasses = [];
 
-        $resolveTypeCommand = new ResolveType();
-        $resolveTypeCommand->setIndexDatabase($this->indexDatabase);
-
         $classUsages = array_merge(
             $this->classUsageFetchingVisitor->getClassUsageList(),
             $this->docblockClassUsageFetchingVisitor->getClassUsageList()
@@ -92,7 +101,7 @@ class UnknownClassAnalyzer implements AnalyzerInterface
             if ($classUsage['isFullyQualified']) {
                 $fqcn = $classUsage['name'];
             } else {
-                $fqcn = $resolveTypeCommand->resolveType(
+                $fqcn = $this->resolveType->resolveType(
                     $classUsage['name'],
                     $this->file,
                     $classUsage['line']

@@ -421,7 +421,7 @@ class DeduceTypes extends BaseCommand
     protected function getVariableTypesCommand()
     {
         if (!$this->variableTypesCommand) {
-            $this->variableTypesCommand = new VariableTypes();
+            $this->variableTypesCommand = new VariableTypes($this->cache);
             $this->variableTypesCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -434,7 +434,7 @@ class DeduceTypes extends BaseCommand
     protected function getClassListCommand()
     {
         if (!$this->classListCommand) {
-            $this->classListCommand = new ClassList();
+            $this->classListCommand = new ClassList($this->cache);
             $this->classListCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -447,7 +447,7 @@ class DeduceTypes extends BaseCommand
     protected function getClassInfoCommand()
     {
         if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfo();
+            $this->classInfoCommand = new ClassInfo($this->cache);
             $this->classInfoCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -460,7 +460,7 @@ class DeduceTypes extends BaseCommand
     protected function getGlobalFunctionsCommand()
     {
         if (!$this->globalFunctionsCommand) {
-            $this->globalFunctionsCommand = new GlobalFunctions();
+            $this->globalFunctionsCommand = new GlobalFunctions($this->cache);
             $this->globalFunctionsCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -473,7 +473,7 @@ class DeduceTypes extends BaseCommand
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType();
+            $this->resolveTypeCommand = new ResolveType($this->cache);
             $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
         }
 

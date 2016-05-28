@@ -4,11 +4,18 @@ namespace PhpIntegrator;
 
 use Exception;
 
+use Doctrine\Common\Cache\FilesystemCache;
+
 /**
  * Main application class.
  */
 class Application
 {
+    /**
+     * @var FilesystemCache
+     */
+    protected $filesystemCache;
+
     /**
      * Handles the application process.
      *
@@ -40,7 +47,7 @@ class Application
             $className = "\\PhpIntegrator\\Application\\Command\\{$commands[$command]}";
 
             /** @var \PhpIntegrator\Application\CommandInterface $command */
-            $command = new $className();
+            $command = new $className($this->getFilesystemCache());
 
             if (interface_exists('Throwable')) {
                 // PHP >= 7.
@@ -62,5 +69,21 @@ class Application
         $supportedCommands = implode(', ', array_keys($commands));
 
         echo "Unknown command {$command}, supported commands: {$supportedCommands}";
+    }
+
+    /**
+     * Retrieves an instance of FilesystemCache. The object will only be created once if needed.
+     *
+     * @return FilesystemCache
+     */
+    protected function getFilesystemCache()
+    {
+        if (!$this->filesystemCache instanceof FilesystemCache) {
+            $this->filesystemCache = new FilesystemCache(
+                sys_get_temp_dir() . '/php-integrator-base/'
+            );
+        }
+
+        return $this->filesystemCache;
     }
 }

@@ -36,6 +36,11 @@ class SemanticLint extends BaseCommand
     protected $classInfoCommand;
 
     /**
+     * @var ResolveType
+     */
+    protected $resolveTypeCommand;
+
+    /**
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
@@ -126,6 +131,7 @@ class SemanticLint extends BaseCommand
                 $unknownClassAnalyzer = new SemanticLint\UnknownClassAnalyzer(
                     $file,
                     $this->indexDatabase,
+                    $this->getResolveTypeCommand(),
                     $this->getTypeAnalyzer()
                 );
 
@@ -211,11 +217,24 @@ class SemanticLint extends BaseCommand
     protected function getClassInfoCommand()
     {
         if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfo();
+            $this->classInfoCommand = new ClassInfo($this->cache);
             $this->classInfoCommand->setIndexDatabase($this->indexDatabase);
         }
 
         return $this->classInfoCommand;
+    }
+
+    /**
+     * @return ResolveType
+     */
+    protected function getResolveTypeCommand()
+    {
+        if (!$this->resolveTypeCommand) {
+            $this->resolveTypeCommand = new ResolveType($this->cache);
+            $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
+        }
+
+        return $this->resolveTypeCommand;
     }
 
     /**

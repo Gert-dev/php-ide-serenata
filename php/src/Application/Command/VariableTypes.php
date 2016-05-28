@@ -151,7 +151,7 @@ class VariableTypes extends BaseCommand
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType();
+            $this->resolveTypeCommand = new ResolveType($this->cache);
             $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -164,7 +164,7 @@ class VariableTypes extends BaseCommand
     protected function getDeduceTypesCommand()
     {
         if (!$this->deduceTypesCommand) {
-            $this->deduceTypesCommand = new DeduceTypes();
+            $this->deduceTypesCommand = new DeduceTypes($this->cache);
             $this->deduceTypesCommand->setIndexDatabase($this->indexDatabase);
         }
 
