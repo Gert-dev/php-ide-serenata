@@ -9,7 +9,7 @@ use Traversable;
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
  */
-class IndexDataAdapter
+class IndexDataAdapter implements IndexDataAdapterInterface
 {
     /**
      * The storage to use for accessing index data.
