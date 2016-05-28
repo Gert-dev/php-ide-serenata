@@ -62,7 +62,7 @@ class IndexDataAdapter
      *
      * @return array
      */
-    public function getDirectStructureInfo($id)
+    protected function getDirectStructureInfo($id)
     {
         return $this->resolveStructure(
             $this->storage->getStructureRawInfo($id),
