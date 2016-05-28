@@ -181,8 +181,7 @@ class DeduceTypes extends BaseCommand
 
         // We now know what types we need to start from, now it's just a matter of fetching the return types of members
         // in the call stack.
-        $storageProxy = new DeduceType\IndexDataAdapterProvider($this->indexDatabase, null);
-        $dataAdapter = new IndexDataAdapter($storageProxy);
+        $dataAdapter = $this->getIndexDataAdapter();
 
         foreach ($expressionParts as $element) {
             $isMethod = false;
@@ -209,7 +208,6 @@ class DeduceTypes extends BaseCommand
 
                 $id = $this->indexDatabase->getStructureId($classNameToSearch);
 
-                $storageProxy->setMemberFilter($element);
                 $info = $dataAdapter->getStructureInfo($id);
 
                 $fetchedTypes = [];

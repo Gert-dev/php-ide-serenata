@@ -6,10 +6,12 @@ use ArrayAccess;
 use LogicException;
 use UnexpectedValueException;
 
+use Doctrine\Common\Cache\FilesystemCache;
+
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\IndexDataAdapter;
+use PhpIntegrator\CachingIndexDataAdapter;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
@@ -32,9 +34,19 @@ abstract class Command implements CommandInterface
     protected $indexDatabase;
 
     /**
-     * @var IndexDataAdapter
+     * @var CachingIndexDataAdapter
      */
     protected $indexDataAdapter;
+
+    /**
+     * @var string
+     */
+    protected $databaseFile;
+
+    /**
+     * @var FilesystemCache
+     */
+    protected $filesystemCache;
 
     /**
      * @inheritDoc
@@ -65,7 +77,9 @@ abstract class Command implements CommandInterface
             return $this->outputJson(false, 'No database path passed!');
         }
 
-        $this->setIndexDatabase($this->createIndexDatabase($processedArguments['database']->value));
+        $this->databaseFile = $processedArguments['database']->value;
+
+        $this->setIndexDatabase($this->createIndexDatabase($this->databaseFile));
 
         try {
             return $this->process($processedArguments);
@@ -161,15 +175,34 @@ abstract class Command implements CommandInterface
     }
 
     /**
-     * @return IndexDataAdapter
+     * @return CachingIndexDataAdapter
      */
     protected function getIndexDataAdapter()
     {
         if (!$this->indexDataAdapter) {
-            $this->indexDataAdapter = new IndexDataAdapter($this->indexDatabase);
+            $this->indexDataAdapter = new CachingIndexDataAdapter(
+                $this->indexDatabase,
+                $this->getFilesystemCache()
+            );
         }
 
         return $this->indexDataAdapter;
+    }
+
+    /**
+     * Retrieves an instance of FilesystemCache. The object will only be created once if needed.
+     *
+     * @return FilesystemCache
+     */
+    protected function getFilesystemCache()
+    {
+        if (!$this->filesystemCache instanceof FilesystemCache) {
+            $this->filesystemCache = new FilesystemCache(
+                sys_get_temp_dir() . '/php-integrator-base/' . md5($this->databaseFile) . '/'
+            );
+        }
+
+        return $this->filesystemCache;
     }
 
     /**

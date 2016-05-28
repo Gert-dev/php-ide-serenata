@@ -320,7 +320,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.linked_structure_fqcn = se.fqcn')
             ->where('sepl.structure_id = ?')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -335,7 +336,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
             ->where('sepl.linked_structure_fqcn = se2.fqcn')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -349,7 +351,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.linked_structure_fqcn = se.fqcn')
             ->where('seil.structure_id = ?')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -364,7 +367,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
             ->where('seil.linked_structure_fqcn = se2.fqcn')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -378,7 +382,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.linked_structure_fqcn = se.fqcn')
             ->where('setl.structure_id = ?')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -393,7 +398,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
             ->where('setl.linked_structure_fqcn = se2.fqcn')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -407,7 +413,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->leftJoin('c', IndexStorageItemEnum::FILES, 'fi', 'fi.id = c.file_id')
             ->where('structure_id = ?')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -421,7 +428,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('p', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = p.access_modifier_id')
             ->where('structure_id = ?')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -436,7 +444,8 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('fu', IndexStorageItemEnum::ACCESS_MODIFIERS, 'am', 'am.id = fu.access_modifier_id')
             ->where('structure_id = ?')
             ->setParameter(0, $id)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
