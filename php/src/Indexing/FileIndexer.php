@@ -468,12 +468,12 @@ class FileIndexer
 
         if ($shortDescription === null) {
             $shortDescription = $documentation['descriptions']['short'];
+        }
 
-            // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
-            // from the latter to the former.
-            if (empty($shortDescription)) {
-                $shortDescription = $documentation['var']['description'];
-            }
+        // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
+        // from the latter to the former.
+        if (!empty($documentation['var']['description'])) {
+            $shortDescription = $documentation['var']['description'];
         }
 
         $types = [];

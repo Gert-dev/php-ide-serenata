@@ -86,6 +86,33 @@ $d = 5;
 $d-> // Didn't work because a docblock spanning multiple lines was not examined, should work now.
 ```
 
+* Compound class property statements now properly have their docblocks examined:
+
+```php
+/**
+ * This is the summary.
+ *
+ * This is a long description.
+ *
+ * @var Foo1 $testProperty1 A description of the first property.
+ * @var Foo2 $testProperty2 A description of the second property.
+ */
+protected $testProperty1, $testProperty2;
+```
+
+* In property docblocks with ambiguous summary and `@var` descriptions, the more specific `@var` will now take precedence. This more neatly fits in with compound statements described above:
+
+```php
+/**
+ * This is the docblock summary, it will not be used or available anywhere as it is overridden below.
+ *
+ * This is a long description. It will be used as long description for all of the properties described below.
+ *
+ * @var Foo1 $testProperty1 A description of the first property. This will be used as the summary of this property.
+ */
+protected $testProperty1;
+```
+
 ### Changes for developers
 * All structural elements that involve types will now return arrays of type objects instead of a single type object. The following methods have been renamed to reflect this change:
   * `deduceType` -> `deduceTypes`.

@@ -144,6 +144,35 @@ class ClassInfoTest extends IndexedTest
         ], $output['properties']['testProperty']);
     }
 
+    public function testCompoundClassPropertyStatementsHaveTheirDocblocksAnalyzedCorrectly()
+    {
+        $fileName = 'CompoundClassPropertyStatement.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertEquals('A description of the first property.', $output['properties']['testProperty1']['shortDescription']);
+        $this->assertEquals('This is a long description.', $output['properties']['testProperty1']['longDescription']);
+
+        $this->assertEquals([
+            [
+                'type'         => 'Foo1',
+                'fqcn'         => '\A\Foo1',
+                'resolvedType' => '\A\Foo1'
+            ]
+        ], $output['properties']['testProperty1']['types']);
+
+        $this->assertEquals('A description of the second property.', $output['properties']['testProperty2']['shortDescription']);
+        $this->assertEquals('This is a long description.', $output['properties']['testProperty2']['longDescription']);
+
+        $this->assertEquals([
+            [
+                'type'         => 'Foo2',
+                'fqcn'         => '\A\Foo2',
+                'resolvedType' => '\A\Foo2'
+            ]
+        ], $output['properties']['testProperty2']['types']);
+    }
+
     public function testDataIsCorrectForClassMethods()
     {
         $fileName = 'ClassMethod.php';
