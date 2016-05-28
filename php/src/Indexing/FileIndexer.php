@@ -221,7 +221,7 @@ class FileIndexer
 
         $seData = [
             'name'              => $rawData['name'],
-            'fqcn'             => $fqcn,
+            'fqcn'              => $fqcn,
             'file_id'           => $fileId,
             'start_line'        => $rawData['startLine'],
             'end_line'          => $rawData['endLine'],
