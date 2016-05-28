@@ -113,6 +113,13 @@ protected $testProperty1, $testProperty2;
 protected $testProperty1;
 ```
 
+* Type overrides with multiple types were not analyzed properly:
+
+```php
+/** @var Foo|null $foo */
+$foo-> // Did not work, should work now.
+```
+
 ### Changes for developers
 * All structural elements that involve types will now return arrays of type objects instead of a single type object. The following methods have been renamed to reflect this change:
   * `deduceType` -> `deduceTypes`.

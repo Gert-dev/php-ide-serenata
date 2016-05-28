@@ -12,7 +12,7 @@ $a = new \DateTimeImmutable();
 /** @var $b \Traversable */
 $b = new \DateTimeImmutable();
 
-/** @var C $c This is a description. */
+/** @var C|null $c This is a description. */
 $c = new \DateTimeImmutable();
 
 /**

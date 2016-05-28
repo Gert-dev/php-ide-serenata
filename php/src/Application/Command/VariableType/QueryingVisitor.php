@@ -281,7 +281,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected function getTypes()
     {
         if ($this->bestTypeOverrideMatch) {
-            return $this->bestTypeOverrideMatch ? [$this->bestTypeOverrideMatch] : [];
+            return $this->typeAnalyzer->getTypesForTypeSpecification($this->bestTypeOverrideMatch);
         } elseif ($this->name === 'this') {
             return $this->currentClassName ? [$this->currentClassName] : [];
         } elseif ($this->bestMatch) {
