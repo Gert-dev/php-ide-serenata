@@ -453,6 +453,10 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      */
     protected function parseTraitData(ArrayObject $result, $traits, $element)
     {
+        if (empty($traits)) {
+            return;
+        }
+
         $traitAliases = $this->storage->getStructureTraitAliasesAssoc($element['id']);
         $traitPrecedences = $this->storage->getStructureTraitPrecedencesAssoc($element['id']);
 
