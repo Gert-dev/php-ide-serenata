@@ -19,9 +19,9 @@ class LocalizeTypeTest extends IndexedTest
 
         $this->assertEquals('\C', $command->localizeType('C', $path, 1));
         $this->assertEquals('\C', $command->localizeType('\C', $path, 5));
-        $this->assertEquals('A\C', $command->localizeType('A\C', $path, 5));
-        $this->assertEquals('B\C', $command->localizeType('B\C', $path, 10));
-        $this->assertEquals('B\DateTime', $command->localizeType('B\DateTime', $path, 10));
+        $this->assertEquals('C', $command->localizeType('A\C', $path, 5));
+        $this->assertEquals('C', $command->localizeType('B\C', $path, 10));
+        $this->assertEquals('DateTime', $command->localizeType('B\DateTime', $path, 10));
         $this->assertEquals('DateTime', $command->localizeType('DateTime', $path, 11));
         $this->assertEquals('DateTime', $command->localizeType('DateTime', $path, 12));
         $this->assertEquals('DateTime', $command->localizeType('\DateTime', $path, 12));

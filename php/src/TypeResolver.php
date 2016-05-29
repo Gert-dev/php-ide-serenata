@@ -107,17 +107,27 @@ class TypeResolver
 
         $imports = $this->imports;
 
-        if ($this->namespace) {
-            $namespaceParts = explode('\\', $this->namespace);
-
-            // The namespace is also acts as a "use statement".
-            $imports[] = [
-                'fqcn' => $this->namespace,
-                'alias' => array_pop($namespaceParts)
-            ];
-        }
-
         $typeFqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($type);
+
+        if ($this->namespace) {
+            $namespaceFqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($this->namespace);
+
+            $namespaceParts = explode('\\', $namespaceFqcn);
+
+            if (mb_strpos($typeFqcn, $namespaceFqcn) === 0) {
+                $typeWithoutNamespacePrefix = mb_substr($typeFqcn, mb_strlen($namespaceFqcn) + 1);
+
+                $typeWithoutNamespacePrefixParts = explode('\\', $typeWithoutNamespacePrefix);
+
+                // The namespace also acts as a use statement, but the rules are slightly different: in namespace A,
+                // the class \A\B becomes B rather than A\B (the latter which would happen if there were a use
+                // statement "use A;").
+                $imports[] = [
+                    'fqcn'  => $namespaceFqcn . '\\' . $typeWithoutNamespacePrefixParts[0],
+                    'alias' => $typeWithoutNamespacePrefixParts[0]
+                ];
+            }
+        }
 
         foreach ($imports as $import) {
             $importFqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($import['fqcn']);
