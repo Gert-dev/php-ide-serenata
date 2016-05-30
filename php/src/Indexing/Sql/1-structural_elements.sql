@@ -190,8 +190,8 @@ CREATE TABLE functions(
     structure_id            integer unsigned,
     access_modifier_id      integer unsigned,
 
-    is_magic                tinyint(1),
-    is_static               tinyint(1),
+    is_magic                tinyint(1) NOT NULL DEFAULT 0,
+    is_static               tinyint(1) NOT NULL DEFAULT 0,
     is_abstract             tinyint(1) NOT NULL DEFAULT 0,
     has_docblock            tinyint(1) NOT NULL DEFAULT 0,
 
