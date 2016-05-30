@@ -178,7 +178,6 @@ CREATE TABLE functions(
     end_line                integer unsigned,
 
     is_builtin              tinyint(1) NOT NULL DEFAULT 0,
-    is_abstract             tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated           tinyint(1) NOT NULL DEFAULT 0,
 
     short_description       text,
@@ -193,6 +192,7 @@ CREATE TABLE functions(
 
     is_magic                tinyint(1),
     is_static               tinyint(1),
+    is_abstract             tinyint(1) NOT NULL DEFAULT 0,
     has_docblock            tinyint(1) NOT NULL DEFAULT 0,
 
     -- Holds data that is added to link tables in a serialized format. This allows very fast access
