@@ -405,7 +405,7 @@ class BuiltinIndexer
         if ($method->isPublic()) {
             $accessModifierName = 'public';
         } elseif ($method->isProtected()) {
-            $accessModifierName = 'public';
+            $accessModifierName = 'protected';
         } else/*if ($method->isPrivate())*/ {
             $accessModifierName = 'private';
         }
@@ -431,7 +431,7 @@ class BuiltinIndexer
         if ($property->isPublic()) {
             $accessModifierName = 'public';
         } elseif ($property->isProtected()) {
-            $accessModifierName = 'public';
+            $accessModifierName = 'protected';
         } else/*if ($property->isPrivate())*/ {
             $accessModifierName = 'private';
         }
