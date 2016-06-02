@@ -80,7 +80,7 @@ class Application
     {
         if (!$this->filesystemCache instanceof FilesystemCache) {
             $this->filesystemCache = new FilesystemCache(
-                sys_get_temp_dir() . '/php-integrator-base/'
+                sys_get_temp_dir() . '/php-integrator-base/' . Application\Command::DATABASE_VERSION . '/'
             );
         }
 
