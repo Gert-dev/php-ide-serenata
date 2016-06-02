@@ -352,6 +352,7 @@ class BuiltinIndexer
             'short_description' => null,
             'long_description'  => null,
             'is_builtin'        => 1,
+            'is_final'          => $element->isFinal() ? 1 : 0,
             'is_abstract'       => $element->isAbstract() ? 1 : 0,
             'is_annotation'     => 0,
             'is_deprecated'     => 0,
@@ -417,7 +418,8 @@ class BuiltinIndexer
             'access_modifier_id' => $accessModifierMap[$accessModifierName],
             'is_magic'           => 0,
             'is_static'          => $method->isStatic(),
-            'is_abstract'        => $method->isAbstract() ? 1 : 0
+            'is_abstract'        => $method->isAbstract() ? 1 : 0,
+            'is_final'           => $method->isFinal() ? 1 : 0
         ]);
     }
 

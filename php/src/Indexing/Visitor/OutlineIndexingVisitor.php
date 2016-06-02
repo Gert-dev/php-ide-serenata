@@ -104,6 +104,7 @@ class OutlineIndexingVisitor extends NameResolver
             'startPosName'   => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
             'endPosName'     => $node->getAttribute('startFilePos') ? ($node->getAttribute('startFilePos') + 1) : null,
             'isAbstract'     => $node->isAbstract(),
+            'isFinal'        => $node->isFinal(),
             'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null,
             'parents'        => $node->extends ? [$this->fetchClassName($node->extends)] : [],
             'interfaces'     => $interfaces,
@@ -253,6 +254,7 @@ class OutlineIndexingVisitor extends NameResolver
             'isPrivate'      => $node->isPrivate(),
             'isProtected'    => $node->isProtected(),
             'isAbstract'     => $node->isAbstract(),
+            'isFinal'        => $node->isFinal(),
             'isStatic'       => $node->isStatic()
         ];
     }

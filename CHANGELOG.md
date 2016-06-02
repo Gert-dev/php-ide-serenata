@@ -127,6 +127,7 @@ protected $testProperty1;
   * `getVariableType` -> `getVariableTypes`.
   * `getResultingTypeAt` -> `getResultingTypesAt`.
   * `getVariableTypeByOffset` -> `getVariableTypesByOffset`.
+* An `isFinal` property is now returned for classes and methods.
 * An `isNullable` property is now returned for function and method parameters.
 * A `defaultValue` property is now returned for function and method parameters with the default value in string format.
 * `resolveType` will now also return types with a leading slash, consistent with other commands.

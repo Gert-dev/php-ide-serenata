@@ -134,6 +134,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
             'filename'           => $element['path'],
             'type'               => $element['type_name'],
             'isAbstract'         => !!$element['is_abstract'],
+            'isFinal'            => !!$element['is_final'],
             'isBuiltin'          => !!$element['is_builtin'],
             'isDeprecated'       => !!$element['is_deprecated'],
             'isAnnotation'       => !!$element['is_annotation'],
@@ -616,6 +617,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
             'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
             'isStatic'           => !!$rawInfo['is_static'],
             'isAbstract'         => !!$rawInfo['is_abstract'],
+            'isFinal'            => !!$rawInfo['is_final'],
 
             'override'           => null,
             'implementation'     => null,

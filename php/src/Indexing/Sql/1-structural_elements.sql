@@ -82,6 +82,7 @@ CREATE TABLE structures(
     long_description           text,
     is_builtin                 tinyint(1) NOT NULL DEFAULT 0,
     is_abstract                tinyint(1) NOT NULL DEFAULT 0,
+    is_final                   tinyint(1) NOT NULL DEFAULT 0,
     is_annotation              tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated              tinyint(1) NOT NULL DEFAULT 0,
     has_docblock               tinyint(1) NOT NULL DEFAULT 0,
@@ -193,6 +194,7 @@ CREATE TABLE functions(
     is_magic                tinyint(1) NOT NULL DEFAULT 0,
     is_static               tinyint(1) NOT NULL DEFAULT 0,
     is_abstract             tinyint(1) NOT NULL DEFAULT 0,
+    is_final                tinyint(1) NOT NULL DEFAULT 0,
     has_docblock            tinyint(1) NOT NULL DEFAULT 0,
 
     -- Holds data that is added to link tables in a serialized format. This allows very fast access

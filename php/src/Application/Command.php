@@ -28,7 +28,7 @@ abstract class Command implements CommandInterface
      *
      * @var int
      */
-    const DATABASE_VERSION = 19;
+    const DATABASE_VERSION = 20;
 
     /**
      * @var IndexDatabase

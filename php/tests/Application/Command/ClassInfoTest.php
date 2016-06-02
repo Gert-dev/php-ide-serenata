@@ -55,6 +55,7 @@ class ClassInfoTest extends IndexedTest
             'filename'           => $this->getPathFor($fileName),
             'type'               => 'class',
             'isAbstract'         => false,
+            'isFinal'            => false,
             'isBuiltin'          => false,
             'isDeprecated'       => false,
             'isAnnotation'       => false,
@@ -84,6 +85,15 @@ class ClassInfoTest extends IndexedTest
         $output = $this->getClassInfo($fileName, 'A\AnnotationClass');
 
         $this->assertTrue($output['isAnnotation']);
+    }
+
+    public function testFinalClassIsCorrectlyPickedUp()
+    {
+        $fileName = 'FinalClass.php';
+
+        $output = $this->getClassInfo($fileName, 'A\FinalClass');
+
+        $this->assertTrue($output['isFinal']);
     }
 
     public function testDataIsCorrectForClassProperties()
@@ -272,6 +282,7 @@ class ClassInfoTest extends IndexedTest
             'isPrivate'          => false,
             'isStatic'           => false,
             'isAbstract'         => false,
+            'isFinal'            => false,
             'override'           => null,
             'implementation'     => null,
 
@@ -293,6 +304,15 @@ class ClassInfoTest extends IndexedTest
                 'endLineMember'   => 22
             ]
         ], $output['methods']['testMethod']);
+    }
+
+    public function testFinalMethodIsCorrectlyPickedUp()
+    {
+        $fileName = 'FinalClassMethod.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertTrue($output['methods']['finalMethod']['isFinal']);
     }
 
     public function testDataIsCorrectForClassConstants()
