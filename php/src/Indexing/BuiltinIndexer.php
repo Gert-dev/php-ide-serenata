@@ -86,13 +86,13 @@ class BuiltinIndexer
 
         try {
             $this->logMessage('Indexing built-in constants...');
-            $this->indexBuiltinConstants();
+            $this->indexConstants();
 
             $this->logMessage('Indexing built-in functions...');
-            $this->indexBuiltinFunctions();
+            $this->indexFunctions();
 
             $this->logMessage('Indexing built-in classes...');
-            $this->indexBuiltinStructures();
+            $this->indexStructures();
 
             $this->storage->commitTransaction();
         } catch (Exception $e) {
@@ -105,7 +105,7 @@ class BuiltinIndexer
     /**
      * Indexes built-in PHP constants.
      */
-    protected function indexBuiltinConstants()
+    protected function indexConstants()
     {
         foreach (get_defined_constants(true) as $namespace => $constantList) {
             if ($namespace === 'user') {
@@ -115,7 +115,7 @@ class BuiltinIndexer
             // NOTE: Be very careful if you want to pass back the value, there are also escaped paths, newlines
             // (PHP_EOL), etc. in there.
             foreach ($constantList as $name => $value) {
-                $this->indexBuiltinConstant($name);
+                $this->indexConstant($name);
             }
         }
     }
@@ -125,7 +125,7 @@ class BuiltinIndexer
      *
      * @return int
      */
-    protected function indexBuiltinConstant($name)
+    protected function indexConstant($name)
     {
         return $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'               => $name,
@@ -146,7 +146,7 @@ class BuiltinIndexer
     /**
      * Indexes built-in PHP functions.
      */
-    protected function indexBuiltinFunctions()
+    protected function indexFunctions()
     {
         foreach (get_defined_functions() as $group => $functions) {
             foreach ($functions as $functionName) {
@@ -162,7 +162,7 @@ class BuiltinIndexer
                     continue;
                 }
 
-                $this->indexBuiltinFunctionLike($function);
+                $this->indexFunctionLike($function);
             }
         }
     }
@@ -172,7 +172,7 @@ class BuiltinIndexer
      *
      * @return int
      */
-    protected function indexBuiltinFunctionLike(ReflectionFunctionAbstract $function)
+    protected function indexFunctionLike(ReflectionFunctionAbstract $function)
     {
         $returnTypes = [];
 
@@ -284,13 +284,13 @@ class BuiltinIndexer
     /**
      * Indexes built-in PHP classes, interfaces and traits.
      */
-    protected function indexBuiltinStructures()
+    protected function indexStructures()
     {
         foreach (get_declared_traits() as $trait) {
             $element = new ReflectionClass($trait);
 
             if ($element->isInternal()) {
-                $this->indexBuiltinStructure($element);
+                $this->indexStructure($element);
             }
         }
 
@@ -298,7 +298,7 @@ class BuiltinIndexer
             $element = new ReflectionClass($interface);
 
             if ($element->isInternal()) {
-                $this->indexBuiltinStructure($element);
+                $this->indexStructure($element);
             }
         }
 
@@ -306,7 +306,7 @@ class BuiltinIndexer
             $element = new ReflectionClass($class);
 
             if ($element->isInternal()) {
-                $this->indexBuiltinStructure($element);
+                $this->indexStructure($element);
             }
         }
     }
@@ -316,7 +316,7 @@ class BuiltinIndexer
      *
      * @param ReflectionClass $element
      */
-    protected function indexBuiltinStructure(ReflectionClass $element)
+    protected function indexStructure(ReflectionClass $element)
     {
         $type = null;
         $parents = [];
@@ -381,15 +381,15 @@ class BuiltinIndexer
         }
 
         foreach ($element->getMethods() as $method) {
-            $this->indexBuiltinMethod($method, $structureId);
+            $this->indexMethod($method, $structureId);
         }
 
         foreach ($element->getProperties() as $property) {
-            $this->indexBuiltinProperty($property, $structureId);
+            $this->indexProperty($property, $structureId);
         }
 
         foreach ($element->getConstants() as $constantName => $constantValue) {
-            $this->indexBuiltinClassConstant($constantName, $structureId);
+            $this->indexClassConstant($constantName, $structureId);
         }
     }
 
@@ -397,9 +397,9 @@ class BuiltinIndexer
      * @param ReflectionMethod $method
      * @param int              $structureId
      */
-    protected function indexBuiltinMethod(ReflectionMethod $method, $structureId)
+    protected function indexMethod(ReflectionMethod $method, $structureId)
     {
-        $functionId = $this->indexBuiltinFunctionLike($method);
+        $functionId = $this->indexFunctionLike($method);
 
         $accessModifierName = null;
 
@@ -427,7 +427,7 @@ class BuiltinIndexer
      * @param ReflectionProperty $property
      * @param int                $structureId
      */
-    protected function indexBuiltinProperty(ReflectionProperty $property, $structureId)
+    protected function indexProperty(ReflectionProperty $property, $structureId)
     {
         $accessModifierName = null;
 
@@ -463,9 +463,9 @@ class BuiltinIndexer
      * @param string $name
      * @param int    $structureId
      */
-    protected function indexBuiltinClassConstant($name, $structureId)
+    protected function indexClassConstant($name, $structureId)
     {
-        $constantId = $this->indexBuiltinConstant($name);
+        $constantId = $this->indexConstant($name);
 
         $this->storage->update(IndexStorageItemEnum::CONSTANTS, $constantId, [
             'structure_id' => $structureId
