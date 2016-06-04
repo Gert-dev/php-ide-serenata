@@ -17,6 +17,11 @@ use PhpIntegrator\Application\Command as BaseCommand;
 class ClassInfo extends BaseCommand
 {
     /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
      * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
@@ -47,9 +52,7 @@ class ClassInfo extends BaseCommand
      */
     public function getClassInfo($fqcn)
     {
-        if ($fqcn[0] === '\\') {
-            $fqcn = mb_substr($fqcn, 1);
-        }
+        $fqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($fqcn);
 
         $id = $this->indexDatabase->getStructureId($fqcn);
 
@@ -58,5 +61,19 @@ class ClassInfo extends BaseCommand
         }
 
         return $this->getIndexDataAdapter()->getStructureInfo($id);
+    }
+
+    /**
+     * Retrieves an instance of TypeAnalyzer. The object will only be created once if needed.
+     *
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer instanceof TypeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
     }
 }
