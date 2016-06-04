@@ -49,6 +49,8 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      *
      * @param string $fqcn
      *
+     * @throws UnexpectedValueException
+     *
      * @return array
      */
     public function getStructureInfo($fqcn)
@@ -60,6 +62,8 @@ class IndexDataAdapter implements IndexDataAdapterInterface
 
     /**
      * @param string $fqcn
+     *
+     * @throws UnexpectedValueException
      *
      * @return array
      */
