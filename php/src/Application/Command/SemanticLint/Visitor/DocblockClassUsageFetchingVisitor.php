@@ -42,7 +42,7 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
         if ($docblock) {
             // Look for types right after a tag.
             preg_match_all(
-                '/@(?:param|throws|return|var)\s+((?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?(?:\|(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?)*)(?:$|\s|\})/',
+                '/@(?:(?:param|throws|return|var)\s+)?((?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?(?:\|(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?)*)(?:$|\W|\})/',
                 $docblock,
                 $matches,
                 PREG_SET_ORDER | PREG_OFFSET_CAPTURE

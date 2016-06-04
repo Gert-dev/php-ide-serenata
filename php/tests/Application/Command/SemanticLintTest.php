@@ -146,15 +146,15 @@ class SemanticLintTest extends IndexedTest
             [
                 'name'  => 'SplMinHeap',
                 'alias' => 'SplMinHeap',
-                'start' => 39,
-                'end'   => 49
+                'start' => 53,
+                'end'   => 63
             ],
 
             [
                 'name'  => 'SplFileInfo',
                 'alias' => 'SplFileInfo',
-                'start' => 72,
-                'end'   => 83
+                'start' => 69,
+                'end'   => 80
             ]
         ], $output['warnings']['unusedUseStatements']);
     }

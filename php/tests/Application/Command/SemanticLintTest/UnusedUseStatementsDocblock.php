@@ -2,11 +2,14 @@
 
 namespace A;
 
+use Iterator;
 use DateTime;
 use SplMinHeap;
-use Traversable;
 use SplFileInfo;
+use Traversable;
 use UnexpectedValueException;
+
+use Some;
 
 /**
  * Pre. {@see SplFileInfo} Post. This uses the SplMinHeap function.
@@ -14,6 +17,10 @@ use UnexpectedValueException;
  * @param string|DateTime|int $test
  *
  * @throws UnexpectedValueException
+ *
+ * @Iterator
+ * @\Some\Annotation
+ * @Some\Annotation()
  *
  * @return Traversable
  */
