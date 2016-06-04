@@ -30,9 +30,7 @@ class CachingIndexDataAdapter extends IndexDataAdapter
     }
 
     /**
-     * @param string $fqcn
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getDirectStructureInfo($fqcn)
     {
