@@ -16,8 +16,7 @@ not provide any user-visible functionality. This is instead covered by various o
   * **[php-integrator-linter](https://github.com/Gert-dev/php-integrator-linter)** - Shows indexing errors and problems with your code.
   * **[php-integrator-symbol-viewer](https://github.com/tocjent/php-integrator-symbol-viewer)** - Provides a side panel listing class symbols with search and filter features.
 
-The source code was originally based on the php-autocomplete-plus code base and provides various
-improvements as well as separation of the various components into separate packages.
+The source code was originally based on the php-autocomplete-plus code base, but has significantly diverged from it since then.
 
 ## What do I need to do to make it work?
 Currently the following is required in order to get the package up and running:
