@@ -52,7 +52,7 @@ class ClassList extends BaseCommand
              // record.
              $storageProxy->setStructureRawInfo($element);
 
-             $info = $dataAdapter->getStructureInfo($element['id']);
+             $info = $dataAdapter->getStructureInfo($element['name']);
 
              unset($info['constants'], $info['properties'], $info['methods']);
 

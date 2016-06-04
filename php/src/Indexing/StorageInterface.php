@@ -39,19 +39,10 @@ interface StorageInterface
     public function getFileId($path);
 
     /**
-     * Retrieves the ID of the structural element with the specified FQCN.
-     *
-     * @param string $fqcn
-     *
-     * @return int|null
-     */
-    public function getStructureId($fqcn);
-
-    /**
      * @param string $path
      */
     public function deleteFile($path);
-    
+
     /**
      * Retrieves the value of the setting with the specified name.
      *

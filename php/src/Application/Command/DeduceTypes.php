@@ -206,9 +206,11 @@ class DeduceTypes extends BaseCommand
 
                 $classNameToSearch = ($type && $type[0] === '\\' ? mb_substr($type, 1) : $type);
 
-                $id = $this->indexDatabase->getStructureId($classNameToSearch);
-
-                $info = $dataAdapter->getStructureInfo($id);
+                try {
+                    $info = $dataAdapter->getStructureInfo($classNameToSearch);
+                } catch (UnexpectedValueException $e) {
+                    continue;
+                }
 
                 $fetchedTypes = [];
 

@@ -8,11 +8,11 @@ namespace PhpIntegrator\IndexDataAdapter;
 interface ProviderInterface
 {
     /**
-     * @param int $id
+     * @param string $fqcn
      *
      * @return array
      */
-    public function getStructureRawInfo($id);
+    public function getStructureRawInfo($fqcn);
 
     /**
      * @param int $id

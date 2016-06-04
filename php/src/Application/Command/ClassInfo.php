@@ -7,6 +7,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Application\Command as BaseCommand;
@@ -54,13 +55,7 @@ class ClassInfo extends BaseCommand
     {
         $fqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($fqcn);
 
-        $id = $this->indexDatabase->getStructureId($fqcn);
-
-        if (!$id) {
-            throw new UnexpectedValueException('The structural element "' . $fqcn . '" was not found!');
-        }
-
-        return $this->getIndexDataAdapter()->getStructureInfo($id);
+        return $this->getIndexDataAdapter()->getStructureInfo($fqcn);
     }
 
     /**

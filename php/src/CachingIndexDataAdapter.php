@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator;
 
+use UnexpectedValueException;
+
 use Doctrine\Common\Cache\Cache;
 
 /**
@@ -28,21 +30,29 @@ class CachingIndexDataAdapter extends IndexDataAdapter
     }
 
     /**
-     * @param int $id
+     * @param string $fqcn
      *
      * @return array
      */
-    public function getDirectStructureInfo($id)
+    public function getDirectStructureInfo($fqcn)
     {
         $parameters = null;
 
-        $cacheId = 'getDirectStructureInfo_' . $id;
+        $cacheId = 'getDirectStructureInfo_' . $fqcn;
 
         if ($this->cache->contains($cacheId)) {
             $parameters = $this->cache->fetch($cacheId);
         } else {
+            $rawInfo = $this->storage->getStructureRawInfo($fqcn);
+
+            if (!$rawInfo) {
+                throw new UnexpectedValueException('The structural element "' . $fqcn . '" was not found!');
+            }
+
+            $id = $rawInfo['id'];
+
             $parameters = [
-                $this->storage->getStructureRawInfo($id),
+                $rawInfo,
                 $this->storage->getStructureRawParents($id),
                 $this->storage->getStructureRawChildren($id),
                 $this->storage->getStructureRawInterfaces($id),

@@ -5,6 +5,7 @@ namespace PhpIntegrator;
 use ArrayAccess;
 use ArrayObject;
 use Traversable;
+use UnexpectedValueException;
 
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
@@ -46,26 +47,34 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     /**
      * Retrieves information about the specified structural element.
      *
-     * @param int $id
+     * @param string $fqcn
      *
      * @return array
      */
-    public function getStructureInfo($id)
+    public function getStructureInfo($fqcn)
     {
         $this->parentLog = [];
 
-        return $this->getDirectStructureInfo($id);
+        return $this->getDirectStructureInfo($fqcn);
     }
 
     /**
-     * @param int $id
+     * @param string $fqcn
      *
      * @return array
      */
-    protected function getDirectStructureInfo($id)
+    protected function getDirectStructureInfo($fqcn)
     {
+        $rawInfo = $this->storage->getStructureRawInfo($fqcn);
+
+        if (!$rawInfo) {
+            throw new UnexpectedValueException('The structural element "' . $fqcn . '" was not found!');
+        }
+
+        $id = $rawInfo['id'];
+
         return $this->resolveStructure(
-            $this->storage->getStructureRawInfo($id),
+            $rawInfo,
             $this->storage->getStructureRawParents($id),
             $this->storage->getStructureRawChildren($id),
             $this->storage->getStructureRawInterfaces($id),
@@ -79,13 +88,12 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     }
 
     /**
-     * @param int    $id
      * @param string $fqcn
      * @param string $originFqcn
      *
      * @return array
      */
-    protected function getCheckedParentStructureInfo($id, $fqcn, $originFqcn)
+    protected function getCheckedParentStructureInfo($fqcn, $originFqcn)
     {
         if (isset($this->parentLog[$fqcn][$originFqcn])) {
             throw new IndexDataAdapter\CircularDependencyException(
@@ -95,7 +103,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
 
         $this->parentLog[$fqcn][$originFqcn] = true;
 
-        return $this->getDirectStructureInfo($id);
+        return $this->getDirectStructureInfo($fqcn);
     }
 
     /**
@@ -385,7 +393,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected function parseParentData(ArrayObject $result, $parents)
     {
         foreach ($parents as $parent) {
-            $parentInfo = $this->getCheckedParentStructureInfo($parent['id'], $parent['fqcn'], $result['name']);
+            $parentInfo = $this->getCheckedParentStructureInfo($parent['fqcn'], $result['name']);
 
             if ($parentInfo) {
                 if (!$result['shortDescription']) {
@@ -426,7 +434,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected function parseInterfaceData(ArrayObject $result, $interfaces)
     {
         foreach ($interfaces as $interface) {
-            $interface = $this->getStructureInfo($interface['id']);
+            $interface = $this->getStructureInfo($interface['fqcn']);
 
             $result['interfaces'][] = $interface['name'];
             $result['directInterfaces'][] = $interface['name'];
@@ -462,7 +470,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         $traitPrecedences = $this->storage->getStructureTraitPrecedencesAssoc($element['id']);
 
         foreach ($traits as $trait) {
-            $trait = $this->getStructureInfo($trait['id']);
+            $trait = $this->getStructureInfo($trait['fqcn']);
 
             $result['traits'][] = $trait['name'];
             $result['directTraits'][] = $trait['name'];

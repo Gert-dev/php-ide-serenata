@@ -217,22 +217,6 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
     /**
      * @inheritDoc
      */
-    public function getStructureId($fqcn)
-    {
-        $result = $this->getConnection()->createQueryBuilder()
-            ->select('id')
-            ->from(IndexStorageItemEnum::STRUCTURES)
-            ->where('fqcn = ?')
-            ->setParameter(0, $fqcn)
-            ->execute()
-            ->fetchColumn();
-
-        return $result ? $result : null;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function deleteFile($path)
     {
         $this->getConnection()->createQueryBuilder()
@@ -300,11 +284,11 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
     /**
      * @inheritDoc
      */
-    public function getStructureRawInfo($id)
+    public function getStructureRawInfo($fqcn)
     {
         return $this->getStructureRawInfoQueryBuilder()
-            ->where('se.id = ?')
-            ->setParameter(0, $id)
+            ->where('se.fqcn = ?')
+            ->setParameter(0, $fqcn)
             ->execute()
             ->fetch();
     }
@@ -346,7 +330,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
     public function getStructureRawInterfaces($id)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('se.id')
+            ->select('se.id', 'se.fqcn')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.linked_structure_fqcn = se.fqcn')
             ->where('seil.structure_id = ?')
@@ -377,7 +361,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
     public function getStructureRawTraits($id)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('se.id')
+            ->select('se.id', 'se.fqcn')
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.linked_structure_fqcn = se.fqcn')
             ->where('setl.structure_id = ?')
