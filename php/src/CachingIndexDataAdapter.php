@@ -36,19 +36,22 @@ class CachingIndexDataAdapter extends IndexDataAdapter
     {
         $parameters = null;
 
-        $cacheId = 'getDirectStructureInfo_' . $fqcn;
+        // This query is not cached so we can take up the ID in the cache. This prevents the need to clear the cache
+        // for a FQCN when it's reindexed as the ID changes every reindex (a further optimization would be to do that
+        // instead of using this).
+        $rawInfo = $this->storage->getStructureRawInfo($fqcn);
+
+        if (!$rawInfo) {
+            throw new UnexpectedValueException('The structural element "' . $fqcn . '" was not found!');
+        }
+
+        $id = $rawInfo['id'];
+
+        $cacheId = 'getDirectStructureInfo_' . $fqcn . '_' . $id;
 
         if ($this->cache->contains($cacheId)) {
             $parameters = $this->cache->fetch($cacheId);
         } else {
-            $rawInfo = $this->storage->getStructureRawInfo($fqcn);
-
-            if (!$rawInfo) {
-                throw new UnexpectedValueException('The structural element "' . $fqcn . '" was not found!');
-            }
-
-            $id = $rawInfo['id'];
-
             $parameters = [
                 $rawInfo,
                 $this->storage->getStructureRawParents($id),
