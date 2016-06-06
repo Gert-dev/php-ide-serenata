@@ -63,7 +63,7 @@ class UnknownClassAnalyzer implements AnalyzerInterface
         $this->indexDatabase = $indexDatabase;
 
         $this->classUsageFetchingVisitor = new Visitor\ClassUsageFetchingVisitor();
-        $this->docblockClassUsageFetchingVisitor = new Visitor\DocblockClassUsageFetchingVisitor();
+        $this->docblockClassUsageFetchingVisitor = new Visitor\DocblockClassUsageFetchingVisitor($typeAnalyzer);
     }
 
     /**

@@ -143,7 +143,7 @@ class SemanticLint extends BaseCommand
             $unusedUseStatementAnalyzer = null;
 
             if ($retrieveUnusedUseStatements) {
-                $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer();
+                $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer($this->getTypeAnalyzer());
 
                 foreach ($unusedUseStatementAnalyzer->getVisitors() as $visitor) {
                     $traverser->addVisitor($visitor);

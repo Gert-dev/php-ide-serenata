@@ -19,14 +19,22 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
     protected $classUsageList = [];
 
     /**
-     * @var TypeAnalyzer|null
+     * @var TypeAnalyzer
      */
-    protected $typeAnalyzer = null;
+    protected $typeAnalyzer;
 
     /**
      * @var string|null
      */
     protected $lastNamespace = null;
+
+    /**
+     * @param TypeAnalyzer $typeAnalyzer
+     */
+    public function __construct(TypeAnalyzer $typeAnalyzer)
+    {
+        $this->typeAnalyzer = $typeAnalyzer;
+    }
 
     /**
      * @inheritDoc
@@ -95,20 +103,8 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
      */
      protected function isValidType($type)
      {
-         return !$this->getTypeAnalyzer()->isSpecialType($type);
+         return !$this->typeAnalyzer->isSpecialType($type);
      }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
-    }
 
     /**
      * Retrieves the class usage list.
