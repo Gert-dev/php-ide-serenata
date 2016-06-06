@@ -2,6 +2,9 @@
 
 namespace A;
 
+/**
+ * @Annotation
+ */
 class Foo
 {
 
@@ -12,6 +15,13 @@ class Foo
  * @throws string
  * @throws mixed
  * @throws \A\Foo
+ *
+ * @api
+ *
+ * @Foo
+ * @MissingAnnotationClass
+ * @A\MissingAnnotationClass
+ * @\B\MissingAnnotationClass
  */
 function foo()
 {

@@ -14,14 +14,19 @@ use PhpParser\NodeVisitorAbstract;
 class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
 {
     /**
-     * @var array
-     */
-    protected $classUsageList = [];
-
-    /**
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
+
+    /**
+     * @var DocParser
+     */
+    protected $docParser;
+
+    /**
+     * @var array
+     */
+    protected $classUsageList = [];
 
     /**
      * @var string|null
@@ -30,10 +35,12 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
 
     /**
      * @param TypeAnalyzer $typeAnalyzer
+     * @param DocParser    $docParser
      */
-    public function __construct(TypeAnalyzer $typeAnalyzer)
+    public function __construct(TypeAnalyzer $typeAnalyzer, DocParser $docParser)
     {
         $this->typeAnalyzer = $typeAnalyzer;
+        $this->docParser = $docParser;
     }
 
     /**
@@ -103,7 +110,9 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
      */
      protected function isValidType($type)
      {
-         return !$this->typeAnalyzer->isSpecialType($type);
+         return
+            !$this->typeAnalyzer->isSpecialType($type) &&
+            !$this->docParser->isValidTag($type);
      }
 
     /**

@@ -90,15 +90,36 @@ class SemanticLintTest extends IndexedTest
             [
                 'name'      => 'A\B',
                 'namespace' => 'A',
-                'start'     => 52,
-                'end'       => 72
+                'start'     => 75,
+                'end'       => 95
             ],
 
             [
                 'name'      => 'A\C',
                 'namespace' => 'A',
-                'start'     => 52,
-                'end'       => 72
+                'start'     => 75,
+                'end'       => 95
+            ],
+
+            [
+                'name'      => 'MissingAnnotationClass',
+                'namespace' => 'A',
+                'start'     => 175,
+                'end'       => 197
+            ],
+
+            [
+                'name'      => 'A\MissingAnnotationClass',
+                'namespace' => 'A',
+                'start'     => 202,
+                'end'       => 226
+            ],
+
+            [
+                'name'      => 'B\MissingAnnotationClass',
+                'namespace' => 'A',
+                'start'     => 231,
+                'end'       => 256
             ]
         ], $output['errors']['unknownClasses']);
     }

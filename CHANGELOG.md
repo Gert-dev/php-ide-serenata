@@ -1,6 +1,7 @@
 ## 0.10.0
 ### Features and enhancements
 * Minor performance improvements when calculating the global class list.
+* Annotation tags in docblocks will now be subject to unknown class examination.
 * A caching layer was introduced that will drastically cut down on time needed to calculate information about structures. This information is used almost everywhere throughout the code so an increase in responsiveness should be noticable across the board. This will especially be the case in complex classes that have many dependencies. The cache files will be stored in your system's temporary folder so they will get recycled automatically when necessary.
 * Type deduction learned how to deal with ternary expressions where both operands have the same resulting type:
 

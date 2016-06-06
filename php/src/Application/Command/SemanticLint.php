@@ -7,17 +7,18 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
 
 use PhpIntegrator\Application\Command as BaseCommand;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
-use PhpParser\Lexer;
 use PhpParser\Error;
+use PhpParser\Lexer;
 use PhpParser\Parser;
-use PhpParser\ParserFactory;
 use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
 
 /**
  * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the
@@ -44,6 +45,11 @@ class SemanticLint extends BaseCommand
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
+
+    /**
+     * @var DocParser
+     */
+    protected $docParser;
 
     /**
      * @inheritDoc
@@ -132,7 +138,8 @@ class SemanticLint extends BaseCommand
                     $file,
                     $this->indexDatabase,
                     $this->getResolveTypeCommand(),
-                    $this->getTypeAnalyzer()
+                    $this->getTypeAnalyzer(),
+                    $this->getDocParser()
                 );
 
                 foreach ($unknownClassAnalyzer->getVisitors() as $visitor) {
@@ -143,7 +150,10 @@ class SemanticLint extends BaseCommand
             $unusedUseStatementAnalyzer = null;
 
             if ($retrieveUnusedUseStatements) {
-                $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer($this->getTypeAnalyzer());
+                $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer(
+                    $this->getTypeAnalyzer(),
+                    $this->getDocParser()
+                );
 
                 foreach ($unusedUseStatementAnalyzer->getVisitors() as $visitor) {
                     $traverser->addVisitor($visitor);
@@ -247,6 +257,18 @@ class SemanticLint extends BaseCommand
         }
 
         return $this->typeAnalyzer;
+    }
+
+    /**
+     * @return DocParser
+     */
+    protected function getDocParser()
+    {
+        if (!$this->docParser) {
+            $this->docParser = new DocParser();
+        }
+
+        return $this->docParser;
     }
 
     /**

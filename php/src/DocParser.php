@@ -125,6 +125,53 @@ class DocParser
     }
 
     /**
+     * Indicates if the specified tag is valid. Tags should be lower-case.
+     *
+     * @param string $tag The tag, without the @ sign.
+     *
+     * @return bool
+     */
+    public function isValidTag($tag)
+    {
+        return in_array($tag, [
+            'api',
+            'author',
+            'category',
+            'copyright',
+            'deprecated',
+            'example',
+            'filesource',
+            'global',
+            'ignore',
+            'internal',
+            'license',
+            'link',
+            'method',
+            'package',
+            'param',
+            'property',
+            'property-read',
+            'property-write',
+            'return',
+            'see',
+            'since',
+            'source',
+            'subpackage',
+            'throws',
+            'todo',
+            'uses',
+            'var',
+            'version',
+            
+            'inheritdoc',
+            'inheritDoc',
+
+            // Non-standard tags:
+            'Annotation'
+        ], true);
+    }
+
+    /**
      * Returns an array of $partCount values, the first value will go up until the first space, the second value will
      * go up until the second space, and so on. The last value will contain the rest of the string. Convenience method
      * for tags that consist of multiple parameters. This method returns an array with guaranteed $partCount elements.
