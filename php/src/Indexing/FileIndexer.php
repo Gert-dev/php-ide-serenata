@@ -236,7 +236,7 @@ class FileIndexer
             'long_description'  => $documentation['descriptions']['long']
         ];
 
-        $seId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, $seData);
+        $seId = $this->storage->insertStructure($seData);
 
         $accessModifierMap = $this->getAccessModifierMap();
 

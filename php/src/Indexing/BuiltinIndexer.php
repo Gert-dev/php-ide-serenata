@@ -342,7 +342,7 @@ class BuiltinIndexer
 
         $structureTypeMap = $this->getStructureTypeMap();
 
-        $structureId = $this->storage->insert(IndexStorageItemEnum::STRUCTURES, [
+        $structureId = $this->storage->insertStructure([
             'name'              => $element->getShortName(),
             'fqcn'             => $element->getName(),
             'file_id'           => null,

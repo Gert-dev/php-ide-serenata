@@ -13,10 +13,14 @@ use PhpIntegrator\TypeAnalyzer;
 
 use PhpIntegrator\Application\Command as BaseCommand;
 
+use PhpIntegrator\IndexDataAdapter\ProviderCachingProxy;
+
 use PhpIntegrator\Indexing\Scanner;
 use PhpIntegrator\Indexing\FileIndexer;
 use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\ProjectIndexer;
+use PhpIntegrator\Indexing\StorageInterface;
+use PhpIntegrator\Indexing\CallbackStorageProxy;
 use PhpIntegrator\Indexing\IndexStorageItemEnum;
 
 use PhpParser\ParserFactory;
@@ -65,6 +69,11 @@ class Reindex extends BaseCommand
      * @var ParserFactory
      */
     protected $parserFactory;
+
+    /**
+     * @var StorageInterface
+     */
+    protected $storageForIndexers;
 
     /**
      * @inheritDoc
@@ -126,7 +135,7 @@ class Reindex extends BaseCommand
             }
 
             $databaseFileHandle = null;
-            
+
             if ($this->indexDatabase->getDatabasePath() !== ':memory:') {
                 // All other commands don't abide by these locks, so they can just happily continue using the database (as
                 // they are only reading, that poses no problem). However, writing in a transaction will cause the database
@@ -161,7 +170,7 @@ class Reindex extends BaseCommand
     {
         if (!$this->projectIndexer) {
             $this->projectIndexer = new ProjectIndexer(
-                $this->indexDatabase,
+                $this->getStorageForIndexers(),
                 $this->getBuiltinIndexer(),
                 $this->getFileIndexer(),
                 $this->getScanner()
@@ -178,7 +187,7 @@ class Reindex extends BaseCommand
     {
         if (!$this->fileIndexer) {
             $this->fileIndexer = new FileIndexer(
-                $this->indexDatabase,
+                $this->getStorageForIndexers(),
                 $this->getTypeAnalyzer(),
                 $this->getDocParser(),
                 $this->getParserFactory()
@@ -194,10 +203,28 @@ class Reindex extends BaseCommand
     protected function getBuiltinIndexer()
     {
         if (!$this->builtinIndexer) {
-            $this->builtinIndexer = new BuiltinIndexer($this->indexDatabase);
+            $this->builtinIndexer = new BuiltinIndexer($this->getStorageForIndexers());
         }
 
         return $this->builtinIndexer;
+    }
+
+    /**
+     * @return StorageInterface
+     */
+    protected function getStorageForIndexers()
+    {
+        if (!$this->storageForIndexers) {
+            $this->storageForIndexers = new CallbackStorageProxy($this->indexDatabase, function ($fqcn) {
+                $provider = $this->getIndexDataAdapterProvider();
+
+                if ($provider instanceof ProviderCachingProxy) {
+                    $provider->clearCacheFor($fqcn);
+                }
+            });
+        }
+
+        return $this->storageForIndexers;
     }
 
     /**

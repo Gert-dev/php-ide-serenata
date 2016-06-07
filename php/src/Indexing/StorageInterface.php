@@ -53,6 +53,13 @@ interface StorageInterface
     public function getSetting($name);
 
     /**
+     * @param array  $data
+     *
+     * @return int The unique identifier assigned to the inserted data.
+     */
+    public function insertStructure(array $data);
+
+    /**
      * Inserts the specified index item into the storage.
      *
      * @param string $indexStorageItem

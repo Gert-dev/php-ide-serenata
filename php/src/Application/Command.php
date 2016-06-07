@@ -7,15 +7,14 @@ use LogicException;
 use UnexpectedValueException;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Cache\FilesystemCache;
 
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\IndexDataAdapter;
-use PhpIntegrator\CachingIndexDataAdapter;
 
 use PhpIntegrator\Indexing\IndexDatabase;
+use PhpIntegrator\Indexing\CallbackStorageProxy;
 
 /**
  * Base class for commands.
@@ -36,7 +35,7 @@ abstract class Command implements CommandInterface
     protected $indexDatabase;
 
     /**
-     * @var CachingIndexDataAdapter
+     * @var IndexDataAdapter
      */
     protected $indexDataAdapter;
 
@@ -49,6 +48,11 @@ abstract class Command implements CommandInterface
      * @var CacheIdPrefixDecorator|null
      */
     protected $cache;
+
+    /**
+     * @var IndexDataAdapter\ProviderCachingProxy
+     */
+    protected $indexDataAdapterProvider;
 
     /**
      * @param Cache|null $cache
@@ -188,19 +192,34 @@ abstract class Command implements CommandInterface
     }
 
     /**
-     * @return CachingIndexDataAdapter
+     * @return IndexDataAdapter
      */
     protected function getIndexDataAdapter()
     {
         if (!$this->indexDataAdapter) {
-            if ($this->cache) {
-                $this->indexDataAdapter = new CachingIndexDataAdapter($this->indexDatabase, $this->cache);
-            } else {
-                $this->indexDataAdapter = new IndexDataAdapter($this->indexDatabase);
-            }
+            $this->indexDataAdapter = new IndexDataAdapter($this->getIndexDataAdapterProvider());
         }
 
         return $this->indexDataAdapter;
+    }
+
+    /**
+     * @return IndexDataAdapter\ProviderInterface
+     */
+    protected function getIndexDataAdapterProvider()
+    {
+        if (!$this->indexDataAdapterProvider) {
+            if ($this->cache) {
+                $this->indexDataAdapterProvider = new IndexDataAdapter\ProviderCachingProxy(
+                    $this->indexDatabase,
+                    $this->cache
+                );
+            } else {
+                $this->indexDataAdapterProvider = $this->indexDatabase;
+            }
+        }
+
+        return $this->indexDataAdapterProvider;
     }
 
     /**

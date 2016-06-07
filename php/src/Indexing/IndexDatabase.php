@@ -480,6 +480,14 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
     /**
      * @inheritDoc
      */
+    public function insertStructure(array $data)
+    {
+        return $this->insert(IndexStorageItemEnum::STRUCTURES, $data);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function insert($indexStorageItem, array $data)
     {
         $this->getConnection()->insert($indexStorageItem, $data);
