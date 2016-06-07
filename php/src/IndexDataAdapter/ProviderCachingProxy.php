@@ -153,7 +153,8 @@ class ProviderCachingProxy implements ProviderInterface
     }
 
     /**
-     * @return string
+     * @param string $method
+     * @param array  $arguments
      */
     protected function getCacheId($method, array $arguments)
     {
