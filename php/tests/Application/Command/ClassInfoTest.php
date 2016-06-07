@@ -1411,7 +1411,7 @@ class ClassInfoTest extends IndexedTest
     }
 
     /**
-     * @expectedException \PhpIntegrator\IndexDataAdapter\CircularDependencyException
+     * @expectedException \PhpIntegrator\CircularDependencyException
      */
     public function testThrowsExceptionOnCircularDependency()
     {

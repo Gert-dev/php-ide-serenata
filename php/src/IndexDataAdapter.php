@@ -100,7 +100,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected function getCheckedParentStructureInfo($fqcn, $originFqcn)
     {
         if (isset($this->parentLog[$fqcn][$originFqcn])) {
-            throw new IndexDataAdapter\CircularDependencyException(
+            throw new CircularDependencyException(
                 "Circular dependency detected from {$originFqcn} to {$fqcn}!"
             );
         }

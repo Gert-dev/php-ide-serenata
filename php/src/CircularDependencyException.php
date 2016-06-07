@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\IndexDataAdapter;
+namespace PhpIntegrator;
 
 use Exception;
 
