@@ -162,9 +162,40 @@ class DocParser
             'uses',
             'var',
             'version',
-            
+
             'inheritdoc',
             'inheritDoc',
+
+            // PHPUnit tags.
+            'author',
+            'after',
+            'afterClass',
+            'backupGlobals',
+            'backupStaticAttributes',
+            'before',
+            'beforeClass',
+            'codeCoverageIgnore*',
+            'covers',
+            'coversDefaultClass',
+            'coversNothing',
+            'dataProvider',
+            'depends',
+            'expectedException',
+            'expectedExceptionCode',
+            'expectedExceptionMessage',
+            'expectedExceptionMessageRegExp',
+            'group',
+            'large',
+            'medium',
+            'preserveGlobalState',
+            'requires',
+            'runTestsInSeparateProcesses',
+            'runInSeparateProcess',
+            'small',
+            'test',
+            'testdox',
+            'ticket',
+            'uses',
 
             // Non-standard tags:
             'Annotation'
