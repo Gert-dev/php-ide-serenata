@@ -1415,7 +1415,7 @@ class ClassInfoTest extends IndexedTest
      */
     public function testThrowsExceptionOnCircularDependency()
     {
-        $fileName = 'CircularDependency.php';
+        $fileName = 'CircularDependencyClasses.php';
 
         $output = $this->getClassInfo($fileName, 'A\C');
     }
