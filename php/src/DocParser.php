@@ -80,7 +80,7 @@ class DocParser
                 $tagValue = $this->normalizeNewlines($tagValue);
 
                 // Remove the delimiters of the docblock itself at the start of each line, if any.
-                $tagValue = preg_replace('/\n\s+\*\s*/', ' ', $tagValue);
+                $tagValue = preg_replace('/\n\s+\*\/?\s*/', ' ', $tagValue);
 
                 // Collapse multiple spaces, just like HTML does.
                 $tagValue = preg_replace('/\s\s+/', ' ', $tagValue);
