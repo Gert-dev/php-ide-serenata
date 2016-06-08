@@ -1413,9 +1413,29 @@ class ClassInfoTest extends IndexedTest
     /**
      * @expectedException \PhpIntegrator\CircularDependencyException
      */
-    public function testThrowsExceptionOnCircularDependency()
+    public function testThrowsExceptionOnCircularDependencyWithClassExtendingItself()
     {
-        $fileName = 'CircularDependencyClasses.php';
+        $fileName = 'CircularDependencyExtends.php';
+
+        $output = $this->getClassInfo($fileName, 'A\C');
+    }
+
+    /**
+     * @expectedException \PhpIntegrator\CircularDependencyException
+     */
+    public function testThrowsExceptionOnCircularDependencyWithClassImplementingItself()
+    {
+        $fileName = 'CircularDependencyImplements.php';
+
+        $output = $this->getClassInfo($fileName, 'A\C');
+    }
+
+    /**
+     * @expectedException \PhpIntegrator\CircularDependencyException
+     */
+    public function testThrowsExceptionOnCircularDependencyWithClassUsingItselfAsTrait()
+    {
+        $fileName = 'CircularDependencyUses.php';
 
         $output = $this->getClassInfo($fileName, 'A\C');
     }

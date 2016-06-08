@@ -97,7 +97,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      *
      * @return array
      */
-    protected function getCheckedParentStructureInfo($fqcn, $originFqcn)
+    protected function getCheckedStructureInfo($fqcn, $originFqcn)
     {
         if (isset($this->parentLog[$fqcn][$originFqcn])) {
             throw new CircularDependencyException(
@@ -397,7 +397,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected function parseParentData(ArrayObject $result, $parents)
     {
         foreach ($parents as $parent) {
-            $parentInfo = $this->getCheckedParentStructureInfo($parent['fqcn'], $result['name']);
+            $parentInfo = $this->getCheckedStructureInfo($parent['fqcn'], $result['name']);
 
             if ($parentInfo) {
                 if (!$result['shortDescription']) {
@@ -438,7 +438,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected function parseInterfaceData(ArrayObject $result, $interfaces)
     {
         foreach ($interfaces as $interface) {
-            $interface = $this->getStructureInfo($interface['fqcn']);
+            $interface = $this->getCheckedStructureInfo($interface['fqcn'], $result['name']);
 
             $result['interfaces'][] = $interface['name'];
             $result['directInterfaces'][] = $interface['name'];
@@ -474,7 +474,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         $traitPrecedences = $this->storage->getStructureTraitPrecedencesAssoc($element['id']);
 
         foreach ($traits as $trait) {
-            $trait = $this->getStructureInfo($trait['fqcn']);
+            $trait = $this->getCheckedStructureInfo($trait['fqcn'], $result['name']);
 
             $result['traits'][] = $trait['name'];
             $result['directTraits'][] = $trait['name'];
