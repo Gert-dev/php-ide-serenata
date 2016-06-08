@@ -134,6 +134,7 @@ class DocParser
     public function isValidTag($tag)
     {
         return in_array($tag, [
+            // PHPDOC tags, see also https://phpdoc.org/docs/latest/index.html .
             'api',
             'author',
             'category',
@@ -166,7 +167,7 @@ class DocParser
             'inheritdoc',
             'inheritDoc',
 
-            // PHPUnit tags.
+            // PHPUnit tags, see also https://phpunit.de/manual/current/en/appendixes.annotations.html .
             'author',
             'after',
             'afterClass',
