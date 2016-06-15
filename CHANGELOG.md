@@ -34,6 +34,7 @@ $a = ($foo instanceof Foo) ? $foo-> // Will now autocomplete Foo.
 * Use statements are no longer marked as unused if they are used inside docblocks as annotation.
 * Parameters that have the type `self` (in docblock or type hint), `static` or `$this` (in docblock) will now correctly be examined.
 * Don't freeze up until the call stack overflows when classes try to implement themeselves (as interface) or use themselves (as trait).
+* Foreach statements that contain a list() expression as value will no longer cause an error (e.g. `foreach ($array as list($a, $b)) { ... }`).
 * Type localization didn't work properly for classlikes that were in the same namespace as the active one. For example, in namespace `A`, type `\A\B` would be localized to `A\B` instead of just `B`.
 * Fixed a classlike suddenly no longer being found if you defined another classlike with the same FQCN in another file (i.e. after copying a file). This happened, most annoyingly, even if you then changed the FQCN in the copied file, and couldn't be fixed without reindexing the original file.
 * Static method calls where the class name had a leading slash were not being examined correctly:

@@ -183,7 +183,7 @@ class QueryingVisitor extends NodeVisitorAbstract
                 }
             }
         } elseif ($node instanceof Node\Stmt\Foreach_) {
-            if ($node->valueVar->name === $this->name) {
+            if (!$node->valueVar instanceof Node\Expr\List_ && $node->valueVar->name === $this->name) {
                 $this->bestMatch = $node;
             }
         }
