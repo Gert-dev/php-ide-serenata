@@ -350,7 +350,7 @@ $b = clone $a;
 $b-> // Autocompletion for DateTime.
 ```
 
-* The draft PSR-5's `@inheritDoc` is now supported to indicate documentation was forgotten. Also, note the difference with the non-standard ("incorrect"), yet commonly used, curly brace syntax used by Symfony 2 and other frameworks (which is also supported).
+* The draft PSR-5's `@inheritDoc` is now supported to indicate documentation was not forgotten. Also, note the difference with the non-standard ("incorrect"), yet commonly used, curly brace syntax used by Symfony 2 and other frameworks (which is also supported).
 
 ```php
 /**
