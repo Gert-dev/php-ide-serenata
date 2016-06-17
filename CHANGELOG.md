@@ -139,6 +139,10 @@ protected $testProperty1;
 * `localizeType` will now return the FQCN instead of null if it couldn't localize a type based on use statements. The reasoning behind this is that you want a localized version of the type you pass, if there are no use statements to localize it, the FQCN is the only way to address the type locally.
 * The format the descriptions are returned in has changed; there is no more `descriptions` property that has a `short` and `long` property. Instead, there is now the `shortDescription` and `longDescription` property. Similarly, the description of the return value of functions and methods has moved to `returnDescription` and the description of the type of properties and constants to `typeDescription`.
 
+## 0.9.4
+### Bugs fixed
+* Fixed the database handle never being closed after it was opened.
+
 ## 0.9.3
 ### Bugs fixed
 * Fixed variables nclosure use statements not having their type resolved properly in some corner cases.
