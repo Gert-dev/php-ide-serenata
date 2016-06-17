@@ -99,7 +99,7 @@ class Reindex extends BaseCommand
                 // to become locked, which poses a problem if two simultaneous reindexing processes are spawned. If that
                 // happens, just block until the database becomes available again. If we don't, we will receive an
                 // exception from the driver.
-                $databaseFileHandle = fopen($this->indexDatabase->getDatabasePath(), 'rw');
+                $databaseFileHandle = fopen($this->indexDatabase->getDatabasePath(), 'r+b');
                 flock($databaseFileHandle, LOCK_EX);
             }
 
