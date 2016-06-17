@@ -1,3 +1,7 @@
+## 0.9.5
+### Bugs fixed
+* Fixed the database handle being opened in an incorrect way.
+
 ## 0.9.4
 ### Bugs fixed
 * Fixed the database handle never being closed after it was opened.
