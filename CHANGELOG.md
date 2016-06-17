@@ -1,3 +1,7 @@
+## 0.9.4
+### Bugs fixed
+* Fixed the database handle never being closed after it was opened.
+
 ## 0.9.3
 ### Bugs fixed
 * Fixed variables nclosure use statements not having their type resolved properly in some corner cases.
