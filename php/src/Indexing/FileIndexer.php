@@ -182,7 +182,7 @@ class FileIndexer
                  $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
                      'line'               => $useStatement['line'],
                      'alias'              => $useStatement['alias'] ?: null,
-                     'fqcn'              => $useStatement['fqcn'],
+                     'fqcn'               => $useStatement['fqcn'],
                      'files_namespace_id' => $namespaceId
                  ]);
              }
@@ -243,7 +243,7 @@ class FileIndexer
         if (isset($rawData['parents'])) {
             foreach ($rawData['parents'] as $parent) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
-                    'structure_id'           => $seId,
+                    'structure_id'          => $seId,
                     'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($parent)
                 ]);
             }
@@ -252,7 +252,7 @@ class FileIndexer
         if (isset($rawData['interfaces'])) {
             foreach ($rawData['interfaces'] as $interface) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
-                    'structure_id'           => $seId,
+                    'structure_id'          => $seId,
                     'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($interface)
                 ]);
             }
@@ -261,7 +261,7 @@ class FileIndexer
         if (isset($rawData['traits'])) {
             foreach ($rawData['traits'] as $trait) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
-                    'structure_id'           => $seId,
+                    'structure_id'          => $seId,
                     'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($trait)
                 ]);
             }
@@ -272,11 +272,11 @@ class FileIndexer
                 $accessModifier = $this->parseAccessModifier($traitAlias, true);
 
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_ALIASES, [
-                    'structure_id'          => $seId,
+                    'structure_id'         => $seId,
                     'trait_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($traitAlias['trait']),
-                    'access_modifier_id'    => $accessModifier ? $accessModifierMap[$accessModifier] : null,
-                    'name'                  => $traitAlias['name'],
-                    'alias'                 => $traitAlias['alias']
+                    'access_modifier_id'   => $accessModifier ? $accessModifierMap[$accessModifier] : null,
+                    'name'                 => $traitAlias['name'],
+                    'alias'                => $traitAlias['alias']
                 ]);
             }
         }
@@ -284,9 +284,9 @@ class FileIndexer
         if (isset($rawData['traitPrecedences'])) {
             foreach ($rawData['traitPrecedences'] as $traitPrecedence) {
                 $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_PRECEDENCES, [
-                    'structure_id'          => $seId,
+                    'structure_id'         => $seId,
                     'trait_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($traitPrecedence['trait']),
-                    'name'                  => $traitPrecedence['name']
+                    'name'                 => $traitPrecedence['name']
                 ]);
             }
         }
@@ -428,7 +428,7 @@ class FileIndexer
 
         $constantId = $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'                  => $rawData['name'],
-            'fqcn'                 => isset($rawData['fqcn']) ? $rawData['fqcn'] : null,
+            'fqcn'                  => isset($rawData['fqcn']) ? $rawData['fqcn'] : null,
             'file_id'               => $fileId,
             'start_line'            => $rawData['startLine'],
             'end_line'              => $rawData['endLine'],
@@ -761,7 +761,7 @@ class FileIndexer
 
         $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
             'name'                    => $rawData['name'],
-            'fqcn'                   => null,
+            'fqcn'                    => null,
             'file_id'                 => $fileId,
             'start_line'              => $rawData['startLine'],
             'end_line'                => $rawData['endLine'],
