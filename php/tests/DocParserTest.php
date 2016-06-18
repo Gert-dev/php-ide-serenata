@@ -24,4 +24,23 @@ class DocParserTest extends \PHPUnit_Framework_TestCase
             ]
         ], $result['params']);
     }
+
+    public function testParamTagWithAtSymbolIsInterpretedCorrectly()
+    {
+        $parser = new DocParser();
+        $result = $parser->parse('
+            /**
+             * @param string $foo Test description with @ sign.
+             */
+        ', [DocParser::PARAM_TYPE], '');
+
+        $this->assertEquals([
+            '$foo' => [
+                'type'        => 'string',
+                'description' => 'Test description with @ sign.',
+                'isVariadic'  => false,
+                'isReference' => false
+            ]
+        ], $result['params']);
+    }
 }

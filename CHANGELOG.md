@@ -30,6 +30,7 @@ $a = ($foo instanceof Foo) ? $foo-> // Will now autocomplete Foo.
 ### Bugs fixed
 * The type of global built-in function parameters was not getting analyzed correctly.
 * Built-in functions that have invalid UTF-8 characters in their name are now ignored.
+* Fixed docblock tags containing an @ sign in their description being incorrectly parsed.
 * Docblock types did not always get precedence over type hints of function or method parameters.
 * Use statements are no longer marked as unused if they are used inside docblocks as annotation.
 * Parameters that have the type `self` (in docblock or type hint), `static` or `$this` (in docblock) will now correctly be examined.

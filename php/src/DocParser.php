@@ -69,14 +69,46 @@ class DocParser
         $docblock = is_string($docblock) ? $docblock : null;
 
         if ($docblock) {
-            preg_match_all('/\*\s+(@[a-zA-Z-][a-z-]*)([^@]*)(?:\n|\*\/)/', $docblock, $matches, PREG_SET_ORDER);
+            preg_match_all('/\*\s+(@[a-zA-Z-][a-z-]*)(?:\s+([.\n]*))/', $docblock, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
 
+            $segments = [];
+            $previousStart = 0;
+            $previousTag = null;
+
+            // Build a list of 'segments', which are just a collection of ranges indicating where each detected tag
+            // starts and stops.
             foreach ($matches as $match) {
-                if (!isset($tags[$match[1]])) {
-                    $tags[$match[1]] = [];
+                $tag = $match[1][0];
+                $tagOffset = $match[0][1];
+
+                $tagContentOffset = null;
+
+                if (isset($match[2][1])) {
+                    $tagContentOffset = $match[2][1];
+                } else {
+                    $tagContentOffset = $previousStart;
                 }
 
-                $tagValue = $match[2];
+                $segments[] = [$previousTag, $previousStart, $tagOffset];
+
+                $previousStart = $tagContentOffset;
+                $previousTag = $tag;
+            }
+
+            $segments[] = [$previousTag, $previousStart, mb_strlen($docblock)];
+
+            foreach ($segments as $segment) {
+                list($tag, $start, $end) = $segment;
+
+                if (!$tag) {
+                    continue;
+                }
+
+                if (!isset($tags[$tag])) {
+                    $tags[$tag] = [];
+                }
+
+                $tagValue = mb_substr($docblock, $start, $end - $start);
                 $tagValue = $this->normalizeNewlines($tagValue);
 
                 // Remove the delimiters of the docblock itself at the start of each line, if any.
@@ -85,7 +117,7 @@ class DocParser
                 // Collapse multiple spaces, just like HTML does.
                 $tagValue = preg_replace('/\s\s+/', ' ', $tagValue);
 
-                $tags[$match[1]][] = trim($tagValue);
+                $tags[$tag][] = trim($tagValue);
             }
         }
 
