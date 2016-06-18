@@ -175,7 +175,7 @@ class FileIndexer
                  'start_line'  => $namespace['startLine'],
                  'end_line'    => $namespace['endLine'],
                  'namespace'   => $namespace['name'],
-                 'file_id'    => $fileId
+                 'file_id'     => $fileId
              ]);
 
              foreach ($namespace['useStatements'] as $useStatement) {
