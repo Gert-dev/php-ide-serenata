@@ -33,6 +33,10 @@ Note that folders that aren't readable (no permission) will be silently ignored!
 
 Some features may or may not work outside these restrictions. **Don't forget to open the settings page after installing to set up the package!**
 
+## Performance tips
+* Use PHP 7 for the indexer.
+* Your temp folder is used for caching database access. Mounting it in memory (tmpfs) or using a RAMdisk may significantly improve performance.
+
 ## I'm a package developer - How do I use this?
 You can very easily start using the service by simply consuming the service in your package (see also the `package.json` and `Main.coffee` files of the packages listed above for an example). The service is a single exposed class, which is located in the [Service.coffee](https://github.com/Gert-dev/php-integrator-base/blob/master/lib/Service.coffee) file, along with docblocks explaining what they do and what they accept as parameters.
 
