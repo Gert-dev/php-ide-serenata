@@ -1,4 +1,4 @@
-## 0.10.0
+## 1.0.0
 ### Features and enhancements
 * Minor performance improvements when calculating the global class list.
 * Annotation tags in docblocks will now be subject to unknown class examination.
