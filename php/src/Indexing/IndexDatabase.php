@@ -303,6 +303,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.linked_structure_fqcn = se.fqcn')
             ->where('sepl.structure_id = ?')
+            ->groupBy('se.fqcn')
             ->setParameter(0, $id)
             ->execute()
             ->fetchAll();
@@ -319,6 +320,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, 'sepl', 'sepl.structure_id = se.id')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
             ->where('sepl.linked_structure_fqcn = se2.fqcn')
+            ->groupBy('se.fqcn')
             ->setParameter(0, $id)
             ->execute()
             ->fetchAll();
@@ -334,6 +336,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.linked_structure_fqcn = se.fqcn')
             ->where('seil.structure_id = ?')
+            ->groupBy('se.fqcn')
             ->setParameter(0, $id)
             ->execute()
             ->fetchAll();
@@ -350,6 +353,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, 'seil', 'seil.structure_id = se.id')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
             ->where('seil.linked_structure_fqcn = se2.fqcn')
+            ->groupBy('se.fqcn')
             ->setParameter(0, $id)
             ->execute()
             ->fetchAll();
@@ -365,6 +369,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->from(IndexStorageItemEnum::STRUCTURES, 'se')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.linked_structure_fqcn = se.fqcn')
             ->where('setl.structure_id = ?')
+            ->groupBy('se.fqcn')
             ->setParameter(0, $id)
             ->execute()
             ->fetchAll();
@@ -381,6 +386,7 @@ class IndexDatabase implements StorageInterface, IndexDataAdapter\ProviderInterf
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, 'setl', 'setl.structure_id = se.id')
             ->innerJoin('se', IndexStorageItemEnum::STRUCTURES, 'se2', 'se2.id = ?')
             ->where('setl.linked_structure_fqcn = se2.fqcn')
+            ->groupBy('se.fqcn')
             ->setParameter(0, $id)
             ->execute()
             ->fetchAll();
