@@ -1,3 +1,6 @@
+## 1.0.1
+* Fixed error regarding `$type` when not using PHP 7 (thanks to [@UziTech](https://github.com/UziTech)).
+
 ## 1.0.0
 ### Features and enhancements
 * Minor performance improvements when calculating the global class list.
