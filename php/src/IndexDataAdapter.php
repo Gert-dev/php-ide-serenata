@@ -30,9 +30,9 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected $typeAnalyzer;
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $parentLog = [];
+    protected $resolutionStack = [];
 
     /**
      * Constructor.
@@ -55,7 +55,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      */
     public function getStructureInfo($fqcn)
     {
-        $this->parentLog = [];
+        $this->resolutionStack = [$fqcn];
 
         return $this->getDirectStructureInfo($fqcn);
     }
@@ -99,15 +99,19 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      */
     protected function getCheckedStructureInfo($fqcn, $originFqcn)
     {
-        if (isset($this->parentLog[$fqcn][$originFqcn])) {
+        if (in_array($fqcn, $this->resolutionStack)) {
             throw new CircularDependencyException(
                 "Circular dependency detected from {$originFqcn} to {$fqcn}!"
             );
         }
 
-        $this->parentLog[$fqcn][$originFqcn] = true;
+        $this->resolutionStack[] = $fqcn;
 
-        return $this->getDirectStructureInfo($fqcn);
+        $data = $this->getDirectStructureInfo($fqcn);
+
+        array_pop($this->resolutionStack);
+
+        return $data;
     }
 
     /**
