@@ -228,7 +228,8 @@ class BuiltinIndexer
             if (method_exists($parameter, 'isVariadic')) {
                 $isVariadic = $parameter->isVariadic();
             }
-
+            
+            $type = null;
             $types = [];
 
             // Requires PHP >= 7, good thing this only affects built-in functions, which don't have any type
