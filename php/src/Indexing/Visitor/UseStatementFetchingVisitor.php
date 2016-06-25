@@ -11,28 +11,28 @@ use PhpParser\NodeVisitor;
 class UseStatementFetchingVisitor implements NodeVisitor
 {
     /**
-     * @var array
+     * @var array[]
      */
     protected $namespaces = [];
 
     /**
-     * @var string|null
+     * @var int
      */
-    protected $lastNamespace = null;
+    protected $lastIndex = 0;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->namespaces[null] = [
+        $this->namespaces[] = [
             'name'          => null,
             'startLine'     => 0,
             'endLine'       => null,
             'useStatements' => []
         ];
 
-        $this->lastNamespace = null;
+        $this->lastIndex = 0;
     }
 
     /**
@@ -41,10 +41,8 @@ class UseStatementFetchingVisitor implements NodeVisitor
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Namespace_) {
-            $namespace = (string) $node->name;
-
-            $this->namespaces[$namespace] = [
-                'name'          => $namespace,
+            $this->namespaces[] = [
+                'name'          => $node->name ? (string) $node->name : '',
                 'startLine'     => $node->getLine(),
                 'endLine'       => null,
                 'useStatements' => []
@@ -52,12 +50,13 @@ class UseStatementFetchingVisitor implements NodeVisitor
 
             // There is no way to fetch the end of a namespace, so determine it manually (a value of null signifies the
             // end of the file).
-            $this->namespaces[$this->lastNamespace]['endLine'] = $node->getLine() - 1;
-            $this->lastNamespace = $namespace;
+            $this->namespaces[$this->lastIndex]['endLine'] = $node->getLine() - 1;
+
+            ++$this->lastIndex;
         } elseif ($node instanceof Node\Stmt\Use_) {
             foreach ($node->uses as $use) {
                 // NOTE: The namespace may be null here (intended behavior).
-                $this->namespaces[$this->lastNamespace]['useStatements'][] = [
+                $this->namespaces[$this->lastIndex]['useStatements'][] = [
                     'fqcn'  => (string) $use->name,
                     'alias' => $use->alias,
                     'line'  => $node->getLine()

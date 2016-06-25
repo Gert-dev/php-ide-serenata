@@ -1,3 +1,7 @@
+## 1.0.3
+### Bugs fixed
+* Fixed namespaces without a name causing an error when resolving types.
+
 ## 1.0.2
 ### Bugs fixed
 * Fixed a circular dependency exception being thrown if a classlike implemented the same interface twice via separate paths.
