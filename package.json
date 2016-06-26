@@ -1,8 +1,8 @@
 {
   "name": "php-integrator-base",
   "main": "./lib/Main",
-  "version": "1.0.2",
-  "description": "Indexes PHP code and exposes services to query it (required for other php-integrator-* packages)",
+  "version": "1.0.3",
+  "description": "Indexes PHP code and exposes services to query it (required for other php-integrator-* packages).",
   "repository": "https://github.com/Gert-dev/php-integrator-base.git",
   "license": "GPL-3.0",
   "engines": {

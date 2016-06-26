@@ -355,3 +355,18 @@ class Service
     ###
     isBasicType: (type) ->
         return /^(string|int|bool|float|object|mixed|array|resource|void|null|callable|false|true|self|static|parent|\$this)$/i.test(type)
+
+    ###*
+     * Utility function to convert byte offsets returned by the service into character offsets.
+     *
+     * @param {Number} byteOffset
+     * @param {String} string
+     *
+     * @return {Number}
+    ###
+    getCharacterOffsetFromByteOffset: (byteOffset, string) ->
+        {Buffer} = require 'buffer'
+
+        buffer = new Buffer(string)
+
+        return buffer.slice(0, byteOffset).toString().length

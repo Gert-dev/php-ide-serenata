@@ -24,6 +24,7 @@ class ResolveTypeTest extends IndexedTest
         $this->assertEquals('\DateTime', $command->resolveType('DateTime', $path, 11));
         $this->assertEquals('\DateTime', $command->resolveType('DateTime', $path, 12));
         $this->assertEquals('\C\D\Test', $command->resolveType('D\Test', $path, 13));
+        $this->assertEquals('\DateTime', $command->resolveType('DateTime', $path, 18));
     }
 
     /**

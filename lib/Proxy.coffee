@@ -260,7 +260,7 @@ class Proxy
             parameter = '--stdin'
 
         return @performRequest(
-            ['--available-variables', '--database=' + @getIndexDatabasePath(), parameter, '--offset=' + offset],
+            ['--available-variables', '--database=' + @getIndexDatabasePath(), parameter, '--offset=' + offset, '--charoffset'],
             null,
             source
         )
@@ -279,7 +279,7 @@ class Proxy
         if not file?
             throw 'A path to a file must be passed!'
 
-        parameters = ['--variable-types', '--database=' + @getIndexDatabasePath(), '--name=' + name, '--offset=' + offset]
+        parameters = ['--variable-types', '--database=' + @getIndexDatabasePath(), '--name=' + name, '--offset=' + offset, '--charoffset']
 
         if file?
             parameters.push('--file=' + file)
@@ -307,7 +307,7 @@ class Proxy
         if not file?
             throw 'A path to a file must be passed!'
 
-        parameters = ['--deduce-types', '--database=' + @getIndexDatabasePath(), '--offset=' + offset]
+        parameters = ['--deduce-types', '--database=' + @getIndexDatabasePath(), '--offset=' + offset, '--charoffset']
 
         if file?
             parameters.push('--file=' + file)

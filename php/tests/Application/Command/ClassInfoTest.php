@@ -1410,6 +1410,15 @@ class ClassInfoTest extends IndexedTest
         $this->assertEmpty($output['constants']['TEST_CONSTANT']['types']);
     }
 
+    public function testCorrectlyFindsClassesInNamelessNamespace()
+    {
+        $fileName = 'ClassNamelessNamespace.php';
+
+        $output = $this->getClassInfo($fileName, 'TestClass');
+
+        $this->assertEquals('TestClass', $output['name']);
+    }
+
     /**
      * @expectedException \PhpIntegrator\CircularDependencyException
      */

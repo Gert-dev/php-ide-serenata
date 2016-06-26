@@ -12,3 +12,8 @@ use DateTime;
 use C\D;
 
 }
+
+namespace
+{
+    
+}

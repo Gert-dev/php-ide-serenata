@@ -32,6 +32,7 @@ class AvailableVariables extends BaseCommand
     {
         $optionCollection->add('file?', 'The file to examine.')->isa('string');
         $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
+        $optionCollection->add('charoffset?', 'If set, the input offset will be treated as a character offset instead of a byte offset.');
         $optionCollection->add('offset:', 'The character byte offset into the code to use for the determination.')->isa('number');
     }
 
@@ -51,7 +52,13 @@ class AvailableVariables extends BaseCommand
             isset($arguments['stdin']) && $arguments['stdin']->value
         );
 
-         $result = $this->getAvailableVariables($code, $arguments['offset']->value);
+        $offset = $arguments['offset']->value;
+
+        if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
+            $offset = $this->getCharacterOffsetFromByteOffset($offset, $code);
+        }
+
+        $result = $this->getAvailableVariables($code, $offset);
 
         return $this->outputJson(true, $result);
      }

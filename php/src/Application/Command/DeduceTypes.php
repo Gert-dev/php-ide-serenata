@@ -58,6 +58,7 @@ class DeduceTypes extends BaseCommand
     {
         $optionCollection->add('file:', 'The file to examine.')->isa('string');
         $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
+        $optionCollection->add('charoffset?', 'If set, the input offset will be treated as a character offset instead of a byte offset.');
         $optionCollection->add('part+', 'A part of the expression as string. Specify this as many times as you have parts.')->isa('string');
         $optionCollection->add('offset:', 'The character byte offset into the code to use for the determination.')->isa('number');
     }
@@ -80,11 +81,17 @@ class DeduceTypes extends BaseCommand
             isset($arguments['stdin']) && $arguments['stdin']->value
         );
 
+        $offset = $arguments['offset']->value;
+
+        if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
+            $offset = $this->getCharacterOffsetFromByteOffset($offset, $code);
+        }
+
         $result = $this->deduceTypes(
            isset($arguments['file']) ? $arguments['file']->value : null,
            $code,
            $arguments['part']->value,
-           $arguments['offset']->value
+           $offset
         );
 
         return $this->outputJson(true, $result);

@@ -27,7 +27,7 @@ abstract class Command implements CommandInterface
      *
      * @var int
      */
-    const DATABASE_VERSION = 20;
+    const DATABASE_VERSION = 21;
 
     /**
      * @var IndexDatabase
@@ -189,6 +189,20 @@ abstract class Command implements CommandInterface
     protected function calculateLineByOffset($source, $offset)
     {
         return substr_count($source, "\n", 0, $offset) + 1;
+    }
+
+    /**
+     * Retrieves the character offset from the specified byte offset in the specified string. The result will always be
+     * smaller than or equal to the passed in value, depending on the amount of multi-byte characters encountered.
+     *
+     * @param string $string
+     * @param int    $byteOffset
+     *
+     * @return int
+     */
+    protected function getCharacterOffsetFromByteOffset($byteOffset, $string)
+    {
+        return mb_strlen(mb_strcut($string, 0, $byteOffset));
     }
 
     /**

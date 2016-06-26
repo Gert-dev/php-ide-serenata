@@ -1,8 +1,21 @@
+## 1.0.4
+### Bugs fixed
+* Byte and character offsets were being mixed up. The expected formats have been documented in the README:
+  * Output offsets retrieved from the service (and PHP side) have always been byte offsets, and this will also remain the same. To deal with the conversion, a new service method, `getCharacterOffsetFromByteOffset`, has been added.
+  * The PHP side expects byte offsets, but commands that need offsets also gained an option `charoffset` to switch to pass character offsets instead. The CoffeeScript side has always expected character offsets as input because Atom mainly works with these, and this will remain the same.
+  * In short, nothing has changed for dependent packages, but packages that use byte offsets incorrectly as character offsets may want to use the new service method to perform the conversion.
+
+## 1.0.3
+### Bugs fixed
+* Fixed namespaces without a name causing an error when resolving types.
+
 ## 1.0.2
+### Bugs fixed
 * Fixed a circular dependency exception being thrown if a classlike implemented the same interface twice via separate paths.
 * If you have the same FQCN twice in your code base, only one of them will be analyzed when examining classlikes for associations (parents, traits, interfaces, ...). Having two classes with the same FQCN is actually an error, but it can happen if you store files that aren't actually directly part of your code inside your project folder. A better solution for this is to exclude those folders from indexing, which will be possible as soon as project support is implemented. Until that happens, this should mitigate the circular dependency exception that ensued because two classlikes with the same name were examined.
 
 ## 1.0.1
+### Bugs fixed
 * Fixed error regarding `$type` when not using PHP 7 (thanks to [@UziTech](https://github.com/UziTech)).
 
 ## 1.0.0

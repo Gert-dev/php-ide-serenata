@@ -51,6 +51,7 @@ class VariableTypes extends BaseCommand
     {
         $optionCollection->add('file:', 'The file to examine.')->isa('string');
         $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
+        $optionCollection->add('charoffset?', 'If set, the input offset will be treated as a character offset instead of a byte offset.');
         $optionCollection->add('name:', 'The name of the variable to examine.')->isa('string');
         $optionCollection->add('offset:', 'The character byte offset into the code to use for the determination.')->isa('number');
     }
@@ -73,11 +74,17 @@ class VariableTypes extends BaseCommand
             isset($arguments['stdin']) && $arguments['stdin']->value
         );
 
+        $offset = $arguments['offset']->value;
+
+        if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
+            $offset = $this->getCharacterOffsetFromByteOffset($offset, $code);
+        }
+
         $result = $this->getVariableTypes(
            isset($arguments['file']) ? $arguments['file']->value : null,
            $code,
            $arguments['name']->value,
-           $arguments['offset']->value
+           $offset
        );
 
        return $this->outputJson(true, $result);
