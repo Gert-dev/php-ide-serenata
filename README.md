@@ -46,6 +46,10 @@ As the service allows fetching information about the code base, other packages c
 * An (UML?) class diagram builder that creates a visual representation of the relations between all classes in a code base (i.e. their implemented interfaces, base classes and traits).
 * Most of the existing packages could use new improvements, contributions are most welcome.
 
+### Notes
+* Offsets passed to the service should be character offsets. The PHP side can actually work with both, but Atom's `TextBuffer` works primarily with character offsets.
+* Offsets returned by the service are byte offsets. This is because the PHP parsing back end works with these and to cut down on code that needs to be Unicode-aware. The service provides the `getCharacterOffsetFromByteOffset` method to allow you to deal with conversion if necessary.
+
 ## Can I use this for other editors?
 Well, yes and no: the packages themselves are dependent on Atom, of course, but the PHP side is not dependent on Atom at all. In theory it is possible to just extract out the PHP source and build a plugin or extension for another editor around it.
 

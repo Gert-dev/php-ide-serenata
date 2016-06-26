@@ -1,3 +1,10 @@
+## 1.0.4
+### Bugs fixed
+* Byte and character offsets were being mixed up. The expected formats have been documented in the README:
+  * Output offsets retrieved from the service (and PHP side) have always been byte offsets, and this will also remain the same. To deal with the conversion, a new service method, `getCharacterOffsetFromByteOffset`, has been added.
+  * The PHP side expects byte offsets, but commands that need offsets also gained an option `charoffset` to switch to pass character offsets instead. The CoffeeScript side has always expected character offsets as input because Atom mainly works with these, and this will remain the same.
+  * In short, nothing has changed for dependent packages, but packages that use byte offsets incorrectly as character offsets may want to use the new service method to perform the conversion.
+
 ## 1.0.3
 ### Bugs fixed
 * Fixed namespaces without a name causing an error when resolving types.

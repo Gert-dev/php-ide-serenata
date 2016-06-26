@@ -288,7 +288,7 @@ class OutlineIndexingVisitor extends NameResolver
                 ),
 
                 'defaultValue' => $param->default ?
-                    mb_substr(
+                    substr(
                         $this->code,
                         $param->default->getAttribute('startFilePos'),
                         $param->default->getAttribute('endFilePos') - $param->default->getAttribute('startFilePos') + 1
