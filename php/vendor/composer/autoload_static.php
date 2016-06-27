@@ -73,16 +73,16 @@ class ComposerStaticInit6d911d2c0317086b52990384597ba6c1
     );
 
     public static $classMap = array (
-        'A\\A' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/CircularDependency.php',
+        'A\\A' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/CircularDependencyExtends.php',
         'A\\AncestorClass' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/ClassInheritance.php',
         'A\\AnnotationClass' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/AnnotationClass.php',
         'A\\AnotherChildClass' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/ClassDocblockInheritance.php',
-        'A\\B' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/CircularDependency.php',
+        'A\\B' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/CircularDependencyExtends.php',
         'A\\Base' => __DIR__ . '/../..' . '/tests/Application/Command/SemanticLintTest/DocblockCorrectnessMissingDocumentation.php',
         'A\\BaseClass' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/ClassInheritance.php',
         'A\\BaseInterface' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/InterfaceImplementation.php',
         'A\\BaseTrait' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/TraitUsage.php',
-        'A\\C' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/CircularDependency.php',
+        'A\\C' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/CircularDependencyExtends.php',
         'A\\ChildClass' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/ClassDocblockInheritance.php',
         'A\\FinalClass' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/FinalClass.php',
         'A\\FirstClass' => __DIR__ . '/../..' . '/tests/Application/Command/ClassListTest/ClassList.php',
@@ -145,15 +145,17 @@ class ComposerStaticInit6d911d2c0317086b52990384597ba6c1
         'PhpIntegrator\\Application\\Command\\VariableTypes' => __DIR__ . '/../..' . '/src/Application/Command/VariableTypes.php',
         'PhpIntegrator\\Application\\Command\\VariableTypesTest' => __DIR__ . '/../..' . '/tests/Application/Command/VariableTypesTest.php',
         'PhpIntegrator\\Application\\Command\\Visitor\\ScopeLimitingVisitor' => __DIR__ . '/../..' . '/src/Application/Command/Visitor/ScopeLimitingVisitor.php',
+        'PhpIntegrator\\CircularDependencyException' => __DIR__ . '/../..' . '/src/CircularDependencyException.php',
         'PhpIntegrator\\DocParser' => __DIR__ . '/../..' . '/src/DocParser.php',
+        'PhpIntegrator\\DocParserTest' => __DIR__ . '/../..' . '/tests/DocParserTest.php',
         'PhpIntegrator\\DocblockAnalyzer' => __DIR__ . '/../..' . '/src/DocblockAnalyzer.php',
         'PhpIntegrator\\IndexDataAdapter' => __DIR__ . '/../..' . '/src/IndexDataAdapter.php',
         'PhpIntegrator\\IndexDataAdapterInterface' => __DIR__ . '/../..' . '/src/IndexDataAdapterInterface.php',
-        'PhpIntegrator\\IndexDataAdapter\\CircularDependencyException' => __DIR__ . '/../..' . '/src/IndexDataAdapter/CircularDependencyException.php',
         'PhpIntegrator\\IndexDataAdapter\\ProviderCachingProxy' => __DIR__ . '/../..' . '/src/IndexDataAdapter/ProviderCachingProxy.php',
         'PhpIntegrator\\IndexDataAdapter\\ProviderInterface' => __DIR__ . '/../..' . '/src/IndexDataAdapter/ProviderInterface.php',
         'PhpIntegrator\\IndexedTest' => __DIR__ . '/../..' . '/tests/IndexedTest.php',
         'PhpIntegrator\\Indexing\\BuiltinIndexer' => __DIR__ . '/../..' . '/src/Indexing/BuiltinIndexer.php',
+        'PhpIntegrator\\Indexing\\CallbackStorageProxy' => __DIR__ . '/../..' . '/src/Indexing/CallbackStorageProxy.php',
         'PhpIntegrator\\Indexing\\FileIndexer' => __DIR__ . '/../..' . '/src/Indexing/FileIndexer.php',
         'PhpIntegrator\\Indexing\\IndexDatabase' => __DIR__ . '/../..' . '/src/Indexing/IndexDatabase.php',
         'PhpIntegrator\\Indexing\\IndexStorageItemEnum' => __DIR__ . '/../..' . '/src/Indexing/IndexStorageItemEnum.php',
@@ -166,6 +168,7 @@ class ComposerStaticInit6d911d2c0317086b52990384597ba6c1
         'PhpIntegrator\\TypeAnalyzer' => __DIR__ . '/../..' . '/src/TypeAnalyzer.php',
         'PhpIntegrator\\TypeResolver' => __DIR__ . '/../..' . '/src/TypeResolver.php',
         'PhpIntegrator\\TypeResolverTest' => __DIR__ . '/../..' . '/tests/TypeResolverTest.php',
+        'TestClass' => __DIR__ . '/../..' . '/tests/Application/Command/ClassInfoTest/ClassNamelessNamespace.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

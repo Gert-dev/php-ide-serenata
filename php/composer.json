@@ -7,7 +7,7 @@
     },
 
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.5.0",
         "ext-mbstring": "*",
         "ext-pdo_sqlite": "*",
         "nikic/php-parser": "~2.1.0",
