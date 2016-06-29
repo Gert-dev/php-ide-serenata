@@ -1,3 +1,7 @@
+## 1.0.6
+### Bugs fixed
+* Fixed docblock correctness linting going haywire when there were unicode characters inside the docblock.
+
 ## 1.0.5
 ### Bugs fixed
 * Attempt to fix the cache permission denied issue on Windows by using a different caching directory.

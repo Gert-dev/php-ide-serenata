@@ -3,6 +3,8 @@
 namespace A;
 
 /**
+ * à couple of Unicode chàràcters
+ *
  * @param mixed          $param1
  * @param \DateTime|null $param2
  * @param int[]          $param3

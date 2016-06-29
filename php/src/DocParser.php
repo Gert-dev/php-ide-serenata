@@ -108,7 +108,8 @@ class DocParser
                     $tags[$tag] = [];
                 }
 
-                $tagValue = mb_substr($docblock, $start, $end - $start);
+                // NOTE: preg_match_all returns byte offsets, not character offsets.
+                $tagValue = substr($docblock, $start, $end - $start);
                 $tagValue = $this->normalizeNewlines($tagValue);
 
                 // Remove the delimiters of the docblock itself at the start of each line, if any.
