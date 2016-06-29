@@ -79,9 +79,18 @@ class Application
     protected function getFilesystemCache()
     {
         if (!$this->filesystemCache instanceof FilesystemCache) {
-            $this->filesystemCache = new FilesystemCache(
-                sys_get_temp_dir() . '/php-integrator-base/' . Application\Command::DATABASE_VERSION . '/'
-            );
+            $directory = sys_get_temp_dir() . '/php-integrator-base/';
+
+            // For some reason, Windows gives permission denied errors in its temp folder when Doctrine Cache tries to
+            // read its cache files again. For this reason, switch to the package folder instead. See also
+            // https://github.com/Gert-dev/php-integrator-base/issues/185 
+            if (mb_strtoupper(mb_substr(PHP_OS, 0, 3)) === 'WIN') {
+                $directory = __DIR__ . '/../../indexes/cache/';
+            }
+
+            $directory .= Application\Command::DATABASE_VERSION . '/';
+
+            $this->filesystemCache = new FilesystemCache($directory);
         }
 
         return $this->filesystemCache;

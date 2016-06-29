@@ -1,3 +1,7 @@
+## 1.0.5
+### Bugs fixed
+* Attempt to fix the cache permission denied issue on Windows by using a different caching directory.
+
 ## 1.0.4
 ### Bugs fixed
 * Byte and character offsets were being mixed up. The expected formats have been documented in the README:
