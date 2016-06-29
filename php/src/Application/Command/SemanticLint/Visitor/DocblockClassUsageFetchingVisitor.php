@@ -6,6 +6,7 @@ use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
 
 use PhpParser\Node;
+use PhpParser\Comment;
 use PhpParser\NodeVisitorAbstract;
 
 /**
@@ -54,51 +55,88 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
             $this->lastNamespace = (string) $node->name;
         }
 
-        if ($docblock) {
-            // Look for types right after a tag.
-            preg_match_all(
-                '/@(?:(?:param|throws|return|var)\s+)?((?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?(?:\|(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?)*)(?:$|\W|\})/',
-                $docblock,
-                $matches,
-                PREG_SET_ORDER | PREG_OFFSET_CAPTURE
-            );
+        if (!$docblock) {
+            return;
+        }
 
-            foreach ($matches as $match) {
-                $typeString = $match[1][0];
-                $typeStringOffset = $match[1][1];
+        $this->fetchTypeClasses($docblock);
+        $this->fetchAnnotationClasses($docblock);
+    }
 
-                $types = explode(DocParser::TYPE_SPLITTER, $typeString);
+    /**
+     * Fetches classes being used as type (e.g. @param Foo, @throws \My\Class, ...).
+     *
+     * @param Comment\Doc $docblock
+     */
+    protected function fetchTypeClasses(Comment\Doc $docblock)
+    {
+        preg_match_all(
+            '/@(?:param|throws|return|var)\s+((?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?(?:\|(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?)*)(?:$|\s|\})/',
+            $docblock,
+            $matches,
+            PREG_SET_ORDER | PREG_OFFSET_CAPTURE
+        );
 
-                foreach ($types as $type) {
-                    if (mb_substr($type, -2) === '[]') {
-                        $type = mb_substr($type, 0, -2);
-                    }
+        foreach ($matches as $match) {
+            $this->validateType($docblock, $match[1][0], $match[1][1]);
+        }
+    }
 
-                    if ($this->isValidType($type)) {
-                        $parts = explode('\\', $type);
-                        $firstPart = array_shift($parts);
+    /**
+     * Fetches class names being used as annotation (e.g. @\My\Class).
+     *
+     * @param Comment\Doc $docblock
+     */
+    protected function fetchAnnotationClasses(Comment\Doc $docblock)
+    {
+        preg_match_all(
+            '/\*\s+@((?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?(?:\|(?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*)(?:\[\])?)*)(?:$|\W|\})/',
+            $docblock,
+            $matches,
+            PREG_SET_ORDER | PREG_OFFSET_CAPTURE
+        );
 
-                        $isFullyQualified = false;
+        foreach ($matches as $match) {
+            $this->validateType($docblock, $match[1][0], $match[1][1]);
+        }
+    }
 
-                        if (!empty($type) && $type[0] === '\\') {
-                            $isFullyQualified = true;
-                            $type = mb_substr($type, 1);
-                        }
+    /**
+     * @param Comment\Doc $docblock
+     * @param mixed       $typeString
+     * @param mixed       $typeStringOffset
+     */
+    protected function validateType(Comment\Doc $docblock, $typeString, $typeStringOffset)
+    {
+        $types = explode(DocParser::TYPE_SPLITTER, $typeString);
+        foreach ($types as $type) {
+            if (mb_substr($type, -2) === '[]') {
+                $type = mb_substr($type, 0, -2);
+            }
 
-                        $this->classUsageList[] = [
-                            'name'             => $type,
-                            'firstPart'        => $firstPart,
-                            'isFullyQualified' => $isFullyQualified,
-                            'namespace'        => $this->lastNamespace,
-                            'line'             => $docblock->getLine()    ? $docblock->getLine() : null,
-                            'start'            => $docblock->getFilePos() ?
-                                ($docblock->getFilePos() + $typeStringOffset) : null,
+            if ($this->isValidType($type)) {
+                $parts = explode('\\', $type);
+                $firstPart = array_shift($parts);
 
-                            'end'              => $docblock->getFilePos() ?
-                                ($docblock->getFilePos() + $typeStringOffset + mb_strlen($typeString)) : null
-                        ];
-                    }
+                $isFullyQualified = false;
+
+                if (!empty($type) && $type[0] === '\\') {
+                    $isFullyQualified = true;
+                    $type = mb_substr($type, 1);
                 }
+
+                $this->classUsageList[] = [
+                    'name'             => $type,
+                    'firstPart'        => $firstPart,
+                    'isFullyQualified' => $isFullyQualified,
+                    'namespace'        => $this->lastNamespace,
+                    'line'             => $docblock->getLine()    ? $docblock->getLine() : null,
+                    'start'            => $docblock->getFilePos() ?
+                        ($docblock->getFilePos() + $typeStringOffset) : null,
+
+                    'end'              => $docblock->getFilePos() ?
+                        ($docblock->getFilePos() + $typeStringOffset + mb_strlen($typeString)) : null
+                ];
             }
         }
     }

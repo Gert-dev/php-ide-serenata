@@ -22,6 +22,8 @@ class Foo
  * @MissingAnnotationClass
  * @A\MissingAnnotationClass
  * @\B\MissingAnnotationClass
+ *
+ * @author Some name <test@testdomain.com>
  */
 function foo()
 {
