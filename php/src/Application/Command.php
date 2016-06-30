@@ -94,7 +94,9 @@ abstract class Command implements CommandInterface
         $this->databaseFile = $processedArguments['database']->value;
 
         // Ensure we differentiate caches between databases.
-        $this->cache->setCachePrefix(md5($this->databaseFile));
+        if ($this->cache) {
+            $this->cache->setCachePrefix(md5($this->databaseFile));
+        }
 
         $this->setIndexDatabase($this->createIndexDatabase($this->databaseFile));
 

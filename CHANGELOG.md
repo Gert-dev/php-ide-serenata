@@ -2,6 +2,10 @@
 ### Features and enhancements
 * At least PHP 5.5 is now required to run the service. PHP 5.4 has been declared end of life for quite some time now and 5.5 will be declared end of life 10 July 2016. This does not affect the code you can actually write, the indexer still supports PHP 5.2 up to PHP 7.0, it is just the PHP interpreter running the indexer that had a required version bump.
 
+## 1.0.7
+### Bugs fixed
+* Fixed the `setCachePrefix` error on Windows.
+
 ## 1.0.6
 ### Bugs fixed
 * Fixed docblock correctness linting going haywire when there were unicode characters inside the docblock.
