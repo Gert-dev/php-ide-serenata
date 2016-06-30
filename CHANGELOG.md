@@ -1,3 +1,7 @@
+## 1.0.7
+### Bugs fixed
+* Fixed the `setCachePrefix` error on Windows.
+
 ## 1.0.6
 ### Bugs fixed
 * Fixed docblock correctness linting going haywire when there were unicode characters inside the docblock.
