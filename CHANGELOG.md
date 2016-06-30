@@ -5,6 +5,7 @@
 ## 1.0.6
 ### Bugs fixed
 * Fixed docblock correctness linting going haywire when there were unicode characters inside the docblock.
+* The caching fix from 1.0.5 was rolled back because it didn't work. Caching has been disabled on Windows until a solution can be found.
 * Fixed words after an `@` symbol in docblocks incorrectly being marked as unknown annotation class (e.g. `@author Someone <someone@test.com>`).
 
 ## 1.0.5
