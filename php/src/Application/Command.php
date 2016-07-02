@@ -14,7 +14,6 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Indexing\IndexDatabase;
-use PhpIntegrator\Indexing\CallbackStorageProxy;
 
 /**
  * Base class for commands.
