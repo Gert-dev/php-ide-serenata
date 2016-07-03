@@ -6,12 +6,10 @@ use ArrayAccess;
 
 use PhpIntegrator\IndexDataAdapter;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 /**
  * Command that shows a list of global constants.
  */
-class GlobalConstants extends BaseCommand
+class GlobalConstants extends AbstractCommand
 {
     /**
      * @inheritDoc

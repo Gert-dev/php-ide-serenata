@@ -8,8 +8,6 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
@@ -18,7 +16,7 @@ use PhpParser\NodeTraverser;
 /**
  * Command that shows information about the scopes at a specific position in a file.
  */
-class AvailableVariables extends BaseCommand
+class AvailableVariables extends AbstractCommand
 {
     /**
      * @var Parser

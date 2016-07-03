@@ -10,8 +10,6 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDataAdapter;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpParser\Node;
@@ -19,7 +17,7 @@ use PhpParser\Node;
 /**
  * Allows deducing the types of an expression (e.g. a call chain, a simple string, ...).
  */
-class DeduceTypes extends BaseCommand
+class DeduceTypes extends AbstractCommand
 {
     /**
      * @var VariableTypes

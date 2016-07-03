@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application;
+namespace PhpIntegrator\Application\Command;
 
 use ArrayAccess;
 use LogicException;
@@ -18,7 +18,7 @@ use PhpIntegrator\Indexing\IndexDatabase;
 /**
  * Base class for commands.
  */
-abstract class Command implements CommandInterface
+abstract class AbstractCommand implements CommandInterface
 {
     /**
      * The version of the database we're currently at. When there are large changes to the layout of the database, this

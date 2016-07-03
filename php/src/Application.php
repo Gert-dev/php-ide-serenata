@@ -46,7 +46,7 @@ class Application
         if (isset($commands[$command])) {
             $className = "\\PhpIntegrator\\Application\\Command\\{$commands[$command]}";
 
-            /** @var \PhpIntegrator\Application\CommandInterface $command */
+            /** @var \PhpIntegrator\Application\Command\CommandInterface $command */
             $command = new $className($this->getFilesystemCache());
 
             if (interface_exists('Throwable')) {
@@ -87,7 +87,7 @@ class Application
             }
 
             $this->filesystemCache = new FilesystemCache(
-                sys_get_temp_dir() . '/php-integrator-base/' . Application\Command::DATABASE_VERSION . '/'
+                sys_get_temp_dir() . '/php-integrator-base/' . Application\Command\AbstractCommand::DATABASE_VERSION . '/'
             );
         }
 

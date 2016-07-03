@@ -10,12 +10,10 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDataAdapter;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 /**
  * Command that shows information about a class, interface or trait.
  */
-class ClassInfo extends BaseCommand
+class ClassInfo extends AbstractCommand
 {
     /**
      * @var TypeAnalyzer

@@ -4,12 +4,10 @@ namespace PhpIntegrator\Application\Command;
 
 use ArrayAccess;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 /**
  * Command that shows a list of global functions.
  */
-class GlobalFunctions extends BaseCommand
+class GlobalFunctions extends AbstractCommand
 {
     /**
      * @inheritDoc

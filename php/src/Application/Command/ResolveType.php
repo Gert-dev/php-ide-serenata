@@ -10,12 +10,10 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeResolver;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 /**
  * Command that resolves local types in a file.
  */
-class ResolveType extends BaseCommand
+class ResolveType extends AbstractCommand
 {
     /**
      * @inheritDoc

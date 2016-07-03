@@ -9,8 +9,6 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeAnalyzer;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpParser\Error;
@@ -22,7 +20,7 @@ use PhpParser\ParserFactory;
 /**
  * Command that retrieves information about the types of a variable.
  */
-class VariableTypes extends BaseCommand
+class VariableTypes extends AbstractCommand
 {
     /**
      * @var Parser

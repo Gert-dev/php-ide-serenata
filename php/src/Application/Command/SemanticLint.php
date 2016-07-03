@@ -10,8 +10,6 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpParser\Error;
@@ -24,7 +22,7 @@ use PhpParser\ParserFactory;
  * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the
  * indexer).
  */
-class SemanticLint extends BaseCommand
+class SemanticLint extends AbstractCommand
 {
     /**
      * @var Parser

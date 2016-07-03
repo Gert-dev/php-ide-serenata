@@ -8,12 +8,10 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\IndexDataAdapter;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 /**
  * Command that shows a list of available classes, interfaces and traits.
  */
-class ClassList extends BaseCommand
+class ClassList extends AbstractCommand
 {
     /**
      * @inheritDoc

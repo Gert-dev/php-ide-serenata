@@ -11,8 +11,6 @@ use PhpIntegrator\Indexing;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 use PhpIntegrator\IndexDataAdapter\ProviderCachingProxy;
 
 use PhpIntegrator\Indexing\Scanner;
@@ -28,7 +26,7 @@ use PhpParser\ParserFactory;
 /**
  * Command that reindexes a file or folder.
  */
-class Reindex extends BaseCommand
+class Reindex extends AbstractCommand
 {
     /**
      * @var ProjectIndexer

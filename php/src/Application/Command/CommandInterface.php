@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application;
+namespace PhpIntegrator\Application\Command;
 
 /**
  * Interface for commands.

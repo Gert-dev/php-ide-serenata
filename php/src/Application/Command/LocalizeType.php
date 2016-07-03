@@ -10,12 +10,10 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeResolver;
 
-use PhpIntegrator\Application\Command as BaseCommand;
-
 /**
  * Command that makes a FQCN relative to local use statements in a file.
  */
-class LocalizeType extends BaseCommand
+class LocalizeType extends AbstractCommand
 {
     /**
      * @inheritDoc
