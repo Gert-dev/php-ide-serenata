@@ -58,7 +58,7 @@ abstract class AbstractCommand implements CommandInterface
      */
     public function __construct(Cache $cache = null)
     {
-        $this->cache = $cache ? (new CacheIdPrefixDecorator($cache, '')) : null;
+        $this->cache = $cache ? (new CacheIdPrefixDecorator($cache, $this->getCachePrefix())) : null;
     }
 
     /**
@@ -204,6 +204,14 @@ abstract class AbstractCommand implements CommandInterface
     protected function getCharacterOffsetFromByteOffset($byteOffset, $string)
     {
         return mb_strlen(mb_strcut($string, 0, $byteOffset));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCachePrefix()
+    {
+        return '';
     }
 
     /**
