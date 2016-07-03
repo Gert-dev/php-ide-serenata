@@ -42,7 +42,7 @@ class ClassList extends AbstractCommand
      {
          $result = [];
 
-         $storageProxy = new ClassList\ProxyProvider($this->indexDatabase);
+         $storageProxy = new ClassList\ProxyProvider($this->getIndexDataAdapterProvider());
          $dataAdapter = new IndexDataAdapter($storageProxy);
 
          foreach ($this->indexDatabase->getAllStructuresRawInfo($file) as $element) {
