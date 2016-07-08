@@ -65,21 +65,21 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
             'expressionHasNoSuchMember' => []
         ];
 
-        $methodCallList = $this->methodUsageFetchingVisitor->getMethodCallList();
+        $memberCallList = $this->methodUsageFetchingVisitor->getMemberCallList();
 
-        foreach ($methodCallList as $methodCall) {
-            if ($methodCall['type'] === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_HAS_NO_TYPE) {
-                unset ($methodCall['type']);
+        foreach ($memberCallList as $memberCall) {
+            if ($memberCall['type'] === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_HAS_NO_TYPE) {
+                unset ($memberCall['type']);
 
-                $output['expressionHasNoType'][] = $methodCall;
-            } elseif ($methodCall['type'] === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_IS_NOT_CLASSLIKE) {
-                unset ($methodCall['type']);
+                $output['expressionHasNoType'][] = $memberCall;
+            } elseif ($memberCall['type'] === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_IS_NOT_CLASSLIKE) {
+                unset ($memberCall['type']);
 
-                $output['expressionIsNotClasslike'][] = $methodCall;
-            } elseif ($methodCall['type'] === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER) {
-                unset ($methodCall['type']);
+                $output['expressionIsNotClasslike'][] = $memberCall;
+            } elseif ($memberCall['type'] === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER) {
+                unset ($memberCall['type']);
 
-                $output['expressionHasNoSuchMember'][] = $methodCall;
+                $output['expressionHasNoSuchMember'][] = $memberCall;
             }
         }
 

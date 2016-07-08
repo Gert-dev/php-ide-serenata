@@ -36,7 +36,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     /**
      * @var array
      */
-    protected $methodCallList = [];
+    protected $memberCallList = [];
 
     /**
      * @var string
@@ -113,12 +113,12 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                 if ($this->typeAnalyzer->isClassType($className)) {
                     $className = $this->resolveType->resolveType($className, $this->file, $node->getAttribute('startLine'));
                 }
-                
+
                 $objectTypes = [$className];
             }
 
             if (empty($objectTypes)) {
-                $this->methodCallList[] = [
+                $this->memberCallList[] = [
                     'type'       => self::TYPE_EXPRESSION_HAS_NO_TYPE,
                     'memberName' => is_string($node->name) ? $node->name : null,
                     'start'      => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
@@ -130,7 +130,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
 
             foreach ($objectTypes as $objectType) {
                 if (!$this->typeAnalyzer->isClassType($objectType)) {
-                    $this->methodCallList[] = [
+                    $this->memberCallList[] = [
                         'type'           => self::TYPE_EXPRESSION_IS_NOT_CLASSLIKE,
                         'memberName'     => is_string($node->name) ? $node->name : null,
                         'expressionType' => $objectType,
@@ -149,7 +149,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                     }
 
                     if (!$classInfo || !isset($classInfo['methods'][$node->name])) {
-                        $this->methodCallList[] = [
+                        $this->memberCallList[] = [
                             'type'           => self::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER,
                             'memberName'     => is_string($node->name) ? $node->name : null,
                             'expressionType' => $objectType,
@@ -163,12 +163,10 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * Retrieves the class usage list.
-     *
      * @return array
      */
-    public function getMethodCallList()
+    public function getMemberCallList()
     {
-        return $this->methodCallList;
+        return $this->memberCallList;
     }
 }
