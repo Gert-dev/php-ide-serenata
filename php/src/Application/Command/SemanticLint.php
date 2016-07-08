@@ -35,6 +35,11 @@ class SemanticLint extends AbstractCommand
     protected $classInfoCommand;
 
     /**
+     * @var ClassInfo
+     */
+    protected $deduceTypesCommand;
+
+    /**
      * @var ResolveType
      */
     protected $resolveTypeCommand;
@@ -79,6 +84,7 @@ class SemanticLint extends AbstractCommand
             $arguments['file']->value,
             $code,
             !(isset($arguments['no-unknown-classes']) && $arguments['no-unknown-classes']->value),
+            !(isset($arguments['no-unknown-members']) && $arguments['no-unknown-members']->value),
             !(isset($arguments['no-docblock-correctness']) && $arguments['no-docblock-correctness']->value),
             !(isset($arguments['no-unused-use-statements']) && $arguments['no-unused-use-statements']->value)
         );
@@ -90,6 +96,7 @@ class SemanticLint extends AbstractCommand
      * @param string $file
      * @param string $code
      * @param bool   $retrieveUnknownClasses
+     * @param bool   $retrieveUnknownMembers
      * @param bool   $analyzeDocblockCorrectness
      * @param bool   $retrieveUnusedUseStatements
      *
@@ -99,6 +106,7 @@ class SemanticLint extends AbstractCommand
         $file,
         $code,
         $retrieveUnknownClasses = true,
+        $retrieveUnknownMembers = true,
         $analyzeDocblockCorrectness = true,
         $retrieveUnusedUseStatements = true
     ) {
@@ -141,6 +149,22 @@ class SemanticLint extends AbstractCommand
                 );
 
                 foreach ($unknownClassAnalyzer->getVisitors() as $visitor) {
+                    $traverser->addVisitor($visitor);
+                }
+            }
+
+            $unknownMemberAnalyzer = null;
+
+            if ($retrieveUnknownMembers) {
+                $unknownMemberAnalyzer = new SemanticLint\UnknownMemberAnalyzer(
+                    $this->getDeduceTypesCommand(),
+                    $this->getClassInfoCommand(),
+                    $this->getTypeAnalyzer(),
+                    $file,
+                    $code
+                );
+
+                foreach ($unknownMemberAnalyzer->getVisitors() as $visitor) {
                     $traverser->addVisitor($visitor);
                 }
             }
@@ -195,6 +219,10 @@ class SemanticLint extends AbstractCommand
                 $output['errors']['unknownClasses'] = $unknownClassAnalyzer->getOutput();
             }
 
+            if ($unknownMemberAnalyzer) {
+                $output['errors']['unknownMembers'] = $unknownMemberAnalyzer->getOutput();
+            }
+
             if ($docblockCorrectnessAnalyzer) {
                 $output['warnings']['docblockIssues'] = $docblockCorrectnessAnalyzer->getOutput();
             }
@@ -230,6 +258,19 @@ class SemanticLint extends AbstractCommand
         }
 
         return $this->classInfoCommand;
+    }
+
+    /**
+     * @return DeduceTypes
+     */
+    protected function getDeduceTypesCommand()
+    {
+        if (!$this->deduceTypesCommand) {
+            $this->deduceTypesCommand = new DeduceTypes($this->cache);
+            $this->deduceTypesCommand->setIndexDatabase($this->indexDatabase);
+        }
+
+        return $this->deduceTypesCommand;
     }
 
     /**

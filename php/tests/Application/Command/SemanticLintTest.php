@@ -124,6 +124,54 @@ class SemanticLintTest extends IndexedTest
         ], $output['errors']['unknownClasses']);
     }
 
+    public function testReportsInvalidMemberCallsOnAnExpressionWithoutAType()
+    {
+        $output = $this->lintFile('UnknownMemberExpressionWithNoType.php');
+
+        $this->assertEquals([
+            [
+                'memberName' => 'foo',
+                'start'      => 21,
+                'end'        => 32
+            ]
+        ], $output['errors']['unknownMembers']['expressionHasNoType']);
+    }
+
+    public function testReportsInvalidMemberCallsOnAnExpressionThatDoesNotReturnAClasslike()
+    {
+        $output = $this->lintFile('UnknownMemberExpressionWithNoClasslike.php');
+
+        $this->assertEquals([
+            [
+                'memberName'     => 'foo',
+                'expressionType' => 'int',
+                'start'          => 57,
+                'end'            => 68
+            ],
+
+            [
+                'memberName'     => 'foo',
+                'expressionType' => 'bool',
+                'start'          => 57,
+                'end'            => 68
+            ]
+        ], $output['errors']['unknownMembers']['expressionIsNotClasslike']);
+    }
+
+    public function testReportsInvalidMemberCallsOnAnExpressionThatReturnsAClasslikeWithNoSuchMember()
+    {
+        $output = $this->lintFile('UnknownMemberExpressionWithNoSuchMember.php');
+
+        $this->assertEquals([
+            [
+                'memberName'     => 'foo',
+                'expressionType' => '\A\Foo',
+                'start'          => 55,
+                'end'            => 66
+            ]
+        ], $output['errors']['unknownMembers']['expressionHasNoSuchMember']);
+    }
+
     public function testReportsUnusedUseStatementsWithSingleNamespace()
     {
         $output = $this->lintFile('UnusedUseStatementsSingleNamespace.php');

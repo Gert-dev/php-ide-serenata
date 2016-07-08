@@ -113,7 +113,7 @@ class Service
      *
      * @param {String}      file
      * @param {String|null} source The source code of the file to index. May be null if a directory is passed instead.
-     * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses,
+     * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses, noUnknownMembers,
      *                              noDocblockCorrectness and noUnusedUseStatements are supported.
      *
      * @return {Promise}
