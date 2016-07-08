@@ -168,6 +168,13 @@ class SemanticLintTest extends IndexedTest
                 'expressionType' => '\A\Foo',
                 'start'          => 55,
                 'end'            => 66
+            ],
+
+            [
+                'memberName'     => 'bar',
+                'expressionType' => '\A\Foo',
+                'start'          => 68,
+                'end'            => 78
             ]
         ], $output['errors']['unknownMembers']['expressionHasNoSuchMember']);
     }

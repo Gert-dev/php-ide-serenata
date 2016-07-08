@@ -5,6 +5,7 @@ namespace PhpIntegrator\Application\Command\SemanticLint;
 use PhpIntegrator\TypeAnalyzer;
 
 use PhpIntegrator\Application\Command\ClassInfo;
+use PhpIntegrator\Application\Command\ResolveType;
 use PhpIntegrator\Application\Command\DeduceTypes;
 
 /**
@@ -20,6 +21,7 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
     /**
      * @param DeduceTypes  $deduceTypes
      * @param ClassInfo    $classInfo
+     * @param ResolveType  $resolveType
      * @param TypeAnalyzer $typeAnalyzer
      * @param string       $file
      * @param string       $code
@@ -27,6 +29,7 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
     public function __construct(
         DeduceTypes $deduceTypes,
         ClassInfo $classInfo,
+        ResolveType $resolveType,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
@@ -34,6 +37,7 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
         $this->methodUsageFetchingVisitor = new Visitor\MemberUsageFetchingVisitor(
             $deduceTypes,
             $classInfo,
+            $resolveType,
             $typeAnalyzer,
             $file,
             $code

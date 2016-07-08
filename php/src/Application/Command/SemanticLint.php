@@ -159,6 +159,7 @@ class SemanticLint extends AbstractCommand
                 $unknownMemberAnalyzer = new SemanticLint\UnknownMemberAnalyzer(
                     $this->getDeduceTypesCommand(),
                     $this->getClassInfoCommand(),
+                    $this->getResolveTypeCommand(),
                     $this->getTypeAnalyzer(),
                     $file,
                     $code

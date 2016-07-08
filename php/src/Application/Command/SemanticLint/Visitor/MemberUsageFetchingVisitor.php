@@ -2,9 +2,12 @@
 
 namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
 
+use UnexpectedValueException;
+
 use PhpIntegrator\TypeAnalyzer;
 
 use PhpIntegrator\Application\Command\ClassInfo;
+use PhpIntegrator\Application\Command\ResolveType;
 use PhpIntegrator\Application\Command\DeduceTypes;
 
 use PhpParser\Node;
@@ -51,6 +54,11 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     protected $deduceTypes;
 
     /**
+     * @var ResolveType
+     */
+    protected $resolveType;
+
+    /**
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
@@ -63,6 +71,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     /**
      * @param DeduceTypes  $deduceTypes
      * @param ClassInfo    $classInfo
+     * @param ResolveType  $resolveType
      * @param TypeAnalyzer $typeAnalyzer
      * @param string       $file
      * @param string       $code
@@ -70,6 +79,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     public function __construct(
         DeduceTypes $deduceTypes,
         ClassInfo $classInfo,
+        ResolveType $resolveType,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
@@ -77,6 +87,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
         $this->deduceTypes = $deduceTypes;
         $this->classInfo = $classInfo;
         $this->typeAnalyzer = $typeAnalyzer;
+        $this->resolveType = $resolveType;
         $this->file = $file;
         $this->code = $code;
     }
@@ -86,13 +97,25 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Expr\MethodCall) {
-            $objectTypes = $this->deduceTypes->deduceTypesFromNode(
-                $this->file,
-                $this->code,
-                $node->var,
-                $node->getAttribute('startFilePos')
-            );
+        if ($node instanceof Node\Expr\MethodCall || $node instanceof Node\Expr\StaticCall) {
+            $objectTypes = [];
+
+            if ($node instanceof Node\Expr\MethodCall) {
+                $objectTypes = $this->deduceTypes->deduceTypesFromNode(
+                    $this->file,
+                    $this->code,
+                    $node->var,
+                    $node->getAttribute('startFilePos')
+                );
+            } elseif ($node instanceof Node\Expr\StaticCall) {
+                $className = (string) $node->class;
+
+                if ($this->typeAnalyzer->isClassType($className)) {
+                    $className = $this->resolveType->resolveType($className, $this->file, $node->getAttribute('startLine'));
+                }
+                
+                $objectTypes = [$className];
+            }
 
             if (empty($objectTypes)) {
                 $this->methodCallList[] = [
@@ -117,7 +140,13 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
 
 
                 } elseif (is_string($node->name)) {
-                    $classInfo = $this->classInfo->getClassInfo($objectType);
+                    $classInfo = null;
+
+                    try {
+                        $classInfo = $this->classInfo->getClassInfo($objectType);
+                    } catch (UnexpectedValueException $e) {
+                        // Ignore exception, no class information means we return an error anyhow.
+                    }
 
                     if (!$classInfo || !isset($classInfo['methods'][$node->name])) {
                         $this->methodCallList[] = [
