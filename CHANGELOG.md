@@ -3,7 +3,7 @@
 * At least PHP 5.5 is now required to run the service. PHP 5.4 has been declared end of life for quite some time now and 5.5 will be declared end of life 10 July 2016. This does not affect the code you can actually write, the indexer still supports PHP 5.2 up to PHP 7.0, it is just the PHP interpreter running the indexer that had a required version bump.
 
 ### Changes for developers
-* `semanticLint` learned how to validate unknown method names, which can be used by linter packages.
+* `semanticLint` learned how to validate unknown method and property names, which can be used by linter packages.
 
 ## 1.0.7
 ### Bugs fixed

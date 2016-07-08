@@ -97,66 +97,72 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
-        if ($node instanceof Node\Expr\MethodCall || $node instanceof Node\Expr\StaticCall) {
-            $objectTypes = [];
+        if (!$node instanceof Node\Expr\MethodCall &&
+            !$node instanceof Node\Expr\StaticCall &&
+            !$node instanceof Node\Expr\PropertyFetch &&
+            !$node instanceof Node\Expr\StaticPropertyFetch
+        ) {
+            return;
+        }
 
-            if ($node instanceof Node\Expr\MethodCall) {
-                $objectTypes = $this->deduceTypes->deduceTypesFromNode(
-                    $this->file,
-                    $this->code,
-                    $node->var,
-                    $node->getAttribute('startFilePos')
-                );
-            } elseif ($node instanceof Node\Expr\StaticCall) {
-                $className = (string) $node->class;
+        $objectTypes = [];
 
-                if ($this->typeAnalyzer->isClassType($className)) {
-                    $className = $this->resolveType->resolveType($className, $this->file, $node->getAttribute('startLine'));
-                }
+        if ($node instanceof Node\Expr\MethodCall || $node instanceof Node\Expr\PropertyFetch) {
+            $objectTypes = $this->deduceTypes->deduceTypesFromNode(
+                $this->file,
+                $this->code,
+                $node->var,
+                $node->getAttribute('startFilePos')
+            );
+        } elseif ($node instanceof Node\Expr\StaticCall || $node instanceof Node\Expr\StaticPropertyFetch) {
+            $className = (string) $node->class;
 
-                $objectTypes = [$className];
+            if ($this->typeAnalyzer->isClassType($className)) {
+                $className = $this->resolveType->resolveType($className, $this->file, $node->getAttribute('startLine'));
             }
 
-            if (empty($objectTypes)) {
+            $objectTypes = [$className];
+        }
+
+        if (empty($objectTypes)) {
+            $this->memberCallList[] = [
+                'type'       => self::TYPE_EXPRESSION_HAS_NO_TYPE,
+                'memberName' => is_string($node->name) ? $node->name : null,
+                'start'      => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
+                'end'        => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
+            ];
+
+            return;
+        }
+
+        foreach ($objectTypes as $objectType) {
+            if (!$this->typeAnalyzer->isClassType($objectType)) {
                 $this->memberCallList[] = [
-                    'type'       => self::TYPE_EXPRESSION_HAS_NO_TYPE,
-                    'memberName' => is_string($node->name) ? $node->name : null,
-                    'start'      => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
-                    'end'        => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
+                    'type'           => self::TYPE_EXPRESSION_IS_NOT_CLASSLIKE,
+                    'memberName'     => is_string($node->name) ? $node->name : null,
+                    'expressionType' => $objectType,
+                    'start'          => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
+                    'end'            => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
                 ];
 
-                return;
-            }
 
-            foreach ($objectTypes as $objectType) {
-                if (!$this->typeAnalyzer->isClassType($objectType)) {
+            } elseif (is_string($node->name)) {
+                $classInfo = null;
+
+                try {
+                    $classInfo = $this->classInfo->getClassInfo($objectType);
+                } catch (UnexpectedValueException $e) {
+                    // Ignore exception, no class information means we return an error anyhow.
+                }
+
+                if (!$classInfo || !isset($classInfo['methods'][$node->name])) {
                     $this->memberCallList[] = [
-                        'type'           => self::TYPE_EXPRESSION_IS_NOT_CLASSLIKE,
+                        'type'           => self::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER,
                         'memberName'     => is_string($node->name) ? $node->name : null,
                         'expressionType' => $objectType,
                         'start'          => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
                         'end'            => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
                     ];
-
-
-                } elseif (is_string($node->name)) {
-                    $classInfo = null;
-
-                    try {
-                        $classInfo = $this->classInfo->getClassInfo($objectType);
-                    } catch (UnexpectedValueException $e) {
-                        // Ignore exception, no class information means we return an error anyhow.
-                    }
-
-                    if (!$classInfo || !isset($classInfo['methods'][$node->name])) {
-                        $this->memberCallList[] = [
-                            'type'           => self::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER,
-                            'memberName'     => is_string($node->name) ? $node->name : null,
-                            'expressionType' => $objectType,
-                            'start'          => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
-                            'end'            => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
-                        ];
-                    }
                 }
             }
         }
