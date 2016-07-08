@@ -100,7 +100,8 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
         if (!$node instanceof Node\Expr\MethodCall &&
             !$node instanceof Node\Expr\StaticCall &&
             !$node instanceof Node\Expr\PropertyFetch &&
-            !$node instanceof Node\Expr\StaticPropertyFetch
+            !$node instanceof Node\Expr\StaticPropertyFetch &&
+            !$node instanceof Node\Expr\ClassConstFetch
         ) {
             return;
         }
@@ -114,7 +115,11 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                 $node->var,
                 $node->getAttribute('startFilePos')
             );
-        } elseif ($node instanceof Node\Expr\StaticCall || $node instanceof Node\Expr\StaticPropertyFetch) {
+        } elseif (
+            $node instanceof Node\Expr\StaticCall ||
+            $node instanceof Node\Expr\StaticPropertyFetch ||
+            $node instanceof Node\Expr\ClassConstFetch
+        ) {
             $className = (string) $node->class;
 
             if ($this->typeAnalyzer->isClassType($className)) {
@@ -155,7 +160,17 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                     // Ignore exception, no class information means we return an error anyhow.
                 }
 
-                if (!$classInfo || !isset($classInfo['methods'][$node->name])) {
+                $key = null;
+
+                if ($node instanceof Node\Expr\MethodCall || $node instanceof Node\Expr\StaticCall) {
+                    $key = 'methods';
+                } elseif ($node instanceof Node\Expr\PropertyFetch || $node instanceof Node\Expr\StaticPropertyFetch) {
+                    $key = 'properties';
+                } elseif ($node instanceof Node\Expr\ClassConstFetch) {
+                    $key = 'constants';
+                }
+
+                if (!$classInfo || !isset($classInfo[$key][$node->name])) {
                     $this->memberCallList[] = [
                         'type'           => self::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER,
                         'memberName'     => is_string($node->name) ? $node->name : null,
