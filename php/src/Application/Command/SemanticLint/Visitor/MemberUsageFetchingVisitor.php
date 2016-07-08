@@ -102,15 +102,11 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                     'end'        => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
                 ];
 
-                // TODO: Issue an error "Invalid method call on an expression that has no type".
-
                 return;
             }
 
             foreach ($objectTypes as $objectType) {
                 if (!$this->typeAnalyzer->isClassType($objectType)) {
-                    // TODO: Issue a warning "Can not guarantee that object type is a classlike, it may also be of type X, Y."
-
                     $this->methodCallList[] = [
                         'type'           => self::TYPE_EXPRESSION_IS_NOT_CLASSLIKE,
                         'memberName'     => is_string($node->name) ? $node->name : null,
@@ -124,8 +120,6 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                     $classInfo = $this->classInfo->getClassInfo($objectType);
 
                     if (!$classInfo || !isset($classInfo['methods'][$node->name])) {
-                        // TODO: "No such method Z found for type X.".
-
                         $this->methodCallList[] = [
                             'type'           => self::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER,
                             'memberName'     => is_string($node->name) ? $node->name : null,
