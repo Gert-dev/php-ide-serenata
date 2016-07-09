@@ -129,7 +129,7 @@ class BuiltinIndexer
     {
         return $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'               => $name,
-            'fqcn'              => $name,
+            'fqcn'               => $name,
             'file_id'            => null,
             'start_line'         => null,
             'end_line'           => null,
