@@ -162,7 +162,7 @@ class BuiltinIndexer
                     continue;
                 }
 
-                $this->indexFunctionLike($function);
+                $this->indexFunction($function);
             }
         }
     }
@@ -228,7 +228,7 @@ class BuiltinIndexer
             if (method_exists($parameter, 'isVariadic')) {
                 $isVariadic = $parameter->isVariadic();
             }
-            
+
             $type = null;
             $types = [];
 
@@ -392,6 +392,18 @@ class BuiltinIndexer
         foreach ($element->getConstants() as $constantName => $constantValue) {
             $this->indexClassConstant($constantName, $structureId);
         }
+    }
+
+    /**
+     * @param ReflectionFunction $function
+     */
+    protected function indexFunction(ReflectionFunction $function)
+    {
+        $functionId = $this->indexFunctionLike($function);
+
+        $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
+            'fqcn' => $function->getName()
+        ]);
     }
 
     /**
