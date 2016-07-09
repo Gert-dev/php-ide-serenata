@@ -45,6 +45,11 @@ class SemanticLint extends AbstractCommand
     protected $globalFunctions;
 
     /**
+     * @var GlobalConstants
+     */
+    protected $globalConstants;
+
+    /**
      * @var ResolveType
      */
     protected $resolveTypeCommand;
@@ -69,6 +74,7 @@ class SemanticLint extends AbstractCommand
         $optionCollection->add('no-unknown-classes?', 'If set, unknown class names will not be returned.');
         $optionCollection->add('no-unknown-members?', 'If set, unknown class member linting will not be performed.');
         $optionCollection->add('no-unknown-global-functions?', 'If set, unknown global function linting will not be performed.');
+        $optionCollection->add('no-unknown-global-constants?', 'If set, unknown global constant linting will not be performed.');
         $optionCollection->add('no-docblock-correctness?', 'If set, docblock correctness will not be analyzed.');
         $optionCollection->add('no-unused-use-statements?', 'If set, unused use statements will not be returned.');
     }
@@ -93,6 +99,7 @@ class SemanticLint extends AbstractCommand
             !(isset($arguments['no-unknown-classes']) && $arguments['no-unknown-classes']->value),
             !(isset($arguments['no-unknown-members']) && $arguments['no-unknown-members']->value),
             !(isset($arguments['no-unknown-global-functions']) && $arguments['no-unknown-global-functions']->value),
+            !(isset($arguments['no-unknown-global-constants']) && $arguments['no-unknown-global-constants']->value),
             !(isset($arguments['no-docblock-correctness']) && $arguments['no-docblock-correctness']->value),
             !(isset($arguments['no-unused-use-statements']) && $arguments['no-unused-use-statements']->value)
         );
@@ -106,6 +113,7 @@ class SemanticLint extends AbstractCommand
      * @param bool   $retrieveUnknownClasses
      * @param bool   $retrieveUnknownMembers
      * @param bool   $retrieveUnknownGlobalFunctions
+     * @param bool   $retrieveUnknownGlobalConstants
      * @param bool   $analyzeDocblockCorrectness
      * @param bool   $retrieveUnusedUseStatements
      *
@@ -117,6 +125,7 @@ class SemanticLint extends AbstractCommand
         $retrieveUnknownClasses = true,
         $retrieveUnknownMembers = true,
         $retrieveUnknownGlobalFunctions = true,
+        $retrieveUnknownGlobalConstants = true,
         $analyzeDocblockCorrectness = true,
         $retrieveUnusedUseStatements = true
     ) {
@@ -193,6 +202,19 @@ class SemanticLint extends AbstractCommand
                 }
             }
 
+            $unknownGlobalConstantAnalyzer = null;
+
+            if ($retrieveUnknownGlobalFunctions) {
+                $unknownGlobalConstantAnalyzer = new SemanticLint\UnknownGlobalConstantAnalyzer(
+                    $this->getGlobalConstantsCommand(),
+                    $this->getTypeAnalyzer()
+                );
+
+                foreach ($unknownGlobalConstantAnalyzer->getVisitors() as $visitor) {
+                    $traverser->addVisitor($visitor);
+                }
+            }
+
             $unusedUseStatementAnalyzer = null;
 
             if ($retrieveUnusedUseStatements) {
@@ -252,6 +274,10 @@ class SemanticLint extends AbstractCommand
 
             if ($unknownGlobalFunctionAnalyzer) {
                 $output['errors']['unknownGlobalFunctions'] = $unknownGlobalFunctionAnalyzer->getOutput();
+            }
+
+            if ($unknownGlobalConstantAnalyzer) {
+                $output['errors']['unknownGlobalConstants'] = $unknownGlobalConstantAnalyzer->getOutput();
             }
 
             if ($docblockCorrectnessAnalyzer) {
@@ -328,6 +354,19 @@ class SemanticLint extends AbstractCommand
         }
 
         return $this->globalFunctions;
+    }
+
+    /**
+     * @return GlobalConstants
+     */
+    protected function getGlobalConstantsCommand()
+    {
+        if (!$this->globalConstants) {
+            $this->globalConstants = new GlobalConstants($this->cache);
+            $this->globalConstants->setIndexDatabase($this->indexDatabase);
+        }
+
+        return $this->globalConstants;
     }
 
     /**
