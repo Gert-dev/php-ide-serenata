@@ -17,10 +17,12 @@ class GlobalConstantsTest extends IndexedTest
 
         $output = $command->getGlobalConstants();
 
-        $this->assertThat($output, $this->arrayHasKey('FIRST_CONSTANT'));
-        $this->assertEquals($output['FIRST_CONSTANT']['fqcn'], 'A\FIRST_CONSTANT');
-        $this->assertThat($output, $this->arrayHasKey('SECOND_CONSTANT'));
-        $this->assertEquals($output['SECOND_CONSTANT']['fqcn'], 'A\SECOND_CONSTANT');
+        $this->assertThat($output, $this->arrayHasKey('A\FIRST_CONSTANT'));
+        $this->assertEquals($output['A\FIRST_CONSTANT']['name'], 'FIRST_CONSTANT');
+        $this->assertEquals($output['A\FIRST_CONSTANT']['fqcn'], 'A\FIRST_CONSTANT');
+        $this->assertThat($output, $this->arrayHasKey('A\SECOND_CONSTANT'));
+        $this->assertEquals($output['A\SECOND_CONSTANT']['name'], 'SECOND_CONSTANT');
+        $this->assertEquals($output['A\SECOND_CONSTANT']['fqcn'], 'A\SECOND_CONSTANT');
         $this->assertThat($output, $this->logicalNot($this->arrayHasKey('SHOULD_NOT_SHOW_UP')));
     }
 }

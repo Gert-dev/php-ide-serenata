@@ -5,7 +5,7 @@
 ### Changes for developers
 * Builtin functions did not have a FQCN set.
 * `semanticLint` learned how to validate unknown class members, which can be used by linter packages.
-* The global functions list will now return a mapping of function FQCN's to their data (instead of their name to their data).
+* The global function and constant list will now return a mapping of FQCN's to data (instead of names to data).
 
 ## 1.0.7
 ### Bugs fixed
