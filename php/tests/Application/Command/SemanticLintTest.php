@@ -164,13 +164,6 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'memberName'     => 'test',
-                'expressionType' => '\A\Foo',
-                'start'          => 80,
-                'end'            => 91
-            ],
-
-            [
                 'memberName'     => 'foo',
                 'expressionType' => '\A\Foo',
                 'start'          => 124,
@@ -185,6 +178,27 @@ class SemanticLintTest extends IndexedTest
             ],
 
             [
+                'memberName'     => 'CONSTANT',
+                'expressionType' => '\A\Foo',
+                'start'          => 187,
+                'end'            => 200
+            ]
+        ], $output['errors']['unknownMembers']['expressionHasNoSuchMember']);
+    }
+
+    public function testReportsInvalidMemberCallsOnAnExpressionThatReturnsAClasslikeWithNoSuchMemberCausingANewMemberToBeCreated()
+    {
+        $output = $this->lintFile('UnknownMemberExpressionWithNoSuchMember.php');
+
+        $this->assertEquals([
+            [
+                'memberName'     => 'test',
+                'expressionType' => '\A\Foo',
+                'start'          => 80,
+                'end'            => 91
+            ],
+
+            [
                 'memberName'     => 'fooProp',
                 'expressionType' => '\A\Foo',
                 'start'          => 149,
@@ -196,15 +210,8 @@ class SemanticLintTest extends IndexedTest
                 'expressionType' => '\A\Foo',
                 'start'          => 168,
                 'end'            => 181
-            ],
-
-            [
-                'memberName'     => 'CONSTANT',
-                'expressionType' => '\A\Foo',
-                'start'          => 187,
-                'end'            => 200
             ]
-        ], $output['errors']['unknownMembers']['expressionHasNoSuchMember']);
+        ], $output['warnings']['unknownMembers']['expressionNewMemberWillBeCreated']);
     }
 
     public function testReportsUnusedUseStatementsWithSingleNamespace()

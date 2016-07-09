@@ -221,7 +221,10 @@ class SemanticLint extends AbstractCommand
             }
 
             if ($unknownMemberAnalyzer) {
-                $output['errors']['unknownMembers'] = $unknownMemberAnalyzer->getOutput();
+                $analyzerOutput = $unknownMemberAnalyzer->getOutput();
+
+                $output['errors']['unknownMembers']   = $analyzerOutput['errors'];
+                $output['warnings']['unknownMembers'] = $analyzerOutput['warnings'];
             }
 
             if ($docblockCorrectnessAnalyzer) {
