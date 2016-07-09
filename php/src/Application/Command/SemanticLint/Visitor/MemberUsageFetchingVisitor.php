@@ -146,8 +146,6 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                     'start'          => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
                     'end'            => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
                 ];
-
-
             } elseif (is_string($node->name)) {
                 $classInfo = null;
 
