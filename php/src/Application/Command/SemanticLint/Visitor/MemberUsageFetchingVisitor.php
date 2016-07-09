@@ -166,16 +166,30 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                 }
 
                 if (!$classInfo || !isset($classInfo[$key][$node->name])) {
-                    $this->memberCallList[] = [
-                        'type'           => self::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER,
-                        'memberName'     => is_string($node->name) ? $node->name : null,
-                        'expressionType' => $objectType,
-                        'start'          => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
-                        'end'            => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
-                    ];
+                    if (!$this->isClassExcluded($objectType)) {
+                        $this->memberCallList[] = [
+                            'type'           => self::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER,
+                            'memberName'     => is_string($node->name) ? $node->name : null,
+                            'expressionType' => $objectType,
+                            'start'          => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
+                            'end'            => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
+                        ];
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return bool
+     */
+    protected function isClassExcluded($className)
+    {
+        $className = $this->typeAnalyzer->getNormalizedFqcn($className, false);
+
+        return ($className === 'stdClass');
     }
 
     /**

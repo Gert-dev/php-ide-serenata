@@ -16,3 +16,7 @@ Foo::bar();
 $foo->fooProp = 5;
 Foo::$barProp = 5;
 Foo::CONSTANT;
+
+$bar = new \stdClass();
+$bar->stdClassProp = 3;
+$b = $bar->stdClassProp;
