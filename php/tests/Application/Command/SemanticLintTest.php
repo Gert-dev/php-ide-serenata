@@ -164,38 +164,45 @@ class SemanticLintTest extends IndexedTest
 
         $this->assertEquals([
             [
+                'memberName'     => 'test',
+                'expressionType' => '\A\Foo',
+                'start'          => 80,
+                'end'            => 91
+            ],
+
+            [
                 'memberName'     => 'foo',
                 'expressionType' => '\A\Foo',
-                'start'          => 55,
-                'end'            => 66
+                'start'          => 124,
+                'end'            => 135
             ],
 
             [
                 'memberName'     => 'bar',
                 'expressionType' => '\A\Foo',
-                'start'          => 68,
-                'end'            => 78
+                'start'          => 137,
+                'end'            => 147
             ],
 
             [
                 'memberName'     => 'fooProp',
                 'expressionType' => '\A\Foo',
-                'start'          => 80,
-                'end'            => 93
+                'start'          => 149,
+                'end'            => 162
             ],
 
             [
                 'memberName'     => 'barProp',
                 'expressionType' => '\A\Foo',
-                'start'          => 99,
-                'end'            => 112
+                'start'          => 168,
+                'end'            => 181
             ],
 
             [
                 'memberName'     => 'CONSTANT',
                 'expressionType' => '\A\Foo',
-                'start'          => 118,
-                'end'            => 131
+                'start'          => 187,
+                'end'            => 200
             ]
         ], $output['errors']['unknownMembers']['expressionHasNoSuchMember']);
     }

@@ -120,13 +120,12 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Expr\StaticPropertyFetch ||
             $node instanceof Node\Expr\ClassConstFetch
         ) {
-            $className = (string) $node->class;
-
-            if ($this->typeAnalyzer->isClassType($className)) {
-                $className = $this->resolveType->resolveType($className, $this->file, $node->getAttribute('startLine'));
-            }
-
-            $objectTypes = [$className];
+            $objectTypes = $this->deduceTypes->deduceTypes(
+                $this->file,
+                $this->code,
+                [(string) $node->class],
+                $node->getAttribute('startFilePos')
+            );
         }
 
         if (empty($objectTypes)) {
