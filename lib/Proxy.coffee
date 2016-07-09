@@ -216,7 +216,7 @@ class Proxy
      * @param {String}      file
      * @param {String|null} source  The source code of the file to index. May be null if a directory is passed instead.
      * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses, noUnknownMembers,
-     *                              noDocblockCorrectness and noUnusedUseStatements are supported.
+     *                              noUnknownGlobalFunctions, noDocblockCorrectness and noUnusedUseStatements are supported.
      *
      * @return {Promise}
     ###
@@ -230,6 +230,9 @@ class Proxy
 
         if options.noUnknownMembers == true
             parameters.push('--no-unknown-members')
+
+        if options.noUnknownGlobalFunctions == true
+            parameters.push('--no-unknown-global-functions')
 
         if options.noDocblockCorrectness == true
             parameters.push('--no-docblock-correctness')

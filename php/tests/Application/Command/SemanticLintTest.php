@@ -214,6 +214,31 @@ class SemanticLintTest extends IndexedTest
         ], $output['warnings']['unknownMembers']['expressionNewMemberWillBeCreated']);
     }
 
+    public function testReportsUnknownGlobalFunctions()
+    {
+        $output = $this->lintFile('UnknownGlobalFunctions.php');
+
+        $this->assertEquals([
+            [
+                'name'  => 'foo',
+                'start' => 42,
+                'end'   => 47
+            ],
+
+            [
+                'name'  => 'bar',
+                'start' => 49,
+                'end'   => 54
+            ],
+
+            [
+                'name'  => '\A\foo',
+                'start' => 56,
+                'end'   => 64
+            ]
+        ], $output['errors']['unknownGlobalFunctions']);
+    }
+
     public function testReportsUnusedUseStatementsWithSingleNamespace()
     {
         $output = $this->lintFile('UnusedUseStatementsSingleNamespace.php');

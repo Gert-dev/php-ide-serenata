@@ -112,9 +112,9 @@ class Service
      * Performs a semantic lint of the specified file.
      *
      * @param {String}      file
-     * @param {String|null} source The source code of the file to index. May be null if a directory is passed instead.
+     * @param {String|null} source  The source code of the file to index. May be null if a directory is passed instead.
      * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses, noUnknownMembers,
-     *                              noDocblockCorrectness and noUnusedUseStatements are supported.
+     *                              noUnknownGlobalFunctions, noDocblockCorrectness and noUnusedUseStatements are supported.
      *
      * @return {Promise}
     ###

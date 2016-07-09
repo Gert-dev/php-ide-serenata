@@ -35,9 +35,14 @@ class SemanticLint extends AbstractCommand
     protected $classInfoCommand;
 
     /**
-     * @var ClassInfo
+     * @var DeduceTypes
      */
     protected $deduceTypesCommand;
+
+    /**
+     * @var GlobalFunctions
+     */
+    protected $globalFunctions;
 
     /**
      * @var ResolveType
@@ -85,6 +90,7 @@ class SemanticLint extends AbstractCommand
             $code,
             !(isset($arguments['no-unknown-classes']) && $arguments['no-unknown-classes']->value),
             !(isset($arguments['no-unknown-members']) && $arguments['no-unknown-members']->value),
+            !(isset($arguments['no-unknown-global-functions']) && $arguments['no-unknown-global-functions']->value),
             !(isset($arguments['no-docblock-correctness']) && $arguments['no-docblock-correctness']->value),
             !(isset($arguments['no-unused-use-statements']) && $arguments['no-unused-use-statements']->value)
         );
@@ -97,6 +103,7 @@ class SemanticLint extends AbstractCommand
      * @param string $code
      * @param bool   $retrieveUnknownClasses
      * @param bool   $retrieveUnknownMembers
+     * @param bool   $retrieveUnknownGlobalFunctions
      * @param bool   $analyzeDocblockCorrectness
      * @param bool   $retrieveUnusedUseStatements
      *
@@ -107,6 +114,7 @@ class SemanticLint extends AbstractCommand
         $code,
         $retrieveUnknownClasses = true,
         $retrieveUnknownMembers = true,
+        $retrieveUnknownGlobalFunctions = true,
         $analyzeDocblockCorrectness = true,
         $retrieveUnusedUseStatements = true
     ) {
@@ -170,6 +178,19 @@ class SemanticLint extends AbstractCommand
                 }
             }
 
+            $unknownGlobalFunctionAnalyzer = null;
+
+            if ($retrieveUnknownGlobalFunctions) {
+                $unknownGlobalFunctionAnalyzer = new SemanticLint\UnknownGlobalFunctionAnalyzer(
+                    $this->getGlobalFunctionsCommand(),
+                    $this->getTypeAnalyzer()
+                );
+
+                foreach ($unknownGlobalFunctionAnalyzer->getVisitors() as $visitor) {
+                    $traverser->addVisitor($visitor);
+                }
+            }
+
             $unusedUseStatementAnalyzer = null;
 
             if ($retrieveUnusedUseStatements) {
@@ -225,6 +246,10 @@ class SemanticLint extends AbstractCommand
 
                 $output['errors']['unknownMembers']   = $analyzerOutput['errors'];
                 $output['warnings']['unknownMembers'] = $analyzerOutput['warnings'];
+            }
+
+            if ($unknownGlobalFunctionAnalyzer) {
+                $output['errors']['unknownGlobalFunctions'] = $unknownGlobalFunctionAnalyzer->getOutput();
             }
 
             if ($docblockCorrectnessAnalyzer) {
@@ -288,6 +313,19 @@ class SemanticLint extends AbstractCommand
         }
 
         return $this->resolveTypeCommand;
+    }
+
+    /**
+     * @return GlobalFunctions
+     */
+    protected function getGlobalFunctionsCommand()
+    {
+        if (!$this->globalFunctions) {
+            $this->globalFunctions = new GlobalFunctions($this->cache);
+            $this->globalFunctions->setIndexDatabase($this->indexDatabase);
+        }
+
+        return $this->globalFunctions;
     }
 
     /**
