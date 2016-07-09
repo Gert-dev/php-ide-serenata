@@ -27,7 +27,7 @@ class GlobalFunctions extends AbstractCommand
          $result = [];
 
          foreach ($this->indexDatabase->getGlobalFunctions() as $function) {
-             $result[$function['name']] = $this->getIndexDataAdapter()->getFunctionInfo($function);
+             $result[$function['fqcn']] = $this->getIndexDataAdapter()->getFunctionInfo($function);
          }
 
          return $result;
