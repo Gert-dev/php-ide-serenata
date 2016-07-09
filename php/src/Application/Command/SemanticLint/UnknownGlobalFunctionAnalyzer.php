@@ -17,11 +17,6 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
     protected $globalFunctionUsageFetchingVisitor;
 
     /**
-     * @var TypeAnalyzer
-     */
-    protected $typeAnalyzer;
-
-    /**
      * @param GlobalFunctions $globalFunctions
      * @param TypeAnalyzer    $typeAnalyzer
      */
