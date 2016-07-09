@@ -107,26 +107,24 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
         }
 
         $objectTypes = [];
+        $nodeToDeduceTypeFrom = null;
 
         if ($node instanceof Node\Expr\MethodCall || $node instanceof Node\Expr\PropertyFetch) {
-            $objectTypes = $this->deduceTypes->deduceTypesFromNode(
-                $this->file,
-                $this->code,
-                $node->var,
-                $node->getAttribute('startFilePos')
-            );
+            $nodeToDeduceTypeFrom = $node->var;
         } elseif (
             $node instanceof Node\Expr\StaticCall ||
             $node instanceof Node\Expr\StaticPropertyFetch ||
             $node instanceof Node\Expr\ClassConstFetch
         ) {
-            $objectTypes = $this->deduceTypes->deduceTypes(
-                $this->file,
-                $this->code,
-                [(string) $node->class],
-                $node->getAttribute('startFilePos')
-            );
+            $nodeToDeduceTypeFrom = $node->class;
         }
+
+        $objectTypes = $this->deduceTypes->deduceTypesFromNode(
+            $this->file,
+            $this->code,
+            $nodeToDeduceTypeFrom,
+            $node->getAttribute('startFilePos')
+        );
 
         if (empty($objectTypes)) {
             $this->memberCallList[] = [

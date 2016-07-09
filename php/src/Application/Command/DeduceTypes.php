@@ -266,14 +266,14 @@ class DeduceTypes extends AbstractCommand
     /**
      * @param string|null $file
      * @param string      $code
-     * @param Node\Expr   $expression
+     * @param Node        $expression
      * @param int         $offset
      *
      * @return string[]
      */
-    public function deduceTypesFromNode($file, $code, Node\Expr $expression, $offset)
+    public function deduceTypesFromNode($file, $code, Node $expression, $offset)
     {
-        $expressionParts = $this->convertExpressionToStringParts($expression);
+        $expressionParts = $this->convertNodeToStringParts($expression);
 
         return $expressionParts ? $this->deduceTypes($file, $code, $expressionParts, $offset) : [];
     }
@@ -285,11 +285,11 @@ class DeduceTypes extends AbstractCommand
      * can be converted to an intermediate AST so data from CoffeeScript (that has no notion of the AST) can be treated
      * the same way.
      *
-     * @param Node\Expr $node
+     * @param Node $node
      *
      * @return string[]|null
      */
-    protected function convertExpressionToStringParts(Node\Expr $node)
+    protected function convertNodeToStringParts(Node $node)
     {
         if ($node instanceof Node\Expr\Variable) {
             if (is_string($node->name)) {
@@ -325,7 +325,7 @@ class DeduceTypes extends AbstractCommand
             return ['""'];
         } elseif ($node instanceof Node\Expr\MethodCall) {
             if (is_string($node->name)) {
-                $parts = $this->convertExpressionToStringParts($node->var);
+                $parts = $this->convertNodeToStringParts($node->var);
                 $parts[] = $node->name . '()';
 
                 return $parts;
@@ -336,7 +336,7 @@ class DeduceTypes extends AbstractCommand
             }
         } elseif ($node instanceof Node\Expr\PropertyFetch) {
             if (is_string($node->name)) {
-                $parts = $this->convertExpressionToStringParts($node->var);
+                $parts = $this->convertNodeToStringParts($node->var);
                 $parts[] = $node->name;
 
                 return $parts;
@@ -349,6 +349,8 @@ class DeduceTypes extends AbstractCommand
             if ($node->name instanceof Node\Name) {
                 return [$node->name->toString() . '()'];
             }
+        } elseif ($node instanceof Node\Name) {
+            return [$this->fetchClassName($node)];
         }
 
         return null;
