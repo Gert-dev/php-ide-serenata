@@ -69,15 +69,15 @@ class SemanticLintTest extends IndexedTest
             [
                 'name'      => 'DateTime',
                 'namespace' => 'A',
-                'start'     => 56,
-                'end'       => 64
+                'start'     => 97,
+                'end'       => 105
             ],
 
             [
                 'name'      => 'SplFileInfo',
                 'namespace' => 'B',
-                'start'     => 117,
-                'end'       => 128
+                'start'     => 153,
+                'end'       => 164
             ]
         ], $output['errors']['unknownClasses']);
     }

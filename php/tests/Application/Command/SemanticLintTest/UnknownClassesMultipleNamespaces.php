@@ -1,15 +1,20 @@
 <?php
 
+namespace {
+    class Foo {}
+    class Bar {}
+}
+
 namespace A
 {
-    use SplFileInfo;
+    use Foo;
 
     $a = new DateTime();
 }
 
 namespace B
 {
-    use DateTime;
+    use Bar;
 
     $a = new SplFileInfo();
 }
