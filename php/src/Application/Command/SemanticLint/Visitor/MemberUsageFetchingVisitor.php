@@ -180,7 +180,6 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
 
                 if (!$classInfo || !isset($classInfo[$key][$node->name])) {
                     if (!$this->isClassExcluded($objectType)) {
-
                         if ($previousNode instanceof Node\Expr\Assign ||
                             $previousNode instanceof Node\Expr\AssignOp ||
                             $previousNode instanceof Node\Expr\AssignRef
