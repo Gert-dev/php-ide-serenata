@@ -2,7 +2,7 @@
 
 namespace A;
 
-const BAR = 5;
+const BAR = null;
 
 FOO;
 BAR;

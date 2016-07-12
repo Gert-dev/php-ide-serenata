@@ -52,7 +52,7 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
 
         $globalConstants = $this->globalConstants->getGlobalConstants();
 
-        if (!isset($globalConstants[$fqcn])) {
+        if (!isset($globalConstants[$fqcn]) && !$this->isConstantExcluded($node->name->toString())) {
             $this->globalConstantCallList[] = [
                 'name'  => $this->fetchClassName($node->name),
                 'start' => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
@@ -78,6 +78,16 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
 
         return $newName;
     }
+
+   /**
+    * @param string $name
+    *
+    * @return bool
+    */
+   protected function isConstantExcluded($name)
+   {
+       return in_array(mb_strtolower($name), ['null', 'true', 'false'], true);
+   }
 
     /**
      * @return array

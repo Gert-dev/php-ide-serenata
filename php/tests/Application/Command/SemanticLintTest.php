@@ -246,20 +246,20 @@ class SemanticLintTest extends IndexedTest
         $this->assertEquals([
             [
                 'name'  => 'FOO',
-                'start' => 37,
-                'end'   => 40
+                'start' => 40,
+                'end'   => 43
             ],
 
             [
                 'name'  => 'BAR',
-                'start' => 42,
-                'end'   => 45
+                'start' => 45,
+                'end'   => 48
             ],
 
             [
                 'name'  => '\A\FOO',
-                'start' => 47,
-                'end'   => 53
+                'start' => 50,
+                'end'   => 56
             ]
         ], $output['errors']['unknownGlobalConstants']);
     }
