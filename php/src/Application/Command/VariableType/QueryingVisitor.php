@@ -230,7 +230,7 @@ class QueryingVisitor extends NodeVisitorAbstract
             $leftTypes = $this->parseCondition($node->left);
             $rightTypes = $this->parseCondition($node->right);
 
-            $types = array_merge($types, $leftTypes, $rightTypes);
+            $types = array_unique(array_merge($types, $leftTypes, $rightTypes));
         } elseif ($node instanceof Node\Expr\Instanceof_) {
             if ($node->expr instanceof Node\Expr\Variable && $node->expr->name === $this->name) {
                 if ($node->class instanceof Node\Name) {
