@@ -153,7 +153,7 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B', '\A\C', '\A\D', '\A\E'], $output);
     }
 
-    public function testCorrectlyConfinesTreatsIfConditionAsSeparateScope()
+    public function testCorrectlyTreatsIfConditionAsSeparateScope()
     {
         $output = $this->getVariableTypes('InstanceofIfSeparateScope.php', '$b');
 
