@@ -132,25 +132,18 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B'], $output);
     }
 
-    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndBooleanAnd()
+    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndAnd()
     {
-        $output = $this->getVariableTypes('InstanceofComplexIfBooleanAnd.php', '$b');
+        $output = $this->getVariableTypes('InstanceofComplexIfAnd.php', '$b');
 
-        $this->assertEquals(['\A\B'], $output);
+        $this->assertEquals(['\A\B', '\A\C', '\A\D'], $output);
     }
 
-    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndLogicalAnd()
+    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndOr()
     {
-        $output = $this->getVariableTypes('InstanceofComplexIfLogicalAnd.php', '$b');
+        $output = $this->getVariableTypes('InstanceofComplexIfOr.php', '$b');
 
-        $this->assertEquals(['\A\B'], $output);
-    }
-
-    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndLogicalOr()
-    {
-        $output = $this->getVariableTypes('InstanceofComplexIfBooleanOr.php', '$b');
-
-        $this->assertEquals(['\A\B', '\A\C'], $output);
+        $this->assertEquals(['\A\B', '\A\C', '\A\D', '\A\E'], $output);
     }
 
     public function testCorrectlyConfinesTreatsIfConditionAsSeparateScope()
