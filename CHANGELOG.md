@@ -9,6 +9,14 @@ if ((1 ^ 0) && true && $b instanceof B && ($test || false && true)) {
 }
 ```
 
+* If-statements containing variable handling functions such as `is_string`, `is_bool` will now influence type deduction:
+
+```php
+if (is_string($b) || is_array($b)) {    
+    // $b is now of type string|array.
+}
+```
+
 ### Changes for developers
 * Builtin functions did not have a FQCN set.
 * The global function and constant list will now return a mapping of FQCN's to data (instead of names to data).

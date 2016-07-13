@@ -153,6 +153,23 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B', '\A\C', '\A\D', '\A\E'], $output);
     }
 
+    public function testCorrectlyAnalyzesComplexIfStatementWithVariableHandlingFunction()
+    {
+        $output = $this->getVariableTypes('IfVariableHandlingFunction.php', '$b');
+
+        $this->assertEquals([
+            'array',
+            'bool',
+            'callable',
+            'float',
+            'int',
+            'null',
+            'string',
+            'object',
+            'resource'
+        ], $output);
+    }
+
     public function testCorrectlyTreatsIfConditionAsSeparateScope()
     {
         $output = $this->getVariableTypes('InstanceofIfSeparateScope.php', '$b');
