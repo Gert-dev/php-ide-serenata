@@ -146,6 +146,13 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B'], $output);
     }
 
+    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndLogicalOr()
+    {
+        $output = $this->getVariableTypes('InstanceofComplexIfBooleanOr.php', '$b');
+
+        $this->assertEquals(['\A\B', '\A\C'], $output);
+    }
+
     public function testCorrectlyConfinesTreatsIfConditionAsSeparateScope()
     {
         $output = $this->getVariableTypes('InstanceofIfSeparateScope.php', '$b');

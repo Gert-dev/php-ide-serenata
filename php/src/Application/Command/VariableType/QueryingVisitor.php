@@ -73,7 +73,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $currentClassName;
 
     /**
-     * @var Node|string||null
+     * @var Node|string|string[]|null
      */
     protected $bestMatch;
 
@@ -157,7 +157,11 @@ class QueryingVisitor extends NodeVisitorAbstract
                 $this->position >= $node->getAttribute('startFilePos') &&
                 $this->position <= $node->getAttribute('endFilePos')
             ) {
-                $this->parseCondition($node->cond);
+                $type = $this->parseCondition($node->cond);
+
+                if ($type) {
+                    $this->bestMatch = $type;
+                }
             }
         } elseif ($node instanceof Node\Expr\Assign) {
             if ($node->var instanceof Node\Expr\Variable) {
@@ -211,22 +215,34 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     protected function parseCondition(Node\Expr $node)
     {
-        // TODO: instanceof A || instanceof B
+        $types = [];
 
-        if ($node instanceof Node\Expr\BinaryOp\BooleanAnd || $node instanceof Node\Expr\BinaryOp\LogicalAnd) {
+        if (
+            $node instanceof Node\Expr\BinaryOp\BitwiseAnd ||
+            $node instanceof Node\Expr\BinaryOp\BitwiseOr ||
+            $node instanceof Node\Expr\BinaryOp\BitwiseXor ||
+            $node instanceof Node\Expr\BinaryOp\BooleanAnd ||
+            $node instanceof Node\Expr\BinaryOp\BooleanOr ||
+            $node instanceof Node\Expr\BinaryOp\LogicalAnd ||
+            $node instanceof Node\Expr\BinaryOp\LogicalOr ||
+            $node instanceof Node\Expr\BinaryOp\LogicalXor
+        ) {
+            $leftTypes = $this->parseCondition($node->left);
+            $rightTypes = $this->parseCondition($node->right);
 
-            $this->parseCondition($node->left);
-            $this->parseCondition($node->right);
+            $types = array_merge($types, $leftTypes, $rightTypes);
         } elseif ($node instanceof Node\Expr\Instanceof_) {
             if ($node->expr instanceof Node\Expr\Variable && $node->expr->name === $this->name) {
                 if ($node->class instanceof Node\Name) {
-                    $this->bestMatch = $this->fetchClassName($node->class);
+                    $types = [$this->fetchClassName($node->class)];
                 } else {
                     // This is an expression, we could fetch its return type, but that still won't tell us what
                     // the actual class is, so it's useless at the moment.
                 }
             }
         }
+
+        return $types;
     }
 
     /**
@@ -341,6 +357,8 @@ class QueryingVisitor extends NodeVisitorAbstract
                         return $type ? [$type] : [];
                     }
                 }
+            } elseif (is_array($this->bestMatch)) {
+                return $this->bestMatch;
             } else {
                 return $this->bestMatch ? [$this->bestMatch] : [];
             }
