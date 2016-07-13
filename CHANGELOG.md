@@ -1,6 +1,13 @@
 ## 1.1.0
 ### Features and enhancements
 * At least PHP 5.5 is now required to run the service. PHP 5.4 has been declared end of life for quite some time now and 5.5 will be declared end of life 10 July 2016. This does not affect the code you can actually write, the indexer still supports PHP 5.2 up to PHP 7.0, it is just the PHP interpreter running the indexer that had a required version bump.
+* The strictness on `instanceof` has been lifted. The variable type deducer is now able to parse somewhat more complex if statements:
+
+```php
+if ((1 ^ 0) && true && $b instanceof B && ($test || false && true)) {    
+    // $b will now be recognized as an instance of B.
+}
+```
 
 ### Changes for developers
 * Builtin functions did not have a FQCN set.

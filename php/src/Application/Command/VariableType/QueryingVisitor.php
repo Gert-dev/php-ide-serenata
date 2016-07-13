@@ -157,16 +157,7 @@ class QueryingVisitor extends NodeVisitorAbstract
                 $this->position >= $node->getAttribute('startFilePos') &&
                 $this->position <= $node->getAttribute('endFilePos')
             ) {
-                if ($node->cond instanceof Node\Expr\Instanceof_) {
-                    if ($node->cond->expr instanceof Node\Expr\Variable && $node->cond->expr->name === $this->name) {
-                        if ($node->cond->class instanceof Node\Name) {
-                            $this->bestMatch = $this->fetchClassName($node->cond->class);
-                        } else {
-                            // This is an expression, we could fetch its return type, but that still won't tell us what
-                            // the actual class is, so it's useless at the moment.
-                        }
-                    }
-                }
+                $this->parseCondition($node->cond);
             }
         } elseif ($node instanceof Node\Expr\Assign) {
             if ($node->var instanceof Node\Expr\Variable) {
@@ -210,6 +201,29 @@ class QueryingVisitor extends NodeVisitorAbstract
                 if (!$variableIsOutsideCurrentScope) {
                     $this->resetStateForNewScope();
                     $this->lastFunctionLikeNode = $node;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param Node\Expr $node
+     */
+    protected function parseCondition(Node\Expr $node)
+    {
+        // TODO: instanceof A || instanceof B
+
+        if ($node instanceof Node\Expr\BinaryOp\BooleanAnd || $node instanceof Node\Expr\BinaryOp\LogicalAnd) {
+
+            $this->parseCondition($node->left);
+            $this->parseCondition($node->right);
+        } elseif ($node instanceof Node\Expr\Instanceof_) {
+            if ($node->expr instanceof Node\Expr\Variable && $node->expr->name === $this->name) {
+                if ($node->class instanceof Node\Name) {
+                    $this->bestMatch = $this->fetchClassName($node->class);
+                } else {
+                    // This is an expression, we could fetch its return type, but that still won't tell us what
+                    // the actual class is, so it's useless at the moment.
                 }
             }
         }
