@@ -387,12 +387,16 @@ class QueryingVisitor extends NodeVisitorAbstract
 
     /**
      * @param Node|null $bestMatch
+     *
+     * @return static
      */
     protected function setBestMatch(Node $bestMatch = null)
     {
         $this->resetConditionalState();
 
         $this->bestMatch = $bestMatch;
+
+        return $this;
     }
 
     /**
