@@ -73,7 +73,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $currentClassName;
 
     /**
-     * @var Node|string|null
+     * @var Node|null
      */
     protected $bestMatch;
 
@@ -161,7 +161,7 @@ class QueryingVisitor extends NodeVisitorAbstract
 
         if ($node instanceof Node\Stmt\Catch_) {
             if ($node->var === $this->name) {
-                $this->setBestMatch($this->fetchClassName($node->type));
+                $this->setBestMatch($node->type);
             }
         } elseif (
             $node instanceof Node\Stmt\If_ ||
@@ -386,9 +386,9 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @param Node|string|null $bestMatch
+     * @param Node|null $bestMatch
      */
-    protected function setBestMatch($bestMatch)
+    protected function setBestMatch(Node $bestMatch = null)
     {
         $this->resetConditionalState();
 
@@ -470,8 +470,8 @@ class QueryingVisitor extends NodeVisitorAbstract
                         return $type ? [$type] : [];
                     }
                 }
-            } else {
-                return $this->bestMatch ? [$this->bestMatch] : [];
+            } elseif ($this->bestMatch instanceof Node\Name) {
+                return [$this->fetchClassName($this->bestMatch)];
             }
         } elseif ($this->lastFunctionLikeNode) {
             foreach ($this->lastFunctionLikeNode->getParams() as $param) {
