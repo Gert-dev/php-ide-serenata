@@ -153,6 +153,20 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B', '\A\C', '\A\D', '\A\E'], $output);
     }
 
+    public function testCorrectlyAnalyzesComplexIfStatementWithStrictlyEqualsNull()
+    {
+        $output = $this->getVariableTypes('IfStrictlyEqualsNull.php', '$b');
+
+        $this->assertEquals(['null'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithLooselyEqualsNull()
+    {
+        $output = $this->getVariableTypes('IfLooselyEqualsNull.php', '$b');
+
+        $this->assertEquals(['null'], $output);
+    }
+
     public function testCorrectlyAnalyzesComplexIfStatementWithVariableHandlingFunction()
     {
         $output = $this->getVariableTypes('IfVariableHandlingFunction.php', '$b');

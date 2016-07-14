@@ -231,6 +231,19 @@ class QueryingVisitor extends NodeVisitorAbstract
             $rightTypes = $this->parseCondition($node->right);
 
             $types = array_unique(array_merge($types, $leftTypes, $rightTypes));
+        } elseif (
+            $node instanceof Node\Expr\BinaryOp\Equal ||
+            $node instanceof Node\Expr\BinaryOp\Identical
+        ) {
+            if ($node->left instanceof Node\Expr\Variable && $node->left->name === $this->name) {
+                if ($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toString() === 'null') {
+                    $types = ['null'];
+                }
+            } elseif ($node->right instanceof Node\Expr\Variable && $node->right->name === $this->name) {
+                if ($node->left instanceof Node\Expr\ConstFetch && $node->left->name->toString() === 'null') {
+                    $types = ['null'];
+                }
+            }
         } elseif ($node instanceof Node\Expr\Instanceof_) {
             if ($node->expr instanceof Node\Expr\Variable && $node->expr->name === $this->name) {
                 if ($node->class instanceof Node\Name) {
@@ -337,9 +350,12 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
+     * Retrieves the detected types without filtering out any types that might be excluded (i.e. due to conditionals
+     * such as $a !== null).
+     *
      * @var string[]
      */
-    protected function getTypes()
+    protected function getUnfilteredTypes()
     {
         if ($this->bestTypeOverrideMatch) {
             return $this->typeAnalyzer->getTypesForTypeSpecification($this->bestTypeOverrideMatch);
@@ -436,6 +452,14 @@ class QueryingVisitor extends NodeVisitorAbstract
         }
 
         return [];
+    }
+
+    /**
+     * @var string[]
+     */
+    protected function getTypes()
+    {
+        return $this->getUnfilteredTypes();
     }
 
     /**
