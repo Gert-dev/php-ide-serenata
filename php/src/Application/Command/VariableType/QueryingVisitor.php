@@ -73,9 +73,27 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $currentClassName;
 
     /**
-     * @var Node|string|string[]|null
+     * @var Node|string|null
      */
     protected $bestMatch;
+
+    /**
+     * Types that the variable is guaranteed to have because a conditional confirmed it.
+     *
+     * For example, if an if statement checks that $a === null, then $a is guaranteed to have type 'null'.
+     *
+     * @var string[]
+     */
+    protected $conditionallyAssuredTypes = [];
+
+    /**
+     * Types that the variable is guaranteed nto to have because a conditional excluded it.
+     *
+     * For example, if an if statement checks that $a !== null, then $a is guaranteed not have type 'null'.
+     *
+     * @var string[]
+     */
+    protected $conditionallyImpossibleTypes = [];
 
     /**
      * @var string|null
@@ -143,7 +161,7 @@ class QueryingVisitor extends NodeVisitorAbstract
 
         if ($node instanceof Node\Stmt\Catch_) {
             if ($node->var === $this->name) {
-                $this->bestMatch = $this->fetchClassName($node->type);
+                $this->setBestMatch($this->fetchClassName($node->type));
             }
         } elseif (
             $node instanceof Node\Stmt\If_ ||
@@ -157,10 +175,20 @@ class QueryingVisitor extends NodeVisitorAbstract
                 $this->position >= $node->getAttribute('startFilePos') &&
                 $this->position <= $node->getAttribute('endFilePos')
             ) {
-                $type = $this->parseCondition($node->cond);
+                $typeData = $this->parseCondition($node->cond);
 
-                if ($type) {
-                    $this->bestMatch = $type;
+                if ($typeData['types']) {
+                    $this->conditionallyAssuredTypes = array_unique(array_merge(
+                        $this->conditionallyAssuredTypes,
+                        $typeData['types']
+                    ));
+                }
+
+                if ($typeData['excludedTypes']) {
+                    $this->conditionallyImpossibleTypes = array_unique(array_merge(
+                        $this->conditionallyImpossibleTypes,
+                        $typeData['excludedTypes']
+                    ));
                 }
             }
         } elseif ($node instanceof Node\Expr\Assign) {
@@ -174,12 +202,12 @@ class QueryingVisitor extends NodeVisitorAbstract
                 }
 
                 if ($variableName && $variableName === $this->name) {
-                    $this->bestMatch = $node;
+                    $this->setBestMatch($node);
                 }
             }
         } elseif ($node instanceof Node\Stmt\Foreach_) {
             if (!$node->valueVar instanceof Node\Expr\List_ && $node->valueVar->name === $this->name) {
-                $this->bestMatch = $node;
+                $this->setBestMatch($node);
             }
         }
 
@@ -216,6 +244,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected function parseCondition(Node\Expr $node)
     {
         $types = [];
+        $excludedTypes = [];
 
         if (
             $node instanceof Node\Expr\BinaryOp\BitwiseAnd ||
@@ -227,10 +256,11 @@ class QueryingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Expr\BinaryOp\LogicalOr ||
             $node instanceof Node\Expr\BinaryOp\LogicalXor
         ) {
-            $leftTypes = $this->parseCondition($node->left);
-            $rightTypes = $this->parseCondition($node->right);
+            $leftTypeData = $this->parseCondition($node->left);
+            $rightTypeData = $this->parseCondition($node->right);
 
-            $types = array_unique(array_merge($types, $leftTypes, $rightTypes));
+            $types = array_unique(array_merge($types, $leftTypeData['types'], $rightTypeData['types']));
+            $excludedTypes = array_unique(array_merge($excludedTypes, $leftTypeData['excludedTypes'], $rightTypeData['excludedTypes']));
         } elseif (
             $node instanceof Node\Expr\BinaryOp\Equal ||
             $node instanceof Node\Expr\BinaryOp\Identical
@@ -242,6 +272,19 @@ class QueryingVisitor extends NodeVisitorAbstract
             } elseif ($node->right instanceof Node\Expr\Variable && $node->right->name === $this->name) {
                 if ($node->left instanceof Node\Expr\ConstFetch && $node->left->name->toString() === 'null') {
                     $types = ['null'];
+                }
+            }
+        } elseif (
+            $node instanceof Node\Expr\BinaryOp\NotEqual ||
+            $node instanceof Node\Expr\BinaryOp\NotIdentical
+        ) {
+            if ($node->left instanceof Node\Expr\Variable && $node->left->name === $this->name) {
+                if ($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toString() === 'null') {
+                    $excludedTypes = ['null'];
+                }
+            } elseif ($node->right instanceof Node\Expr\Variable && $node->right->name === $this->name) {
+                if ($node->left instanceof Node\Expr\ConstFetch && $node->left->name->toString() === 'null') {
+                    $excludedTypes = ['null'];
                 }
             }
         } elseif ($node instanceof Node\Expr\Instanceof_) {
@@ -286,7 +329,10 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
         }
 
-        return $types;
+        return [
+            'types'         => $types,
+            'excludedTypes' => $excludedTypes
+        ];
     }
 
     /**
@@ -340,11 +386,31 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
+     * @param Node|string|null $bestMatch
+     */
+    protected function setBestMatch($bestMatch)
+    {
+        $this->resetConditionalState();
+
+        $this->bestMatch = $bestMatch;
+    }
+
+    /**
+     *
+     */
+    protected function resetConditionalState()
+    {
+        $this->conditionallyAssuredTypes = [];
+        $this->conditionallyImpossibleTypes = [];
+    }
+
+    /**
      * @return void
      */
     protected function resetStateForNewScope()
     {
-        $this->bestMatch = null;
+        $this->setBestMatch(null);
+
         $this->bestTypeOverrideMatch = null;
         $this->bestTypeOverrideMatchLine = null;
     }
@@ -404,8 +470,6 @@ class QueryingVisitor extends NodeVisitorAbstract
                         return $type ? [$type] : [];
                     }
                 }
-            } elseif (is_array($this->bestMatch)) {
-                return $this->bestMatch;
             } else {
                 return $this->bestMatch ? [$this->bestMatch] : [];
             }
@@ -459,7 +523,15 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     protected function getTypes()
     {
-        return $this->getUnfilteredTypes();
+        $types = $this->getUnfilteredTypes();
+
+        if (!empty($this->conditionallyAssuredTypes)) {
+            $types = $this->conditionallyAssuredTypes;
+        }
+
+        $types = array_diff($types, $this->conditionallyImpossibleTypes);
+
+        return $types;
     }
 
     /**
