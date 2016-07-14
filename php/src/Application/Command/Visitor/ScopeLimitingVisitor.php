@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Application\Command\Visitor;
 
+use PhpIntegrator\Application\Command\VariableType\DummyExprNode;
+
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
@@ -67,6 +69,7 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
                     if ($elseIfNode->getAttribute('startFilePos') < $this->position) {
                         $node->stmts = [];
                         $node->elseifs = [$elseIfNode];
+                        $node->cond = new DummyExprNode();
                         break;
                     }
                 }
@@ -74,6 +77,7 @@ class ScopeLimitingVisitor extends NodeVisitorAbstract
                 if ($node->else && $node->else->getAttribute('startFilePos') < $this->position) {
                     $node->stmts = [];
                     $node->elseifs = [];
+                    $node->cond = new DummyExprNode();
                 }
             } elseif ($node instanceof Node\Stmt\Switch_) {
                 // Case statements do encompass their statements with their start and end position, but they do not
