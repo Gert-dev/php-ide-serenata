@@ -530,13 +530,14 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
         }
 
-        // TODO: A call to getUnfilteredTypes may be avoidable in this case as they don't apply anyway.
-        $types = $this->getUnfilteredTypes();
+        $types = [];
 
         // Types guaranteed by a conditional statement take precedence (if they didn't apply, the if statement could
         // never have executed in the first place).
         if (!empty($guaranteedTypes)) {
             $types = $guaranteedTypes;
+        } else {
+            $types = $this->getUnfilteredTypes();
         }
 
         $filteredTypes = [];
