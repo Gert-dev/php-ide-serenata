@@ -506,31 +506,14 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * Retrieves the detected types without filtering out any types that might be excluded (i.e. due to conditionals
-     * such as $a !== null).
-     *
-     * @var string[]
-     */
-    protected function getUnfilteredTypes()
-    {
-        if ($this->bestTypeOverrideMatch) {
-            return $this->typeAnalyzer->getTypesForTypeSpecification($this->bestTypeOverrideMatch);
-        } elseif ($this->name === 'this') {
-            return $this->currentClassName ? [$this->currentClassName] : [];
-        } elseif ($this->bestMatch) {
-            return $this->getTypesForNode($this->bestMatch);
-        } elseif ($this->lastFunctionLikeNode) {
-            return $this->getTypesForNode($this->lastFunctionLikeNode);
-        }
-
-        return [];
-    }
-
-    /**
      * @return string[]
      */
     protected function getTypes()
     {
+        if ($this->bestTypeOverrideMatch) {
+            return $this->typeAnalyzer->getTypesForTypeSpecification($this->bestTypeOverrideMatch);
+        }
+
         $guaranteedTypes = [];
         $possibleTypeMap = [];
 
@@ -548,8 +531,12 @@ class QueryingVisitor extends NodeVisitorAbstract
         // never have executed in the first place).
         if (!empty($guaranteedTypes)) {
             $types = $guaranteedTypes;
-        } else {
-            $types = $this->getUnfilteredTypes();
+        } elseif ($this->name === 'this') {
+            $types = $this->currentClassName ? [$this->currentClassName] : [];
+        } elseif ($this->bestMatch) {
+            $types = $this->getTypesForNode($this->bestMatch);
+        } elseif ($this->lastFunctionLikeNode) {
+            $types = $this->getTypesForNode($this->lastFunctionLikeNode);
         }
 
         $filteredTypes = [];
