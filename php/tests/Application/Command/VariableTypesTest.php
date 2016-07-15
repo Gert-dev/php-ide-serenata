@@ -181,6 +181,20 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['null'], $output);
     }
 
+    public function testCorrectlyAnalyzesIfStatementWithTruthy()
+    {
+        $output = $this->getVariableTypes('IfTruthy.php', '$b');
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesIfStatementWithFalsy()
+    {
+        $output = $this->getVariableTypes('IfFalsy.php', '$b');
+
+        $this->assertEquals(['null'], $output);
+    }
+
     public function testCorrectlyAnalyzesComplexIfStatementWithVariableHandlingFunction()
     {
         $output = $this->getVariableTypes('IfVariableHandlingFunction.php', '$b');

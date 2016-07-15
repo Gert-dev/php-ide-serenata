@@ -20,6 +20,21 @@ class QueryingVisitor extends NodeVisitorAbstract
     /**
      * @var int
      */
+    const TYPE_CONDITIONALLY_GUARANTEED = 1;
+
+    /**
+     * @var int
+     */
+    const TYPE_CONDITIONALLY_POSSIBLE   = 2;
+
+    /**
+     * @var int
+     */
+    const TYPE_CONDITIONALLY_IMPOSSIBLE = 4;
+
+    /**
+     * @var int
+     */
     protected $position;
 
     /**
@@ -78,22 +93,9 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $bestMatch;
 
     /**
-     * Types that the variable is guaranteed to have because a conditional confirmed it.
-     *
-     * For example, if an if statement checks that $a === null, then $a is guaranteed to have type 'null'.
-     *
-     * @var string[]
+     * @var array
      */
-    protected $conditionallyAssuredTypes = [];
-
-    /**
-     * Types that the variable is guaranteed to to have because a conditional excluded it.
-     *
-     * For example, if an if statement checks that $a !== null, then $a is guaranteed not have type 'null'.
-     *
-     * @var string[]
-     */
-    protected $conditionallyImpossibleTypes = [];
+    protected $conditionalTypes = [];
 
     /**
      * @var string|null
@@ -176,20 +178,6 @@ class QueryingVisitor extends NodeVisitorAbstract
                 $this->position <= $node->getAttribute('endFilePos')
             ) {
                 $typeData = $this->parseCondition($node->cond);
-
-                if ($typeData['types']) {
-                    $this->conditionallyAssuredTypes = array_unique(array_merge(
-                        $this->conditionallyAssuredTypes,
-                        $typeData['types']
-                    ));
-                }
-
-                if ($typeData['excludedTypes']) {
-                    $this->conditionallyImpossibleTypes = array_unique(array_merge(
-                        $this->conditionallyImpossibleTypes,
-                        $typeData['excludedTypes']
-                    ));
-                }
             }
         } elseif ($node instanceof Node\Expr\Assign) {
             if ($node->var instanceof Node\Expr\Variable) {
@@ -243,9 +231,6 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     protected function parseCondition(Node\Expr $node)
     {
-        $types = [];
-        $excludedTypes = [];
-
         if (
             $node instanceof Node\Expr\BinaryOp\BitwiseAnd ||
             $node instanceof Node\Expr\BinaryOp\BitwiseOr ||
@@ -256,22 +241,19 @@ class QueryingVisitor extends NodeVisitorAbstract
             $node instanceof Node\Expr\BinaryOp\LogicalOr ||
             $node instanceof Node\Expr\BinaryOp\LogicalXor
         ) {
-            $leftTypeData = $this->parseCondition($node->left);
-            $rightTypeData = $this->parseCondition($node->right);
-
-            $types = array_unique(array_merge($types, $leftTypeData['types'], $rightTypeData['types']));
-            $excludedTypes = array_unique(array_merge($excludedTypes, $leftTypeData['excludedTypes'], $rightTypeData['excludedTypes']));
+            $this->parseCondition($node->left);
+            $this->parseCondition($node->right);
         } elseif (
             $node instanceof Node\Expr\BinaryOp\Equal ||
             $node instanceof Node\Expr\BinaryOp\Identical
         ) {
             if ($node->left instanceof Node\Expr\Variable && $node->left->name === $this->name) {
                 if ($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toString() === 'null') {
-                    $types = ['null'];
+                    $this->conditionalTypes['null'] = self::TYPE_CONDITIONALLY_GUARANTEED;
                 }
             } elseif ($node->right instanceof Node\Expr\Variable && $node->right->name === $this->name) {
                 if ($node->left instanceof Node\Expr\ConstFetch && $node->left->name->toString() === 'null') {
-                    $types = ['null'];
+                    $this->conditionalTypes['null'] = self::TYPE_CONDITIONALLY_GUARANTEED;
                 }
             }
         } elseif (
@@ -280,17 +262,29 @@ class QueryingVisitor extends NodeVisitorAbstract
         ) {
             if ($node->left instanceof Node\Expr\Variable && $node->left->name === $this->name) {
                 if ($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toString() === 'null') {
-                    $excludedTypes = ['null'];
+                    $this->conditionalTypes['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
                 }
             } elseif ($node->right instanceof Node\Expr\Variable && $node->right->name === $this->name) {
                 if ($node->left instanceof Node\Expr\ConstFetch && $node->left->name->toString() === 'null') {
-                    $excludedTypes = ['null'];
+                    $this->conditionalTypes['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
                 }
             }
+        } elseif ($node instanceof Node\Expr\BooleanNot) {
+            if ($node->expr instanceof Node\Expr\Variable && $node->expr->name === $this->name) {
+                $this->conditionalTypes['int']    = self::TYPE_CONDITIONALLY_POSSIBLE; // 0
+                $this->conditionalTypes['string'] = self::TYPE_CONDITIONALLY_POSSIBLE; // ''
+                $this->conditionalTypes['float']  = self::TYPE_CONDITIONALLY_POSSIBLE; // 0.0
+                $this->conditionalTypes['array']  = self::TYPE_CONDITIONALLY_POSSIBLE; // []
+                $this->conditionalTypes['null']   = self::TYPE_CONDITIONALLY_POSSIBLE; // null
+            } else {
+                $this->parseCondition($node->expr);
+            }
+        } elseif ($node instanceof Node\Expr\Variable && $node->name === $this->name) {
+            $this->conditionalTypes['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
         } elseif ($node instanceof Node\Expr\Instanceof_) {
             if ($node->expr instanceof Node\Expr\Variable && $node->expr->name === $this->name) {
                 if ($node->class instanceof Node\Name) {
-                    $types = [$this->fetchClassName($node->class)];
+                    $this->conditionalTypes[$this->fetchClassName($node->class)] = self::TYPE_CONDITIONALLY_GUARANTEED;
                 } else {
                     // This is an expression, we could fetch its return type, but that still won't tell us what
                     // the actual class is, so it's useless at the moment.
@@ -324,15 +318,14 @@ class QueryingVisitor extends NodeVisitorAbstract
                         $node->args[0]->value->name === $this->name
                     ) {
                         $types = $variableHandlingFunctionTypeMap[$node->name->toString()];
+
+                        foreach ($types as $type) {
+                            $this->conditionalTypes[$type] = self::TYPE_CONDITIONALLY_GUARANTEED;
+                        }
                     }
                 }
             }
         }
-
-        return [
-            'types'         => $types,
-            'excludedTypes' => $excludedTypes
-        ];
     }
 
     /**
@@ -404,8 +397,7 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     protected function resetConditionalState()
     {
-        $this->conditionallyAssuredTypes = [];
-        $this->conditionallyImpossibleTypes = [];
+        $this->conditionalTypes = [];
     }
 
     /**
@@ -527,15 +519,47 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     protected function getTypes()
     {
-        $types = $this->getUnfilteredTypes();
+        $guaranteedTypes = [];
+        $possibleTypeMap = [];
 
-        if (!empty($this->conditionallyAssuredTypes)) {
-            $types = $this->conditionallyAssuredTypes;
+        foreach ($this->conditionalTypes as $type => $possibility) {
+            if ($possibility === self::TYPE_CONDITIONALLY_GUARANTEED) {
+                $guaranteedTypes[] = $type;
+            } elseif ($possibility === self::TYPE_CONDITIONALLY_POSSIBLE) {
+                $possibleTypeMap[$type] = true;
+            }
         }
 
-        $types = array_diff($types, $this->conditionallyImpossibleTypes);
+        // TODO: A call to getUnfilteredTypes may be avoidable in this case as they don't apply anyway.
+        $types = $this->getUnfilteredTypes();
 
-        return $types;
+        // Types guaranteed by a conditional statement take precedence (if they didn't apply, the if statement could
+        // never have executed in the first place).
+        if (!empty($guaranteedTypes)) {
+            $types = $guaranteedTypes;
+        }
+
+        $filteredTypes = [];
+
+        foreach ($types as $type) {
+            if (isset($this->conditionalTypes[$type])) {
+                $possibility = $this->conditionalTypes[$type];
+
+                if ($possibility === self::TYPE_CONDITIONALLY_IMPOSSIBLE) {
+                    continue;
+                } elseif (isset($possibleTypeMap[$type])) {
+                    $filteredTypes[] = $type;
+                } elseif ($possibility === self::TYPE_CONDITIONALLY_GUARANTEED) {
+                    $filteredTypes[] = $type;
+                }
+            } elseif (empty($possibleTypeMap)) {
+                // If the possibleTypeMap wasn't empty, the types the variable can have are limited to those present
+                // in it (it acts as a whitelist).
+                $filteredTypes[] = $type;
+            }
+        }
+
+        return $filteredTypes;
     }
 
     /**
