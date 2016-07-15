@@ -515,7 +515,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @var string[]
+     * @return string[]
      */
     protected function getTypes()
     {
