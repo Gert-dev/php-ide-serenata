@@ -87,7 +87,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $conditionallyAssuredTypes = [];
 
     /**
-     * Types that the variable is guaranteed nto to have because a conditional excluded it.
+     * Types that the variable is guaranteed to to have because a conditional excluded it.
      *
      * For example, if an if statement checks that $a !== null, then $a is guaranteed not have type 'null'.
      *
