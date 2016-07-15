@@ -412,76 +412,65 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * Retrieves the detected types without filtering out any types that might be excluded (i.e. due to conditionals
-     * such as $a !== null).
+     * @param Node $node
      *
-     * @var string[]
+     * @return string[]
      */
-    protected function getUnfilteredTypes()
+    protected function getTypesForNode(Node $node)
     {
-        if ($this->bestTypeOverrideMatch) {
-            return $this->typeAnalyzer->getTypesForTypeSpecification($this->bestTypeOverrideMatch);
-        } elseif ($this->name === 'this') {
-            return $this->currentClassName ? [$this->currentClassName] : [];
-        } elseif ($this->bestMatch) {
-            if ($this->bestMatch instanceof Node\Expr\Assign) {
-                if ($this->bestMatch->expr instanceof Node\Expr\Ternary) {
-                    $firstOperandType = $this->deduceTypesCommand->deduceTypesFromNode(
-                        $this->file,
-                        $this->code,
-                        $this->bestMatch->expr->if ?: $this->bestMatch->expr->cond,
-                        $this->bestMatch->getAttribute('startFilePos')
-                    );
-
-                    $secondOperandType = $this->deduceTypesCommand->deduceTypesFromNode(
-                        $this->file,
-                        $this->code,
-                        $this->bestMatch->expr->else,
-                        $this->bestMatch->getAttribute('startFilePos')
-                    );
-
-                    if ($firstOperandType === $secondOperandType) {
-                        return $firstOperandType;
-                    }
-                } else {
-                    return $this->deduceTypesCommand->deduceTypesFromNode(
-                        $this->file,
-                        $this->code,
-                        $this->bestMatch->expr,
-                        $this->bestMatch->getAttribute('startFilePos')
-                    );
-                }
-            } elseif ($this->bestMatch instanceof Node\Stmt\Foreach_) {
-                $types = $this->deduceTypesCommand->deduceTypesFromNode(
+        if ($node instanceof Node\Expr\Assign) {
+            if ($node->expr instanceof Node\Expr\Ternary) {
+                $firstOperandType = $this->deduceTypesCommand->deduceTypesFromNode(
                     $this->file,
                     $this->code,
-                    $this->bestMatch->expr,
-                    $this->bestMatch->getAttribute('startFilePos')
+                    $node->expr->if ?: $node->expr->cond,
+                    $node->getAttribute('startFilePos')
                 );
 
-                foreach ($types as $type) {
-                    if ($type && mb_strpos($type, '[]') !== false) {
-                        $type = mb_substr($type, 0, -2);
+                $secondOperandType = $this->deduceTypesCommand->deduceTypesFromNode(
+                    $this->file,
+                    $this->code,
+                    $node->expr->else,
+                    $node->getAttribute('startFilePos')
+                );
 
-                        return $type ? [$type] : [];
-                    }
+                if ($firstOperandType === $secondOperandType) {
+                    return $firstOperandType;
                 }
-            } elseif ($this->bestMatch instanceof Node\Name) {
-                return [$this->fetchClassName($this->bestMatch)];
+            } else {
+                return $this->deduceTypesCommand->deduceTypesFromNode(
+                    $this->file,
+                    $this->code,
+                    $node->expr,
+                    $node->getAttribute('startFilePos')
+                );
             }
-        } elseif ($this->lastFunctionLikeNode) {
-            foreach ($this->lastFunctionLikeNode->getParams() as $param) {
+        } elseif ($node instanceof Node\Stmt\Foreach_) {
+            $types = $this->deduceTypesCommand->deduceTypesFromNode(
+                $this->file,
+                $this->code,
+                $node->expr,
+                $node->getAttribute('startFilePos')
+            );
+
+            foreach ($types as $type) {
+                if ($type && mb_strpos($type, '[]') !== false) {
+                    $type = mb_substr($type, 0, -2);
+
+                    return $type ? [$type] : [];
+                }
+            }
+        } elseif ($node instanceof Node\FunctionLike) {
+            foreach ($node->getParams() as $param) {
                 if ($param->name === $this->name) {
-                    $docBlock = $this->lastFunctionLikeNode->getDocComment();
+                    $docBlock = $node->getDocComment();
 
                     if ($docBlock) {
                         // Analyze the docblock's @param tags.
                         $name = null;
 
-                        if ($this->lastFunctionLikeNode instanceof Node\Stmt\Function_ ||
-                            $this->lastFunctionLikeNode instanceof Node\Stmt\ClassMethod
-                        ) {
-                            $name = $this->lastFunctionLikeNode->name;
+                        if ($node instanceof Node\Stmt\Function_ || $node instanceof Node\Stmt\ClassMethod) {
+                            $name = $node->name;
                         }
 
                         $result = $this->getDocParser()->parse((string) $docBlock, [
@@ -509,6 +498,29 @@ class QueryingVisitor extends NodeVisitorAbstract
                     break;
                 }
             }
+        } elseif ($node instanceof Node\Name) {
+            return [$this->fetchClassName($node)];
+        }
+
+        return [];
+    }
+
+    /**
+     * Retrieves the detected types without filtering out any types that might be excluded (i.e. due to conditionals
+     * such as $a !== null).
+     *
+     * @var string[]
+     */
+    protected function getUnfilteredTypes()
+    {
+        if ($this->bestTypeOverrideMatch) {
+            return $this->typeAnalyzer->getTypesForTypeSpecification($this->bestTypeOverrideMatch);
+        } elseif ($this->name === 'this') {
+            return $this->currentClassName ? [$this->currentClassName] : [];
+        } elseif ($this->bestMatch) {
+            return $this->getTypesForNode($this->bestMatch);
+        } elseif ($this->lastFunctionLikeNode) {
+            return $this->getTypesForNode($this->lastFunctionLikeNode);
         }
 
         return [];
