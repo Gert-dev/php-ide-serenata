@@ -202,6 +202,13 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['null'], $output);
     }
 
+    public function testTypeOverrideAnnotationsStillTakePrecedenceOverConditionals()
+    {
+        $output = $this->getVariableTypes('IfWithTypeOverride.php', '$b');
+
+        $this->assertEquals(['string'], $output);
+    }
+
     public function testCorrectlyAnalyzesComplexIfStatementWithVariableHandlingFunction()
     {
         $output = $this->getVariableTypes('IfVariableHandlingFunction.php', '$b');
