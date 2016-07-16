@@ -153,6 +153,27 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B', '\A\C', '\A\D', '\A\E'], $output);
     }
 
+    public function testCorrectlyAnalyzesNestedIfStatementWithInstanceof()
+    {
+        $output = $this->getVariableTypes('InstanceofNestedIf.php', '$b');
+
+        $this->assertEquals(['\A\B', '\A\A'], $output);
+    }
+
+    public function testCorrectlyAnalyzesNestedIfStatementWithInstanceofAndNegation()
+    {
+        $output = $this->getVariableTypes('InstanceofNestedIfWithNegation.php', '$b');
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesNestedIfStatementWithInstanceofAndReassignment()
+    {
+        $output = $this->getVariableTypes('InstanceofNestedIfReassignment.php', '$b');
+
+        $this->assertEquals(['\A\A'], $output);
+    }
+
     public function testCorrectlyAnalyzesIfStatementWithNotInstanceof()
     {
         $output = $this->getVariableTypes('IfNotInstanceof.php', '$b');
