@@ -153,6 +153,13 @@ class VariableTypesTest extends IndexedTest
         $this->assertEquals(['\A\B', '\A\C', '\A\D', '\A\E'], $output);
     }
 
+    public function testCorrectlyAnalyzesIfStatementWithNotInstanceof()
+    {
+        $output = $this->getVariableTypes('IfNotInstanceof.php', '$b');
+
+        $this->assertEquals(['null'], $output);
+    }
+
     public function testCorrectlyAnalyzesComplexIfStatementWithNotStrictlyEqualsNull()
     {
         $output = $this->getVariableTypes('IfNotStrictlyEqualsNull.php', '$b');
