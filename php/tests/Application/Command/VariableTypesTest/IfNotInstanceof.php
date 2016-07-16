@@ -3,9 +3,9 @@
 namespace A;
 
 /**
- * @param B|null $b
+ * @param A|B $b
  */
-function foo(B $b = null)
+function foo($b)
 {
     if (!$b instanceof B) {
         // <MARKER>
