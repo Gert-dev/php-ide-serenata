@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\VariableType;
+namespace PhpIntegrator\Application\Command\VariableTypes;
 
 use PhpParser\Node;
 

@@ -116,7 +116,7 @@ class VariableTypes extends AbstractCommand
 
         $offsetLine = $this->calculateLineByOffset($code, $offset);
 
-        $queryingVisitor = new VariableType\QueryingVisitor(
+        $queryingVisitor = new VariableTypes\QueryingVisitor(
             $file,
             $code,
             $offset,

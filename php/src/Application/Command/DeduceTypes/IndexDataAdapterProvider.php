@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\DeduceType;
+namespace PhpIntegrator\Application\Command\DeduceTypes;
 
 use ArrayIterator;
 
