@@ -143,8 +143,11 @@ class VariableTypes extends AbstractCommand
     public function setIndexDatabase(IndexDatabase $indexDatabase)
     {
         if ($this->resolveTypeCommand) {
-            $this->getDeduceTypesCommand()->setIndexDatabase($indexDatabase);
             $this->getResolveTypeCommand()->setIndexDatabase($indexDatabase);
+        }
+
+        if ($this->deduceTypesCommand) {
+            $this->getDeduceTypesCommand()->setIndexDatabase($indexDatabase);
         }
 
         parent::setIndexDatabase($indexDatabase);
