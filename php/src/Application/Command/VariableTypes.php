@@ -33,7 +33,7 @@ class VariableTypes extends AbstractCommand
     protected $resolveTypeCommand;
 
     /**
-     * @var DeduceTypesCommand
+     * @var DeduceTypes
      */
     protected $deduceTypesCommand;
 
