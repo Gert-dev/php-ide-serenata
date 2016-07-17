@@ -55,7 +55,6 @@ class Application
             '--localize-type'       => 'LocalizeType',
             '--semantic-lint'       => 'SemanticLint',
             '--available-variables' => 'AvailableVariables',
-            '--variable-types'      => 'VariableTypes',
             '--deduce-types'        => 'DeduceTypes'
         ];
 

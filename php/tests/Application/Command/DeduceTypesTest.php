@@ -69,6 +69,311 @@ class DeduceTypesTest extends IndexedTest
     //     return $nodes;
     // }
 
+    public function testCorrectlyAnalyzesTypeOverrideAnnotations()
+    {
+        $output = $this->deduceTypes('TypeOverrideAnnotations.php', ['$a']);
+
+        $this->assertEquals(['\Traversable'], $output);
+
+        $output = $this->deduceTypes('TypeOverrideAnnotations.php', ['$b']);
+
+        $this->assertEquals(['\Traversable'], $output);
+
+        $output = $this->deduceTypes('TypeOverrideAnnotations.php', ['$c']);
+
+        $this->assertEquals(['\A\C', 'null'], $output);
+
+        $output = $this->deduceTypes('TypeOverrideAnnotations.php', ['$d']);
+
+        $this->assertEquals(['\A\D'], $output);
+    }
+
+    public function testCorrectlyResolvesThisInClass()
+    {
+        $output = $this->deduceTypes('ThisInClass.php', ['$this']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyResolvesThisOutsideClass()
+    {
+        $output = $this->deduceTypes('ThisOutsideClass.php', ['$this']);
+
+        $this->assertEquals([], $output);
+    }
+
+    public function testCorrectlyAnalyzesFunctionTypeHints()
+    {
+        $output = $this->deduceTypes('FunctionParameterTypeHint.php', ['$b']);
+
+        $this->assertEquals(['\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesFunctionDocblocks()
+    {
+        $output = $this->deduceTypes('FunctionParameterDocblock.php', ['$b']);
+
+        $this->assertEquals(['\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesMethodTypeHints()
+    {
+        $output = $this->deduceTypes('MethodParameterTypeHint.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesMethodDocblocks()
+    {
+        $output = $this->deduceTypes('MethodParameterDocblock.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesClosureTypeHints()
+    {
+        $output = $this->deduceTypes('ClosureParameterTypeHint.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyMovesBeyondClosureScopeForVariableUses()
+    {
+        $output = $this->deduceTypes('ClosureVariableUseStatement.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+
+        $output = $this->deduceTypes('ClosureVariableUseStatement.php', ['$c']);
+
+        $this->assertEquals(['\A\C'], $output);
+
+        $output = $this->deduceTypes('ClosureVariableUseStatement.php', ['$d']);
+
+        $this->assertEquals(['\A\D'], $output);
+
+        $output = $this->deduceTypes('ClosureVariableUseStatement.php', ['$e']);
+
+        $this->assertEquals([], $output);
+    }
+
+    public function testCorrectlyAnalyzesCatchBlockTypeHints()
+    {
+        $output = $this->deduceTypes('CatchBlockTypeHint.php', ['$e']);
+
+        $this->assertEquals(['\UnexpectedValueException'], $output);
+    }
+
+    public function testCorrectlyAnalyzesIfStatementWithInstanceof()
+    {
+        $output = $this->deduceTypes('InstanceofIf.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndVariableInsideCondition()
+    {
+        $output = $this->deduceTypes('InstanceofComplexIfVariableInsideCondition.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndAnd()
+    {
+        $output = $this->deduceTypes('InstanceofComplexIfAnd.php', ['$b']);
+
+        $this->assertEquals(['\A\B', '\A\C', '\A\D'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithInstanceofAndOr()
+    {
+        $output = $this->deduceTypes('InstanceofComplexIfOr.php', ['$b']);
+
+        $this->assertEquals(['\A\B', '\A\C', '\A\D', '\A\E'], $output);
+    }
+
+    public function testCorrectlyAnalyzesNestedIfStatementWithInstanceof()
+    {
+        $output = $this->deduceTypes('InstanceofNestedIf.php', ['$b']);
+
+        $this->assertEquals(['\A\B', '\A\A'], $output);
+    }
+
+    public function testCorrectlyAnalyzesNestedIfStatementWithInstanceofAndNegation()
+    {
+        $output = $this->deduceTypes('InstanceofNestedIfWithNegation.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesNestedIfStatementWithInstanceofAndReassignment()
+    {
+        $output = $this->deduceTypes('InstanceofNestedIfReassignment.php', ['$b']);
+
+        $this->assertEquals(['\A\A'], $output);
+    }
+
+    public function testCorrectlyAnalyzesIfStatementWithNotInstanceof()
+    {
+        $output = $this->deduceTypes('IfNotInstanceof.php', ['$b']);
+
+        $this->assertEquals(['\A\A'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithNotStrictlyEqualsNull()
+    {
+        $output = $this->deduceTypes('IfNotStrictlyEqualsNull.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithNotLooselyEqualsNull()
+    {
+        $output = $this->deduceTypes('IfNotLooselyEqualsNull.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithStrictlyEqualsNull()
+    {
+        $output = $this->deduceTypes('IfStrictlyEqualsNull.php', ['$b']);
+
+        $this->assertEquals(['null'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithLooselyEqualsNull()
+    {
+        $output = $this->deduceTypes('IfLooselyEqualsNull.php', ['$b']);
+
+        $this->assertEquals(['null'], $output);
+    }
+
+    public function testCorrectlyAnalyzesIfStatementWithTruthy()
+    {
+        $output = $this->deduceTypes('IfTruthy.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesIfStatementWithFalsy()
+    {
+        $output = $this->deduceTypes('IfFalsy.php', ['$b']);
+
+        $this->assertEquals(['null'], $output);
+    }
+
+    public function testTypeOverrideAnnotationsStillTakePrecedenceOverConditionals()
+    {
+        $output = $this->deduceTypes('IfWithTypeOverride.php', ['$b']);
+
+        $this->assertEquals(['string'], $output);
+    }
+
+    public function testCorrectlyAnalyzesComplexIfStatementWithVariableHandlingFunction()
+    {
+        $output = $this->deduceTypes('IfVariableHandlingFunction.php', ['$b']);
+
+        $this->assertEquals([
+            'array',
+            'bool',
+            'callable',
+            'float',
+            'int',
+            'null',
+            'string',
+            'object',
+            'resource'
+        ], $output);
+    }
+
+    public function testCorrectlyTreatsIfConditionAsSeparateScope()
+    {
+        $output = $this->deduceTypes('InstanceofIfSeparateScope.php', ['$b']);
+
+        $this->assertEquals([], $output);
+    }
+
+    public function testCorrectlyAnalyzesElseIfStatementWithInstanceof()
+    {
+        $output = $this->deduceTypes('InstanceofElseIf.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyConfinesTreatsElseIfConditionAsSeparateScope()
+    {
+        $output = $this->deduceTypes('InstanceofElseIfSeparateScope.php', ['$b']);
+
+        $this->assertEquals([], $output);
+    }
+
+    public function testCorrectlyAnalyzesTernaryExpressionWithInstanceof()
+    {
+        $output = $this->deduceTypes('InstanceofTernary.php', ['$b']);
+
+        $this->assertEquals(['\A\B'], $output);
+    }
+
+    public function testCorrectlyConfinesTreatsTernaryExpressionConditionAsSeparateScope()
+    {
+        $output = $this->deduceTypes('InstanceofTernarySeparateScope.php', ['$b']);
+
+        $this->assertEquals([], $output);
+    }
+
+    public function testCorrectlyAnalyzesTernaryExpressionWhereBothOperandsResultInTheSameType()
+    {
+        $output = $this->deduceTypes('TernarySameResultingType.php', ['$a']);
+
+        $this->assertEquals(['\A'], $output);
+
+        $output = $this->deduceTypes('TernarySameResultingType.php', ['$b']);
+
+        $this->assertEquals(['\B'], $output);
+    }
+
+    public function testCorrectlyAnalyzesForeach()
+    {
+        $output = $this->deduceTypes('Foreach.php', ['$a']);
+
+        $this->assertEquals(['\DateTime'], $output);
+    }
+
+    public function testCorrectlyAnalyzesAssignments()
+    {
+        $output = $this->deduceTypes('Assignment.php', ['$a']);
+
+        $this->assertEquals(['\DateTime'], $output);
+    }
+
+    public function testCorrectlyIgnoresAssignmentsOutOfScope()
+    {
+        $output = $this->deduceTypes('AssignmentOutOfScope.php', ['$a']);
+
+        $this->assertEquals(['\DateTime'], $output);
+    }
+
+    public function testDocblockTakesPrecedenceOverTypeHint()
+    {
+        $output = $this->deduceTypes('DocblockPrecedence.php', ['$b']);
+
+        $this->assertEquals(['\B'], $output);
+    }
+
+    public function testSpecialTypesForParametersResolveCorrectly()
+    {
+        $output = $this->deduceTypes('FunctionParameterTypeHintSpecial.php', ['$a']);
+
+        $this->assertEquals(['\A\C'], $output);
+
+        $output = $this->deduceTypes('FunctionParameterTypeHintSpecial.php', ['$b']);
+
+        $this->assertEquals(['\A\C'], $output);
+
+        $output = $this->deduceTypes('FunctionParameterTypeHintSpecial.php', ['$c']);
+
+        $this->assertEquals(['\A\C'], $output);
+    }
+
     public function testCorrectlyAnalyzesStaticPropertyAccess()
     {
         $result = $this->deduceTypes(

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\VariableTypes;
+namespace PhpIntegrator\Application\Command\DeduceTypes;
 
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;

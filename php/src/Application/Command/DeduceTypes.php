@@ -13,17 +13,13 @@ use PhpIntegrator\IndexDataAdapter;
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 
 /**
  * Allows deducing the types of an expression (e.g. a call chain, a simple string, ...).
  */
 class DeduceTypes extends AbstractCommand
 {
-    /**
-     * @var VariableTypes
-     */
-    protected $variableTypesCommand;
-
     /**
      * @var ClassList
      */
@@ -121,7 +117,7 @@ class DeduceTypes extends AbstractCommand
         $classRegexPart = "?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*";
 
         if ($firstElement[0] === '$') {
-            $types = $this->getVariableTypesCommand()->getVariableTypes($file, $code, $firstElement, $offset);
+            $types = $this->getVariableTypes($file, $code, $firstElement, $offset);
         } elseif ($firstElement === 'static' or $firstElement === 'self') {
             $propertyAccessNeedsDollarSign = true;
 
@@ -241,6 +237,55 @@ class DeduceTypes extends AbstractCommand
         }
 
         return $types;
+    }
+
+    /**
+     * @param string     $file
+     * @param string     $code
+     * @param string     $name
+     * @param int        $offset
+     *
+     * @return string[]
+     */
+    public function getVariableTypes($file, $code, $name, $offset)
+    {
+        if (empty($name) || $name[0] !== '$') {
+            throw new UnexpectedValueException('The variable name must start with a dollar sign!');
+        }
+
+        $parser = $this->getParser();
+
+        try {
+            $nodes = $parser->parse($code);
+        } catch (Error $e) {
+            throw new UnexpectedValueException('Parsing the file failed!');
+        }
+
+        if ($nodes === null) {
+            throw new UnexpectedValueException('Parsing the file failed!');
+        }
+
+        $offsetLine = $this->calculateLineByOffset($code, $offset);
+
+        $queryingVisitor = new DeduceTypes\QueryingVisitor(
+            $file,
+            $code,
+            $offset,
+            $offsetLine,
+            mb_substr($name, 1),
+            $this->getTypeAnalyzer(),
+            $this->getResolveTypeCommand(),
+            $this
+        );
+
+        $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
+
+        $traverser = new NodeTraverser(false);
+        $traverser->addVisitor($scopeLimitingVisitor);
+        $traverser->addVisitor($queryingVisitor);
+        $traverser->traverse($nodes);
+
+        return $queryingVisitor->getResolvedTypes($file);
     }
 
     /**
@@ -401,10 +446,6 @@ class DeduceTypes extends AbstractCommand
      */
     public function setIndexDatabase(IndexDatabase $indexDatabase)
     {
-        if ($this->variableTypesCommand) {
-            $this->getVariableTypesCommand()->setIndexDatabase($indexDatabase);
-        }
-
         if ($this->classListCommand) {
             $this->getClassListCommand()->setIndexDatabase($indexDatabase);
         }
@@ -422,19 +463,6 @@ class DeduceTypes extends AbstractCommand
         }
 
         parent::setIndexDatabase($indexDatabase);
-    }
-
-    /**
-     * @return VariableTypes
-     */
-    protected function getVariableTypesCommand()
-    {
-        if (!$this->variableTypesCommand) {
-            $this->variableTypesCommand = new VariableTypes($this->getParser(), $this->cache);
-            $this->variableTypesCommand->setIndexDatabase($this->indexDatabase);
-        }
-
-        return $this->variableTypesCommand;
     }
 
     /**

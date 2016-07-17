@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Application\Command\Visitor;
 
-use PhpIntegrator\Application\Command\VariableTypes\DummyExprNode;
+use PhpIntegrator\Application\Command\DeduceTypes\DummyExprNode;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
