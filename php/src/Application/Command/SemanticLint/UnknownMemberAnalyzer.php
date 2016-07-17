@@ -14,7 +14,7 @@ use PhpIntegrator\Application\Command\DeduceTypes;
 class UnknownMemberAnalyzer implements AnalyzerInterface
 {
     /**
-     * @var Visitor\MethodUsageFetchingVisitor
+     * @var Visitor\MemberUsageFetchingVisitor
      */
     protected $methodUsageFetchingVisitor;
 
