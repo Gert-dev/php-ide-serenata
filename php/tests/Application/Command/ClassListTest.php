@@ -12,7 +12,7 @@ class ClassListTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new ClassList();
+        $command = new ClassList($this->getParser());
         $command->setIndexDatabase($indexDatabase);
 
         $output = $command->getClassList($path);

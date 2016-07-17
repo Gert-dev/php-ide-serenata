@@ -14,7 +14,7 @@ class AvailableVariablesTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new AvailableVariables();
+        $command = new AvailableVariables($this->getParser());
         $command->setIndexDatabase($indexDatabase);
 
         return $command;
@@ -161,7 +161,7 @@ class AvailableVariablesTest extends IndexedTest
      */
     public function testThrowsExceptionOnParsingFailed()
     {
-        $command = new AvailableVariables();
+        $command = new AvailableVariables($this->getParser());
         $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
 
         $output = $this->getAvailableVariables('MissingFile.php', 0);

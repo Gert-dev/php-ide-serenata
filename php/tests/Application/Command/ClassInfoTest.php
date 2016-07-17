@@ -12,7 +12,7 @@ class ClassInfoTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new ClassInfo();
+        $command = new ClassInfo($this->getParser());
         $command->setIndexDatabase($indexDatabase);
 
         return $command->getClassInfo($fqcn);

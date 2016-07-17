@@ -15,6 +15,8 @@ use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
+use PhpParser\Parser;
+
 /**
  * Base class for commands.
  */
@@ -44,9 +46,19 @@ abstract class AbstractCommand implements CommandInterface
     protected $databaseFile;
 
     /**
+     * @var Parser
+     */
+    protected $parser;
+
+    /**
      * @var CacheIdPrefixDecorator|null
      */
     protected $cache;
+
+    /**
+     * @var CachingParserProxy|null
+     */
+    protected $cachingParserProxy;
 
     /**
      * @var IndexDataAdapter\ProviderCachingProxy
@@ -56,8 +68,9 @@ abstract class AbstractCommand implements CommandInterface
     /**
      * @param Cache|null $cache
      */
-    public function __construct(Cache $cache = null)
+    public function __construct(Parser $parser, Cache $cache = null)
     {
+        $this->parser = $parser;
         $this->cache = $cache ? (new CacheIdPrefixDecorator($cache, $this->getCachePrefix())) : null;
     }
 
@@ -259,5 +272,13 @@ abstract class AbstractCommand implements CommandInterface
             'success' => $success,
             'result'  => $data
         ]);
+    }
+
+    /**
+     * @return Parser
+     */
+    public function getParser()
+    {
+        return $this->parser;
     }
 }

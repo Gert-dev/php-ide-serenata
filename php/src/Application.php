@@ -6,6 +6,12 @@ use Exception;
 
 use Doctrine\Common\Cache\FilesystemCache;
 
+use PhpIntegrator\Application\Command\CachingParserProxy;
+
+use PhpParser\Lexer;
+use PhpParser\Parser;
+use PhpParser\ParserFactory;
+
 /**
  * Main application class.
  */
@@ -15,6 +21,16 @@ class Application
      * @var FilesystemCache
      */
     protected $filesystemCache;
+
+    /**
+     * @var CachingParserProxy
+     */
+    protected $cachingParserProxy;
+
+    /**
+     * @var Parser
+     */
+    protected $parser;
 
     /**
      * Handles the application process.
@@ -47,7 +63,7 @@ class Application
             $className = "\\PhpIntegrator\\Application\\Command\\{$commands[$command]}";
 
             /** @var \PhpIntegrator\Application\Command\CommandInterface $command */
-            $command = new $className($this->getFilesystemCache());
+            $command = new $className($this->getCachingParserProxy(), $this->getFilesystemCache());
 
             if (interface_exists('Throwable')) {
                 // PHP >= 7.
@@ -92,5 +108,39 @@ class Application
         }
 
         return $this->filesystemCache;
+    }
+
+    /**
+     * @return CachingParserProxy
+     */
+    protected function getCachingParserProxy()
+    {
+        if (!$this->cachingParserProxy instanceof CachingParserProxy) {
+            $this->cachingParserProxy = new CachingParserProxy($this->getParser());
+        }
+
+        return $this->cachingParserProxy;
+    }
+
+    /**
+     * @return Parser
+     */
+    protected function getParser()
+    {
+        if (!$this->parser) {
+            $lexer = new Lexer([
+                'usedAttributes' => [
+                    'comments', 'startLine', 'endLine', 'startFilePos', 'endFilePos'
+                ]
+            ]);
+
+            $parserFactory = new ParserFactory();
+
+            $this->parser = $parserFactory->create(ParserFactory::PREFER_PHP7, $lexer, [
+                'throwOnError' => false
+            ]);
+        }
+
+        return $this->parser;
     }
 }

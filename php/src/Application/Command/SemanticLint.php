@@ -25,11 +25,6 @@ use PhpParser\ParserFactory;
 class SemanticLint extends AbstractCommand
 {
     /**
-     * @var Parser
-     */
-    protected $parser;
-
-    /**
      * @var ClassInfo
      */
     protected $classInfoCommand;
@@ -310,7 +305,7 @@ class SemanticLint extends AbstractCommand
     protected function getClassInfoCommand()
     {
         if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfo($this->cache);
+            $this->classInfoCommand = new ClassInfo($this->getParser(), $this->cache);
             $this->classInfoCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -323,7 +318,7 @@ class SemanticLint extends AbstractCommand
     protected function getDeduceTypesCommand()
     {
         if (!$this->deduceTypesCommand) {
-            $this->deduceTypesCommand = new DeduceTypes($this->cache);
+            $this->deduceTypesCommand = new DeduceTypes($this->getParser(), $this->cache);
             $this->deduceTypesCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -336,7 +331,7 @@ class SemanticLint extends AbstractCommand
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType($this->cache);
+            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache);
             $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -349,7 +344,7 @@ class SemanticLint extends AbstractCommand
     protected function getGlobalFunctionsCommand()
     {
         if (!$this->globalFunctions) {
-            $this->globalFunctions = new GlobalFunctions($this->cache);
+            $this->globalFunctions = new GlobalFunctions($this->getParser(), $this->cache);
             $this->globalFunctions->setIndexDatabase($this->indexDatabase);
         }
 
@@ -362,7 +357,7 @@ class SemanticLint extends AbstractCommand
     protected function getGlobalConstantsCommand()
     {
         if (!$this->globalConstants) {
-            $this->globalConstants = new GlobalConstants($this->cache);
+            $this->globalConstants = new GlobalConstants($this->getParser(), $this->cache);
             $this->globalConstants->setIndexDatabase($this->indexDatabase);
         }
 
@@ -391,25 +386,5 @@ class SemanticLint extends AbstractCommand
         }
 
         return $this->docParser;
-    }
-
-    /**
-     * @return Parser
-     */
-    protected function getParser()
-    {
-        if (!$this->parser) {
-            $lexer = new Lexer([
-                'usedAttributes' => [
-                    'comments', 'startLine', 'endLine', 'startFilePos', 'endFilePos'
-                ]
-            ]);
-
-            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer, [
-                'throwOnError' => false
-            ]);
-        }
-
-        return $this->parser;
     }
 }

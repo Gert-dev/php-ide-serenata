@@ -430,7 +430,7 @@ class DeduceTypes extends AbstractCommand
     protected function getVariableTypesCommand()
     {
         if (!$this->variableTypesCommand) {
-            $this->variableTypesCommand = new VariableTypes($this->cache);
+            $this->variableTypesCommand = new VariableTypes($this->getParser(), $this->cache);
             $this->variableTypesCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -443,7 +443,7 @@ class DeduceTypes extends AbstractCommand
     protected function getClassListCommand()
     {
         if (!$this->classListCommand) {
-            $this->classListCommand = new ClassList($this->cache);
+            $this->classListCommand = new ClassList($this->getParser(), $this->cache);
             $this->classListCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -456,7 +456,7 @@ class DeduceTypes extends AbstractCommand
     protected function getClassInfoCommand()
     {
         if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfo($this->cache);
+            $this->classInfoCommand = new ClassInfo($this->getParser(), $this->cache);
             $this->classInfoCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -469,7 +469,7 @@ class DeduceTypes extends AbstractCommand
     protected function getGlobalFunctionsCommand()
     {
         if (!$this->globalFunctionsCommand) {
-            $this->globalFunctionsCommand = new GlobalFunctions($this->cache);
+            $this->globalFunctionsCommand = new GlobalFunctions($this->getParser(), $this->cache);
             $this->globalFunctionsCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -482,7 +482,7 @@ class DeduceTypes extends AbstractCommand
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType($this->cache);
+            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache);
             $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
         }
 

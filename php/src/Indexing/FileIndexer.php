@@ -47,11 +47,6 @@ class FileIndexer
     protected $typeAnalyzer;
 
     /**
-     * @var ParserFactory
-     */
-    protected $parserFactory;
-
-    /**
      * @var Parser
      */
     protected $parser;
@@ -70,18 +65,18 @@ class FileIndexer
      * @param StorageInterface $storage
      * @param TypeAnalyzer     $typeAnalyzer
      * @param DocParser        $docParser
-     * @param ParserFactory    $parserFactory
+     * @param Parser           $parser
      */
     public function __construct(
         StorageInterface $storage,
         TypeAnalyzer $typeAnalyzer,
         DocParser $docParser,
-        ParserFactory $parserFactory
+        Parser $parser
     ) {
         $this->storage = $storage;
         $this->typeAnalyzer = $typeAnalyzer;
         $this->docParser = $docParser;
-        $this->parserFactory = $parserFactory;
+        $this->parser = $parser;
     }
 
     /**
@@ -884,18 +879,6 @@ class FileIndexer
      */
     protected function getParser()
     {
-        if (!$this->parser) {
-            $lexer = new Lexer([
-                'usedAttributes' => [
-                    'comments', 'startLine', 'endLine', 'startFilePos', 'endFilePos'
-                ]
-            ]);
-
-            $this->parser = $this->parserFactory->create(ParserFactory::PREFER_PHP7, $lexer, [
-                'throwOnError' => false
-            ]);
-        }
-
         return $this->parser;
     }
 }

@@ -14,7 +14,7 @@ class SemanticLintTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path, $indexingMayFail);
 
-        $command = new SemanticLint();
+        $command = new SemanticLint($this->getParser());
         $command->setIndexDatabase($indexDatabase);
 
         return $command->semanticLint($path, file_get_contents($path));
@@ -502,7 +502,7 @@ class SemanticLintTest extends IndexedTest
      */
     public function testThrowsExceptionOnUnknownFile()
     {
-        $command = new SemanticLint();
+        $command = new SemanticLint($this->getParser());
         $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
 
         $output = $this->lintFile('MissingFile.php');

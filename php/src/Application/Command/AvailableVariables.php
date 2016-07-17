@@ -19,11 +19,6 @@ use PhpParser\NodeTraverser;
 class AvailableVariables extends AbstractCommand
 {
     /**
-     * @var Parser
-     */
-    protected $parser;
-
-    /**
      * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
@@ -100,25 +95,5 @@ class AvailableVariables extends AbstractCommand
          }
 
          return $outputVariables;
-     }
-
-     /**
-      * @return Parser
-      */
-     protected function getParser()
-     {
-         if (!$this->parser) {
-             $lexer = new Lexer([
-                 'usedAttributes' => [
-                     'comments', 'startFilePos', 'endFilePos'
-                 ]
-             ]);
-
-             $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer, [
-                 'throwOnError' => false
-             ]);
-         }
-
-         return $this->parser;
      }
 }

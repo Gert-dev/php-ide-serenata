@@ -20,7 +20,7 @@ class DeduceTypesTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new DeduceTypes();
+        $command = new DeduceTypes($this->getParser());
         $command->setIndexDatabase($indexDatabase);
 
         return $command->deduceTypes($path, file_get_contents($path), $expressionParts, $markerOffset);

@@ -14,7 +14,7 @@ class ResolveTypeTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new ResolveType();
+        $command = new ResolveType($this->getParser());
         $command->setIndexDatabase($indexDatabase);
 
         $this->assertEquals('\C', $command->resolveType('C', $path, 1));
@@ -32,7 +32,7 @@ class ResolveTypeTest extends IndexedTest
      */
     public function testThrowsExceptionOnUnknownFile()
     {
-        $command = new ResolveType();
+        $command = new ResolveType($this->getParser());
         $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
 
         $command->resolveType('\C', 'MissingFile.php', 1);

@@ -14,7 +14,7 @@ class LocalizeTypeTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new LocalizeType();
+        $command = new LocalizeType($this->getParser());
         $command->setIndexDatabase($indexDatabase);
 
         $this->assertEquals('\C', $command->localizeType('C', $path, 1));
@@ -35,7 +35,7 @@ class LocalizeTypeTest extends IndexedTest
      */
     public function testThrowsExceptionOnUnknownFile()
     {
-        $command = new LocalizeType();
+        $command = new LocalizeType($this->getParser());
         $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
 
         $command->localizeType('C', 'MissingFile.php', 1);

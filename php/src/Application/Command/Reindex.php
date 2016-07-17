@@ -64,11 +64,6 @@ class Reindex extends AbstractCommand
     protected $typeAnalyzer;
 
     /**
-     * @var ParserFactory
-     */
-    protected $parserFactory;
-
-    /**
      * @var StorageInterface
      */
     protected $storageForIndexers;
@@ -188,7 +183,7 @@ class Reindex extends AbstractCommand
                 $this->getStorageForIndexers(),
                 $this->getTypeAnalyzer(),
                 $this->getDocParser(),
-                $this->getParserFactory()
+                $this->getParser()
             );
         }
 
@@ -271,17 +266,5 @@ class Reindex extends AbstractCommand
         }
 
         return $this->docParser;
-    }
-
-    /**
-     * @return DocParser
-     */
-    protected function getParserFactory()
-    {
-        if (!$this->parserFactory) {
-            $this->parserFactory = new ParserFactory();
-        }
-
-        return $this->parserFactory;
     }
 }

@@ -23,11 +23,6 @@ use PhpParser\ParserFactory;
 class VariableTypes extends AbstractCommand
 {
     /**
-     * @var Parser
-     */
-    protected $parser;
-
-    /**
      * @var ResolveType
      */
     protected $resolveTypeCommand;
@@ -89,29 +84,32 @@ class VariableTypes extends AbstractCommand
     }
 
     /**
-     * @param string $file
-     * @param string $code
-     * @param string $name
-     * @param int    $offset
+     * @param string     $file
+     * @param string     $code
+     * @param string     $name
+     * @param int        $offset
+     * @param array|null $nodes
      *
      * @return string[]
      */
-    public function getVariableTypes($file, $code, $name, $offset)
+    public function getVariableTypes($file, $code, $name, $offset, array $nodes = null)
     {
         if (empty($name) || $name[0] !== '$') {
             throw new UnexpectedValueException('The variable name must start with a dollar sign!');
         }
 
-        $parser = $this->getParser();
-
-        try {
-            $nodes = $parser->parse($code);
-        } catch (Error $e) {
-            throw new UnexpectedValueException('Parsing the file failed!');
-        }
-
         if ($nodes === null) {
-            throw new UnexpectedValueException('Parsing the file failed!');
+            $parser = $this->getParser();
+
+            try {
+                $nodes = $parser->parse($code);
+            } catch (Error $e) {
+                throw new UnexpectedValueException('Parsing the file failed!');
+            }
+
+            if ($nodes === null) {
+                throw new UnexpectedValueException('Parsing the file failed!');
+            }
         }
 
         $offsetLine = $this->calculateLineByOffset($code, $offset);
@@ -159,7 +157,7 @@ class VariableTypes extends AbstractCommand
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType($this->cache);
+            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache);
             $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -172,7 +170,7 @@ class VariableTypes extends AbstractCommand
     protected function getDeduceTypesCommand()
     {
         if (!$this->deduceTypesCommand) {
-            $this->deduceTypesCommand = new DeduceTypes($this->cache);
+            $this->deduceTypesCommand = new DeduceTypes($this->getParser(), $this->cache);
             $this->deduceTypesCommand->setIndexDatabase($this->indexDatabase);
         }
 
@@ -189,25 +187,5 @@ class VariableTypes extends AbstractCommand
         }
 
         return $this->typeAnalyzer;
-    }
-
-    /**
-     * @return Parser
-     */
-    protected function getParser()
-    {
-        if (!$this->parser) {
-            $lexer = new Lexer([
-                'usedAttributes' => [
-                    'comments', 'startLine', 'startFilePos', 'endFilePos'
-                ]
-            ]);
-
-            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer, [
-                'throwOnError' => false
-            ]);
-        }
-
-        return $this->parser;
     }
 }

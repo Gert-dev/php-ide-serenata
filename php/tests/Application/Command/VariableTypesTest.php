@@ -16,7 +16,7 @@ class VariableTypesTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new VariableTypes();
+        $command = new VariableTypes($this->getParser());
         $command->setIndexDatabase($indexDatabase);
 
         return $command->getVariableTypes($path, file_get_contents($path), $name, $markerOffset);
@@ -353,7 +353,7 @@ class VariableTypesTest extends IndexedTest
      */
     public function testThrowsExceptionOnUnknownFile()
     {
-        $command = new VariableTypes();
+        $command = new VariableTypes($this->getParser());
         $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
 
         $output = $this->getVariableTypes('MissingFile.php', '$test');
