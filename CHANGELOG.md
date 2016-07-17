@@ -20,9 +20,10 @@ if (is_string($b) || is_array($b)) {
 
 ### Changes for developers
 * Builtin functions did not have a FQCN set.
+* Added `deduceTypesAt` as a convenience alias.
 * The global function and constant list will now return a mapping of FQCN's to data (instead of names to data).
-* `getVariableTypes` is now deprecated as it is just an alias for calling `deduceTypes` with the variable name as the sole part.
 * `semanticLint` learned how to validate unknown class members, global functions and global constants, which can be used by linter packages.
+* `getVariableTypes` is now deprecated as it is just an alias for calling `deduceTypes` and `deduceTypes` with the variable name as the sole part.
 
 ## 1.0.7
 ### Bugs fixed

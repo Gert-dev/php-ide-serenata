@@ -163,6 +163,22 @@ class Service
         return @proxy.deduceTypes(parts, file, source, offset)
 
     ###*
+     * Convenience alias for {@see deduceTypes}.
+     *
+     * @param {TextEditor} editor
+     * @param {Range}      bufferPosition
+     * @param {String}     name
+     *
+     * @return {Promise}
+    ###
+    deduceTypesAt: (parts, editor, bufferPosition) ->
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
+
+        bufferText = editor.getBuffer().getText()
+
+        return @deduceTypes(parts, editor.getPath(), bufferText, offset)
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {String}      path                   The full path to the file  or folder to refresh.
@@ -267,7 +283,7 @@ class Service
      * Retrieves the types of a variable, relative to the context at the specified buffer location. Class names will
      * be returned in their full form (full class name, with a leading slash).
      *
-     * @deprecated Use deduceTypes instead.
+     * @deprecated Use deduceTypesAt instead.
      *
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition
