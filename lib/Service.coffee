@@ -137,6 +137,8 @@ class Service
     ###*
      * Fetches the types of the specified variable at the specified location.
      *
+     * @deprecated Use deduceTypes instead.
+     *
      * @param {String}      name   The variable to fetch, including its leading dollar sign.
      * @param {String}      file   The path to the file to examine.
      * @param {String|null} source The source code to search. May be null if a file is passed instead.
@@ -264,6 +266,8 @@ class Service
     ###*
      * Retrieves the types of a variable, relative to the context at the specified buffer location. Class names will
      * be returned in their full form (full class name, with a leading slash).
+     *
+     * @deprecated Use deduceTypes instead.
      *
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition

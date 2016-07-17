@@ -278,6 +278,8 @@ class Proxy
     ###*
      * Fetches the types of the specified variable at the specified location.
      *
+     * @deprecated Use deduceTypes instead.
+     *
      * @param {String}      name   The variable to fetch, including its leading dollar sign.
      * @param {String}      file   The path to the file to examine.
      * @param {String|null} source The source code to search. May be null if a file is passed instead.
@@ -286,22 +288,7 @@ class Proxy
      * @return {Promise}
     ###
     getVariableTypes: (name, file, source, offset) ->
-        if not file?
-            throw 'A path to a file must be passed!'
-
-        parameters = ['--variable-types', '--database=' + @getIndexDatabasePath(), '--name=' + name, '--offset=' + offset, '--charoffset']
-
-        if file?
-            parameters.push('--file=' + file)
-
-        if source?
-            parameters.push('--stdin')
-
-        return @performRequest(
-            parameters,
-            null,
-            source
-        )
+        return @deduceTypes([name], file, source, offset)
 
     ###*
      * Deduces the resulting types of an expression based on its parts.
