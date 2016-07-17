@@ -88,28 +88,25 @@ class VariableTypes extends AbstractCommand
      * @param string     $code
      * @param string     $name
      * @param int        $offset
-     * @param array|null $nodes
      *
      * @return string[]
      */
-    public function getVariableTypes($file, $code, $name, $offset, array $nodes = null)
+    public function getVariableTypes($file, $code, $name, $offset)
     {
         if (empty($name) || $name[0] !== '$') {
             throw new UnexpectedValueException('The variable name must start with a dollar sign!');
         }
 
+        $parser = $this->getParser();
+
+        try {
+            $nodes = $parser->parse($code);
+        } catch (Error $e) {
+            throw new UnexpectedValueException('Parsing the file failed!');
+        }
+
         if ($nodes === null) {
-            $parser = $this->getParser();
-
-            try {
-                $nodes = $parser->parse($code);
-            } catch (Error $e) {
-                throw new UnexpectedValueException('Parsing the file failed!');
-            }
-
-            if ($nodes === null) {
-                throw new UnexpectedValueException('Parsing the file failed!');
-            }
+            throw new UnexpectedValueException('Parsing the file failed!');
         }
 
         $offsetLine = $this->calculateLineByOffset($code, $offset);
