@@ -186,9 +186,9 @@ class ProviderCachingProxy implements ProviderInterface
             foreach ($cachedMap[$fqcn] as $cacheId => $ignoredValue) {
                 $this->cache->delete($cacheId);
             }
-        }
 
-        $this->cache->delete($this->getCacheIdForFqcnListCacheId());
+            $this->cache->delete($this->getCacheIdForFqcnListCacheId());
+        }
     }
 
     /**
