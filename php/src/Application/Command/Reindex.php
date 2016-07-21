@@ -134,6 +134,10 @@ class Reindex extends BaseCommand
                 $code = file_get_contents('php://stdin');
             }
 
+            if (mb_detect_encoding($code, 'UTF-8', true) !== 'UTF-8') {
+                throw new UnexpectedValueException("The file {$path} is not UTF-8!");
+            }
+
             $databaseFileHandle = null;
 
             if ($this->indexDatabase->getDatabasePath() !== ':memory:') {
