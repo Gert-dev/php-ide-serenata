@@ -38,7 +38,7 @@ class ProviderCachingProxy implements ProviderInterface
 
         $data = $this->proxyCall(__FUNCTION__, func_get_args());
 
-        $this->rememberCacheIdForFqcn($cacheId, $fqcn);
+        $this->rememberCacheIdForFqcn($fqcn, $cacheId);
 
         return $data;
     }
@@ -162,28 +162,17 @@ class ProviderCachingProxy implements ProviderInterface
     }
 
     /**
-     * @param string $cacheId
      * @param string $fqcn
+     * @param string $cacheId
      */
-    protected function rememberCacheIdForFqcn($cacheId, $fqcn)
+    protected function rememberCacheIdForFqcn($fqcn, $cacheId)
     {
         $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
 
         $tagData = $this->cache->fetch($cacheIdsCacheId);
-
-        $tagData[$cacheId] = $fqcn;
+        $tagData[$fqcn][$cacheId] = true;
 
         $this->cache->save($cacheIdsCacheId, $tagData);
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getCacheIdsForFqcn()
-    {
-        $tagData = $this->cache->fetch($this->getCacheIdForFqcnListCacheId());
-
-        return $tagData ?: [];
     }
 
     /**
@@ -191,8 +180,10 @@ class ProviderCachingProxy implements ProviderInterface
      */
     public function clearCacheFor($fqcn)
     {
-        foreach ($this->getCacheIdsForFqcn() as $cacheId => $data) {
-            if ($fqcn === $data) {
+        $cachedMap = $this->cache->fetch($this->getCacheIdForFqcnListCacheId());
+
+        if (isset($cachedMap[$fqcn])) {
+            foreach ($cachedMap[$fqcn] as $cacheId => $ignoredValue) {
                 $this->cache->delete($cacheId);
             }
         }

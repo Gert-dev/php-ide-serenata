@@ -2,6 +2,7 @@
 ### Features and enhancements
 * At least PHP 5.5 is now required to run the service. PHP 5.4 has been declared end of life for quite some time now and 5.5 will be declared end of life 10 July 2016. This does not affect the code you can actually write, the indexer still supports PHP 5.2 up to PHP 7.0, it is just the PHP interpreter running the indexer that had a required version bump.
 * Some commands delegate work to other commands, but each command that requires parsing performed its own parsing of the (same) source code, even though it only needs to happen once. This unnecessary overhead has been removed, resulting in performance improvements across the board.
+* Caching performance has been improved.
 * The strictness on `instanceof` has been lifted. The variable type deducer is now able to parse somewhat more complex if statements:
 
 ```php
