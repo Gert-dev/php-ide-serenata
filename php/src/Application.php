@@ -94,13 +94,6 @@ class Application
     protected function getFilesystemCache()
     {
         if (!$this->filesystemCache instanceof FilesystemCache) {
-            // For some reason, Windows gives permission denied errors in any folder when Doctrine Cache tries to
-            // read its cache files again. For this reason, disable caching temporarily. See also
-            // https://github.com/Gert-dev/php-integrator-base/issues/185
-            if (mb_strtoupper(mb_substr(PHP_OS, 0, 3)) === 'WIN') {
-                return null;
-            }
-
             $this->filesystemCache = new FilesystemCache(
                 sys_get_temp_dir() . '/php-integrator-base/' . Application\Command\AbstractCommand::DATABASE_VERSION . '/'
             );
