@@ -146,10 +146,12 @@ class Reindex extends BaseCommand
                 flock($databaseFileHandle, LOCK_EX);
             }
 
+            $success = true;
+
             try {
                 $this->getFileIndexer()->index($path, $code ?: null);
             } catch (Indexing\IndexingFailedException $e) {
-                return $this->outputJson(false, []);
+                $success = false;
             }
 
             if ($databaseFileHandle) {
@@ -157,7 +159,7 @@ class Reindex extends BaseCommand
                 fclose($databaseFileHandle);
             }
 
-            return $this->outputJson(true, []);
+            return $this->outputJson($success, []);
         }
 
         throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');

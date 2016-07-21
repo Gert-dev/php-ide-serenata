@@ -1,3 +1,7 @@
+## 1.0.8
+### Bugs fixed
+* Fixed the database file never getting unlocked if indexing failed.
+
 ## 1.0.7
 ### Bugs fixed
 * Fixed the `setCachePrefix` error on Windows.
