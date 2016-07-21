@@ -28,6 +28,8 @@ if (function_exists('xdebug_disable')) {
 // picked up as being modified if the user changes the timezone in php.ini.
 date_default_timezone_set('UTC');
 
+mb_internal_encoding('UTF-8');
+
 chdir(__DIR__);
 
 require '../vendor/autoload.php';
