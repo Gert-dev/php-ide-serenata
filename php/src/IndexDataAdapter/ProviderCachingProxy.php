@@ -167,14 +167,12 @@ class ProviderCachingProxy implements ProviderInterface
      */
     protected function rememberCacheIdForFqcn($fqcn, $cacheId)
     {
-        $this->synchronized(function () use ($fqcn, $cacheId) {
-            $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
+        $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
 
-            $cachedMap = $this->cache->fetch($cacheIdsCacheId);
-            $cachedMap[$fqcn][$cacheId] = true;
+        $cachedMap = $this->cache->fetch($cacheIdsCacheId);
+        $cachedMap[$fqcn][$cacheId] = true;
 
-            $this->cache->save($cacheIdsCacheId, $cachedMap);
-        });
+        $this->cache->save($cacheIdsCacheId, $cachedMap);
     }
 
     /**
@@ -182,58 +180,19 @@ class ProviderCachingProxy implements ProviderInterface
      */
     public function clearCacheFor($fqcn)
     {
-        $this->synchronized(function () use ($fqcn) {
-            $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
+        $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
 
-            $cachedMap = $this->cache->fetch($cacheIdsCacheId);
+        $cachedMap = $this->cache->fetch($cacheIdsCacheId);
 
-            if (isset($cachedMap[$fqcn])) {
-                foreach ($cachedMap[$fqcn] as $cacheId => $ignoredValue) {
-                    $this->cache->delete($cacheId);
-                }
-
-                unset($cachedMap[$fqcn]);
-
-                $this->cache->save($cacheIdsCacheId, $cachedMap);
+        if (isset($cachedMap[$fqcn])) {
+            foreach ($cachedMap[$fqcn] as $cacheId => $ignoredValue) {
+                $this->cache->delete($cacheId);
             }
-        });
-    }
 
-    /**
-     * Executes the specified callback in a "synchronized" way. A shared lock file is created to ensure that all
-     * processes executing the code must first wait for the (exclusive) lock.
-     *
-     * The cache map used in this class is used to maintain a list of which FQCN's relate to which cache ID's. This is
-     * necessary because the Doctrine cache has no notion of cache tags or tagging, so there is no way to delete all
-     * cache files associated with a certain FQCN. To solve this problem, a shared cache map is maintained (which is
-     * also stored in the cache) that keeps track of this list and replaces this missing tagging functionality.
-     *
-     * If multiple processes are active, they are all accessing the same shared cache map (some may be trying to read
-     * it, others may be trying to update it). For this reason, locking is used to ensure each process patiently awaits
-     * their turn.
-     *
-     * Windows seems to have an additional amount of trouble with this, see also
-     * https://github.com/Gert-dev/php-integrator-base/issues/185
-     *
-     * @param callable $callback
-     */
-    protected function synchronized($callback)
-    {
-        $handle = fopen($this->getLockFile(), "w");
-        flock($handle, LOCK_EX);
+            unset($cachedMap[$fqcn]);
 
-        $callback();
-
-        flock($handle, LOCK_UN);
-        fclose($handle);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getLockFile()
-    {
-        return sys_get_temp_dir() . '/php-integrator-base/accessing_shared_cache.lock';
+            $this->cache->save($cacheIdsCacheId, $cachedMap);
+        }
     }
 
     /**
