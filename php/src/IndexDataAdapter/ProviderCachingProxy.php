@@ -169,10 +169,10 @@ class ProviderCachingProxy implements ProviderInterface
     {
         $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
 
-        $tagData = $this->cache->fetch($cacheIdsCacheId);
-        $tagData[$fqcn][$cacheId] = true;
+        $cachedMap = $this->cache->fetch($cacheIdsCacheId);
+        $cachedMap[$fqcn][$cacheId] = true;
 
-        $this->cache->save($cacheIdsCacheId, $tagData);
+        $this->cache->save($cacheIdsCacheId, $cachedMap);
     }
 
     /**
