@@ -180,14 +180,18 @@ class ProviderCachingProxy implements ProviderInterface
      */
     public function clearCacheFor($fqcn)
     {
-        $cachedMap = $this->cache->fetch($this->getCacheIdForFqcnListCacheId());
+        $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
+
+        $cachedMap = $this->cache->fetch($cacheIdsCacheId);
 
         if (isset($cachedMap[$fqcn])) {
             foreach ($cachedMap[$fqcn] as $cacheId => $ignoredValue) {
                 $this->cache->delete($cacheId);
             }
 
-            $this->cache->delete($this->getCacheIdForFqcnListCacheId());
+            unset($cachedMap[$fqcn]);
+
+            $this->cache->save($cacheIdsCacheId, $cachedMap);
         }
     }
 

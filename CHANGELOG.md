@@ -19,6 +19,9 @@ if (is_string($b) || is_array($b)) {
 }
 ```
 
+### Bugs fixed
+* In some cases, the internal cache wasn't cleared when a class was modified, which resulted in old data being displayed.
+
 ### Changes for developers
 * Builtin functions did not have a FQCN set.
 * Added `deduceTypesAt` as a convenience alias.
