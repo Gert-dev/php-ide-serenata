@@ -167,12 +167,10 @@ class ProviderCachingProxy implements ProviderInterface
      */
     protected function rememberCacheIdForFqcn($fqcn, $cacheId)
     {
-        $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
+        $cacheMap = $this->getCacheMap();
+        $cacheMap[$fqcn][$cacheId] = true;
 
-        $cachedMap = $this->cache->fetch($cacheIdsCacheId);
-        $cachedMap[$fqcn][$cacheId] = true;
-
-        $this->cache->save($cacheIdsCacheId, $cachedMap);
+        $this->saveCacheMap($cacheMap);
     }
 
     /**
@@ -180,19 +178,44 @@ class ProviderCachingProxy implements ProviderInterface
      */
     public function clearCacheFor($fqcn)
     {
-        $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
+        $cacheMap = $this->getCacheMap();
 
-        $cachedMap = $this->cache->fetch($cacheIdsCacheId);
-
-        if (isset($cachedMap[$fqcn])) {
-            foreach ($cachedMap[$fqcn] as $cacheId => $ignoredValue) {
+        if (isset($cacheMap[$fqcn])) {
+            foreach ($cacheMap[$fqcn] as $cacheId => $ignoredValue) {
                 $this->cache->delete($cacheId);
             }
 
-            unset($cachedMap[$fqcn]);
+            unset($cacheMap[$fqcn]);
 
-            $this->cache->save($cacheIdsCacheId, $cachedMap);
+            $this->saveCacheMap($cacheMap);
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCacheMap()
+    {
+        $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
+
+        // The silence operator isn't actually necessary, except on Windows. In some rare situations, it will complain
+        // with a "permission denied" error on the shared cache map file (locking it has no effect either). Usually,
+        // however, it will work fine on Windows as well. This way at least these users enjoy caching somewhat instead
+        // of having no caching at all. See also https://github.com/Gert-dev/php-integrator-base/issues/185 .
+        $cacheMap = @$this->cache->fetch($cacheIdsCacheId);
+
+        return $cacheMap ?: [];
+    }
+
+    /**
+     * @param array $cacheMap
+     */
+    protected function saveCacheMap(array $cacheMap)
+    {
+        $cacheIdsCacheId = $this->getCacheIdForFqcnListCacheId();
+
+        // Silenced for the same reason as above.
+        @$this->cache->save($cacheIdsCacheId, $cacheMap);
     }
 
     /**
