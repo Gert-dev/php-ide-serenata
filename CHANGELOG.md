@@ -25,6 +25,10 @@ if (is_string($b) || is_array($b)) {
 * `semanticLint` learned how to validate unknown class members, global functions and global constants, which can be used by linter packages.
 * `getVariableTypes` is now deprecated as it is just an alias for calling `deduceTypes` and `deduceTypes` with the variable name as the sole part. It will now also just proxy calls to deduceTypes internally.
 
+## 1.0.8
+### Bugs fixed
+* Fixed the database file never getting unlocked if indexing failed.
+
 ## 1.0.7
 ### Bugs fixed
 * Fixed the `setCachePrefix` error on Windows.
