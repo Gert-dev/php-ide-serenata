@@ -36,7 +36,7 @@ class ProviderCachingProxy implements ProviderInterface
     {
         $cacheId = $this->getCacheId(__FUNCTION__, func_get_args());
 
-        $data = $this->proxyCall(__FUNCTION__, func_get_args(), true);
+        $data = $this->proxyCall(__FUNCTION__, func_get_args());
 
         $this->rememberCacheIdForFqcn($cacheId, $fqcn);
 
