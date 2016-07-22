@@ -30,6 +30,11 @@ if (is_string($b) || is_array($b)) {
 * `semanticLint` learned how to validate unknown class members, global functions and global constants, which can be used by linter packages.
 * `getVariableTypes` is now deprecated as it is just an alias for calling `deduceTypes` and `deduceTypes` with the variable name as the sole part. It will now also just proxy calls to deduceTypes internally.
 
+## 1.0.10
+### Bugs fixed
+* Cleaned up the reindexing process. The locks that were causing so much trouble have been removed for now.
+  * It was originally added as multiple concurrent indexing processes locked the database to ensure the other processes wait their turn. However, testing this again without it seems to indicate SQLite (automatically) gracefully waits for the transaction to finish. Either they accidentally solved the original problem, or the original problem might only manifest in certain circumstances. If the problem reappears anyway, I will investigate alternative solutions.
+
 ## 1.0.9
 ### Bugs fixed
 * An error is now returned if a file is not in UTF-8 encoding.

@@ -104,62 +104,80 @@ class Reindex extends AbstractCommand
      */
     public function reindex($path, $useStdin, $showOutput, $doStreamProgress)
     {
-        if (is_dir($path)) {
-            // Yes, we abuse the error channel...
-            $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
-            $progressStream = $doStreamProgress ? fopen('php://stderr', 'w') : null;
-
-            $this->getProjectIndexer()
-                ->setProgressStream($progressStream)
-                ->setLoggingStream($loggingStream)
-                ->index($path);
-
-            if ($progressStream) {
-                fclose($progressStream);
-            }
-
-            return $this->outputJson(true, []);
-        } elseif (is_file($path) || $useStdin) {
-            $code = null;
-
-            if ($useStdin) {
-                // NOTE: This call is blocking if there is no input!
-                $code = file_get_contents('php://stdin');
-            }
-
-            if (mb_detect_encoding($code, 'UTF-8', true) !== 'UTF-8') {
-                throw new UnexpectedValueException("The file {$path} is not UTF-8!");
-            }
-
-            $databaseFileHandle = null;
-
-            if ($this->indexDatabase->getDatabasePath() !== ':memory:') {
-                // All other commands don't abide by these locks, so they can just happily continue using the database (as
-                // they are only reading, that poses no problem). However, writing in a transaction will cause the database
-                // to become locked, which poses a problem if two simultaneous reindexing processes are spawned. If that
-                // happens, just block until the database becomes available again. If we don't, we will receive an
-                // exception from the driver.
-                $databaseFileHandle = fopen($this->indexDatabase->getDatabasePath(), 'r+b');
-                flock($databaseFileHandle, LOCK_EX);
-            }
-
-            $success = true;
-
-            try {
-                $this->getFileIndexer()->index($path, $code ?: null);
-            } catch (Indexing\IndexingFailedException $e) {
-                $success = false;
-            }
-
-            if ($databaseFileHandle) {
-                flock($databaseFileHandle, LOCK_UN);
-                fclose($databaseFileHandle);
-            }
-
-            return $this->outputJson($success, []);
+        if (!is_dir($path) && !is_file($path) && !$useStdin) {
+            throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
         }
 
-        throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
+        $success = true;
+        $exception = null;
+
+        try {
+            if (is_dir($path)) {
+                $success = $this->reindexDirectory($path, $showOutput, $doStreamProgress);
+            } else {
+                $code = $this->getSourceCode($path, $useStdin);
+
+                $success = $this->reindexFile($path, $code);
+            }
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
+
+        if ($exception) {
+            throw $exception;
+        }
+
+        return $this->outputJson($success, []);
+    }
+
+    /**
+     * @param string $path
+     * @param bool   $showOutput
+     * @param bool   $doStreamProgress
+     *
+     * @return bool
+     */
+    protected function reindexDirectory($path, $showOutput, $doStreamProgress)
+    {
+        // Yes, we abuse the error channel...
+        $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
+        $progressStream = $doStreamProgress ? fopen('php://stderr', 'w') : null;
+
+        $this->getProjectIndexer()
+            ->setProgressStream($progressStream)
+            ->setLoggingStream($loggingStream)
+            ->index($path);
+
+        if ($loggingStream) {
+            fclose($loggingStream);
+        }
+
+        if ($progressStream) {
+            fclose($progressStream);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $path
+     * @param string $code
+     *
+     * @return bool
+     */
+    protected function reindexFile($path, $code)
+    {
+        if (mb_detect_encoding($code, 'UTF-8', true) !== 'UTF-8') {
+            throw new UnexpectedValueException("The file {$path} is not UTF-8!");
+        }
+
+        try {
+            $this->getFileIndexer()->index($path, $code);
+        } catch (Indexing\IndexingFailedException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
