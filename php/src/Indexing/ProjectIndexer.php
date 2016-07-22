@@ -154,8 +154,10 @@ class ProjectIndexer
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
 
+            $code = @file_get_contents($filePath);
+
             try {
-                $this->fileIndexer->index($filePath);
+                $this->fileIndexer->index($filePath, $code);
             } catch (IndexingFailedException $e) {
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
             }
