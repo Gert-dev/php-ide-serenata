@@ -128,6 +128,7 @@ class Reindex extends BaseCommand
         }
 
         $success = true;
+        $exception = null;
 
         if (is_dir($path)) {
             // Yes, we abuse the error channel...
@@ -150,19 +151,23 @@ class Reindex extends BaseCommand
             $code = $this->getSourceCode($path, $useStdin);
 
             if (mb_detect_encoding($code, 'UTF-8', true) !== 'UTF-8') {
-                throw new UnexpectedValueException("The file {$path} is not UTF-8!");
-            }
-
-            try {
-                $this->getFileIndexer()->index($path, $code ?: null);
-            } catch (Indexing\IndexingFailedException $e) {
-                $success = false;
+                $exception = new UnexpectedValueException("The file {$path} is not UTF-8!");
+            } else {
+                try {
+                    $this->getFileIndexer()->index($path, $code ?: null);
+                } catch (Indexing\IndexingFailedException $e) {
+                    $success = false;
+                }
             }
         }
 
         if ($databaseFileHandle) {
             flock($databaseFileHandle, LOCK_UN);
             fclose($databaseFileHandle);
+        }
+
+        if ($exception) {
+            throw $exception;
         }
 
         return $this->outputJson($success, []);
