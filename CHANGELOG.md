@@ -1,3 +1,8 @@
+## 1.0.10
+### Bugs fixed
+* Cleaned up the reindexing process. The locks that were causing so much trouble have been removed for now.
+  * It was originally added as multiple concurrent indexing processes locked the database to ensure the other processes wait their turn. However, testing this again without it seems to indicate SQLite (automatically) gracefully waits for the transaction to finish. Either they accidentally solved the original problem, or the original problem might only manifest in certain circumstances. If the problem reappears anyway, I will investigate alternative solutions.
+
 ## 1.0.9
 ### Bugs fixed
 * An error is now returned if a file is not in UTF-8 encoding.

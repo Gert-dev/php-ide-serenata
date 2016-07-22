@@ -115,18 +115,6 @@ class Reindex extends BaseCommand
             throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
         }
 
-        $databaseFileHandle = null;
-
-        if ($this->indexDatabase->getDatabasePath() !== ':memory:') {
-            // All other commands don't abide by these locks, so they can just happily continue using the database (as
-            // they are only reading, that poses no problem). However, writing in a transaction will cause the database
-            // to become locked, which poses a problem if two simultaneous reindexing processes are spawned. If that
-            // happens, just block until the database becomes available again. If we don't, we will receive an
-            // exception from the driver.
-            $databaseFileHandle = fopen($this->indexDatabase->getDatabasePath(), 'r+b');
-            flock($databaseFileHandle, LOCK_EX);
-        }
-
         $success = true;
         $exception = null;
 
@@ -140,11 +128,6 @@ class Reindex extends BaseCommand
             }
         } catch (\Exception $e) {
             $exception = $e;
-        }
-
-        if ($databaseFileHandle) {
-            flock($databaseFileHandle, LOCK_UN);
-            fclose($databaseFileHandle);
         }
 
         if ($exception) {
