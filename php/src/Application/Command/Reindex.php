@@ -130,35 +130,16 @@ class Reindex extends BaseCommand
         $success = true;
         $exception = null;
 
-        if (is_dir($path)) {
-            // Yes, we abuse the error channel...
-            $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
-            $progressStream = $doStreamProgress ? fopen('php://stderr', 'w') : null;
-
-            $this->getProjectIndexer()
-                ->setProgressStream($progressStream)
-                ->setLoggingStream($loggingStream)
-                ->index($path);
-
-            if ($loggingStream) {
-                fclose($loggingStream);
-            }
-
-            if ($progressStream) {
-                fclose($progressStream);
-            }
-        } else {
-            $code = $this->getSourceCode($path, $useStdin);
-
-            if (mb_detect_encoding($code, 'UTF-8', true) !== 'UTF-8') {
-                $exception = new UnexpectedValueException("The file {$path} is not UTF-8!");
+        try {
+            if (is_dir($path)) {
+                $success = $this->reindexDirectory($path, $showOutput, $doStreamProgress);
             } else {
-                try {
-                    $this->getFileIndexer()->index($path, $code ?: null);
-                } catch (Indexing\IndexingFailedException $e) {
-                    $success = false;
-                }
+                $code = $this->getSourceCode($path, $useStdin);
+
+                $success = $this->reindexFile($path, $code);
             }
+        } catch (\Exception $e) {
+            $exception = $e;
         }
 
         if ($databaseFileHandle) {
@@ -171,6 +152,56 @@ class Reindex extends BaseCommand
         }
 
         return $this->outputJson($success, []);
+    }
+
+    /**
+     * @param string $path
+     * @param bool   $showOutput
+     * @param bool   $doStreamProgress
+     *
+     * @return bool
+     */
+    protected function reindexDirectory($path, $showOutput, $doStreamProgress)
+    {
+        // Yes, we abuse the error channel...
+        $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
+        $progressStream = $doStreamProgress ? fopen('php://stderr', 'w') : null;
+
+        $this->getProjectIndexer()
+            ->setProgressStream($progressStream)
+            ->setLoggingStream($loggingStream)
+            ->index($path);
+
+        if ($loggingStream) {
+            fclose($loggingStream);
+        }
+
+        if ($progressStream) {
+            fclose($progressStream);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $path
+     * @param string $code
+     *
+     * @return bool
+     */
+    protected function reindexFile($path, $code)
+    {
+        if (mb_detect_encoding($code, 'UTF-8', true) !== 'UTF-8') {
+            throw new UnexpectedValueException("The file {$path} is not UTF-8!");
+        }
+
+        try {
+            $this->getFileIndexer()->index($path, $code);
+        } catch (Indexing\IndexingFailedException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
