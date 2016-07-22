@@ -87,17 +87,11 @@ class FileIndexer
     /**
      * Indexes the specified file.
      *
-     * @param string      $filePath
-     * @param string|null $code     The source code of the file. If null, will be fetched automatically.
+     * @param string $filePath
+     * @param string $code
      */
-    public function index($filePath, $code = null)
+    public function index($filePath, $code)
     {
-        $code = $code ?: @file_get_contents($filePath);
-
-        if (!is_string($code)) {
-            throw new IndexingFailedException();
-        }
-
         try {
             $nodes = $this->getParser()->parse($code);
 

@@ -111,6 +111,24 @@ class Reindex extends BaseCommand
      */
     public function reindex($path, $useStdin, $showOutput, $doStreamProgress)
     {
+        if (!is_dir($path) && !is_file($path) && !$useStdin) {
+            throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
+        }
+
+        $databaseFileHandle = null;
+
+        if ($this->indexDatabase->getDatabasePath() !== ':memory:') {
+            // All other commands don't abide by these locks, so they can just happily continue using the database (as
+            // they are only reading, that poses no problem). However, writing in a transaction will cause the database
+            // to become locked, which poses a problem if two simultaneous reindexing processes are spawned. If that
+            // happens, just block until the database becomes available again. If we don't, we will receive an
+            // exception from the driver.
+            $databaseFileHandle = fopen($this->indexDatabase->getDatabasePath(), 'r+b');
+            flock($databaseFileHandle, LOCK_EX);
+        }
+
+        $success = true;
+
         if (is_dir($path)) {
             // Yes, we abuse the error channel...
             $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
@@ -121,52 +139,33 @@ class Reindex extends BaseCommand
                 ->setLoggingStream($loggingStream)
                 ->index($path);
 
+            if ($loggingStream) {
+                fclose($loggingStream);
+            }
+
             if ($progressStream) {
                 fclose($progressStream);
             }
-
-            return $this->outputJson(true, []);
-        } elseif (is_file($path) || $useStdin) {
-            $code = null;
-
-            if ($useStdin) {
-                // NOTE: This call is blocking if there is no input!
-                $code = file_get_contents('php://stdin');
-            }
+        } else {
+            $code = $this->getSourceCode($path, $useStdin);
 
             if (mb_detect_encoding($code, 'UTF-8', true) !== 'UTF-8') {
                 throw new UnexpectedValueException("The file {$path} is not UTF-8!");
             }
-
-            $databaseFileHandle = null;
-
-            if ($this->indexDatabase->getDatabasePath() !== ':memory:') {
-                // All other commands don't abide by these locks, so they can just happily continue using the database (as
-                // they are only reading, that poses no problem). However, writing in a transaction will cause the database
-                // to become locked, which poses a problem if two simultaneous reindexing processes are spawned. If that
-                // happens, just block until the database becomes available again. If we don't, we will receive an
-                // exception from the driver.
-                $databaseFileHandle = fopen($this->indexDatabase->getDatabasePath(), 'r+b');
-                flock($databaseFileHandle, LOCK_EX);
-            }
-
-            $success = true;
 
             try {
                 $this->getFileIndexer()->index($path, $code ?: null);
             } catch (Indexing\IndexingFailedException $e) {
                 $success = false;
             }
-
-            if ($databaseFileHandle) {
-                flock($databaseFileHandle, LOCK_UN);
-                fclose($databaseFileHandle);
-            }
-
-            return $this->outputJson($success, []);
         }
 
-        throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
+        if ($databaseFileHandle) {
+            flock($databaseFileHandle, LOCK_UN);
+            fclose($databaseFileHandle);
+        }
+
+        return $this->outputJson($success, []);
     }
 
     /**
