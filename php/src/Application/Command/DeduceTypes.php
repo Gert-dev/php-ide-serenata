@@ -247,7 +247,7 @@ class DeduceTypes extends AbstractCommand
      *
      * @return string[]
      */
-    public function getVariableTypes($file, $code, $name, $offset)
+    protected function getVariableTypes($file, $code, $name, $offset)
     {
         if (empty($name) || $name[0] !== '$') {
             throw new UnexpectedValueException('The variable name must start with a dollar sign!');
@@ -272,7 +272,6 @@ class DeduceTypes extends AbstractCommand
             $code,
             $offset,
             $offsetLine,
-            mb_substr($name, 1),
             $this->getTypeAnalyzer(),
             $this->getResolveTypeCommand(),
             $this
@@ -285,7 +284,9 @@ class DeduceTypes extends AbstractCommand
         $traverser->addVisitor($queryingVisitor);
         $traverser->traverse($nodes);
 
-        return $queryingVisitor->getResolvedTypes($file);
+        $variableName = mb_substr($name, 1);
+
+        return $queryingVisitor->getResolvedTypes($variableName, $file);
     }
 
     /**

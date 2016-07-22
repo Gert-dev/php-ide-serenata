@@ -251,7 +251,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         if ($property['docComment']) {
             $result = $this->getDocParser()->parse($property['docComment'], [DocParser::VAR_TYPE], $property['name']);
 
-            if (!$result['var']['type']) {
+            if (!isset($result['var']['$' . $property['name']]['type'])) {
                 $docblockIssues['varTagMissing'][] = [
                     'name'  => $property['name'],
                     'line'  => $property['startLine'],
@@ -294,7 +294,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         if ($constant['docComment']) {
             $result = $this->getDocParser()->parse($constant['docComment'], [DocParser::VAR_TYPE], $constant['name']);
 
-            if (!$result['var']['type']) {
+            if (!isset($result['var']['$' . $constant['name']]['type'])) {
                 $docblockIssues['varTagMissing'][] = [
                     'name'  => $constant['name'],
                     'line'  => $constant['startLine'],

@@ -45,11 +45,6 @@ class QueryingVisitor extends NodeVisitorAbstract
     /**
      * @var string
      */
-    protected $name;
-
-    /**
-     * @var string
-     */
     protected $code;
 
     /**
@@ -78,34 +73,14 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $docParser;
 
     /**
-     * @var Node\FunctionLike|null
-     */
-    protected $lastFunctionLikeNode;
-
-    /**
      * @var string|null
      */
     protected $currentClassName;
 
     /**
-     * @var Node|null
-     */
-    protected $bestMatch;
-
-    /**
      * @var array
      */
-    protected $conditionalTypes = [];
-
-    /**
-     * @var string|null
-     */
-    protected $bestTypeOverrideMatch;
-
-    /**
-     * @var int|null
-     */
-    protected $bestTypeOverrideMatchLine;
+    protected $matchMap = [];
 
     /**
      * Constructor.
@@ -124,12 +99,10 @@ class QueryingVisitor extends NodeVisitorAbstract
         $code,
         $position,
         $line,
-        $name,
         TypeAnalyzer $typeAnalyzer,
         ResolveType $resolveTypeCommand,
         DeduceTypes $deduceTypesCommand
     ) {
-        $this->name = $name;
         $this->line = $line;
         $this->file = $file;
         $this->code = $code;
@@ -162,9 +135,7 @@ class QueryingVisitor extends NodeVisitorAbstract
         $this->parseNodeDocblock($node);
 
         if ($node instanceof Node\Stmt\Catch_) {
-            if ($node->var === $this->name) {
-                $this->setBestMatch($node->type);
-            }
+            $this->setBestMatch($node->var, $node->type);
         } elseif (
             $node instanceof Node\Stmt\If_ ||
             $node instanceof Node\Stmt\ElseIf_ ||
@@ -179,7 +150,13 @@ class QueryingVisitor extends NodeVisitorAbstract
             ) {
                 $typeData = $this->parseCondition($node->cond);
 
-                $this->conditionalTypes = array_merge($this->conditionalTypes, $typeData);
+                foreach ($typeData as $variable => $newConditionalTypes) {
+                    $conditionalTypes = isset($this->matchMap[$variable]['conditionalTypes']) ?
+                        $this->matchMap[$variable]['conditionalTypes'] :
+                        [];
+
+                    $this->matchMap[$variable]['conditionalTypes'] = array_merge($conditionalTypes, $newConditionalTypes);
+                }
             }
         } elseif ($node instanceof Node\Expr\Assign) {
             if ($node->var instanceof Node\Expr\Variable) {
@@ -191,13 +168,13 @@ class QueryingVisitor extends NodeVisitorAbstract
                     $variableName = $node->var->name;
                 }
 
-                if ($variableName && $variableName === $this->name) {
-                    $this->setBestMatch($node);
+                if ($variableName) {
+                    $this->setBestMatch($variableName, $node);
                 }
             }
         } elseif ($node instanceof Node\Stmt\Foreach_) {
-            if (!$node->valueVar instanceof Node\Expr\List_ && $node->valueVar->name === $this->name) {
-                $this->setBestMatch($node);
+            if (!$node->valueVar instanceof Node\Expr\List_) {
+                $this->setBestMatch($node->valueVar->name, $node);
             }
         }
 
@@ -207,22 +184,34 @@ class QueryingVisitor extends NodeVisitorAbstract
 
                 $this->resetStateForNewScope();
             } elseif ($node instanceof Node\FunctionLike) {
-                $variableIsOutsideCurrentScope = false;
+                $variablesOutsideCurrentScope = [];
 
-                // If the variable is in a use() statement of a closure, we can't reset the state as we still need to
+                // If a variable is in a use() statement of a closure, we can't reset the state as we still need to
                 // examine the parent scope of the closure where the variable is defined.
                 if ($node instanceof Node\Expr\Closure) {
                     foreach ($node->uses as $closureUse) {
-                        if ($closureUse->var === $this->name) {
-                            $variableIsOutsideCurrentScope = true;
-                            break;
+                        $variablesOutsideCurrentScope[] = $closureUse->var;
+
+                        if (!isset($this->matchMap[$closureUse->var])) {
+                            $this->matchMap[$closureUse->var] = [];
                         }
                     }
                 }
 
-                if (!$variableIsOutsideCurrentScope) {
-                    $this->resetStateForNewScope();
-                    $this->lastFunctionLikeNode = $node;
+                // Ensure that we at least recognize the parameters in this function if we haven't met them before.
+                foreach ($node->getParams() as $param) {
+                    if (!isset($this->matchMap[$param->name])) {
+                        $this->matchMap[$param->name] = [];
+                    }
+                }
+
+                // die(var_dump(__FILE__ . ':' . __LINE__, $this->matchMap));
+                $this->resetStateForNewScopeForAllBut($variablesOutsideCurrentScope);
+
+                foreach ($this->matchMap as $variable => &$data) {
+                    if (!in_array($variable, $variablesOutsideCurrentScope)) {
+                        $this->matchMap[$variable]['lastFunctionLikeNode'] = $node;
+                    }
                 }
             }
         }
@@ -230,6 +219,8 @@ class QueryingVisitor extends NodeVisitorAbstract
 
     /**
      * @param Node\Expr $node
+     *
+     * @return array
      */
     protected function parseCondition(Node\Expr $node)
     {
@@ -248,60 +239,68 @@ class QueryingVisitor extends NodeVisitorAbstract
             $leftTypes = $this->parseCondition($node->left);
             $rightTypes = $this->parseCondition($node->right);
 
-            $types = array_merge($leftTypes, $rightTypes);
+            $types = $leftTypes;
+
+            foreach ($rightTypes as $variable => $conditionalTypes) {
+                foreach ($conditionalTypes as $conditionalType => $possibility) {
+                    $types[$variable][$conditionalType] = $possibility;
+                }
+            }
         } elseif (
             $node instanceof Node\Expr\BinaryOp\Equal ||
             $node instanceof Node\Expr\BinaryOp\Identical
         ) {
-            if ($node->left instanceof Node\Expr\Variable && $node->left->name === $this->name) {
+            if ($node->left instanceof Node\Expr\Variable) {
                 if ($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toString() === 'null') {
-                    $types['null'] = self::TYPE_CONDITIONALLY_GUARANTEED;
+                    $types[$node->left->name]['null'] = self::TYPE_CONDITIONALLY_GUARANTEED;
                 }
-            } elseif ($node->right instanceof Node\Expr\Variable && $node->right->name === $this->name) {
+            } elseif ($node->right instanceof Node\Expr\Variable) {
                 if ($node->left instanceof Node\Expr\ConstFetch && $node->left->name->toString() === 'null') {
-                    $types['null'] = self::TYPE_CONDITIONALLY_GUARANTEED;
+                    $types[$node->right->name]['null'] = self::TYPE_CONDITIONALLY_GUARANTEED;
                 }
             }
         } elseif (
             $node instanceof Node\Expr\BinaryOp\NotEqual ||
             $node instanceof Node\Expr\BinaryOp\NotIdentical
         ) {
-            if ($node->left instanceof Node\Expr\Variable && $node->left->name === $this->name) {
+            if ($node->left instanceof Node\Expr\Variable) {
                 if ($node->right instanceof Node\Expr\ConstFetch && $node->right->name->toString() === 'null') {
-                    $types['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
+                    $types[$node->left->name]['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
                 }
-            } elseif ($node->right instanceof Node\Expr\Variable && $node->right->name === $this->name) {
+            } elseif ($node->right instanceof Node\Expr\Variable) {
                 if ($node->left instanceof Node\Expr\ConstFetch && $node->left->name->toString() === 'null') {
-                    $types['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
+                    $types[$node->right->name]['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
                 }
             }
         } elseif ($node instanceof Node\Expr\BooleanNot) {
-            if ($node->expr instanceof Node\Expr\Variable && $node->expr->name === $this->name) {
-                $types['int']    = self::TYPE_CONDITIONALLY_POSSIBLE; // 0
-                $types['string'] = self::TYPE_CONDITIONALLY_POSSIBLE; // ''
-                $types['float']  = self::TYPE_CONDITIONALLY_POSSIBLE; // 0.0
-                $types['array']  = self::TYPE_CONDITIONALLY_POSSIBLE; // []
-                $types['null']   = self::TYPE_CONDITIONALLY_POSSIBLE; // null
+            if ($node->expr instanceof Node\Expr\Variable) {
+                $types[$node->expr->name]['int']    = self::TYPE_CONDITIONALLY_POSSIBLE; // 0
+                $types[$node->expr->name]['string'] = self::TYPE_CONDITIONALLY_POSSIBLE; // ''
+                $types[$node->expr->name]['float']  = self::TYPE_CONDITIONALLY_POSSIBLE; // 0.0
+                $types[$node->expr->name]['array']  = self::TYPE_CONDITIONALLY_POSSIBLE; // []
+                $types[$node->expr->name]['null']   = self::TYPE_CONDITIONALLY_POSSIBLE; // null
             } else {
                 $subTypes = $this->parseCondition($node->expr);
 
                 // Reverse the possiblity of the types.
-                foreach ($subTypes as $subType => $possibility) {
-                    if ($possibility === self::TYPE_CONDITIONALLY_GUARANTEED) {
-                        $types[$subType] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
-                    } elseif ($possibility === self::TYPE_CONDITIONALLY_IMPOSSIBLE) {
-                        $types[$subType] = self::TYPE_CONDITIONALLY_GUARANTEED;
-                    } elseif ($possibility === self::TYPE_CONDITIONALLY_POSSIBLE) {
-                        // Possible types are effectively negated and disappear.
+                foreach ($subTypes as $variable => $typeData) {
+                    foreach ($typeData as $subType => $possibility) {
+                        if ($possibility === self::TYPE_CONDITIONALLY_GUARANTEED) {
+                            $types[$variable][$subType] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
+                        } elseif ($possibility === self::TYPE_CONDITIONALLY_IMPOSSIBLE) {
+                            $types[$variable][$subType] = self::TYPE_CONDITIONALLY_GUARANTEED;
+                        } elseif ($possibility === self::TYPE_CONDITIONALLY_POSSIBLE) {
+                            // Possible types are effectively negated and disappear.
+                        }
                     }
                 }
             }
-        } elseif ($node instanceof Node\Expr\Variable && $node->name === $this->name) {
-            $types['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
+        } elseif ($node instanceof Node\Expr\Variable) {
+            $types[$node->name]['null'] = self::TYPE_CONDITIONALLY_IMPOSSIBLE;
         } elseif ($node instanceof Node\Expr\Instanceof_) {
-            if ($node->expr instanceof Node\Expr\Variable && $node->expr->name === $this->name) {
+            if ($node->expr instanceof Node\Expr\Variable) {
                 if ($node->class instanceof Node\Name) {
-                    $types[$this->fetchClassName($node->class)] = self::TYPE_CONDITIONALLY_GUARANTEED;
+                    $types[$node->expr->name][$this->fetchClassName($node->class)] = self::TYPE_CONDITIONALLY_GUARANTEED;
                 } else {
                     // This is an expression, we could fetch its return type, but that still won't tell us what
                     // the actual class is, so it's useless at the moment.
@@ -331,13 +330,12 @@ class QueryingVisitor extends NodeVisitorAbstract
                     if (
                         !empty($node->args) &&
                         !$node->args[0]->unpack &&
-                        $node->args[0]->value instanceof Node\Expr\Variable &&
-                        $node->args[0]->value->name === $this->name
+                        $node->args[0]->value instanceof Node\Expr\Variable
                     ) {
                         $guaranteedTypes = $variableHandlingFunctionTypeMap[$node->name->toString()];
 
                         foreach ($guaranteedTypes as $guaranteedType) {
-                            $types[$guaranteedType] = self::TYPE_CONDITIONALLY_GUARANTEED;
+                            $types[$node->args[0]->value->name][$guaranteedType] = self::TYPE_CONDITIONALLY_GUARANTEED;
                         }
                     }
                 }
@@ -362,19 +360,23 @@ class QueryingVisitor extends NodeVisitorAbstract
         // they aren't consistent with the standard syntax "@var <type> <name>", but they are still used by some IDE's.
         // For this reason we support them, but only their most elementary form.
         $classRegexPart = "?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*";
-        $reverseRegexTypeAnnotation = "/\/\*\*\s*@var\s+\\\${$this->name}\s+(({$classRegexPart}(?:\[\])?))\s*(\s.*)?\*\//";
+        $reverseRegexTypeAnnotation = "/\/\*\*\s*@var\s+\\\$([A-Za-z0-9_])\s+(({$classRegexPart}(?:\[\])?))\s*(\s.*)?\*\//";
 
         if (preg_match($reverseRegexTypeAnnotation, $docblock, $matches) === 1) {
-            $this->bestTypeOverrideMatch = $matches[1];
-            $this->bestTypeOverrideMatchLine = $node->getLine();
+            $variable = $matches[1];
+
+            $this->matchMap[$variable]['bestTypeOverrideMatch'] = $matches[2];
+            $this->matchMap[$variable]['bestTypeOverrideMatchLine'] = $node->getLine();
         } else {
             $docblockData = $this->getDocParser()->parse((string) $docblock, [
                 DocParser::VAR_TYPE
-            ], $this->name);
+            ], null);
 
-            if ($docblockData['var']['name'] === $this->name && $docblockData['var']['type']) {
-                $this->bestTypeOverrideMatch = $docblockData['var']['type'];
-                $this->bestTypeOverrideMatchLine = $node->getLine();
+            foreach ($docblockData['var'] as $variableName => $data) {
+                if ($data['type']) {
+                    $this->matchMap[mb_substr($variableName, 1)]['bestTypeOverrideMatch'] = $data['type'];
+                    $this->matchMap[mb_substr($variableName, 1)]['bestTypeOverrideMatchLine'] = $node->getLine();
+                }
             }
         }
     }
@@ -399,43 +401,60 @@ class QueryingVisitor extends NodeVisitorAbstract
 
     /**
      * @param Node|null $bestMatch
+     * @param string    $variable
      *
      * @return static
      */
-    protected function setBestMatch(Node $bestMatch = null)
+    protected function setBestMatch($variable, Node $bestMatch = null)
     {
-        $this->resetConditionalState();
+        $this->resetConditionalState($variable);
 
-        $this->bestMatch = $bestMatch;
+        $this->matchMap[$variable]['bestMatch'] = $bestMatch;
 
         return $this;
     }
 
     /**
-     *
+     * @param string $variable
      */
-    protected function resetConditionalState()
+    protected function resetConditionalState($variable)
     {
-        $this->conditionalTypes = [];
+        $this->matchMap[$variable]['conditionalTypes'] = [];
     }
 
     /**
-     * @return void
+     *
      */
     protected function resetStateForNewScope()
     {
-        $this->setBestMatch(null);
-
-        $this->bestTypeOverrideMatch = null;
-        $this->bestTypeOverrideMatchLine = null;
+        $this->matchMap = [];
     }
 
     /**
-     * @param Node $node
+     * @param array $exclusionList
+     */
+    protected function resetStateForNewScopeForAllBut(array $exclusionList)
+    {
+        $newMap = [];
+
+        foreach ($this->matchMap as $variable => $data) {
+            if (in_array($variable, $exclusionList)) {
+                $newMap[$variable] = $data;
+            } else {
+                $newMap[$variable] = [];
+            }
+        }
+
+        $this->matchMap = $newMap;
+    }
+
+    /**
+     * @param string $variable
+     * @param Node   $node
      *
      * @return string[]
      */
-    protected function getTypesForNode(Node $node)
+    protected function getTypesForNode($variable, Node $node)
     {
         if ($node instanceof Node\Expr\Assign) {
             if ($node->expr instanceof Node\Expr\Ternary) {
@@ -481,7 +500,7 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
         } elseif ($node instanceof Node\FunctionLike) {
             foreach ($node->getParams() as $param) {
-                if ($param->name === $this->name) {
+                if ($param->name === $variable) {
                     $docBlock = $node->getDocComment();
 
                     if ($docBlock) {
@@ -496,9 +515,9 @@ class QueryingVisitor extends NodeVisitorAbstract
                             DocParser::PARAM_TYPE
                         ], $name, true);
 
-                        if (isset($result['params']['$' . $this->name])) {
+                        if (isset($result['params']['$' . $variable])) {
                             return $this->typeAnalyzer->getTypesForTypeSpecification(
-                                $result['params']['$' . $this->name]['type']
+                                $result['params']['$' . $variable]['type']
                             );
                         }
                     }
@@ -525,18 +544,24 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
+     * @param string $variable
+     *
      * @return string[]
      */
-    protected function getTypes()
+    protected function getTypes($variable)
     {
-        if ($this->bestTypeOverrideMatch) {
-            return $this->typeAnalyzer->getTypesForTypeSpecification($this->bestTypeOverrideMatch);
+        if (isset($this->matchMap[$variable]['bestTypeOverrideMatch'])) {
+            return $this->typeAnalyzer->getTypesForTypeSpecification($this->matchMap[$variable]['bestTypeOverrideMatch']);
         }
 
         $guaranteedTypes = [];
         $possibleTypeMap = [];
 
-        foreach ($this->conditionalTypes as $type => $possibility) {
+        $conditionalTypes = isset($this->matchMap[$variable]['conditionalTypes']) ?
+            $this->matchMap[$variable]['conditionalTypes'] :
+            [];
+
+        foreach ($conditionalTypes as $type => $possibility) {
             if ($possibility === self::TYPE_CONDITIONALLY_GUARANTEED) {
                 $guaranteedTypes[] = $type;
             } elseif ($possibility === self::TYPE_CONDITIONALLY_POSSIBLE) {
@@ -550,19 +575,19 @@ class QueryingVisitor extends NodeVisitorAbstract
         // never have executed in the first place).
         if (!empty($guaranteedTypes)) {
             $types = $guaranteedTypes;
-        } elseif ($this->name === 'this') {
+        } elseif ($variable === 'this') {
             $types = $this->currentClassName ? [$this->currentClassName] : [];
-        } elseif ($this->bestMatch) {
-            $types = $this->getTypesForNode($this->bestMatch);
-        } elseif ($this->lastFunctionLikeNode) {
-            $types = $this->getTypesForNode($this->lastFunctionLikeNode);
+        } elseif (isset($this->matchMap[$variable]['bestMatch'])) {
+            $types = $this->getTypesForNode($variable, $this->matchMap[$variable]['bestMatch']);
+        } elseif (isset($this->matchMap[$variable]['lastFunctionLikeNode'])) {
+            $types = $this->getTypesForNode($variable, $this->matchMap[$variable]['lastFunctionLikeNode']);
         }
 
         $filteredTypes = [];
 
         foreach ($types as $type) {
-            if (isset($this->conditionalTypes[$type])) {
-                $possibility = $this->conditionalTypes[$type];
+            if (isset($this->matchMap[$variable]['conditionalTypes'][$type])) {
+                $possibility = $this->matchMap[$variable]['conditionalTypes'][$type];
 
                 if ($possibility === self::TYPE_CONDITIONALLY_IMPOSSIBLE) {
                     continue;
@@ -586,11 +611,11 @@ class QueryingVisitor extends NodeVisitorAbstract
      *
      * @return string[]
      */
-    public function getResolvedTypes($file)
+    public function getResolvedTypes($variable, $file)
     {
         $resolvedTypes = [];
 
-        $types = $this->getTypes();
+        $types = $this->getTypes($variable);
 
         foreach ($types as $type) {
             if (in_array($type, ['self', 'static', '$this'], true) && $this->currentClassName) {
@@ -598,11 +623,11 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
 
             if ($this->typeAnalyzer->isClassType($type) && $type[0] !== "\\") {
-                $type = $this->resolveTypeCommand->resolveType(
-                    $type,
-                    $file,
-                    $this->bestTypeOverrideMatchLine ?: $this->line
-                );
+                $line = isset($this->matchMap[$variable]['bestTypeOverrideMatchLine']) ?
+                    $this->matchMap[$variable]['bestTypeOverrideMatchLine'] :
+                    $this->line;
+
+                $type = $this->resolveTypeCommand->resolveType($type, $file, $line);
             }
 
             $resolvedTypes[] = $type;

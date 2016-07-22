@@ -364,9 +364,7 @@ class DocParser
      */
     protected function filterVar($docblock, $itemName, array $tags)
     {
-        $name = null;
-        $type = null;
-        $description = null;
+        $vars = [];
 
         if (isset($tags[static::VAR_TYPE])) {
             foreach ($tags[static::VAR_TYPE] as $tag) {
@@ -376,31 +374,29 @@ class DocParser
                     if (mb_substr($varName, 0, 1) === '$') {
                         // Example: "@var DateTime $foo My description". The tag includes the name of the property it
                         // documents, it must match the property we're fetching documentation about.
-                        if (mb_substr($varName, 1) === $itemName) {
-                            $type = $varType;
-                            $name = $itemName;
-                            $description = $varDescription;
-
-                            break;
-                        }
+                        $vars[$varName] = [
+                            'type'        => $varType,
+                            'description' => $varDescription
+                        ];
                     } else {
                         // Example: "@var DateTime My description".
-                        $type = $varType;
-                        $description = trim($varName . ' ' . $varDescription);
+                        $vars['$' . $itemName] = [
+                            'type'        => $varType,
+                            'description' => trim($varName . ' ' . $varDescription)
+                        ];
                     }
-                } else if (!$varName && !$varDescription) {
+                } elseif (!$varName && !$varDescription) {
                     // Example: "@var DateTime".
-                    $type = $varType;
+                    $vars['$' . $itemName] = [
+                        'type'        => $varType,
+                        'description' => null
+                    ];
                 }
             }
         }
 
         return [
-            'var' => [
-                'name'        => $name,
-                'type'        => $type,
-                'description' => $description
-            ]
+            'var' => $vars
         ];
     }
 
