@@ -238,7 +238,10 @@ class DocParser
             'IgnoreAnnotation',
             'Required',
             'Attribute',
-            'Attributes'
+            'Attributes',
+
+            // PHPMD tags, see also https://phpmd.org/documentation/suppress-warnings.html
+            'SuppressWarnings'
         ], true);
     }
 
