@@ -3,10 +3,6 @@
 namespace PhpIntegrator\Application\Command\DeduceTypes;
 
 use PhpIntegrator\DocParser;
-use PhpIntegrator\TypeAnalyzer;
-
-use PhpIntegrator\Application\Command\DeduceTypes;
-use PhpIntegrator\Application\Command\ResolveType;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -38,36 +34,6 @@ class QueryingVisitor extends NodeVisitorAbstract
     protected $position;
 
     /**
-     * @var int
-     */
-    protected $line;
-
-    /**
-     * @var string
-     */
-    protected $code;
-
-    /**
-     * @var string
-     */
-    protected $file;
-
-    /**
-     * @var ResolveType
-     */
-    protected $resolveTypeCommand;
-
-    /**
-     * @var DeduceTypes
-     */
-    protected $deduceTypesCommand;
-
-    /**
-     * @var TypeAnalyzer
-     */
-    protected $typeAnalyzer;
-
-    /**
      * @var DocParser
      */
     protected $docParser;
@@ -85,31 +51,13 @@ class QueryingVisitor extends NodeVisitorAbstract
     /**
      * Constructor.
      *
-     * @param string       $file
-     * @param string       $code
-     * @param int          $position
-     * @param int          $line
-     * @param string       $name
-     * @param TypeAnalyzer $typeAnalyzer
-     * @param ResolveType  $resolveTypeCommand
-     * @param DeduceTypes   $deduceTypesCommand
+     * @param DocParser $docParser
+     * @param int       $position
      */
-    public function __construct(
-        $file,
-        $code,
-        $position,
-        $line,
-        TypeAnalyzer $typeAnalyzer,
-        ResolveType $resolveTypeCommand,
-        DeduceTypes $deduceTypesCommand
-    ) {
-        $this->line = $line;
-        $this->file = $file;
-        $this->code = $code;
+    public function __construct(DocParser $docParser, $position)
+    {
+        $this->docParser = $docParser;
         $this->position = $position;
-        $this->typeAnalyzer = $typeAnalyzer;
-        $this->deduceTypesCommand = $deduceTypesCommand;
-        $this->resolveTypeCommand = $resolveTypeCommand;
     }
 
     /**
@@ -367,7 +315,7 @@ class QueryingVisitor extends NodeVisitorAbstract
             $this->matchMap[$variable]['bestTypeOverrideMatch'] = $matches[2];
             $this->matchMap[$variable]['bestTypeOverrideMatchLine'] = $node->getLine();
         } else {
-            $docblockData = $this->getDocParser()->parse((string) $docblock, [
+            $docblockData = $this->docParser->parse((string) $docblock, [
                 DocParser::VAR_TYPE
             ], null);
 
@@ -461,19 +409,5 @@ class QueryingVisitor extends NodeVisitorAbstract
     public function getActiveClassName()
     {
         return $this->currentClassName;
-    }
-
-    /**
-     * Retrieves an instance of DocParser. The object will only be created once if needed.
-     *
-     * @return DocParser
-     */
-    protected function getDocParser()
-    {
-        if (!$this->docParser instanceof DocParser) {
-            $this->docParser = new DocParser();
-        }
-
-        return $this->docParser;
     }
 }

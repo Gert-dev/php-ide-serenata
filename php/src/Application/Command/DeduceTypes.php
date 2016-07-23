@@ -270,19 +270,8 @@ class DeduceTypes extends AbstractCommand
             throw new UnexpectedValueException('Parsing the file failed!');
         }
 
-        $offsetLine = $this->calculateLineByOffset($code, $offset);
-
-        $queryingVisitor = new DeduceTypes\QueryingVisitor(
-            $file,
-            $code,
-            $offset,
-            $offsetLine,
-            $this->getTypeAnalyzer(),
-            $this->getResolveTypeCommand(),
-            $this
-        );
-
         $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
+        $queryingVisitor = new DeduceTypes\QueryingVisitor($this->getDocParser(), $offset);
 
         $traverser = new NodeTraverser(false);
         $traverser->addVisitor($scopeLimitingVisitor);
@@ -293,6 +282,7 @@ class DeduceTypes extends AbstractCommand
 
         $matchMap = $queryingVisitor->getMatchMap();
         $activeClassName = $queryingVisitor->getActiveClassName();
+        $offsetLine = $this->calculateLineByOffset($code, $offset);
 
         return $this->getResolvedTypes($matchMap, $activeClassName, $variableName, $file, $offsetLine, $code);
     }
@@ -367,7 +357,7 @@ class DeduceTypes extends AbstractCommand
                         ], $name, true);
 
                         if (isset($result['params']['$' . $variable])) {
-                            return $this->typeAnalyzer->getTypesForTypeSpecification(
+                            return $this->getTypeAnalyzer()->getTypesForTypeSpecification(
                                 $result['params']['$' . $variable]['type']
                             );
                         }
@@ -406,7 +396,7 @@ class DeduceTypes extends AbstractCommand
     protected function getTypes($matchMap, $activeClassName, $variable, $file, $code)
     {
         if (isset($matchMap[$variable]['bestTypeOverrideMatch'])) {
-            return $this->typeAnalyzer->getTypesForTypeSpecification($matchMap[$variable]['bestTypeOverrideMatch']);
+            return $this->getTypeAnalyzer()->getTypesForTypeSpecification($matchMap[$variable]['bestTypeOverrideMatch']);
         }
 
         $guaranteedTypes = [];
@@ -480,12 +470,12 @@ class DeduceTypes extends AbstractCommand
                 $type = $activeClassName;
             }
 
-            if ($this->typeAnalyzer->isClassType($type) && $type[0] !== "\\") {
+            if ($this->getTypeAnalyzer()->isClassType($type) && $type[0] !== "\\") {
                 $typeLine = isset($matchMap[$variable]['bestTypeOverrideMatchLine']) ?
                     $matchMap[$variable]['bestTypeOverrideMatchLine'] :
                     $line;
 
-                $type = $this->resolveTypeCommand->resolveType($type, $file, $typeLine);
+                $type = $this->getResolveTypeCommand()->resolveType($type, $file, $typeLine);
             }
 
             $resolvedTypes[] = $type;
