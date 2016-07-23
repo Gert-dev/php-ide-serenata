@@ -9,7 +9,8 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * Visitor that queries the nodes for information about an invoked function or method.
+ * Visitor that walks to a specific position, building a list of information about variables and their possible and
+ * guaranteed types.
  */
 class QueryingVisitor extends NodeVisitorAbstract
 {
