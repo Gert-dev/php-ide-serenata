@@ -448,189 +448,19 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     * @param string $variable
-     * @param Node   $node
-     *
-     * @return string[]
+     * @return array
      */
-    protected function getTypesForNode($variable, Node $node)
+    public function getMatchMap()
     {
-        if ($node instanceof Node\Expr\Assign) {
-            if ($node->expr instanceof Node\Expr\Ternary) {
-                $firstOperandType = $this->deduceTypesCommand->deduceTypesFromNode(
-                    $this->file,
-                    $this->code,
-                    $node->expr->if ?: $node->expr->cond,
-                    $node->getAttribute('startFilePos')
-                );
-
-                $secondOperandType = $this->deduceTypesCommand->deduceTypesFromNode(
-                    $this->file,
-                    $this->code,
-                    $node->expr->else,
-                    $node->getAttribute('startFilePos')
-                );
-
-                if ($firstOperandType === $secondOperandType) {
-                    return $firstOperandType;
-                }
-            } else {
-                return $this->deduceTypesCommand->deduceTypesFromNode(
-                    $this->file,
-                    $this->code,
-                    $node->expr,
-                    $node->getAttribute('startFilePos')
-                );
-            }
-        } elseif ($node instanceof Node\Stmt\Foreach_) {
-            $types = $this->deduceTypesCommand->deduceTypesFromNode(
-                $this->file,
-                $this->code,
-                $node->expr,
-                $node->getAttribute('startFilePos')
-            );
-
-            foreach ($types as $type) {
-                if ($type && mb_strpos($type, '[]') !== false) {
-                    $type = mb_substr($type, 0, -2);
-
-                    return $type ? [$type] : [];
-                }
-            }
-        } elseif ($node instanceof Node\FunctionLike) {
-            foreach ($node->getParams() as $param) {
-                if ($param->name === $variable) {
-                    $docBlock = $node->getDocComment();
-
-                    if ($docBlock) {
-                        // Analyze the docblock's @param tags.
-                        $name = null;
-
-                        if ($node instanceof Node\Stmt\Function_ || $node instanceof Node\Stmt\ClassMethod) {
-                            $name = $node->name;
-                        }
-
-                        $result = $this->getDocParser()->parse((string) $docBlock, [
-                            DocParser::PARAM_TYPE
-                        ], $name, true);
-
-                        if (isset($result['params']['$' . $variable])) {
-                            return $this->typeAnalyzer->getTypesForTypeSpecification(
-                                $result['params']['$' . $variable]['type']
-                            );
-                        }
-                    }
-
-                    if ($param->type) {
-                        // Found a type hint.
-                        if ($param->type instanceof Node\Name) {
-                            $type = $this->fetchClassName($param->type);
-
-                            return $type ? [$type] : [];
-                        }
-
-                        return $param->type ? [$param->type] : [];
-                    }
-
-                    break;
-                }
-            }
-        } elseif ($node instanceof Node\Name) {
-            return [$this->fetchClassName($node)];
-        }
-
-        return [];
+        return $this->matchMap;
     }
 
     /**
-     * @param string $variable
-     *
-     * @return string[]
+     * @return string|null
      */
-    protected function getTypes($variable)
+    public function getActiveClassName()
     {
-        if (isset($this->matchMap[$variable]['bestTypeOverrideMatch'])) {
-            return $this->typeAnalyzer->getTypesForTypeSpecification($this->matchMap[$variable]['bestTypeOverrideMatch']);
-        }
-
-        $guaranteedTypes = [];
-        $possibleTypeMap = [];
-
-        $conditionalTypes = isset($this->matchMap[$variable]['conditionalTypes']) ?
-            $this->matchMap[$variable]['conditionalTypes'] :
-            [];
-
-        foreach ($conditionalTypes as $type => $possibility) {
-            if ($possibility === self::TYPE_CONDITIONALLY_GUARANTEED) {
-                $guaranteedTypes[] = $type;
-            } elseif ($possibility === self::TYPE_CONDITIONALLY_POSSIBLE) {
-                $possibleTypeMap[$type] = true;
-            }
-        }
-
-        $types = [];
-
-        // Types guaranteed by a conditional statement take precedence (if they didn't apply, the if statement could
-        // never have executed in the first place).
-        if (!empty($guaranteedTypes)) {
-            $types = $guaranteedTypes;
-        } elseif ($variable === 'this') {
-            $types = $this->currentClassName ? [$this->currentClassName] : [];
-        } elseif (isset($this->matchMap[$variable]['bestMatch'])) {
-            $types = $this->getTypesForNode($variable, $this->matchMap[$variable]['bestMatch']);
-        }
-
-        $filteredTypes = [];
-
-        foreach ($types as $type) {
-            if (isset($this->matchMap[$variable]['conditionalTypes'][$type])) {
-                $possibility = $this->matchMap[$variable]['conditionalTypes'][$type];
-
-                if ($possibility === self::TYPE_CONDITIONALLY_IMPOSSIBLE) {
-                    continue;
-                } elseif (isset($possibleTypeMap[$type])) {
-                    $filteredTypes[] = $type;
-                } elseif ($possibility === self::TYPE_CONDITIONALLY_GUARANTEED) {
-                    $filteredTypes[] = $type;
-                }
-            } elseif (empty($possibleTypeMap)) {
-                // If the possibleTypeMap wasn't empty, the types the variable can have are limited to those present
-                // in it (it acts as a whitelist).
-                $filteredTypes[] = $type;
-            }
-        }
-
-        return $filteredTypes;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return string[]
-     */
-    public function getResolvedTypes($variable, $file)
-    {
-        $resolvedTypes = [];
-
-        $types = $this->getTypes($variable);
-
-        foreach ($types as $type) {
-            if (in_array($type, ['self', 'static', '$this'], true) && $this->currentClassName) {
-                $type = $this->currentClassName;
-            }
-
-            if ($this->typeAnalyzer->isClassType($type) && $type[0] !== "\\") {
-                $line = isset($this->matchMap[$variable]['bestTypeOverrideMatchLine']) ?
-                    $this->matchMap[$variable]['bestTypeOverrideMatchLine'] :
-                    $this->line;
-
-                $type = $this->resolveTypeCommand->resolveType($type, $file, $line);
-            }
-
-            $resolvedTypes[] = $type;
-        }
-
-        return $resolvedTypes;
+        return $this->currentClassName;
     }
 
     /**

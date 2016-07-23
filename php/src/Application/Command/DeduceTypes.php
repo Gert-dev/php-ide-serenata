@@ -7,6 +7,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
 
 use PhpIntegrator\Indexing\IndexDatabase;
@@ -43,6 +44,11 @@ class DeduceTypes extends AbstractCommand
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
+
+    /**
+     * @var DocParser
+     */
+    protected $docParser;
 
     /**
      * @inheritDoc
@@ -256,7 +262,7 @@ class DeduceTypes extends AbstractCommand
 
         try {
             $nodes = $parser->parse($code);
-        } catch (Error $e) {
+        } catch (\PhpParser\Error $e) {
             throw new UnexpectedValueException('Parsing the file failed!');
         }
 
@@ -285,7 +291,207 @@ class DeduceTypes extends AbstractCommand
 
         $variableName = mb_substr($name, 1);
 
-        return $queryingVisitor->getResolvedTypes($variableName, $file);
+        $matchMap = $queryingVisitor->getMatchMap();
+        $activeClassName = $queryingVisitor->getActiveClassName();
+
+        return $this->getResolvedTypes($matchMap, $activeClassName, $variableName, $file, $offsetLine, $code);
+    }
+
+    /**
+     * @param string $variable
+     * @param Node   $node
+     * @param string $file
+     * @param string $code
+     *
+     * @return string[]
+     */
+    protected function getTypesForNode($variable, Node $node, $file, $code)
+    {
+        if ($node instanceof Node\Expr\Assign) {
+            if ($node->expr instanceof Node\Expr\Ternary) {
+                $firstOperandType = $this->deduceTypesFromNode(
+                    $file,
+                    $code,
+                    $node->expr->if ?: $node->expr->cond,
+                    $node->getAttribute('startFilePos')
+                );
+
+                $secondOperandType = $this->deduceTypesFromNode(
+                    $file,
+                    $code,
+                    $node->expr->else,
+                    $node->getAttribute('startFilePos')
+                );
+
+                if ($firstOperandType === $secondOperandType) {
+                    return $firstOperandType;
+                }
+            } else {
+                return $this->deduceTypesFromNode(
+                    $file,
+                    $code,
+                    $node->expr,
+                    $node->getAttribute('startFilePos')
+                );
+            }
+        } elseif ($node instanceof Node\Stmt\Foreach_) {
+            $types = $this->deduceTypesFromNode(
+                $file,
+                $code,
+                $node->expr,
+                $node->getAttribute('startFilePos')
+            );
+
+            foreach ($types as $type) {
+                if ($type && mb_strpos($type, '[]') !== false) {
+                    $type = mb_substr($type, 0, -2);
+
+                    return $type ? [$type] : [];
+                }
+            }
+        } elseif ($node instanceof Node\FunctionLike) {
+            foreach ($node->getParams() as $param) {
+                if ($param->name === $variable) {
+                    $docBlock = $node->getDocComment();
+
+                    if ($docBlock) {
+                        // Analyze the docblock's @param tags.
+                        $name = null;
+
+                        if ($node instanceof Node\Stmt\Function_ || $node instanceof Node\Stmt\ClassMethod) {
+                            $name = $node->name;
+                        }
+
+                        $result = $this->getDocParser()->parse((string) $docBlock, [
+                            DocParser::PARAM_TYPE
+                        ], $name, true);
+
+                        if (isset($result['params']['$' . $variable])) {
+                            return $this->typeAnalyzer->getTypesForTypeSpecification(
+                                $result['params']['$' . $variable]['type']
+                            );
+                        }
+                    }
+
+                    if ($param->type) {
+                        // Found a type hint.
+                        if ($param->type instanceof Node\Name) {
+                            $type = $this->fetchClassName($param->type);
+
+                            return $type ? [$type] : [];
+                        }
+
+                        return $param->type ? [$param->type] : [];
+                    }
+
+                    break;
+                }
+            }
+        } elseif ($node instanceof Node\Name) {
+            return [$this->fetchClassName($node)];
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array  $matchMap
+     * @param string $activeClassName
+     * @param string $variable
+     * @param string $file
+     * @param string $code
+     *
+     * @return string[]
+     */
+    protected function getTypes($matchMap, $activeClassName, $variable, $file, $code)
+    {
+        if (isset($matchMap[$variable]['bestTypeOverrideMatch'])) {
+            return $this->typeAnalyzer->getTypesForTypeSpecification($matchMap[$variable]['bestTypeOverrideMatch']);
+        }
+
+        $guaranteedTypes = [];
+        $possibleTypeMap = [];
+
+        $conditionalTypes = isset($matchMap[$variable]['conditionalTypes']) ?
+            $matchMap[$variable]['conditionalTypes'] :
+            [];
+
+        foreach ($conditionalTypes as $type => $possibility) {
+            if ($possibility === DeduceTypes\QueryingVisitor::TYPE_CONDITIONALLY_GUARANTEED) {
+                $guaranteedTypes[] = $type;
+            } elseif ($possibility === DeduceTypes\QueryingVisitor::TYPE_CONDITIONALLY_POSSIBLE) {
+                $possibleTypeMap[$type] = true;
+            }
+        }
+
+        $types = [];
+
+        // Types guaranteed by a conditional statement take precedence (if they didn't apply, the if statement could
+        // never have executed in the first place).
+        if (!empty($guaranteedTypes)) {
+            $types = $guaranteedTypes;
+        } elseif ($variable === 'this') {
+            $types = $activeClassName ? [$activeClassName] : [];
+        } elseif (isset($matchMap[$variable]['bestMatch'])) {
+            $types = $this->getTypesForNode($variable, $matchMap[$variable]['bestMatch'], $file, $code);
+        }
+
+        $filteredTypes = [];
+
+        foreach ($types as $type) {
+            if (isset($matchMap[$variable]['conditionalTypes'][$type])) {
+                $possibility = $matchMap[$variable]['conditionalTypes'][$type];
+
+                if ($possibility === DeduceTypes\QueryingVisitor::TYPE_CONDITIONALLY_IMPOSSIBLE) {
+                    continue;
+                } elseif (isset($possibleTypeMap[$type])) {
+                    $filteredTypes[] = $type;
+                } elseif ($possibility === DeduceTypes\QueryingVisitor::TYPE_CONDITIONALLY_GUARANTEED) {
+                    $filteredTypes[] = $type;
+                }
+            } elseif (empty($possibleTypeMap)) {
+                // If the possibleTypeMap wasn't empty, the types the variable can have are limited to those present
+                // in it (it acts as a whitelist).
+                $filteredTypes[] = $type;
+            }
+        }
+
+        return $filteredTypes;
+    }
+
+    /**
+     * @param array  $matchMap
+     * @param string $activeClassName
+     * @param string $variable
+     * @param string $file
+     * @param int    $line
+     * @param string $code
+     *
+     * @return string[]
+     */
+    public function getResolvedTypes($matchMap, $activeClassName, $variable, $file, $line, $code)
+    {
+        $resolvedTypes = [];
+
+        $types = $this->getTypes($matchMap, $activeClassName, $variable, $file, $code);
+
+        foreach ($types as $type) {
+            if (in_array($type, ['self', 'static', '$this'], true) && $activeClassName) {
+                $type = $activeClassName;
+            }
+
+            if ($this->typeAnalyzer->isClassType($type) && $type[0] !== "\\") {
+                $typeLine = isset($matchMap[$variable]['bestTypeOverrideMatchLine']) ?
+                    $matchMap[$variable]['bestTypeOverrideMatchLine'] :
+                    $line;
+
+                $type = $this->resolveTypeCommand->resolveType($type, $file, $typeLine);
+            }
+
+            $resolvedTypes[] = $type;
+        }
+
+        return $resolvedTypes;
     }
 
     /**
@@ -527,5 +733,19 @@ class DeduceTypes extends AbstractCommand
         }
 
         return $this->typeAnalyzer;
+    }
+
+    /**
+     * Retrieves an instance of DocParser. The object will only be created once if needed.
+     *
+     * @return DocParser
+     */
+    protected function getDocParser()
+    {
+        if (!$this->docParser instanceof DocParser) {
+            $this->docParser = new DocParser();
+        }
+
+        return $this->docParser;
     }
 }
