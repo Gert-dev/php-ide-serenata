@@ -205,12 +205,11 @@ class QueryingVisitor extends NodeVisitorAbstract
                     }
                 }
 
-                // die(var_dump(__FILE__ . ':' . __LINE__, $this->matchMap));
                 $this->resetStateForNewScopeForAllBut($variablesOutsideCurrentScope);
 
                 foreach ($this->matchMap as $variable => &$data) {
                     if (!in_array($variable, $variablesOutsideCurrentScope)) {
-                        $this->matchMap[$variable]['lastFunctionLikeNode'] = $node;
+                        $this->matchMap[$variable]['bestMatch'] = $node;
                     }
                 }
             }
@@ -579,8 +578,6 @@ class QueryingVisitor extends NodeVisitorAbstract
             $types = $this->currentClassName ? [$this->currentClassName] : [];
         } elseif (isset($this->matchMap[$variable]['bestMatch'])) {
             $types = $this->getTypesForNode($variable, $this->matchMap[$variable]['bestMatch']);
-        } elseif (isset($this->matchMap[$variable]['lastFunctionLikeNode'])) {
-            $types = $this->getTypesForNode($variable, $this->matchMap[$variable]['lastFunctionLikeNode']);
         }
 
         $filteredTypes = [];
