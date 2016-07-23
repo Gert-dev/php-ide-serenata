@@ -280,7 +280,7 @@ class DeduceTypes extends AbstractCommand
 
         $variableName = mb_substr($name, 1);
 
-        $matchMap = $queryingVisitor->getMatchMap();
+        $matchMap = $queryingVisitor->getVariableTypeInfoMap();
         $activeClassName = $queryingVisitor->getActiveClassName();
         $offsetLine = $this->calculateLineByOffset($code, $offset);
 

@@ -46,7 +46,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     /**
      * @var array
      */
-    protected $matchMap = [];
+    protected $variableTypeInfoMap = [];
 
     /**
      * Constructor.
@@ -99,11 +99,11 @@ class QueryingVisitor extends NodeVisitorAbstract
                 $typeData = $this->parseCondition($node->cond);
 
                 foreach ($typeData as $variable => $newConditionalTypes) {
-                    $conditionalTypes = isset($this->matchMap[$variable]['conditionalTypes']) ?
-                        $this->matchMap[$variable]['conditionalTypes'] :
+                    $conditionalTypes = isset($this->variableTypeInfoMap[$variable]['conditionalTypes']) ?
+                        $this->variableTypeInfoMap[$variable]['conditionalTypes'] :
                         [];
 
-                    $this->matchMap[$variable]['conditionalTypes'] = array_merge($conditionalTypes, $newConditionalTypes);
+                    $this->variableTypeInfoMap[$variable]['conditionalTypes'] = array_merge($conditionalTypes, $newConditionalTypes);
                 }
             }
         } elseif ($node instanceof Node\Expr\Assign) {
@@ -140,24 +140,24 @@ class QueryingVisitor extends NodeVisitorAbstract
                     foreach ($node->uses as $closureUse) {
                         $variablesOutsideCurrentScope[] = $closureUse->var;
 
-                        if (!isset($this->matchMap[$closureUse->var])) {
-                            $this->matchMap[$closureUse->var] = [];
+                        if (!isset($this->variableTypeInfoMap[$closureUse->var])) {
+                            $this->variableTypeInfoMap[$closureUse->var] = [];
                         }
                     }
                 }
 
                 // Ensure that we at least recognize the parameters in this function if we haven't met them before.
                 foreach ($node->getParams() as $param) {
-                    if (!isset($this->matchMap[$param->name])) {
-                        $this->matchMap[$param->name] = [];
+                    if (!isset($this->variableTypeInfoMap[$param->name])) {
+                        $this->variableTypeInfoMap[$param->name] = [];
                     }
                 }
 
                 $this->resetStateForNewScopeForAllBut($variablesOutsideCurrentScope);
 
-                foreach ($this->matchMap as $variable => &$data) {
+                foreach ($this->variableTypeInfoMap as $variable => &$data) {
                     if (!in_array($variable, $variablesOutsideCurrentScope)) {
-                        $this->matchMap[$variable]['bestMatch'] = $node;
+                        $this->variableTypeInfoMap[$variable]['bestMatch'] = $node;
                     }
                 }
             }
@@ -312,8 +312,8 @@ class QueryingVisitor extends NodeVisitorAbstract
         if (preg_match($reverseRegexTypeAnnotation, $docblock, $matches) === 1) {
             $variable = $matches[1];
 
-            $this->matchMap[$variable]['bestTypeOverrideMatch'] = $matches[2];
-            $this->matchMap[$variable]['bestTypeOverrideMatchLine'] = $node->getLine();
+            $this->variableTypeInfoMap[$variable]['bestTypeOverrideMatch'] = $matches[2];
+            $this->variableTypeInfoMap[$variable]['bestTypeOverrideMatchLine'] = $node->getLine();
         } else {
             $docblockData = $this->docParser->parse((string) $docblock, [
                 DocParser::VAR_TYPE
@@ -321,8 +321,8 @@ class QueryingVisitor extends NodeVisitorAbstract
 
             foreach ($docblockData['var'] as $variableName => $data) {
                 if ($data['type']) {
-                    $this->matchMap[mb_substr($variableName, 1)]['bestTypeOverrideMatch'] = $data['type'];
-                    $this->matchMap[mb_substr($variableName, 1)]['bestTypeOverrideMatchLine'] = $node->getLine();
+                    $this->variableTypeInfoMap[mb_substr($variableName, 1)]['bestTypeOverrideMatch'] = $data['type'];
+                    $this->variableTypeInfoMap[mb_substr($variableName, 1)]['bestTypeOverrideMatchLine'] = $node->getLine();
                 }
             }
         }
@@ -356,7 +356,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     {
         $this->resetConditionalState($variable);
 
-        $this->matchMap[$variable]['bestMatch'] = $bestMatch;
+        $this->variableTypeInfoMap[$variable]['bestMatch'] = $bestMatch;
 
         return $this;
     }
@@ -366,7 +366,7 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     protected function resetConditionalState($variable)
     {
-        $this->matchMap[$variable]['conditionalTypes'] = [];
+        $this->variableTypeInfoMap[$variable]['conditionalTypes'] = [];
     }
 
     /**
@@ -374,7 +374,7 @@ class QueryingVisitor extends NodeVisitorAbstract
      */
     protected function resetStateForNewScope()
     {
-        $this->matchMap = [];
+        $this->variableTypeInfoMap = [];
     }
 
     /**
@@ -384,7 +384,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     {
         $newMap = [];
 
-        foreach ($this->matchMap as $variable => $data) {
+        foreach ($this->variableTypeInfoMap as $variable => $data) {
             if (in_array($variable, $exclusionList)) {
                 $newMap[$variable] = $data;
             } else {
@@ -392,15 +392,15 @@ class QueryingVisitor extends NodeVisitorAbstract
             }
         }
 
-        $this->matchMap = $newMap;
+        $this->variableTypeInfoMap = $newMap;
     }
 
     /**
      * @return array
      */
-    public function getMatchMap()
+    public function getVariableTypeInfoMap()
     {
-        return $this->matchMap;
+        return $this->variableTypeInfoMap;
     }
 
     /**
