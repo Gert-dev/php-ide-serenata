@@ -370,7 +370,7 @@ class QueryingVisitor extends NodeVisitorAbstract
     }
 
     /**
-     *
+     * @return void
      */
     protected function resetStateForNewScope()
     {
