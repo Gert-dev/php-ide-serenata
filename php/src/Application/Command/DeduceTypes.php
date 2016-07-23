@@ -10,6 +10,8 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
 
+use PhpIntegrator\Application\Command\DeduceTypes\TypeQueryingVisitor;
+
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpParser\Node;
@@ -271,17 +273,17 @@ class DeduceTypes extends AbstractCommand
         }
 
         $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
-        $queryingVisitor = new DeduceTypes\QueryingVisitor($this->getDocParser(), $offset);
+        $typeQueryingVisitor = new TypeQueryingVisitor($this->getDocParser(), $offset);
 
         $traverser = new NodeTraverser(false);
         $traverser->addVisitor($scopeLimitingVisitor);
-        $traverser->addVisitor($queryingVisitor);
+        $traverser->addVisitor($typeQueryingVisitor);
         $traverser->traverse($nodes);
 
         $variableName = mb_substr($name, 1);
 
-        $matchMap = $queryingVisitor->getVariableTypeInfoMap();
-        $activeClassName = $queryingVisitor->getActiveClassName();
+        $matchMap = $typeQueryingVisitor->getVariableTypeInfoMap();
+        $activeClassName = $typeQueryingVisitor->getActiveClassName();
         $offsetLine = $this->calculateLineByOffset($code, $offset);
 
         return $this->getResolvedTypes($matchMap, $activeClassName, $variableName, $file, $offsetLine, $code);
@@ -407,9 +409,9 @@ class DeduceTypes extends AbstractCommand
             [];
 
         foreach ($conditionalTypes as $type => $possibility) {
-            if ($possibility === DeduceTypes\QueryingVisitor::TYPE_CONDITIONALLY_GUARANTEED) {
+            if ($possibility === TypeQueryingVisitor::TYPE_CONDITIONALLY_GUARANTEED) {
                 $guaranteedTypes[] = $type;
-            } elseif ($possibility === DeduceTypes\QueryingVisitor::TYPE_CONDITIONALLY_POSSIBLE) {
+            } elseif ($possibility === TypeQueryingVisitor::TYPE_CONDITIONALLY_POSSIBLE) {
                 $possibleTypeMap[$type] = true;
             }
         }
@@ -432,11 +434,11 @@ class DeduceTypes extends AbstractCommand
             if (isset($matchMap[$variable]['conditionalTypes'][$type])) {
                 $possibility = $matchMap[$variable]['conditionalTypes'][$type];
 
-                if ($possibility === DeduceTypes\QueryingVisitor::TYPE_CONDITIONALLY_IMPOSSIBLE) {
+                if ($possibility === TypeQueryingVisitor::TYPE_CONDITIONALLY_IMPOSSIBLE) {
                     continue;
                 } elseif (isset($possibleTypeMap[$type])) {
                     $filteredTypes[] = $type;
-                } elseif ($possibility === DeduceTypes\QueryingVisitor::TYPE_CONDITIONALLY_GUARANTEED) {
+                } elseif ($possibility === TypeQueryingVisitor::TYPE_CONDITIONALLY_GUARANTEED) {
                     $filteredTypes[] = $type;
                 }
             } elseif (empty($possibleTypeMap)) {

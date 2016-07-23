@@ -12,7 +12,7 @@ use PhpParser\NodeVisitorAbstract;
  * Visitor that walks to a specific position, building a list of information about variables and their possible and
  * guaranteed types.
  */
-class QueryingVisitor extends NodeVisitorAbstract
+class TypeQueryingVisitor extends NodeVisitorAbstract
 {
     /**
      * @var int
