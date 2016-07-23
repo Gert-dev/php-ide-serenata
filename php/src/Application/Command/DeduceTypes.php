@@ -8,7 +8,6 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
