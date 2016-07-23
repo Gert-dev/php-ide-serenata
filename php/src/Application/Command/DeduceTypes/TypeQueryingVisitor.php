@@ -93,10 +93,7 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
             // There can be conditional expressions inside the current scope (think variables assigned to a ternary
             // expression). In that case we don't want to actually look at the condition for type deduction unless
             // we're inside the scope of that conditional.
-            if (
-                $this->position >= $node->getAttribute('startFilePos') &&
-                $this->position <= $node->getAttribute('endFilePos')
-            ) {
+            if ($this->position >= $startFilePos && $this->position <= $endFilePos) {
                 $typeData = $this->parseCondition($node->cond);
 
                 foreach ($typeData as $variable => $newConditionalTypes) {
