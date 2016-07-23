@@ -15,6 +15,7 @@ use PhpIntegrator\Application\Command\DeduceTypes\TypeQueryingVisitor;
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpParser\Node;
+use PhpParser\Error;
 use PhpParser\NodeTraverser;
 
 /**
@@ -247,6 +248,38 @@ class DeduceTypes extends AbstractCommand
     }
 
     /**
+     * @var TypeQueryingVisitor
+     */
+    protected $typeQueryingVisitor;
+
+    /**
+     * @param string $code
+     * @param int    $offset
+     *
+     * @throws UnexpectedValueException
+     */
+    protected function walkTypeQueryingVisitorTo($code, $offset)
+    {
+        try {
+            $nodes = $this->getParser()->parse($code);
+        } catch (Error $e) {
+            throw new UnexpectedValueException('Parsing the file failed!');
+        }
+
+        if ($nodes === null) {
+            throw new UnexpectedValueException('Parsing the file failed!');
+        }
+
+        $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
+        $this->typeQueryingVisitor = new TypeQueryingVisitor($this->getDocParser(), $offset);
+
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($scopeLimitingVisitor);
+        $traverser->addVisitor($this->typeQueryingVisitor);
+        $traverser->traverse($nodes);
+    }
+
+    /**
      * @param string     $file
      * @param string     $code
      * @param string     $name
@@ -260,30 +293,12 @@ class DeduceTypes extends AbstractCommand
             throw new UnexpectedValueException('The variable name must start with a dollar sign!');
         }
 
-        $parser = $this->getParser();
-
-        try {
-            $nodes = $parser->parse($code);
-        } catch (\PhpParser\Error $e) {
-            throw new UnexpectedValueException('Parsing the file failed!');
-        }
-
-        if ($nodes === null) {
-            throw new UnexpectedValueException('Parsing the file failed!');
-        }
-
-        $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
-        $typeQueryingVisitor = new TypeQueryingVisitor($this->getDocParser(), $offset);
-
-        $traverser = new NodeTraverser(false);
-        $traverser->addVisitor($scopeLimitingVisitor);
-        $traverser->addVisitor($typeQueryingVisitor);
-        $traverser->traverse($nodes);
+        $this->walkTypeQueryingVisitorTo($code, $offset);
 
         $variableName = mb_substr($name, 1);
 
-        $matchMap = $typeQueryingVisitor->getVariableTypeInfoMap();
-        $activeClassName = $typeQueryingVisitor->getActiveClassName();
+        $matchMap = $this->typeQueryingVisitor->getVariableTypeInfoMap();
+        $activeClassName = $this->typeQueryingVisitor->getActiveClassName();
         $offsetLine = $this->calculateLineByOffset($code, $offset);
 
         return $this->getResolvedTypes($matchMap, $activeClassName, $variableName, $file, $offsetLine, $code);
