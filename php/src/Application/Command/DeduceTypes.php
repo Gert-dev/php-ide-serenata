@@ -289,10 +289,6 @@ class DeduceTypes extends AbstractCommand
      */
     protected function getVariableTypes($file, $code, $name, $offset)
     {
-        if (empty($name) || $name[0] !== '$') {
-            throw new UnexpectedValueException('The variable name must start with a dollar sign!');
-        }
-
         $this->walkTypeQueryingVisitorTo($code, $offset);
 
         $variableName = mb_substr($name, 1);
