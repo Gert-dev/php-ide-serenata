@@ -132,10 +132,6 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
                 if ($node instanceof Node\Expr\Closure) {
                     foreach ($node->uses as $closureUse) {
                         $variablesOutsideCurrentScope[] = $closureUse->var;
-
-                        if (!isset($this->variableTypeInfoMap[$closureUse->var])) {
-                            $this->variableTypeInfoMap[$closureUse->var] = [];
-                        }
                     }
                 }
 
