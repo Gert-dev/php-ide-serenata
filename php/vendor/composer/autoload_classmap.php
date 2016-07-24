@@ -430,7 +430,7 @@ return array(
     'PhpIntegrator\\Application\\Command\\DeduceTypes' => $baseDir . '/src/Application/Command/DeduceTypes.php',
     'PhpIntegrator\\Application\\Command\\DeduceTypesTest' => $baseDir . '/tests/Application/Command/DeduceTypesTest.php',
     'PhpIntegrator\\Application\\Command\\DeduceTypes\\DummyExprNode' => $baseDir . '/src/Application/Command/DeduceTypes/DummyExprNode.php',
-    'PhpIntegrator\\Application\\Command\\DeduceTypes\\QueryingVisitor' => $baseDir . '/src/Application/Command/DeduceTypes/QueryingVisitor.php',
+    'PhpIntegrator\\Application\\Command\\DeduceTypes\\TypeQueryingVisitor' => $baseDir . '/src/Application/Command/DeduceTypes/TypeQueryingVisitor.php',
     'PhpIntegrator\\Application\\Command\\GlobalConstants' => $baseDir . '/src/Application/Command/GlobalConstants.php',
     'PhpIntegrator\\Application\\Command\\GlobalConstantsTest' => $baseDir . '/tests/Application/Command/GlobalConstantsTest.php',
     'PhpIntegrator\\Application\\Command\\GlobalFunctions' => $baseDir . '/src/Application/Command/GlobalFunctions.php',

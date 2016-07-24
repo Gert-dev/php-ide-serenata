@@ -540,7 +540,7 @@ class ComposerStaticInit6d911d2c0317086b52990384597ba6c1
         'PhpIntegrator\\Application\\Command\\DeduceTypes' => __DIR__ . '/../..' . '/src/Application/Command/DeduceTypes.php',
         'PhpIntegrator\\Application\\Command\\DeduceTypesTest' => __DIR__ . '/../..' . '/tests/Application/Command/DeduceTypesTest.php',
         'PhpIntegrator\\Application\\Command\\DeduceTypes\\DummyExprNode' => __DIR__ . '/../..' . '/src/Application/Command/DeduceTypes/DummyExprNode.php',
-        'PhpIntegrator\\Application\\Command\\DeduceTypes\\QueryingVisitor' => __DIR__ . '/../..' . '/src/Application/Command/DeduceTypes/QueryingVisitor.php',
+        'PhpIntegrator\\Application\\Command\\DeduceTypes\\TypeQueryingVisitor' => __DIR__ . '/../..' . '/src/Application/Command/DeduceTypes/TypeQueryingVisitor.php',
         'PhpIntegrator\\Application\\Command\\GlobalConstants' => __DIR__ . '/../..' . '/src/Application/Command/GlobalConstants.php',
         'PhpIntegrator\\Application\\Command\\GlobalConstantsTest' => __DIR__ . '/../..' . '/tests/Application/Command/GlobalConstantsTest.php',
         'PhpIntegrator\\Application\\Command\\GlobalFunctions' => __DIR__ . '/../..' . '/src/Application/Command/GlobalFunctions.php',
