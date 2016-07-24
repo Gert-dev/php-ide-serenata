@@ -476,6 +476,41 @@ class DeduceTypes extends AbstractCommand
     }
 
     /**
+     * Retrieves a list of types for the variable, with any referencing types (self, static, $this, ...)
+     * resolved to their actual types.
+     *
+     * @param array  $variableTypeInfoMap
+     * @param string $variable
+     * @param string $file
+     * @param string $code
+     *
+     * @return string[]
+     */
+    protected function getUnreferencedTypes($variableTypeInfoMap, $variable, $file, $code)
+    {
+        $variableTypeInfo = isset($variableTypeInfoMap[$variable]) ? $variableTypeInfoMap[$variable] : [];
+
+        $types = $this->getTypes($variableTypeInfo, $variable, $file, $code);
+
+        $unreferencedTypes = [];
+
+        foreach ($types as $type) {
+            if (in_array($type, ['self', 'static', '$this'], true)) {
+                $unreferencedTypes = array_merge(
+                    $unreferencedTypes,
+                    $this->getUnreferencedTypes($variableTypeInfoMap, 'this', $file, $code)
+                );
+            } else {
+                $unreferencedTypes[] = $type;
+            }
+        }
+
+        return $unreferencedTypes;
+    }
+
+    /**
+     * Retrieves a list of fully resolved types for the variable.
+     *
      * @param array  $variableTypeInfoMap
      * @param string $variable
      * @param string $file
@@ -486,26 +521,13 @@ class DeduceTypes extends AbstractCommand
      */
     protected function getResolvedTypes($variableTypeInfoMap, $variable, $file, $line, $code)
     {
+        $types = $this->getUnreferencedTypes($variableTypeInfoMap, $variable, $file, $code);
+
         $variableTypeInfo = isset($variableTypeInfoMap[$variable]) ? $variableTypeInfoMap[$variable] : [];
-
-        $types = $this->getTypes($variableTypeInfo, $variable, $file, $code);
-
-        $partiallyResolvedTypes = [];
-
-        foreach ($types as $type) {
-            if (in_array($type, ['self', 'static', '$this'], true)) {
-                $partiallyResolvedTypes = array_merge(
-                    $partiallyResolvedTypes,
-                    $this->getResolvedTypes($variableTypeInfoMap, 'this', $file, $line, $code)
-                );
-            } else {
-                $partiallyResolvedTypes[] = $type;
-            }
-        }
 
         $resolvedTypes = [];
 
-        foreach ($partiallyResolvedTypes as $type) {
+        foreach ($types as $type) {
             if ($this->getTypeAnalyzer()->isClassType($type)) {
                 $typeLine = isset($variableTypeInfo['bestTypeOverrideMatchLine']) ?
                     $variableTypeInfo['bestTypeOverrideMatchLine'] :
