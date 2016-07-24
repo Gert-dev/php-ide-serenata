@@ -472,7 +472,7 @@ class DeduceTypes extends AbstractCommand
      *
      * @return string[]
      */
-    public function getResolvedTypes($matchMap, $activeClassName, $variable, $file, $line, $code)
+    protected function getResolvedTypes($matchMap, $activeClassName, $variable, $file, $line, $code)
     {
         $resolvedTypes = [];
 
