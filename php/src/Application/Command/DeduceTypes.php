@@ -369,9 +369,7 @@ class DeduceTypes extends AbstractCommand
         } elseif ($node instanceof Node\FunctionLike) {
             foreach ($node->getParams() as $param) {
                 if ($param->name === $variable) {
-                    $docBlock = $node->getDocComment();
-
-                    if ($docBlock) {
+                    if ($docBlock = $node->getDocComment()) {
                         // Analyze the docblock's @param tags.
                         $name = null;
 
@@ -390,18 +388,11 @@ class DeduceTypes extends AbstractCommand
                         }
                     }
 
-                    if ($param->type) {
-                        // Found a type hint.
-                        if ($param->type instanceof Node\Name) {
-                            $type = $this->fetchClassName($param->type);
-
-                            return $type ? [$type] : [];
-                        }
-
-                        return $param->type ? [$param->type] : [];
+                    if ($param->type instanceof Node\Name) {
+                        return [$this->fetchClassName($param->type)];
                     }
 
-                    break;
+                    return $param->type ? [$param->type] : [];
                 }
             }
         } elseif ($node instanceof Node\Stmt\ClassLike) {
