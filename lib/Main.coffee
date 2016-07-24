@@ -114,7 +114,7 @@ module.exports =
     performDirectoriesIndex: (directories, progressStreamCallback) ->
         pathStrings = ''
 
-        for i,project of directories
+        for i, project of directories
             pathStrings += project.path
 
         md5 = require 'md5'
