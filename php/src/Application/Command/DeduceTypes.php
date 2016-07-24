@@ -100,6 +100,21 @@ class DeduceTypes extends AbstractCommand
     }
 
     /**
+     * @param string|null $file
+     * @param string      $code
+     * @param Node        $expression
+     * @param int         $offset
+     *
+     * @return string[]
+     */
+    public function deduceTypesFromNode($file, $code, Node $expression, $offset)
+    {
+        $expressionParts = $this->convertNodeToStringParts($expression);
+
+        return $expressionParts ? $this->deduceTypes($file, $code, $expressionParts, $offset) : [];
+    }
+
+    /**
      * @param string   $file
      * @param string   $code
      * @param string[] $expressionParts
@@ -515,21 +530,6 @@ class DeduceTypes extends AbstractCommand
     protected function fetchResolvedTypesFromTypeArrays(array $typeArrays)
     {
         return array_map([$this, 'fetchResolvedTypeFromTypeArray'], $typeArrays);
-    }
-
-    /**
-     * @param string|null $file
-     * @param string      $code
-     * @param Node        $expression
-     * @param int         $offset
-     *
-     * @return string[]
-     */
-    public function deduceTypesFromNode($file, $code, Node $expression, $offset)
-    {
-        $expressionParts = $this->convertNodeToStringParts($expression);
-
-        return $expressionParts ? $this->deduceTypes($file, $code, $expressionParts, $offset) : [];
     }
 
     /**
