@@ -138,6 +138,8 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
                 // Ensure that we at least recognize the parameters in this function if we haven't met them before.
                 $variablesInsideParameterList = [];
 
+                $this->resetStateForNewScopeForAllBut($variablesOutsideCurrentScope);
+
                 foreach ($node->getParams() as $param) {
                     $variablesInsideParameterList[] = $param->name;
 
@@ -145,8 +147,6 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
                         $this->variableTypeInfoMap[$param->name] = [];
                     }
                 }
-
-                $this->resetStateForNewScopeForAllBut($variablesOutsideCurrentScope);
 
                 foreach ($this->variableTypeInfoMap as $variable => &$data) {
                     if (in_array($variable, $variablesInsideParameterList)) {
@@ -380,8 +380,6 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
         foreach ($this->variableTypeInfoMap as $variable => $data) {
             if (in_array($variable, $exclusionList)) {
                 $newMap[$variable] = $data;
-            } else {
-                $newMap[$variable] = [];
             }
         }
 
