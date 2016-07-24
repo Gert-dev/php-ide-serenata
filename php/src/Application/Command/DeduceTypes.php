@@ -506,7 +506,7 @@ class DeduceTypes extends AbstractCommand
         $resolvedTypes = [];
 
         foreach ($partiallyResolvedTypes as $type) {
-            if ($this->getTypeAnalyzer()->isClassType($type) && $type[0] !== "\\") {
+            if ($this->getTypeAnalyzer()->isClassType($type)) {
                 $typeLine = isset($variableTypeInfo['bestTypeOverrideMatchLine']) ?
                     $variableTypeInfo['bestTypeOverrideMatchLine'] :
                     $line;
