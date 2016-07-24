@@ -135,23 +135,10 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
                     }
                 }
 
-                // Ensure that we at least recognize the parameters in this function if we haven't met them before.
-                $variablesInsideParameterList = [];
-
                 $this->resetStateForNewScopeForAllBut($variablesOutsideCurrentScope);
 
                 foreach ($node->getParams() as $param) {
-                    $variablesInsideParameterList[] = $param->name;
-
-                    if (!isset($this->variableTypeInfoMap[$param->name])) {
-                        $this->variableTypeInfoMap[$param->name] = [];
-                    }
-                }
-
-                foreach ($this->variableTypeInfoMap as $variable => &$data) {
-                    if (in_array($variable, $variablesInsideParameterList)) {
-                        $this->variableTypeInfoMap[$variable]['bestMatch'] = $node;
-                    }
+                    $this->variableTypeInfoMap[$param->name]['bestMatch'] = $node;
                 }
             }
         }
