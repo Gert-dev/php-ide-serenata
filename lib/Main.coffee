@@ -112,20 +112,18 @@ module.exports =
      * @return {Promise}
     ###
     performDirectoriesIndex: (directories, progressStreamCallback) ->
-        pathStrings = ''
+        pathArrays = []
 
         for i, project of directories
-            pathStrings += project.path
+            pathArrays.push(project.path)
 
         md5 = require 'md5'
 
-        indexDatabaseName = md5(pathStrings)
+        indexDatabaseName = md5(pathArrays.join(''))
 
         @proxy.setIndexDatabaseName(indexDatabaseName)
 
-        # TODO: Support multiple root project directories. We can't send these one by one, they need to all be sent at
-        # the same time in one reindex action or cross-dependencies might not be picked up correctly.
-        return @service.reindex(directories[0].path, null, progressStreamCallback)
+        return @service.reindex(pathArrays, null, progressStreamCallback)
 
     ###*
      * Indexes the project aynschronously.

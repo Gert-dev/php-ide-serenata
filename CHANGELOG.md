@@ -1,5 +1,6 @@
 ## 1.1.0
 ### Features and enhancements
+* Added simple support for multiple root folders in the tree view.
 * At least PHP 5.5 is now required to run the service. PHP 5.4 has been declared end of life for quite some time now and 5.5 will be declared end of life 10 July 2016. This does not affect the code you can actually write, the indexer still supports PHP 5.2 up to PHP 7.0, it is just the PHP interpreter running the indexer that had a required version bump.
 * Some commands delegate work to other commands, but each command that requires parsing performed its own parsing of the (same) source code, even though it only needs to happen once. This unnecessary overhead has been removed, resulting in performance improvements across the board.
 * Caching performance has been improved.
@@ -29,6 +30,7 @@ if (is_string($b) || is_array($b)) {
 * Added `deduceTypesAt` as a convenience alias.
 * The global function and constant list will now return a mapping of FQCN's to data (instead of names to data).
 * `semanticLint` learned how to validate unknown class members, global functions and global constants, which can be used by linter packages.
+* The path passed to handlers registered using `onDidFinishIndexing` and `onDidFailIndexing` will now be an array for project indexes (but not file indexes) as they can contain multiple root folders.
 * `getVariableTypes` is now deprecated as it is just an alias for calling `deduceTypes` and `deduceTypes` with the variable name as the sole part. It will now also just proxy calls to deduceTypes internally.
 
 ## 1.0.10

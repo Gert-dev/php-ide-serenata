@@ -34,7 +34,7 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
         $reindexCommand->setIndexDatabase($indexDatabase);
 
         $reindexOutput = $reindexCommand->reindex(
-            $testPath,
+            [$testPath],
             false,
             false,
             false

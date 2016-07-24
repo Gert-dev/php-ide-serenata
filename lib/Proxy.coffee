@@ -324,15 +324,25 @@ class Proxy
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {String}      path                   The full path to the file  or folder to refresh.
-     * @param {String|null} source                 The source code of the file to index. May be null if a directory is
-     *                                             passed instead.
-     * @param {Callback}    progressStreamCallback A method to invoke each time progress streaming data is received.
+     * @param {String|Array} path                   The full path to the file  or folder to refresh. Alternatively,
+     *                                              this can be a list of items to index at the same time.
+     * @param {String|null}  source                 The source code of the file to index. May be null if a directory is
+     *                                              passed instead.
+     * @param {Callback}     progressStreamCallback A method to invoke each time progress streaming data is received.
      *
      * @return {Promise}
     ###
     reindex: (path, source, progressStreamCallback) ->
-        if not path
+        if typeof path == "string"
+            pathsToIndex = []
+
+            if path
+                pathsToIndex.push(path)
+
+        else
+            pathsToIndex = path
+
+        if path.length == 0
             throw new Error('No filename passed!')
 
         progressStreamCallbackWrapper = null
@@ -346,7 +356,10 @@ class Proxy
                 for percentage in percentages
                     progressStreamCallback(percentage)
 
-        parameters = ['--reindex', '--database=' + @getIndexDatabasePath(), '--source=' + path, '--stream-progress']
+        parameters = ['--reindex', '--database=' + @getIndexDatabasePath(), '--stream-progress']
+
+        for pathToIndex in pathsToIndex
+            parameters.push('--source=' + pathToIndex)
 
         if source?
             parameters.push('--stdin')

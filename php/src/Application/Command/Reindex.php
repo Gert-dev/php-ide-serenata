@@ -73,7 +73,7 @@ class Reindex extends AbstractCommand
      */
     protected function attachOptions(OptionCollection $optionCollection)
     {
-        $optionCollection->add('source:', 'The file or directory to index.')->isa('string');
+        $optionCollection->add('source+', 'The file or directory to index. Can be passed multiple times to process multiple items at once.')->isa('string');
         $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
         $optionCollection->add('v|verbose?', 'If set, verbose output will be displayed.');
         $optionCollection->add('s|stream-progress?', 'If set, progress will be streamed. Incompatible with verbose mode.');
@@ -84,8 +84,8 @@ class Reindex extends AbstractCommand
      */
     protected function process(ArrayAccess $arguments)
     {
-        if (!isset($arguments['source'])) {
-            throw new UnexpectedValueException('The file or directory to index is required for this command.');
+        if (!isset($arguments['source']) || empty($arguments['source'])) {
+            throw new UnexpectedValueException('At least one file or directory to index is required for this command.');
         }
 
         return $this->reindex(
@@ -97,12 +97,36 @@ class Reindex extends AbstractCommand
     }
 
     /**
+     * @param string[] $paths
+     * @param bool     $useStdin
+     * @param bool     $showOutput
+     * @param bool     $doStreamProgress
+     *
+     * @return string
+     */
+    public function reindex(array $paths, $useStdin, $showOutput, $doStreamProgress)
+    {
+        $success = true;
+
+        foreach ($paths as $path) {
+            if (!$this->reindexItem($path, $useStdin, $showOutput, $doStreamProgress)) {
+                $success = false;
+                break;
+            }
+        }
+
+        return $this->outputJson($success, []);
+    }
+
+    /**
      * @param string $path
      * @param bool   $useStdin
      * @param bool   $showOutput
      * @param bool   $doStreamProgress
+     *
+     * @return bool
      */
-    public function reindex($path, $useStdin, $showOutput, $doStreamProgress)
+    protected function reindexItem($path, $useStdin, $showOutput, $doStreamProgress)
     {
         if (!is_dir($path) && !is_file($path) && !$useStdin) {
             throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
@@ -127,7 +151,7 @@ class Reindex extends AbstractCommand
             throw $exception;
         }
 
-        return $this->outputJson($success, []);
+        return $success;
     }
 
     /**
