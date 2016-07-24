@@ -309,12 +309,9 @@ class DeduceTypes extends AbstractCommand
         $variableName = mb_substr($name, 1);
 
         $variableTypeInfoMap = $this->typeQueryingVisitor->getVariableTypeInfoMap();
-        $activeClassName = $this->typeQueryingVisitor->getActiveClassName();
         $offsetLine = $this->calculateLineByOffset($code, $offset);
 
-        $variableTypeInfo = isset($variableTypeInfoMap[$variableName]) ? $variableTypeInfoMap[$variableName] : [];
-
-        return $this->getResolvedTypes($variableTypeInfo, $variableName, $activeClassName, $file, $offsetLine, $code);
+        return $this->getResolvedTypes($variableTypeInfoMap, $variableName, $file, $offsetLine, $code);
     }
 
     /**
@@ -407,6 +404,8 @@ class DeduceTypes extends AbstractCommand
                     break;
                 }
             }
+        } elseif ($node instanceof Node\Stmt\ClassLike) {
+            return [(string) $node->name];
         } elseif ($node instanceof Node\Name) {
             return [$this->fetchClassName($node)];
         }
@@ -417,13 +416,12 @@ class DeduceTypes extends AbstractCommand
     /**
      * @param array  $variableTypeInfo
      * @param string $variable
-     * @param string $activeClassName
      * @param string $file
      * @param string $code
      *
      * @return string[]
      */
-    protected function getTypes($variableTypeInfo, $variable, $activeClassName, $file, $code)
+    protected function getTypes($variableTypeInfo, $variable, $file, $code)
     {
         if (isset($variableTypeInfo['bestTypeOverrideMatch'])) {
             return $this->getTypeAnalyzer()->getTypesForTypeSpecification($variableTypeInfo['bestTypeOverrideMatch']);
@@ -450,8 +448,6 @@ class DeduceTypes extends AbstractCommand
         // never have executed in the first place).
         if (!empty($guaranteedTypes)) {
             $types = $guaranteedTypes;
-        } elseif ($variable === 'this') {
-            $types = $activeClassName ? [$activeClassName] : [];
         } elseif (isset($variableTypeInfo['bestMatch'])) {
             $types = $this->getTypesForNode($variable, $variableTypeInfo['bestMatch'], $file, $code);
         }
@@ -480,26 +476,36 @@ class DeduceTypes extends AbstractCommand
     }
 
     /**
-     * @param array  $variableTypeInfo
+     * @param array  $variableTypeInfoMap
      * @param string $variable
-     * @param string $activeClassName
      * @param string $file
      * @param int    $line
      * @param string $code
      *
      * @return string[]
      */
-    protected function getResolvedTypes($variableTypeInfo, $variable, $activeClassName, $file, $line, $code)
+    protected function getResolvedTypes($variableTypeInfoMap, $variable, $file, $line, $code)
     {
-        $resolvedTypes = [];
+        $variableTypeInfo = isset($variableTypeInfoMap[$variable]) ? $variableTypeInfoMap[$variable] : [];
 
-        $types = $this->getTypes($variableTypeInfo, $variable, $activeClassName, $file, $code);
+        $types = $this->getTypes($variableTypeInfo, $variable, $file, $code);
+
+        $partiallyResolvedTypes = [];
 
         foreach ($types as $type) {
-            if (in_array($type, ['self', 'static', '$this'], true) && $activeClassName) {
-                $type = $activeClassName;
+            if (in_array($type, ['self', 'static', '$this'], true)) {
+                $partiallyResolvedTypes = array_merge(
+                    $partiallyResolvedTypes,
+                    $this->getResolvedTypes($variableTypeInfoMap, 'this', $file, $line, $code)
+                );
+            } else {
+                $partiallyResolvedTypes[] = $type;
             }
+        }
 
+        $resolvedTypes = [];
+
+        foreach ($partiallyResolvedTypes as $type) {
             if ($this->getTypeAnalyzer()->isClassType($type) && $type[0] !== "\\") {
                 $typeLine = isset($variableTypeInfo['bestTypeOverrideMatchLine']) ?
                     $variableTypeInfo['bestTypeOverrideMatchLine'] :
@@ -641,6 +647,18 @@ class DeduceTypes extends AbstractCommand
     {
         $line = $this->calculateLineByOffset($source, $offset);
 
+        return $this->getCurrentClassAtLine($file, $source, $line);
+    }
+
+    /**
+     * @param string $file
+     * @param string $source
+     * @param int    $line
+     *
+     * @return string|null
+     */
+    protected function getCurrentClassAtLine($file, $source, $line)
+    {
         $classes = $this->getClassListCommand()->getClassList($file);
 
         foreach ($classes as $fqcn => $class) {

@@ -40,11 +40,6 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
     protected $docParser;
 
     /**
-     * @var string|null
-     */
-    protected $currentClassName;
-
-    /**
      * @var array
      */
     protected $variableTypeInfoMap = [];
@@ -126,11 +121,11 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
 
         if ($startFilePos <= $this->position && $endFilePos >= $this->position) {
             if ($node instanceof Node\Stmt\ClassLike) {
-                $this->currentClassName = (string) $node->name;
-
                 $this->resetStateForNewScope();
+
+                $this->variableTypeInfoMap['this']['bestMatch'] = $node;
             } elseif ($node instanceof Node\FunctionLike) {
-                $variablesOutsideCurrentScope = [];
+                $variablesOutsideCurrentScope = ['this'];
 
                 // If a variable is in a use() statement of a closure, we can't reset the state as we still need to
                 // examine the parent scope of the closure where the variable is defined.
@@ -145,7 +140,11 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
                 }
 
                 // Ensure that we at least recognize the parameters in this function if we haven't met them before.
+                $variablesInsideParameterList = [];
+
                 foreach ($node->getParams() as $param) {
+                    $variablesInsideParameterList[] = $param->name;
+
                     if (!isset($this->variableTypeInfoMap[$param->name])) {
                         $this->variableTypeInfoMap[$param->name] = [];
                     }
@@ -154,7 +153,7 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
                 $this->resetStateForNewScopeForAllBut($variablesOutsideCurrentScope);
 
                 foreach ($this->variableTypeInfoMap as $variable => &$data) {
-                    if (!in_array($variable, $variablesOutsideCurrentScope)) {
+                    if (in_array($variable, $variablesInsideParameterList)) {
                         $this->variableTypeInfoMap[$variable]['bestMatch'] = $node;
                     }
                 }
@@ -399,13 +398,5 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
     public function getVariableTypeInfoMap()
     {
         return $this->variableTypeInfoMap;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getActiveClassName()
-    {
-        return $this->currentClassName;
     }
 }
