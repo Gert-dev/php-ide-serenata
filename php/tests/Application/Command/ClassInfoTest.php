@@ -154,6 +154,16 @@ class ClassInfoTest extends IndexedTest
         ], $output['properties']['testProperty']);
     }
 
+    public function testDescriptionAfterVarTagTakesPrecedenceOverDocblockSummary()
+    {
+        $fileName = 'ClassPropertyDescriptionPrecedence.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertEquals('This is a description after the var tag.', $output['properties']['testProperty']['shortDescription']);
+        $this->assertEquals('This is a long description.', $output['properties']['testProperty']['longDescription']);
+    }
+
     public function testCompoundClassPropertyStatementsHaveTheirDocblocksAnalyzedCorrectly()
     {
         $fileName = 'CompoundClassPropertyStatement.php';
