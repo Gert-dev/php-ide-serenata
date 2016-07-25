@@ -345,7 +345,7 @@ class BuiltinIndexer
 
         $structureId = $this->storage->insertStructure([
             'name'              => $element->getShortName(),
-            'fqcn'             => $element->getName(),
+            'fqcn'              => $element->getName(),
             'file_id'           => null,
             'start_line'        => null,
             'end_line'          => null,
