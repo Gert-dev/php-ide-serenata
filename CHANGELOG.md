@@ -24,6 +24,7 @@ if (is_string($b) || is_array($b)) {
 * The PHP Mess Detector `@SuppressWarnings` docblock tag will no longer be linted as unknown tag.
 * Different projects weren't using different caches. This means that in some cases the wrong cache was being used.
 * In some cases, the internal cache wasn't cleared when a class was modified, which resulted in old data being displayed.
+* Text following the `@var` tag in docblocks for class constants will now serve as short descriptions (summaries), similar to class properties.
 * *Caching has been reenabled on Windows*, a fix has been applied that should refrain errors from popping up. The cache will simply reset itself if it runs into the erroneous condition (the reason behind which, up this date, is still unknown to me). This way, users are still able to enjoy some caching (users that did not experience any problems at all previously will be able to enjoy full caching).
 
 ### Changes for developers

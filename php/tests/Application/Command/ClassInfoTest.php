@@ -384,6 +384,16 @@ class ClassInfoTest extends IndexedTest
         ]);
     }
 
+    public function testConstantDescriptionAfterVarTagTakesPrecedenceOverDocblockSummary()
+    {
+        $fileName = 'ClassConstantDescriptionPrecedence.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertEquals('This is a description after the var tag.', $output['constants']['TEST_CONSTANT']['shortDescription']);
+        $this->assertEquals('This is a long description.', $output['constants']['TEST_CONSTANT']['longDescription']);
+    }
+
     public function testDocblockInheritanceWorksProperlyForClasses()
     {
         $fileName = 'ClassDocblockInheritance.php';

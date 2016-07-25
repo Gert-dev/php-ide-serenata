@@ -405,13 +405,21 @@ class FileIndexer
             DocParser::DESCRIPTION
         ], $rawData['name']);
 
-        $types = [];
-
         $varDocumentation = isset($documentation['var']['$' . $rawData['name']]) ?
             $documentation['var']['$' . $rawData['name']] :
             null;
 
+        $shortDescription = $documentation['descriptions']['short'];
+
+        $types = [];
+
         if ($varDocumentation) {
+            // You can place documentation after the @var tag as well as at the start of the docblock. Fall back
+            // from the latter to the former.
+            if (!empty($varDocumentation['description'])) {
+                $shortDescription = $varDocumentation['description'];
+            }
+
             $types = $this->getTypeDataForTypeSpecification(
                 $varDocumentation['type'],
                 $rawData['startLine'],
@@ -428,7 +436,7 @@ class FileIndexer
             'is_builtin'            => 0,
             'is_deprecated'         => $documentation['deprecated'] ? 1 : 0,
             'has_docblock'          => empty($rawData['docComment']) ? 0 : 1,
-            'short_description'     => $documentation['descriptions']['short'],
+            'short_description'     => $shortDescription,
             'long_description'      => $documentation['descriptions']['long'],
             'type_description'      => $varDocumentation ? $varDocumentation['description'] : null,
             'types_serialized'      => serialize($types),
