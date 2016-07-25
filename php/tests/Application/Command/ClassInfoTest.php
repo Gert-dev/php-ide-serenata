@@ -154,7 +154,7 @@ class ClassInfoTest extends IndexedTest
         ], $output['properties']['testProperty']);
     }
 
-    public function testDescriptionAfterVarTagTakesPrecedenceOverDocblockSummary()
+    public function testPropertyDescriptionAfterVarTagTakesPrecedenceOverDocblockSummary()
     {
         $fileName = 'ClassPropertyDescriptionPrecedence.php';
 
