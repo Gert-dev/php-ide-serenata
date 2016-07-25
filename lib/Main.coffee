@@ -121,6 +121,7 @@ module.exports =
 
         indexDatabaseName = md5(pathArrays.join(''))
 
+        @proxy.setProjectName(indexDatabaseName)
         @proxy.setIndexDatabaseName(indexDatabaseName)
 
         return @service.reindex(pathArrays, null, progressStreamCallback)

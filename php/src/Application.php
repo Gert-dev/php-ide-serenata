@@ -3,6 +3,7 @@
 namespace PhpIntegrator;
 
 use Exception;
+use UnexpectedValueException;
 
 use Doctrine\Common\Cache\FilesystemCache;
 
@@ -41,8 +42,15 @@ class Application
      */
     public function handle(array $arguments)
     {
+        if (count($arguments) < 3) {
+            throw new UnexpectedValueException('Not enough argument supplied. Usage: . <project> <command> [<addtional parameters>]');
+        }
+
         $programName = array_shift($arguments);
+        $projectName = array_shift($arguments);
         $command = array_shift($arguments);
+
+        // This seems to be needed for GetOptionKit.
         array_unshift($arguments, $programName);
 
         $commands = [
@@ -62,7 +70,10 @@ class Application
             $className = "\\PhpIntegrator\\Application\\Command\\{$commands[$command]}";
 
             /** @var \PhpIntegrator\Application\Command\CommandInterface $command */
-            $command = new $className($this->getCachingParserProxy(), $this->getFilesystemCache());
+            $command = new $className(
+                $this->getCachingParserProxy(),
+                $this->getFilesystemCache($projectName)
+            );
 
             if (interface_exists('Throwable')) {
                 // PHP >= 7.
@@ -89,13 +100,19 @@ class Application
     /**
      * Retrieves an instance of FilesystemCache. The object will only be created once if needed.
      *
+     * @param string $project
+     *
      * @return FilesystemCache
      */
-    protected function getFilesystemCache()
+    protected function getFilesystemCache($project)
     {
         if (!$this->filesystemCache instanceof FilesystemCache) {
             $this->filesystemCache = new FilesystemCache(
-                sys_get_temp_dir() . '/php-integrator-base/' . Application\Command\AbstractCommand::DATABASE_VERSION . '/'
+                sys_get_temp_dir() .
+                '/php-integrator-base/' .
+                $project . '/' .
+                Application\Command\AbstractCommand::DATABASE_VERSION .
+                '/'
             );
         }
 

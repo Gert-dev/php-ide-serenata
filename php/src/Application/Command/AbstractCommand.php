@@ -79,12 +79,6 @@ abstract class AbstractCommand implements CommandInterface
      */
     public function execute(array $arguments)
     {
-        if (count($arguments) < 1) {
-            throw new UnexpectedValueException(
-                'Not enough arguments passed. Usage: . <command> <database path> [<additional options>]'
-            );
-        }
-
         $optionCollection = new OptionCollection();
         $optionCollection->add('database:', 'The index database to use.' )->isa('string');
 

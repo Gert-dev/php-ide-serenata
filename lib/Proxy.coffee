@@ -19,6 +19,11 @@ class Proxy
     indexDatabaseName: null
 
     ###*
+     * The name of the project.
+    ###
+    projectName: null
+
+    ###*
      * Constructor.
      *
      * @param {Config} config
@@ -127,7 +132,13 @@ class Proxy
      * @return {Promise}
     ###
     getClassList: () ->
-        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath()])
+        parameters = [
+            @projectName,
+            '--class-list',
+            '--database=' + @getIndexDatabasePath()
+        ]
+
+        return @performRequest(parameters)
 
     ###*
      * Retrieves a list of available classes in the specified file.
@@ -140,7 +151,14 @@ class Proxy
         if not file
             throw new Error('No file passed!')
 
-        return @performRequest(['--class-list', '--database=' + @getIndexDatabasePath(), '--file=' + file])
+        parameters = [
+            @projectName,
+            '--class-list',
+            '--database=' + @getIndexDatabasePath(),
+            '--file=' + file
+        ]
+
+        return @performRequest(parameters)
 
     ###*
      * Retrieves a list of available global constants.
@@ -148,7 +166,13 @@ class Proxy
      * @return {Promise}
     ###
     getGlobalConstants: () ->
-        return @performRequest(['--constants', '--database=' + @getIndexDatabasePath()])
+        parameters = [
+            @projectName,
+            '--constants',
+            '--database=' + @getIndexDatabasePath()
+        ]
+
+        return @performRequest(parameters)
 
     ###*
      * Retrieves a list of available global functions.
@@ -156,7 +180,13 @@ class Proxy
      * @return {Promise}
     ###
     getGlobalFunctions: () ->
-        return @performRequest(['--functions', '--database=' + @getIndexDatabasePath()])
+        parameters = [
+            @projectName,
+            '--functions',
+            '--database=' + @getIndexDatabasePath()
+        ]
+
+        return @performRequest(parameters)
 
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
@@ -169,9 +199,14 @@ class Proxy
         if not className
             throw new Error('No class name passed!')
 
-        return @performRequest(
-            ['--class-info', '--database=' + @getIndexDatabasePath(), '--name=' + className]
-        )
+        parameters = [
+            @projectName,
+            '--class-info',
+            '--database=' + @getIndexDatabasePath(),
+            '--name=' + className
+        ]
+
+        return @performRequest(parameters)
 
     ###*
      * Resolves a local type in the specified file, based on use statements and the namespace.
@@ -187,9 +222,16 @@ class Proxy
         throw new Error('No line passed!') if not line
         throw new Error('No type passed!') if not type
 
-        return @performRequest(
-            ['--resolve-type', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--line=' + line, '--type=' + type]
-        )
+        parameters = [
+            @projectName,
+            '--resolve-type',
+            '--database=' + @getIndexDatabasePath(),
+            '--file=' + file,
+            '--line=' + line,
+            '--type=' + type
+        ]
+
+        return @performRequest(parameters)
 
     ###*
      * Localizes a type to the specified file, making it relative to local use statements, if possible. If not possible,
@@ -206,9 +248,16 @@ class Proxy
         throw new Error('No line passed!') if not line
         throw new Error('No type passed!') if not type
 
-        return @performRequest(
-            ['--localize-type', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--line=' + line, '--type=' + type]
-        )
+        parameters = [
+            @projectName,
+            '--localize-type',
+            '--database=' + @getIndexDatabasePath(),
+            '--file=' + file,
+            '--line=' + line,
+            '--type=' + type
+        ]
+
+        return @performRequest(parameters)
 
     ###*
      * Performs a semantic lint of the specified file.
@@ -224,7 +273,13 @@ class Proxy
     semanticLint: (file, source, options = {}) ->
         throw new Error('No file passed!') if not file
 
-        parameters = ['--semantic-lint', '--database=' + @getIndexDatabasePath(), '--file=' + file, '--stdin']
+        parameters = [
+            @projectName,
+            '--semantic-lint',
+            '--database=' + @getIndexDatabasePath(),
+            '--file=' + file,
+            '--stdin'
+        ]
 
         if options.noUnknownClasses == true
             parameters.push('--no-unknown-classes')
@@ -269,11 +324,16 @@ class Proxy
         else
             parameter = '--stdin'
 
-        return @performRequest(
-            ['--available-variables', '--database=' + @getIndexDatabasePath(), parameter, '--offset=' + offset, '--charoffset'],
-            null,
-            source
-        )
+        parameters = [
+            @projectName,
+            '--available-variables',
+            '--database=' + @getIndexDatabasePath(),
+            parameter,
+            '--offset=' + offset,
+            '--charoffset'
+        ]
+
+        return @performRequest(parameters, null, source)
 
     ###*
      * Fetches the types of the specified variable at the specified location.
@@ -304,7 +364,13 @@ class Proxy
         if not file?
             throw 'A path to a file must be passed!'
 
-        parameters = ['--deduce-types', '--database=' + @getIndexDatabasePath(), '--offset=' + offset, '--charoffset']
+        parameters = [
+            @projectName,
+            '--deduce-types',
+            '--database=' + @getIndexDatabasePath(),
+            '--offset=' + offset,
+            '--charoffset'
+        ]
 
         if file?
             parameters.push('--file=' + file)
@@ -356,7 +422,12 @@ class Proxy
                 for percentage in percentages
                     progressStreamCallback(percentage)
 
-        parameters = ['--reindex', '--database=' + @getIndexDatabasePath(), '--stream-progress']
+        parameters = [
+            @projectName,
+            '--reindex',
+            '--database=' + @getIndexDatabasePath(),
+            '--stream-progress'
+        ]
 
         for pathToIndex in pathsToIndex
             parameters.push('--source=' + pathToIndex)
@@ -377,6 +448,14 @@ class Proxy
     ###
     setIndexDatabaseName: (name) ->
         @indexDatabaseName = name
+
+    ###*
+     * Sets the project name to pass.
+     *
+     * @param {String} name
+    ###
+    setProjectName: (name) ->
+        @projectName = name
 
     ###*
      * Retrieves the full path to the database file to use.
