@@ -3,6 +3,7 @@
 * Fixed grouped use statements never being seen as unused.
 * Fixed grouped use statements being marked as unknown classes.
 * Fixed grouped use statements being ignored for type resolution when indexing.
+* Files that do not have UTF-8 encoding will be converted before they are indexed.
 
 ## 1.1.1
 ### Bugs fixed
