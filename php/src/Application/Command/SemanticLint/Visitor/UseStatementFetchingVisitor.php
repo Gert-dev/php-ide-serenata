@@ -54,11 +54,17 @@ class UseStatementFetchingVisitor extends NodeVisitorAbstract
             // end of the file).
             $this->namespaces[$this->lastNamespace]['endLine'] = $node->getLine() - 1;
             $this->lastNamespace = $namespace;
-        } elseif ($node instanceof Node\Stmt\Use_) {
+        } elseif ($node instanceof Node\Stmt\Use_ || $node instanceof Node\Stmt\GroupUse) {
+            $prefix = '';
+
+            if ($node instanceof Node\Stmt\GroupUse) {
+                $prefix = ((string) $node->prefix) . '\\';
+            };
+
             foreach ($node->uses as $use) {
                 // NOTE: The namespace may be null here (intended behavior).
                 $this->namespaces[$this->lastNamespace]['useStatements'][(string) $use->alias] = [
-                    'name'  => (string) $use->name,
+                    'name'  => $prefix . ((string) $use->name),
                     'alias' => $use->alias,
                     'start' => $use->getAttribute('startFilePos') ? $use->getAttribute('startFilePos')   : null,
                     'end'   => $use->getAttribute('endFilePos')   ? $use->getAttribute('endFilePos') + 1 : null

@@ -1,5 +1,6 @@
 ## 1.1.2
 ### Bugs fixed
+* Fixed grouped use statements never being seen as unused.
 * Fixed grouped use statements being marked as unknown classes.
 
 ## 1.1.1

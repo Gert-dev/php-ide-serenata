@@ -306,6 +306,34 @@ class SemanticLintTest extends IndexedTest
         ], $output['warnings']['unusedUseStatements']);
     }
 
+    public function testReportsUnusedUseStatementsWithGroupedUseStatements()
+    {
+        $output = $this->lintFile('GroupedUseStatements.php');
+
+        $this->assertEquals([
+            [
+                'name'  => 'B\Foo',
+                'alias' => 'Foo',
+                'start' => 106,
+                'end'   => 109
+            ],
+
+            [
+                'name'  => 'B\Bar',
+                'alias' => 'Bar',
+                'start' => 119,
+                'end'   => 122
+            ],
+
+            [
+                'name'  => 'B\Missing',
+                'alias' => 'Missing',
+                'start' => 132,
+                'end'   => 139
+            ]
+        ], $output['warnings']['unusedUseStatements']);
+    }
+
     public function testSeesUseStatementsAsUsedIfTheyAppearInComments()
     {
         $output = $this->lintFile('UnusedUseStatementsDocblock.php');
