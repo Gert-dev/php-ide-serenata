@@ -191,10 +191,6 @@ class Reindex extends AbstractCommand
      */
     protected function reindexFile($path, $code)
     {
-        if (mb_detect_encoding($code, 'UTF-8', true) !== 'UTF-8') {
-            throw new UnexpectedValueException("The file {$path} is not UTF-8!");
-        }
-
         try {
             $this->getFileIndexer()->index($path, $code);
         } catch (Indexing\IndexingFailedException $e) {
@@ -214,7 +210,8 @@ class Reindex extends AbstractCommand
                 $this->getStorageForIndexers(),
                 $this->getBuiltinIndexer(),
                 $this->getFileIndexer(),
-                $this->getScanner()
+                $this->getScanner(),
+                $this->getSourceCodeHelper()
             );
         }
 

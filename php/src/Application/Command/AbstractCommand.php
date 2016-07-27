@@ -11,6 +11,7 @@ use Doctrine\Common\Cache\Cache;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\SourceCodeHelper;
 use PhpIntegrator\IndexDataAdapter;
 
 use PhpIntegrator\Indexing\IndexDatabase;
@@ -64,6 +65,11 @@ abstract class AbstractCommand implements CommandInterface
      * @var IndexDataAdapter\ProviderCachingProxy
      */
     protected $indexDataAdapterProvider;
+
+    /**
+     * @var SourceCodeHelper
+     */
+    protected $sourceCodeHelper;
 
     /**
      * @param Cache|null $cache
@@ -165,25 +171,11 @@ abstract class AbstractCommand implements CommandInterface
      * @param string|null $file
      * @param bool        $isStdin
      *
-     * @throws LogicException
      * @throws UnexpectedValueException
      */
     protected function getSourceCode($file, $isStdin)
     {
-        $code = null;
-
-        if ($isStdin) {
-            // NOTE: This call is blocking if there is no input!
-            return file_get_contents('php://stdin');
-        } else {
-            if (!$file) {
-                throw new UnexpectedValueException('The specified file does not exist!');
-            }
-
-            return @file_get_contents($file);
-        }
-
-        throw new LogicException('Should never be reached.');
+        return $this->getSourceCodeHelper()->getSourceCode($file, $isStdin);
     }
 
     /**
@@ -231,6 +223,18 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         return $this->indexDataAdapter;
+    }
+
+    /**
+     * @return SourceCodeHelper
+     */
+    protected function getSourceCodeHelper()
+    {
+        if (!$this->sourceCodeHelper) {
+            $this->sourceCodeHelper = new SourceCodeHelper();
+        }
+
+        return $this->sourceCodeHelper;
     }
 
     /**

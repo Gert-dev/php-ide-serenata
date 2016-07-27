@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Indexing;
 
+use PhpIntegrator\SourceCodeHelper;
+
 /**
  * Handles project and folder indexing.
  */
@@ -28,6 +30,11 @@ class ProjectIndexer
     protected $scanner;
 
     /**
+     * @var SourceCodeHelper
+     */
+    protected $sourceCodeHelper;
+
+    /**
      * @var resource|null
      */
     protected $loggingStream;
@@ -42,17 +49,20 @@ class ProjectIndexer
      * @param BuiltinIndexer   $builtinIndexer
      * @param FileIndexer      $fileIndexer
      * @param Scanner          $scanner
+     * @param SourceCodeHelper $sourceCodeHelper
      */
     public function __construct(
         StorageInterface $storage,
         BuiltinIndexer $builtinIndexer,
         FileIndexer $fileIndexer,
-        Scanner $scanner
+        Scanner $scanner,
+        SourceCodeHelper $sourceCodeHelper
     ) {
         $this->storage = $storage;
         $this->builtinIndexer = $builtinIndexer;
         $this->fileIndexer = $fileIndexer;
         $this->scanner = $scanner;
+        $this->sourceCodeHelper = $sourceCodeHelper;
     }
 
     /**
@@ -154,7 +164,7 @@ class ProjectIndexer
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
 
-            $code = @file_get_contents($filePath);
+            $code = $this->sourceCodeHelper->getSourceCode($filePath, false);
 
             try {
                 $this->fileIndexer->index($filePath, $code);

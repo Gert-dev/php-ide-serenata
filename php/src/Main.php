@@ -29,6 +29,13 @@ if (function_exists('xdebug_disable')) {
 date_default_timezone_set('UTC');
 
 mb_internal_encoding('UTF-8');
+mb_detect_order(array_merge([
+    'ASCII',
+    'UTF-8',
+
+    // Explicitly mention this up top as it's wrongly interpreted as SJIS first.
+    'ISO-8859-1',
+], mb_list_encodings()));
 
 chdir(__DIR__);
 
