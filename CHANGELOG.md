@@ -1,3 +1,7 @@
+## 1.1.2
+### Bugs fixed
+* Fixed grouped use statements being marked as unknown classes.
+
 ## 1.1.1
 ### Bugs fixed
 * Fixed the various `codeCoverageIgnore` tags from PHPUnit being seen as invalid tags (thanks to [@hultberg](https://github.com/hultberg)).

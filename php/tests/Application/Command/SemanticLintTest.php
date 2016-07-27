@@ -124,6 +124,13 @@ class SemanticLintTest extends IndexedTest
         ], $output['errors']['unknownClasses']);
     }
 
+    public function testDoesNotComplainAboutUnknownClassesInGroupedUseStatements()
+    {
+        $output = $this->lintFile('GroupedUseStatements.php');
+
+        $this->assertEquals([], $output['errors']['unknownClasses']);
+    }
+
     public function testReportsInvalidMemberCallsOnAnExpressionWithoutAType()
     {
         $output = $this->lintFile('UnknownMemberExpressionWithNoType.php');

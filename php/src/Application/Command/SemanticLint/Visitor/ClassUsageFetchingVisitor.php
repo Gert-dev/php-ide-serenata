@@ -50,7 +50,7 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
             $this->lastNamespace = (string) $node->name;
         }
 
-        if ($node instanceof Node\Stmt\Use_) {
+        if ($node instanceof Node\Stmt\Use_ || $node instanceof Node\Stmt\GroupUse) {
             return NodeTraverser::DONT_TRAVERSE_CHILDREN;
         }
 
