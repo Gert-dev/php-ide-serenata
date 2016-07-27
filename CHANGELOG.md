@@ -1,3 +1,7 @@
+## 1.1.1
+### Bugs fixed
+* Fixed the various `codeCoverageIgnore` tags from PHPUnit being seen as invalid tags (thanks to [@hultberg](https://github.com/hultberg)).
+
 ## 1.1.0
 ### Features and enhancements
 * Caching performance has been improved.
