@@ -2,6 +2,7 @@
 ### Bugs fixed
 * Fixed grouped use statements never being seen as unused.
 * Fixed grouped use statements being marked as unknown classes.
+* Fixed grouped use statements being ignored for type resolution when indexing.
 
 ## 1.1.1
 ### Bugs fixed

@@ -53,11 +53,17 @@ class UseStatementFetchingVisitor implements NodeVisitor
             $this->namespaces[$this->lastIndex]['endLine'] = $node->getLine() - 1;
 
             ++$this->lastIndex;
-        } elseif ($node instanceof Node\Stmt\Use_) {
+        } elseif ($node instanceof Node\Stmt\Use_ || $node instanceof Node\Stmt\GroupUse) {
+            $prefix = '';
+
+            if ($node instanceof Node\Stmt\GroupUse) {
+                $prefix = ((string) $node->prefix) . '\\';
+            };
+
             foreach ($node->uses as $use) {
                 // NOTE: The namespace may be null here (intended behavior).
                 $this->namespaces[$this->lastIndex]['useStatements'][] = [
-                    'fqcn'  => (string) $use->name,
+                    'fqcn'  => $prefix . ((string) $use->name),
                     'alias' => $use->alias,
                     'line'  => $node->getLine()
                 ];
