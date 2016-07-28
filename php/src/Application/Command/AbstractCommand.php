@@ -3,7 +3,6 @@
 namespace PhpIntegrator\Application\Command;
 
 use ArrayAccess;
-use LogicException;
 use UnexpectedValueException;
 
 use Doctrine\Common\Cache\Cache;
