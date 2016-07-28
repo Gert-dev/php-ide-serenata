@@ -71,6 +71,7 @@ abstract class AbstractCommand implements CommandInterface
     protected $sourceCodeHelper;
 
     /**
+     * @param Parser     $parser
      * @param Cache|null $cache
      */
     public function __construct(Parser $parser, Cache $cache = null)
