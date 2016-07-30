@@ -83,7 +83,7 @@ class SemanticLint extends AbstractCommand
             throw new UnexpectedValueException('A file name is required for this command.');
         }
 
-        $code = $this->getSourceCode(
+        $code = $this->getSourceCodeHelper()->getSourceCode(
             $arguments['file']->value,
             (isset($arguments['stdin']) && $arguments['stdin']->value)
         );

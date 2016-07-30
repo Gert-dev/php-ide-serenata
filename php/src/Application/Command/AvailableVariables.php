@@ -40,7 +40,7 @@ class AvailableVariables extends AbstractCommand
              throw new UnexpectedValueException('An --offset must be supplied into the source code!');
          }
 
-         $code = $this->getSourceCode(
+         $code = $this->getSourceCodeHelper()->getSourceCode(
             isset($arguments['file']) ? $arguments['file']->value : null,
             isset($arguments['stdin']) && $arguments['stdin']->value
         );
@@ -48,7 +48,7 @@ class AvailableVariables extends AbstractCommand
         $offset = $arguments['offset']->value;
 
         if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
-            $offset = $this->getCharacterOffsetFromByteOffset($offset, $code);
+            $offset = $this->getSourceCodeHelper()->getCharacterOffsetFromByteOffset($offset, $code);
         }
 
         $result = $this->getAvailableVariables($code, $offset);

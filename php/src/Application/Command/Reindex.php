@@ -139,7 +139,7 @@ class Reindex extends AbstractCommand
             if (is_dir($path)) {
                 $success = $this->reindexDirectory($path, $showOutput, $doStreamProgress);
             } else {
-                $code = $this->getSourceCode($path, $useStdin);
+                $code = $this->getSourceCodeHelper()->getSourceCode($path, $useStdin);
 
                 $success = $this->reindexFile($path, $code);
             }

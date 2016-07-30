@@ -78,7 +78,7 @@ class DeduceTypes extends AbstractCommand
             throw new UnexpectedValueException('You must specify at least one part using --part!');
         }
 
-        $code = $this->getSourceCode(
+        $code = $this->getSourceCodeHelper()->getSourceCode(
             isset($arguments['file']) ? $arguments['file']->value : null,
             isset($arguments['stdin']) && $arguments['stdin']->value
         );
@@ -86,7 +86,7 @@ class DeduceTypes extends AbstractCommand
         $offset = $arguments['offset']->value;
 
         if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
-            $offset = $this->getCharacterOffsetFromByteOffset($offset, $code);
+            $offset = $this->getSourceCodeHelper()->getCharacterOffsetFromByteOffset($offset, $code);
         }
 
         $result = $this->deduceTypes(
@@ -198,7 +198,7 @@ class DeduceTypes extends AbstractCommand
             // Static class name.
             $propertyAccessNeedsDollarSign = true;
 
-            $line = $this->calculateLineByOffset($code, $offset);
+            $line = $this->getSourceCodeHelper()->calculateLineByOffset($code, $offset);
 
             $types = [$this->getResolveTypeCommand()->resolveType($matches[1], $file, $line)];
         }
@@ -309,7 +309,7 @@ class DeduceTypes extends AbstractCommand
         $variableName = mb_substr($name, 1);
 
         $variableTypeInfoMap = $this->typeQueryingVisitor->getVariableTypeInfoMap();
-        $offsetLine = $this->calculateLineByOffset($code, $offset);
+        $offsetLine = $this->getSourceCodeHelper()->calculateLineByOffset($code, $offset);
 
         return $this->getResolvedTypes($variableTypeInfoMap, $variableName, $file, $offsetLine, $code);
     }
@@ -658,7 +658,7 @@ class DeduceTypes extends AbstractCommand
      */
     protected function getCurrentClassAt($file, $source, $offset)
     {
-        $line = $this->calculateLineByOffset($source, $offset);
+        $line = $this->getSourceCodeHelper()->calculateLineByOffset($source, $offset);
 
         return $this->getCurrentClassAtLine($file, $source, $line);
     }
