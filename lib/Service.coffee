@@ -13,11 +13,6 @@ class Service
     proxy: null
 
     ###*
-     * The parser to use to query the source code.
-    ###
-    parser: null
-
-    ###*
      * The emitter to use to emit indexing events.
     ###
     indexingEventEmitter: null
@@ -26,10 +21,9 @@ class Service
      * Constructor.
      *
      * @param {CachingProxy} proxy
-     * @param {Parser}       parser
      * @param {Emitter}      indexingEventEmitter
     ###
-    constructor: (@proxy, @parser, @indexingEventEmitter) ->
+    constructor: (@proxy, @indexingEventEmitter) ->
 
     ###*
      * Clears the autocompletion cache. Most fetching operations such as fetching constants, autocompletion, fetching

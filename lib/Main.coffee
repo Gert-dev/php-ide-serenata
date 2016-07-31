@@ -26,11 +26,6 @@ module.exports =
     proxy: null
 
     ###*
-     * The parser object.
-    ###
-    parser: null
-
-    ###*
      * Keeps track of files that are being indexed.
     ###
     indexMap: {}
@@ -330,7 +325,6 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
-        Parser                = require './Parser'
         Service               = require './Service'
         AtomConfig            = require './AtomConfig'
         CachingProxy          = require './CachingProxy'
@@ -350,9 +344,8 @@ module.exports =
         @proxy = new CachingProxy(@configuration)
 
         emitter = new Emitter()
-        @parser = new Parser()
 
-        @service = new Service(@proxy, @parser, emitter)
+        @service = new Service(@proxy, emitter)
 
         @registerCommands()
         @registerConfigListeners()
