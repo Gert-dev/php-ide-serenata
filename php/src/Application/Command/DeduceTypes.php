@@ -54,6 +54,11 @@ class DeduceTypes extends AbstractCommand
     protected $docParser;
 
     /**
+     * @var TypeQueryingVisitor
+     */
+    protected $typeQueryingVisitor;
+
+    /**
      * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
@@ -272,11 +277,6 @@ class DeduceTypes extends AbstractCommand
 
         return $types;
     }
-
-    /**
-     * @var TypeQueryingVisitor
-     */
-    protected $typeQueryingVisitor;
 
     /**
      * @param string $code
