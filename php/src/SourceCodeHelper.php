@@ -300,13 +300,11 @@ class SourceCodeHelper
      * @param string $code
      *
      * @return array|null With elements 'callStack' (array), 'argumentIndex', which denotes the argument in the
-     *                    parameter list the position is located at, and bufferPosition which denotes the buffer
-     *                    position the invocation was found at. Returns 'null' if not in a method or function call.
+     *                    parameter list the position is located at, and offset which denotes the byte offset the
+     *                    invocation was found at. Returns 'null' if not in a method or function call.
      */
     public function getInvocationInfoAt($code)
     {
-        // FIXME: Rough translation of the CoffeeScript method.
-
         $scopesOpened = 0;
         $scopesClosed = 0;
         $bracketsOpened = 0;
@@ -383,9 +381,9 @@ class SourceCodeHelper
 
                 $callStack = $this->retrieveSanitizedCallStackAt(substr($code, 0, $i));
 
-                $type = 'function';
-
                 if (!empty($callStack)) {
+                    $type = 'function';
+
                     for ($j = $currentTokenIndex - 2; $j >= 0; --$j) {
                         if (is_array($tokens[$j]) && in_array($tokens[$j][0], [T_WHITESPACE, T_NEW])) {
                             if ($tokens[$j][0] === T_NEW) {
