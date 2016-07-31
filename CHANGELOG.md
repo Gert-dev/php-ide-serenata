@@ -2,6 +2,10 @@
 ### Bugs fixed
 * When retrieving available variables or deducing types, character offsets were not correctly being translated to byte offsets, sometimes resulting in incorrect results.
 
+### Changes for developers
+* `getResultingTypesAt` is now simply a convenience call to `deduceTypes` as its underlying code has been completely moved to PHP.
+* `deduceTypes` gained a new parameter `ignoreLastElement`, which does the same as the identically-named parameter for `getResultingTypesAt` does.
+
 ## 1.1.2
 ### Bugs fixed
 * Fixed grouped use statements never being seen as unused.

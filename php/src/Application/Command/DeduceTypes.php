@@ -63,6 +63,7 @@ class DeduceTypes extends AbstractCommand
         $optionCollection->add('charoffset?', 'If set, the input offset will be treated as a character offset instead of a byte offset.');
         $optionCollection->add('part+', 'A part of the expression as string. Specify this as many times as you have parts.')->isa('string');
         $optionCollection->add('offset:', 'The character byte offset into the code to use for the determination.')->isa('number');
+        $optionCollection->add('ignore-last-element?', 'If set, when determining the parts automatically, the last part of the expression will be ignored (i.e. because it may not be complete).');
     }
 
     /**
@@ -74,8 +75,6 @@ class DeduceTypes extends AbstractCommand
             throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
         } elseif (!isset($arguments['offset'])) {
             throw new UnexpectedValueException('An --offset must be supplied into the source code!');
-        } elseif (!isset($arguments['part'])) {
-            throw new UnexpectedValueException('You must specify at least one part using --part!');
         }
 
         $code = $this->getSourceCodeHelper()->getSourceCode(
@@ -89,10 +88,22 @@ class DeduceTypes extends AbstractCommand
             $offset = $this->getSourceCodeHelper()->getByteOffsetFromCharacterOffset($offset, $code);
         }
 
+        $parts = [];
+
+        if (isset($arguments['part'])) {
+            $parts = $arguments['part']->value;
+        } else {
+            $parts = $this->getSourceCodeHelper()->retrieveSanitizedCallStackAt(substr($code, 0, $offset));
+
+            if (!empty($parts) && isset($arguments['ignore-last-element']) && $arguments['ignore-last-element']) {
+                array_pop($parts);
+            }
+        }
+
         $result = $this->deduceTypes(
            isset($arguments['file']) ? $arguments['file']->value : null,
            $code,
-           $arguments['part']->value,
+           $parts,
            $offset
         );
 

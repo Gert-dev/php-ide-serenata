@@ -119,15 +119,16 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    deduceTypes: (parts, file, source, offset) ->
+    deduceTypes: (parts, file, source, offset, ignoreLastElement) ->
         sourceKey = if source? then md5(source) else null
 
         partsKey = ''
 
-        for part in parts
-            partsKey += part
+        if parts?
+            for part in parts
+                partsKey += part
 
-        return @wrapCachedRequestToParent("deduceTypes-#{partsKey}#{file}-#{sourceKey}-#{offset}", 'deduceTypes', arguments)
+        return @wrapCachedRequestToParent("deduceTypes-#{partsKey}#{file}-#{sourceKey}-#{offset}-#{ignoreLastElement}", 'deduceTypes', arguments)
 
     ###*
      * @inherited

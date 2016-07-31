@@ -353,14 +353,21 @@ class Proxy
     ###*
      * Deduces the resulting types of an expression based on its parts.
      *
-     * @param {Array}       parts  One or more strings that are part of the expression, e.g. ['$this', 'foo()'].
-     * @param {String}      file   The path to the file to examine.
-     * @param {String|null} source The source code to search. May be null if a file is passed instead.
-     * @param {Number}      offset The character offset into the file to examine.
+     * @param {Array|null}  parts             One or more strings that are part of the expression, e.g.
+     *                                        ['$this', 'foo()']. If null, the expression will automatically be deduced
+     *                                        based on the offset.
+     * @param {String}      file              The path to the file to examine.
+     * @param {String|null} source            The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset            The character offset into the file to examine.
+     * @param {bool}        ignoreLastElement Whether to remove the last element or not, this is useful when the user
+     *                                        is still writing code, e.g. "$this->foo()->b" would normally return the
+     *                                        type (class) of 'b', as it is the last element, but as the user is still
+     *                                        writing code, you may instead be interested in the type of 'foo()'
+     *                                       instead.
      *
      * @return {Promise}
     ###
-    deduceTypes: (parts, file, source, offset) ->
+    deduceTypes: (parts, file, source, offset, ignoreLastElement) ->
         if not file?
             throw 'A path to a file must be passed!'
 
@@ -378,8 +385,12 @@ class Proxy
         if source?
             parameters.push('--stdin')
 
-        for part in parts
-            parameters.push('--part=' + part)
+        if ignoreLastElement
+            parameters.push('--ignore-last-element')
+
+        if parts?
+            for part in parts
+                parameters.push('--part=' + part)
 
         return @performRequest(
             parameters,
