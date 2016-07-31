@@ -203,18 +203,9 @@ class SourceCodeHelper
                     // Reached an operator that can never be part of the current statement.
                     $finishedOn = true;
                     break;
-                } elseif ($code[$i] === ':') {
-
-
-                    // FIXME: Can probably replace this with a check for T_DOUBLE_COLON.
-
-
-                    // Only double colons can be part of an expression (for static access), but not single colons,
-                    // which are commonly used in ternary operators.
-                    if ($lastCharacter !== ':' && ($i === 0 || ($i > 0 && $code[$i - 1] !== ':'))) {
-                        $finishedOn = true;
-                        break;
-                    }
+                } elseif ($code[$i] === ':' && $token['type'] !== T_DOUBLE_COLON) {
+                    $finishedOn = true;
+                    break;
                 } elseif (in_array($token['type'], $expressionBoundaryTokens)) {
                     $finishedOn = true;
                     break;
