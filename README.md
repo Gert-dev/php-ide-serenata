@@ -23,11 +23,7 @@ Currently the following is required in order to get the package up and running:
   * **PHP** - To run this package properly, you need at least PHP 5.5. The code you're actually writing can be anything ranging from PHP 5.2 up to (and including) PHP 7.0.
     * **php-sqlite** and SQLite >= 3.7.11 - Required as back end for the indexing database.
   * **PSR-compliant code** - Write code that follows the PSR standards, especially regarding namespacing.
-  * **Documentation** and **type hinting** - Write proper docblocks that follow the draft PSR-5 standard (inspired by phpDocumentor's implementation) or use type hinting as much as possible:
-    * Docblocks with a `@var` tag for properties.
-    * Docblocks with `@param` tags for functions and methods. Parameter type hints will also work.
-    * Docblocks with a `@return` tag for functions and methods. Return types in PHP 7 will also work.
-    * IntellJ-style variable annotations `/** @var MyType $var */` as well as `/** @var $var MyType */` to override automatically deduced types or specify types in cases where it can't be automatically deduced.
+  * **Documentation** and **type hinting** - [See our wiki for more information](https://github.com/Gert-dev/php-integrator-base/wiki/Proper-Documentation-And-Type-Hinting).
 
 Note that folders that aren't readable (no permission) will be silently ignored!
 
