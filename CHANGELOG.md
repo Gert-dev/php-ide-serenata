@@ -1,3 +1,7 @@
+## 1.2.0
+### Bugs fixed
+* When retrieving available variables or deducing types, character offsets were not correctly being translated to byte offsets, sometimes resulting in incorrect results.
+
 ## 1.1.2
 ### Bugs fixed
 * Fixed grouped use statements never being seen as unused.

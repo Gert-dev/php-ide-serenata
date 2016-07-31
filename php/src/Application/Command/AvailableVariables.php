@@ -48,7 +48,7 @@ class AvailableVariables extends AbstractCommand
         $offset = $arguments['offset']->value;
 
         if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
-            $offset = $this->getSourceCodeHelper()->getCharacterOffsetFromByteOffset($offset, $code);
+            $offset = $this->getSourceCodeHelper()->getByteOffsetFromCharacterOffset($offset, $code);
         }
 
         $result = $this->getAvailableVariables($code, $offset);

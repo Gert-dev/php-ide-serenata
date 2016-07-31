@@ -67,6 +67,20 @@ class SourceCodeHelper
     }
 
     /**
+     * Retrieves the byte offset from the specified character offset in the specified string. The result will always be
+     * larger than or equal to the passed in value, depending on the amount of multi-byte characters encountered.
+     *
+     * @param int    $characterOffset
+     * @param string $string
+     *
+     * @return int
+     */
+    public function getByteOffsetFromCharacterOffset($characterOffset, $string)
+    {
+        return strlen(mb_substr($string, 0, $characterOffset));
+    }
+
+    /**
      * Retrieves the start of the expression that ends at the end of the specified source code string.
      *
      * @param string $code
