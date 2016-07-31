@@ -81,7 +81,7 @@ class SourceCodeHelper
     }
 
     /**
-     * Retrieves the start of the expression that ends at the end of the specified source code string.
+     * Retrieves the start of the expression (as byte offset) that ends at the end of the specified source code string.
      *
      * @param string $code
      *
@@ -106,16 +106,16 @@ class SourceCodeHelper
         $token = null;
         $tokens = token_get_all($code);
         $currentTokenIndex = count($tokens);
-        $tokenStartOffset = mb_strlen($code);
+        $tokenStartOffset = strlen($code);
 
         $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
 
-        for ($i = mb_strlen($code) - 1; $i >= 0; --$i) {
+        for ($i = strlen($code) - 1; $i >= 0; --$i) {
             if ($i < $tokenStartOffset) {
                 $token = $tokens[--$currentTokenIndex];
 
                 $tokenString = is_array($token) ? $token[1] : $token;
-                $tokenStartOffset = ($i + 1) - mb_strlen($tokenString);
+                $tokenStartOffset = ($i + 1) - strlen($tokenString);
 
                 $token = [
                     'type' => is_array($token) ? $token[0] : null,
@@ -210,7 +210,7 @@ class SourceCodeHelper
     {
         $boundary = $this->getStartOfExpression($source);
 
-        $expression = mb_substr($source, $boundary);
+        $expression = substr($source, $boundary);
 
         return $this->retrieveSanitizedCallStack($expression);
     }
