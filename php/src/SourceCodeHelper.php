@@ -104,7 +104,7 @@ class SourceCodeHelper
         $startedStaticClassName = false;
 
         $token = null;
-        $tokens = token_get_all($code);
+        $tokens = @token_get_all($code);
         $currentTokenIndex = count($tokens);
         $tokenStartOffset = strlen($code);
 
@@ -315,7 +315,7 @@ class SourceCodeHelper
         $argumentIndex = 0;
 
         $token = null;
-        $tokens = token_get_all($code);
+        $tokens = @token_get_all($code);
         $currentTokenIndex = count($tokens);
         $tokenStartOffset = strlen($code);
 
