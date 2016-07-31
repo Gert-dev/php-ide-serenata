@@ -79,56 +79,39 @@ class SourceCodeHelper
             return 0;
         }
 
-        // TODO: Might be better to start at the end.
-        // TODO: Might be even better than better if we merge this with the loop below.
-
-        $tokens = token_get_all($code);
-
-        $getTokenAtOffset = function ($offset) use ($tokens) {
-            $currentOffset = 0;
-            $tokenString = null;
-
-            foreach ($tokens as $token) {
-                if (is_array($token)) {
-                    $tokenString = $token[1];
-                } elseif (is_string($token)) {
-                    $tokenString = $token;
-                }
-
-                $nextOffset = $currentOffset + mb_strlen($tokenString);
-
-                if ($offset >= $currentOffset && $offset < $nextOffset) {
-                    return [
-                        'type' => isset($token[0]) ? $token[0] : null,
-                        'text' => $tokenString
-                    ];
-                }
-
-                $currentOffset = $nextOffset;
-            }
-
-            // return null;
-            throw new \UnexpectedValueException('Could not find token for the specified offset!');
-        };
-
-        $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
-
         $parenthesesOpened = 0;
         $parenthesesClosed = 0;
         $squareBracketsOpened = 0;
         $squareBracketsClosed = 0;
         $squiggleBracketsOpened = 0;
         $squiggleBracketsClosed = 0;
+
+        $didStartInsideString = null;
         $startedStaticClassName = false;
 
-        $i = mb_strlen($code) - 1;
+        $token = null;
+        $tokens = token_get_all($code);
+        $currentTokenIndex = count($tokens);
+        $tokenStartOffset = mb_strlen($code);
 
-        $token = $getTokenAtOffset($i);
+        $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
 
-        $didStartInsideString = in_array($token['type'], [T_STRING]);
+        for ($i = mb_strlen($code) - 1; $i >= 0; --$i) {
+            if ($i < $tokenStartOffset) {
+                $token = $tokens[--$currentTokenIndex];
 
-        while ($i >= 0) {
-            $token = $getTokenAtOffset($i);
+                $tokenString = is_array($token) ? $token[1] : $token;
+                $tokenStartOffset = ($i + 1) - mb_strlen($tokenString);
+
+                $token = [
+                    'type' => is_array($token) ? $token[0] : null,
+                    'text' => $tokenString
+                ];
+
+                if ($didStartInsideString === null) {
+                    $didStartInsideString = ($token['type'] === T_STRING);
+                }
+            }
 
             if (
                 $token['type'] === T_COMMENT ||
@@ -167,12 +150,13 @@ class SourceCodeHelper
                 ++$squiggleBracketsClosed;
 
                 if ($parenthesesOpened === $parenthesesClosed) {
-                    $nextToken = $getTokenAtOffset($i - 1);
+                    $nextToken = $currentTokenIndex > 0 ? $tokens[$currentTokenIndex - 1] : null;
+                    $nextTokenType = is_array($nextToken) ? $nextToken[0] : null;
 
                     // Subscopes can only exist when e.g. a closure is embedded as an argument to a function call,
                     // in which case they will be inside parentheses. If we find a subscope outside parentheses, it
                     // means we've moved beyond the call stack to e.g. the end of an if statement.
-                    if ($nextToken['type'] !== T_VARIABLE) {
+                    if ($nextTokenType !== T_VARIABLE) {
                         return ++$i;
                     }
                 }
@@ -198,8 +182,6 @@ class SourceCodeHelper
             if ($startedStaticClassName && !in_array($token['type'], [T_DOUBLE_COLON, T_STRING, T_NS_SEPARATOR])) {
                 return ++$i;
             }
-
-            --$i;
         }
 
         return $i;
