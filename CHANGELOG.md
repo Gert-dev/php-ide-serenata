@@ -1,4 +1,7 @@
 ## 1.2.0
+### Features and enhancements
+* The remaining parts of the analyzer that were implemented in CoffeeScript have been moved to PHP. This means the base package is now only reliant on PHP itself for processing. This may positively affect performance, but more importantly allows extracting and using the analyzer in its entirety outside Atom as well (i.e. for other editors or projects).
+
 ### Bugs fixed
 * Retrieving available local variables wasn't always using the most up to date version of the editor's contents.
 * When retrieving available variables or deducing types, character offsets were not correctly being translated to byte offsets, sometimes resulting in incorrect results.
