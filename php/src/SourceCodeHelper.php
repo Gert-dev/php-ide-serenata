@@ -129,7 +129,8 @@ class SourceCodeHelper
 
             if (
                 $token['type'] === T_COMMENT ||
-                $token['type'] === T_DOC_COMMENT || ($didStartInsideString && $token['type'] === T_STRING)
+                $token['type'] === T_DOC_COMMENT ||
+                ($didStartInsideString && $token['type'] === T_STRING)
             ) {
                 // Do nothing, we just keep parsing. (Comments can occur inside call stacks.)
             } elseif ($code[$i] === '(') {
