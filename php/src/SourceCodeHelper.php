@@ -56,8 +56,8 @@ class SourceCodeHelper
      * Retrieves the character offset from the specified byte offset in the specified string. The result will always be
      * smaller than or equal to the passed in value, depending on the amount of multi-byte characters encountered.
      *
-     * @param string $string
      * @param int    $byteOffset
+     * @param string $string
      *
      * @return int
      */
