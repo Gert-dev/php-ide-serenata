@@ -600,4 +600,290 @@ SOURCE;
             $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
         );
     }
+
+    public function testGetInvocationInfoAtWithSingleLineInvocation()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            $this->test(1, 2, 3
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(42, $result['offset']);
+        $this->assertEquals(['$this', 'test'], $result['callStack']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithMultiLineInvocation()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        $this->test(
+            1,
+            2,
+            3
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(34, $result['offset']);
+        $this->assertEquals(['$this', 'test'], $result['callStack']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithMoreComplexNestedArguments1()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        builtin_func(
+            ['test', $this->foo()],
+            function ($a) {
+                // Something here.
+                $this->something();
+            },
+            3
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(35, $result['offset']);
+        $this->assertEquals(['builtin_func'], $result['callStack']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithMoreComplexNestedArguments2()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        builtin_func(/* test */
+            "]",// a comment
+            "}",/*}*/
+            ['test'
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(35, $result['offset']);
+        $this->assertEquals(['builtin_func'], $result['callStack']);
+        $this->assertEquals('function', $result['type']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithMoreComplexNestedArguments3()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        builtin_func(
+            $this->foo(),
+            $array['key'],
+            $array['ke
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(35, $result['offset']);
+        $this->assertEquals(['builtin_func'], $result['callStack']);
+        $this->assertEquals('function', $result['type']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithTrailingCommas()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        builtin_func(
+            foo(),
+            [
+                'Trailing comma',
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(1, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithNestedParantheses()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        builtin_func(
+            foo(),
+            ($a + $b
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(35, $result['offset']);
+        $this->assertEquals(['builtin_func'], $result['callStack']);
+        $this->assertEquals('function', $result['type']);
+        $this->assertEquals(1, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithSqlStringArguments()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        foo("SELECT a.one, a.two, a.three FROM test", second
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(1, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithConstructorCalls1()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        new MyObject(
+            1,
+            2,
+            3
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(35, $result['offset']);
+        $this->assertEquals(['MyObject'], $result['callStack']);
+        $this->assertEquals('instantiation', $result['type']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithConstructorCalls2()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        new static(
+            1,
+            2,
+            3
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(33, $result['offset']);
+        $this->assertEquals(['static'], $result['callStack']);
+        $this->assertEquals('instantiation', $result['type']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtWithConstructorCalls3()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        new self(
+            1,
+            2,
+            3
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(31, $result['offset']);
+        $this->assertEquals(['self'], $result['callStack']);
+        $this->assertEquals('instantiation', $result['type']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
+    public function testGetInvocationInfoAtReturnsNullWhenNotInInvocation1()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        if ($this->test() as $test) {
+            if (true) {
+
+            }
+        }
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertNull($result);
+    }
+
+    public function testGetInvocationInfoAtReturnsNullWhenNotInInvocation2()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        $this->test();
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertNull($result);
+    }
+
+    public function testGetInvocationInfoAtReturnsNullWhenNotInInvocation3()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        function test($a, $b)
+        {
+
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertNull($result);
+    }
+
+    public function testGetInvocationInfoAtReturnsNullWhenNotInInvocation4()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        if (preg_match('/^array\s*\(/', $firstElement) === 1) {
+            $className = 'array';
+        } elseif (
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertNull($result);
+    }
 }

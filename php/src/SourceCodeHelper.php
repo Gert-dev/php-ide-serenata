@@ -293,6 +293,126 @@ class SourceCodeHelper
     }
 
     /**
+     * Retrieves the call stack of the function or method that is being invoked.
+     *
+     * This can be used to fetch information about the function or method call the cursor is in.
+     *
+     * @param string $code
+     *
+     * @return array|null With elements 'callStack' (array), 'argumentIndex', which denotes the argument in the
+     *                    parameter list the position is located at, and bufferPosition which denotes the buffer
+     *                    position the invocation was found at. Returns 'null' if not in a method or function call.
+     */
+    public function getInvocationInfoAt($code)
+    {
+        // FIXME: Rough translation of the CoffeeScript method.
+
+        $scopesOpened = 0;
+        $scopesClosed = 0;
+        $bracketsOpened = 0;
+        $bracketsClosed = 0;
+        $parenthesesOpened = 0;
+        $parenthesesClosed = 0;
+
+        $argumentIndex = 0;
+
+        $token = null;
+        $tokens = token_get_all($code);
+        $currentTokenIndex = count($tokens);
+        $tokenStartOffset = strlen($code);
+
+        $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
+
+        for ($i = strlen($code) - 1; $i >= 0; --$i) {
+            if ($i < $tokenStartOffset) {
+                $token = $tokens[--$currentTokenIndex];
+
+                $tokenString = is_array($token) ? $token[1] : $token;
+                $tokenStartOffset = ($i + 1) - strlen($tokenString);
+
+                $token = [
+                    'type' => is_array($token) ? $token[0] : null,
+                    'text' => $tokenString
+                ];
+            }
+
+            if (in_array($token['type'], [T_COMMENT, T_STRING, T_CONSTANT_ENCAPSED_STRING])) {
+                continue;
+            } elseif ($code[$i] === '}') {
+                ++$scopesClosed;
+            } elseif ($code[$i] === '{') {
+                ++$scopesOpened;
+
+                if ($scopesOpened > $scopesClosed) {
+                    return null; // We reached the start of a block, we can never be in a method call.
+                }
+            } elseif ($code[$i] === ']') {
+                ++$bracketsClosed;
+            } elseif ($code[$i] === '[') {
+                ++$bracketsOpened;
+
+                if ($bracketsOpened > $bracketsClosed) {
+                    // We must have been inside an array argument, reset.
+                    $argumentIndex = 0;
+                    --$bracketsOpened;
+                }
+            } elseif ($code[$i] === ')') {
+                ++$parenthesesClosed;
+            } elseif ($code[$i] === '(') {
+                ++$parenthesesOpened;
+            } elseif ($scopesOpened === $scopesClosed) {
+                if ($code[$i] === ';') {
+                    return null; // We've moved too far and reached another expression, stop here.
+                } elseif ($code[$i] === ',') {
+                    if ($parenthesesOpened === ($parenthesesClosed + 1)) {
+                        // Pretend the parentheses were closed, the user is probably inside an argument that
+                        // contains parentheses.
+                        ++$parenthesesClosed;
+                    }
+
+                    if ($bracketsOpened >= $bracketsClosed && $parenthesesOpened === $parenthesesClosed) {
+                        ++$argumentIndex;
+                    }
+                }
+            }
+
+            if ($scopesOpened === $scopesClosed && $parenthesesOpened === ($parenthesesClosed + 1)) {
+                if (in_array($token['type'], $expressionBoundaryTokens)) {
+                    break;
+                }
+
+                $callStack = $this->retrieveSanitizedCallStackAt(substr($code, 0, $i));
+
+                $type = 'function';
+
+                if (!empty($callStack)) {
+                    for ($j = $currentTokenIndex - 2; $j >= 0; --$j) {
+                        if (is_array($tokens[$j]) && in_array($tokens[$j][0], [T_WHITESPACE, T_NEW])) {
+                            if ($tokens[$j][0] === T_NEW) {
+                                $type = 'instantiation';
+                                break;
+                            }
+
+                            continue;
+                        }
+
+                        break;
+                    }
+
+                    return [
+                        'callStack'      => $callStack,
+                        'type'           => $type,
+                        'argumentIndex'  => $argumentIndex,
+                        'offset'         => $i
+                    ];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @see https://secure.php.net/manual/en/tokens.php
      *
      * @return int[]
