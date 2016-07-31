@@ -1,6 +1,7 @@
 ## 1.2.0
 ### Features and enhancements
 * The remaining parts of the analyzer that were implemented in CoffeeScript have been moved to PHP. This means the base package is now only reliant on PHP itself for processing. This may positively affect performance, but more importantly allows extracting and using the analyzer in its entirety outside Atom as well (i.e. for other editors or projects).
+* For those interested, the wiki now [has an article](https://github.com/Gert-dev/php-integrator-base/wiki/Proper-Documentation-And-Type-Hinting) with information about how analysis of your code happens regarding docblocks and type hinting. Reading it may help you improve your code as well as code assistance from this package.
 
 ### Bugs fixed
 * Retrieving available local variables wasn't always using the most up to date version of the editor's contents.
