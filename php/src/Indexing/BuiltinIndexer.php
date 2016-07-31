@@ -115,17 +115,18 @@ class BuiltinIndexer
             // NOTE: Be very careful if you want to pass back the value, there are also escaped paths, newlines
             // (PHP_EOL), etc. in there.
             foreach ($constantList as $name => $value) {
-                $this->indexConstant($name);
+                $this->indexConstant($name, $value);
             }
         }
     }
 
     /**
      * @param string $name
+     * @param mixed  $value
      *
      * @return int
      */
-    protected function indexConstant($name)
+    protected function indexConstant($name, $value)
     {
         return $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'               => $name,
@@ -133,6 +134,7 @@ class BuiltinIndexer
             'file_id'            => null,
             'start_line'         => null,
             'end_line'           => null,
+            'default_value'      => json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION),
             'is_builtin'         => 1,
             'is_deprecated'      => 0,
             'has_docblock'       => 0,
@@ -390,7 +392,7 @@ class BuiltinIndexer
         }
 
         foreach ($element->getConstants() as $constantName => $constantValue) {
-            $this->indexClassConstant($constantName, $structureId);
+            $this->indexClassConstant($constantName, $constantValue, $structureId);
         }
     }
 
@@ -454,11 +456,22 @@ class BuiltinIndexer
 
         $accessModifierMap = $this->getAccessModifierMap();
 
+        $defaultProperties = $property->getDeclaringClass()->getDefaultProperties();
+
+        $name = $property->getName();
+
+        $defaultValue = isset($defaultProperties[$name]) ? $defaultProperties[$name] : null;
+
+        if ($defaultValue === '') {
+            $defaultValue = "''";
+        }
+
         $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
-            'name'               => $property->getName(),
+            'name'               => $name,
             'file_id'            => null,
             'start_line'         => null,
             'end_line'           => null,
+            'default_value'      => $defaultValue,
             'is_deprecated'      => 0,
             'is_magic'           => 0,
             'is_static'          => $property->isStatic(),
@@ -474,11 +487,12 @@ class BuiltinIndexer
 
     /**
      * @param string $name
+     * @param mixed  $value
      * @param int    $structureId
      */
-    protected function indexClassConstant($name, $structureId)
+    protected function indexClassConstant($name, $value, $structureId)
     {
-        $constantId = $this->indexConstant($name);
+        $constantId = $this->indexConstant($name, $value);
 
         $this->storage->update(IndexStorageItemEnum::CONSTANTS, $constantId, [
             'structure_id' => $structureId

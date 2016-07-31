@@ -252,6 +252,8 @@ CREATE TABLE properties(
     start_line            integer unsigned,
     end_line              integer unsigned,
 
+    default_value         varchar(255),
+
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,
     is_magic              tinyint(1) NOT NULL DEFAULT 0,
     is_static             tinyint(1) NOT NULL DEFAULT 0,
@@ -288,6 +290,8 @@ CREATE TABLE constants(
     file_id               integer,
     start_line            integer unsigned,
     end_line              integer unsigned,
+
+    default_value         varchar(255) NOT NULL,
 
     is_builtin            tinyint(1) NOT NULL DEFAULT 0,
     is_deprecated         tinyint(1) NOT NULL DEFAULT 0,

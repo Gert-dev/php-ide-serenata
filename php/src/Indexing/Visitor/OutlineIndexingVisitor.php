@@ -227,7 +227,15 @@ class OutlineIndexingVisitor extends NameResolver
                 'isPrivate'       => $node->isPrivate(),
                 'isStatic'        => $node->isStatic(),
                 'isProtected'     => $node->isProtected(),
-                'docComment'      => $node->getDocComment() ? $node->getDocComment()->getText() : null
+                'docComment'      => $node->getDocComment() ? $node->getDocComment()->getText() : null,
+
+                'defaultValue' => $property->default ?
+                    substr(
+                        $this->code,
+                        $property->default->getAttribute('startFilePos'),
+                        $property->default->getAttribute('endFilePos') - $property->default->getAttribute('startFilePos') + 1
+                    ) :
+                    null
             ];
         }
     }
@@ -354,7 +362,13 @@ class OutlineIndexingVisitor extends NameResolver
                 'endLine'        => $const->getAttribute('endLine'),
                 'startPosName'   => $const->getAttribute('startFilePos') ? $const->getAttribute('startFilePos') : null,
                 'endPosName'     => $const->getAttribute('startFilePos') ? ($const->getAttribute('startFilePos') + mb_strlen($const->name)) : null,
-                'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null
+                'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null,
+
+                'defaultValue' => substr(
+                    $this->code,
+                    $const->value->getAttribute('startFilePos'),
+                    $const->value->getAttribute('endFilePos') - $const->value->getAttribute('startFilePos') + 1
+                )
             ];
         }
     }
@@ -369,12 +383,18 @@ class OutlineIndexingVisitor extends NameResolver
         foreach ($node->consts as $const) {
             $this->globalConstants[$const->name] = [
                 'name'           => $const->name,
-                'fqcn'          => isset($const->namespacedName) ? $const->namespacedName->toString() : $const->name,
+                'fqcn'           => isset($const->namespacedName) ? $const->namespacedName->toString() : $const->name,
                 'startLine'      => $const->getLine(),
                 'endLine'        => $const->getAttribute('endLine'),
                 'startPosName'   => $const->getAttribute('startFilePos') ? $const->getAttribute('startFilePos') : null,
                 'endPosName'     => $const->getAttribute('endFilePos') ? $const->getAttribute('endFilePos') : null,
-                'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null
+                'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null,
+
+                'defaultValue' => substr(
+                    $this->code,
+                    $const->value->getAttribute('startFilePos'),
+                    $const->value->getAttribute('endFilePos') - $const->value->getAttribute('startFilePos') + 1
+                )
             ];
         }
     }

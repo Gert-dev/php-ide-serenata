@@ -11,5 +11,5 @@ class TestClass
      *
      * @var MyType|string
      */
-    protected $testProperty;
+    protected $testProperty = 'test';
 }

@@ -710,6 +710,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
             'name'               => $rawInfo['name'],
             'startLine'          => (int) $rawInfo['start_line'],
             'endLine'            => (int) $rawInfo['end_line'],
+            'defaultValue'       => $rawInfo['default_value'],
             'isMagic'            => !!$rawInfo['is_magic'],
             'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
             'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
@@ -744,6 +745,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
             'isBuiltin'         => !!$rawInfo['is_builtin'],
             'startLine'         => (int) $rawInfo['start_line'],
             'endLine'           => (int) $rawInfo['end_line'],
+            'defaultValue'      => $rawInfo['default_value'],
             'filename'          => $rawInfo['path'],
 
             'isPublic'          => true,
