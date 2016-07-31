@@ -321,7 +321,7 @@ class Proxy
         if file?
             parameter = '--file=' + file
 
-        else
+        if source?
             parameter = '--stdin'
 
         parameters = [

@@ -1,5 +1,6 @@
 ## 1.2.0
 ### Bugs fixed
+* Retrieving available local variables wasn't always using the most up to date version of the editor's contents.
 * When retrieving available variables or deducing types, character offsets were not correctly being translated to byte offsets, sometimes resulting in incorrect results.
 
 ### Changes for developers
