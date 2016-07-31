@@ -114,7 +114,6 @@ class SourceCodeHelper
             throw new \UnexpectedValueException('Could not find token for the specified offset!');
         };
 
-        // See also https://secure.php.net/manual/en/tokens.php
         $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
 
         $finishedOn = null;
@@ -351,6 +350,8 @@ class SourceCodeHelper
     }
 
     /**
+     * @see https://secure.php.net/manual/en/tokens.php
+     *
      * @return int[]
      */
     protected function getExpressionBoundaryTokens()
