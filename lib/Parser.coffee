@@ -261,9 +261,6 @@ class Parser
      * @param {TextEditor} editor
      * @param {Point}      bufferPosition
      *
-     * @example "$this->test(1, function () {},| 2);" (where the vertical bar denotes the cursor position) will yield
-     *          ['$this', 'test'].
-     *
      * @return {Object|null} With elements 'callStack' (array), 'argumentIndex', which denotes the argument in the
      *                       parameter list the position is located at, and bufferPosition which denotes the buffer
      *                       position the invocation was found at. Returns 'null' if not in a method or function call.
