@@ -208,11 +208,9 @@ class SourceCodeHelper
      */
     protected function retrieveSanitizedCallStack($text)
     {
-        // FIXME: Rough translation of CoffeeScript method.
-
         $text = trim($text);
-        $text = preg_replace('/\/\/.*\n/', '', $text);              // Remove singe line comments.
-        $text = preg_replace('/\/\*(.|\n)*?\*\//', '', $text);      // Remove multi-line comments.
+        $text = preg_replace('/\/\/.*\n/', '', $text);         // Remove singe line comments.
+        $text = preg_replace('/\/\*(.|\n)*?\*\//', '', $text); // Remove multi-line comments.
 
         // The start of the call stack may be wrapped in parentheses, e.g. ""(new Foo())->test", unwrap them. Note that
         // "($this)->" is invalid (at least in PHP 5.6).
@@ -227,15 +225,13 @@ class SourceCodeHelper
         // Remove content inside parantheses (including nested parantheses).
         $text = $this->stripPairContent($text, '(', ')');
 
-        if (!$text) {
-            return [];
-        }
-
         $newElements = [];
 
-        foreach (explode('->', $text) as $part) {
-            foreach (explode('::', $part) as $subPart) {
-                $newElements[] = trim($subPart);
+        if ($text) {
+            foreach (explode('->', $text) as $part) {
+                foreach (explode('::', $part) as $subPart) {
+                    $newElements[] = trim($subPart);
+                }
             }
         }
 
@@ -251,14 +247,12 @@ class SourceCodeHelper
      */
     protected function stripPairContent($text, $openCharacter, $closeCharacter)
     {
-        // FIXME: Rough translation of CoffeeScript method.
-
-        $i = 0;
         $openCount = 0;
         $closeCount = 0;
         $startIndex = -1;
+        $length = mb_strlen($text);
 
-        while ($i < mb_strlen($text)) {
+        for ($i = 0; $i < $length; ++$i) {
             if ($text[$i] === $openCharacter) {
                 ++$openCount;
 
@@ -270,16 +264,15 @@ class SourceCodeHelper
 
                 if ($closeCount === $openCount) {
                     $originalLength = mb_strlen($text);
-                    $text = mb_substr($text, 0, $startIndex + 1) . mb_substr($text, $i, $originalLength);
+                    $text = mb_substr($text, 0, $startIndex + 1) . mb_substr($text, $i);
 
-                    $i -= ($originalLength - mb_strlen($text));
+                    $length = mb_strlen($text);
+                    $i -= ($originalLength - $length);
 
                     $openCount = 0;
                     $closeCount = 0;
                 }
             }
-
-            ++$i;
         }
 
         return $text;
