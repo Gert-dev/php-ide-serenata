@@ -133,6 +133,14 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    getInvocationInfo: (file, source, offset) ->
+        sourceKey = if source? then md5(source) else null
+
+        return @wrapCachedRequestToParent("getInvocationInfo-#{file}-#{sourceKey}-#{offset}", 'getInvocationInfo', arguments)
+
+    ###*
+     * @inherited
+    ###
     reindex: (path, source, progressStreamCallback) ->
         return super(path, source, progressStreamCallback).then (output) =>
             @clearCache()

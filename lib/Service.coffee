@@ -170,6 +170,20 @@ class Service
         return @proxy.deduceTypes(parts, file, source, offset, ignoreLastElement)
 
     ###*
+     * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
+     * used to fetch information about the function or method call the cursor is in.
+     *
+     * @param {String|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
+     *
+     * @return {Promise} With elements 'callStack' (array) as well as 'argumentIndex' which denotes the argument in the
+     *                   parameter list the position is located at. Returns 'null' if not in a method or function call.
+    ###
+    getInvocationInfo: (file, source, offset) ->
+        return @proxy.getInvocationInfo(file, source, offset)
+
+    ###*
      * Convenience alias for {@see deduceTypes}.
      *
      * @param {TextEditor} editor
@@ -347,10 +361,11 @@ class Service
      *          ['$this', 'test'].
     ###
     getInvocationInfoAt: (editor, bufferPosition) ->
-        return new Promise (resolve, reject) =>
-            result = @parser.getInvocationInfoAt(editor, bufferPosition)
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
-            resolve(result)
+        bufferText = editor.getBuffer().getText()
+
+        return @getInvocationInfo(editor.getPath(), bufferText, offset)
 
     ###*
      * Creates a popover with the specified constructor arguments.

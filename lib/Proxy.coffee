@@ -399,6 +399,36 @@ class Proxy
         )
 
     ###*
+     * Fetches invocation information of a method or function call.
+     *
+     * @param {String|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
+     *
+     * @return {Promise}
+    ###
+    getInvocationInfo: (file, source, offset) ->
+        if not file? and not source?
+            throw 'Either a path to a file or source code must be passed!'
+
+        if file?
+            parameter = '--file=' + file
+
+        if source?
+            parameter = '--stdin'
+
+        parameters = [
+            @projectName,
+            '--invocation-info',
+            '--database=' + @getIndexDatabasePath(),
+            parameter,
+            '--offset=' + offset,
+            '--charoffset'
+        ]
+
+        return @performRequest(parameters, null, source)
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {String|Array} path                   The full path to the file  or folder to refresh. Alternatively,

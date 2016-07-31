@@ -63,7 +63,8 @@ class Application
             '--localize-type'       => 'LocalizeType',
             '--semantic-lint'       => 'SemanticLint',
             '--available-variables' => 'AvailableVariables',
-            '--deduce-types'        => 'DeduceTypes'
+            '--deduce-types'        => 'DeduceTypes',
+            '--invocation-info'     => 'InvocationInfo'
         ];
 
         if (isset($commands[$command])) {
