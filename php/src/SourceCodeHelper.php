@@ -80,7 +80,6 @@ class SourceCodeHelper
         }
 
         // FIXME: Rough translation of CoffeeScript method.
-        // FIXME: Some tokens such as spaceship token might not exist in older PHP versions.
 
         // TODO: Might be better to start at the end.
         // TODO: Might be even better than better if we merge this with the loop below.
@@ -115,20 +114,8 @@ class SourceCodeHelper
             throw new \UnexpectedValueException('Could not find token for the specified offset!');
         };
 
-        $expressionBoundaryTokens = [
-            T_ABSTRACT, T_AND_EQUAL, T_AS, T_BOOLEAN_AND, T_BOOLEAN_OR, T_BREAK, T_CALLABLE, T_CASE, T_CATCH,
-            T_CLASS, T_CLONE, T_CLOSE_TAG, T_CONCAT_EQUAL, T_CONST, T_CONTINUE, T_DEC, T_DECLARE, T_DEFAULT,
-            T_DIV_EQUAL, T_DO, T_DOUBLE_ARROW, T_ECHO, T_ELLIPSIS, T_ELSE, T_ELSEIF, T_ENDDECLARE, T_ENDFOR,
-            T_ENDFOREACH, T_ENDIF, T_ENDSWITCH, T_ENDWHILE, T_END_HEREDOC, T_EXIT, T_EXTENDS, T_FINAL, T_FINALLY,
-            T_FOR, T_FOREACH, T_FUNCTION, T_GLOBAL, T_GOTO, T_IF, T_IMPLEMENTS, T_INC, T_INCLUDE,
-            T_INCLUDE_ONCE, T_INSTANCEOF, T_INSTEADOF, T_INTERFACE, T_IS_EQUAL, T_IS_GREATER_OR_EQUAL,
-            T_IS_IDENTICAL, T_IS_NOT_EQUAL, T_IS_NOT_IDENTICAL, T_IS_SMALLER_OR_EQUAL, T_SPACESHIP,
-            T_LOGICAL_AND, T_LOGICAL_OR, T_LOGICAL_XOR, T_MINUS_EQUAL, T_MOD_EQUAL, T_MUL_EQUAL, T_NAMESPACE,
-            T_NEW, T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_OR_EQUAL, T_PLUS_EQUAL, T_POW, T_POW_EQUAL, T_PRINT,
-            T_PRIVATE, T_PUBLIC, T_PROTECTED, T_REQUIRE, T_REQUIRE_ONCE, T_RETURN, T_SL, T_SL_EQUAL, T_SR,
-            T_SR_EQUAL, T_START_HEREDOC, T_SWITCH, T_THROW, T_TRAIT, T_TRY, T_USE, T_VAR, T_WHILE, T_XOR_EQUAL,
-            T_YIELD
-        ];
+        // See also https://secure.php.net/manual/en/tokens.php
+        $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
 
         $finishedOn = null;
         $parenthesesOpened = 0;
@@ -361,5 +348,53 @@ class SourceCodeHelper
         }
 
         return $text;
+    }
+
+    /**
+     * @return int[]
+     */
+    protected function getExpressionBoundaryTokens()
+    {
+        $expressionBoundaryTokens = [
+            T_ABSTRACT, T_AND_EQUAL, T_AS, T_BOOLEAN_AND, T_BOOLEAN_OR, T_BREAK, T_CALLABLE, T_CASE, T_CATCH, T_CLASS,
+            T_CLONE, T_CLOSE_TAG, T_CONCAT_EQUAL, T_CONST, T_CONTINUE, T_DEC, T_DECLARE, T_DEFAULT, T_DIV_EQUAL, T_DO,
+            T_DOUBLE_ARROW, T_ECHO, T_ELSE, T_ELSEIF, T_ENDDECLARE, T_ENDFOR, T_ENDFOREACH, T_ENDIF, T_ENDSWITCH,
+            T_ENDWHILE, T_END_HEREDOC, T_EXIT, T_EXTENDS, T_FINAL, T_FOR, T_FOREACH, T_FUNCTION, T_GLOBAL, T_GOTO, T_IF,
+            T_IMPLEMENTS, T_INC, T_INCLUDE, T_INCLUDE_ONCE, T_INSTANCEOF, T_INSTEADOF, T_INTERFACE, T_IS_EQUAL,
+            T_IS_GREATER_OR_EQUAL, T_IS_IDENTICAL, T_IS_NOT_EQUAL, T_IS_NOT_IDENTICAL, T_IS_SMALLER_OR_EQUAL,
+            T_LOGICAL_AND, T_LOGICAL_OR, T_LOGICAL_XOR, T_MINUS_EQUAL, T_MOD_EQUAL, T_MUL_EQUAL, T_NAMESPACE, T_NEW,
+            T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_OR_EQUAL, T_PLUS_EQUAL, T_PRINT, T_PRIVATE, T_PUBLIC, T_PROTECTED,
+            T_REQUIRE, T_REQUIRE_ONCE, T_RETURN, T_SL, T_SL_EQUAL, T_SR, T_SR_EQUAL, T_START_HEREDOC, T_SWITCH,
+            T_THROW, T_TRAIT, T_TRY, T_USE, T_VAR, T_WHILE, T_XOR_EQUAL
+        ];
+
+        // PHP >= 5.5
+        if (defined('T_FINALLY')) {
+            $expressionBoundaryTokens[] = T_FINALLY;
+        }
+
+        if (defined('T_YIELD')) {
+            $expressionBoundaryTokens[] = T_YIELD;
+        }
+
+        // PHP >= 5.6
+        if (defined('T_ELLIPSIS')) {
+            $expressionBoundaryTokens[] = T_ELLIPSIS;
+        }
+
+        if (defined('T_POW')) {
+            $expressionBoundaryTokens[] = T_POW;
+        }
+
+        if (defined('T_POW_EQUAL')) {
+            $expressionBoundaryTokens[] = T_POW_EQUAL;
+        }
+
+        // PHP >= 7.0
+        if (defined('T_SPACESHIP')) {
+            $expressionBoundaryTokens[] = T_SPACESHIP;
+        }
+
+        return $expressionBoundaryTokens;
     }
 }
