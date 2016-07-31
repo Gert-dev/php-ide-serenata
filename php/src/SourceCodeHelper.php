@@ -79,11 +79,8 @@ class SourceCodeHelper
             return 0;
         }
 
-        // FIXME: Rough translation of CoffeeScript method.
-
         // TODO: Might be better to start at the end.
         // TODO: Might be even better than better if we merge this with the loop below.
-
 
         $tokens = token_get_all($code);
 
@@ -116,16 +113,12 @@ class SourceCodeHelper
 
         $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
 
-        $finishedOn = null;
         $parenthesesOpened = 0;
         $parenthesesClosed = 0;
         $squareBracketsOpened = 0;
         $squareBracketsClosed = 0;
         $squiggleBracketsOpened = 0;
         $squiggleBracketsClosed = 0;
-
-        $lastCharacter = null;
-        $startedKeyword = false;
         $startedStaticClassName = false;
 
         $i = mb_strlen($code) - 1;
@@ -148,8 +141,7 @@ class SourceCodeHelper
                 // Ticket #164 - We're walking backwards, if we find an opening paranthesis that hasn't been closed
                 // anywhere, we know we must stop.
                 if ($parenthesesOpened > $parenthesesClosed) {
-                    $finishedOn = true;
-                    break;
+                    return ++$i;
                 }
             } elseif ($code[$i] === ')') {
                 ++$parenthesesClosed;
@@ -160,8 +152,7 @@ class SourceCodeHelper
 
                 // Same as above.
                 if ($squareBracketsOpened > $squareBracketsClosed) {
-                    $finishedOn = true;
-                    break;
+                    return ++$i;
                 }
             } elseif ($code[$i] === ']') {
                 ++$squareBracketsClosed;
@@ -170,8 +161,7 @@ class SourceCodeHelper
 
                 // Same as above.
                 if ($squiggleBracketsOpened > $squiggleBracketsClosed) {
-                    $finishedOn = true;
-                    break;
+                    return ++$i;
                 }
             } elseif ($code[$i] === '}') {
                 ++$squiggleBracketsClosed;
@@ -183,9 +173,7 @@ class SourceCodeHelper
                     // in which case they will be inside parentheses. If we find a subscope outside parentheses, it
                     // means we've moved beyond the call stack to e.g. the end of an if statement.
                     if ($nextToken['type'] !== T_VARIABLE) {
-                        ++$i;
-                        $finishedOn = true;
-                        break;
+                        return ++$i;
                     }
                 }
             } elseif (
@@ -194,49 +182,24 @@ class SourceCodeHelper
                 $squiggleBracketsOpened === $squiggleBracketsClosed
             ) {
                 // NOTE: We may have entered a closure.
-
-                // Variable name.
-                if ($code[$i] === '$') {
-                    // NOTE: We don't break because dollar signs can be taken up in expressions such as static::$foo.
-                    // $finishedOn = false;
-                } elseif ($code[$i] === ',' || $code[$i] === '.' || $code[$i] === '?' || $code[$i] === ';') {
-                    // Reached an operator that can never be part of the current statement.
-                    $finishedOn = true;
-                    break;
-                } elseif ($code[$i] === ':' && $token['type'] !== T_DOUBLE_COLON) {
-                    $finishedOn = true;
-                    break;
-                } elseif (in_array($token['type'], $expressionBoundaryTokens)) {
-                    $finishedOn = true;
-                    break;
+                if (
+                    in_array($code[$i], ['.', ',', '?', ';'], true) ||
+                    in_array($token['type'], $expressionBoundaryTokens) ||
+                    ($code[$i] === ':' && $token['type'] !== T_DOUBLE_COLON)
+                ) {
+                    return ++$i;
                 } elseif ($token['type'] === T_DOUBLE_COLON) {
                     // For static class names and things like the self and parent keywords, we won't know when to stop.
                     // These always appear the start of the call stack, so we know we can stop if we find them.
                     $startedStaticClassName = true;
-                } /*elseif (mb_strpos($scopeDescriptor, '.storage.type') !== false) {
-                    $startedKeyword = true;
-                }*/
+                }
             }
 
             if ($startedStaticClassName && !in_array($token['type'], [T_DOUBLE_COLON, T_STRING, T_NS_SEPARATOR])) {
-                $finishedOn = true;
-                break;
-            } /*elseif ($startedKeyword && mb_strpos($scopeDescriptor, '.storage.type') === false) {
-                $finishedOn = true;
-                break;
-            }*/
-
-            $lastCharacter = $code[$i];
-
-            if ($finishedOn !== null) {
-                break;
+                return ++$i;
             }
 
             --$i;
-        }
-
-        if ($finishedOn) {
-            ++$i;
         }
 
         return $i;
