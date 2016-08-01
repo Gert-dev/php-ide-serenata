@@ -601,6 +601,24 @@ SOURCE;
         );
     }
 
+    public function testRetrieveSanitizedCallStackAtSanitizesStaticCallWithStaticKeyword()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            static::doSome
+SOURCE;
+
+        $expectedResult = ['static', 'doSome'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
     public function testGetInvocationInfoAtWithSingleLineInvocation()
     {
         $sourceCodeHelper = new SourceCodeHelper();

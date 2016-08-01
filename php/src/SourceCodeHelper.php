@@ -194,7 +194,7 @@ class SourceCodeHelper
                 }
             }
 
-            if ($startedStaticClassName && !in_array($token['type'], [T_DOUBLE_COLON, T_STRING, T_NS_SEPARATOR])) {
+            if ($startedStaticClassName && !in_array($token['type'], [T_DOUBLE_COLON, T_STRING, T_NS_SEPARATOR, T_STATIC])) {
                 return ++$i;
             }
         }
