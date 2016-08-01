@@ -110,6 +110,11 @@ class SourceCodeHelper
 
         $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
 
+        // Characters that include operators that are, for some reason, not token types...
+        $expressionBoundaryCharacters = [
+            '.', ',', '?', ';', '=', '+', '-', '*', '/', '<', '>', '%', '|', '&', '^', '~', '!', '@'
+        ];
+
         for ($i = strlen($code) - 1; $i >= 0; --$i) {
             if ($i < $tokenStartOffset) {
                 $token = $tokens[--$currentTokenIndex];
@@ -182,8 +187,8 @@ class SourceCodeHelper
             ) {
                 // NOTE: We may have entered a closure.
                 if (
-                    in_array($code[$i], ['.', ',', '?', ';', '='], true) ||
                     in_array($token['type'], $expressionBoundaryTokens) ||
+                    (in_array($code[$i], $expressionBoundaryCharacters, true) && $token['type'] === null) ||
                     ($code[$i] === ':' && $token['type'] !== T_DOUBLE_COLON)
                 ) {
                     return ++$i;

@@ -637,6 +637,240 @@ SOURCE;
         );
     }
 
+    public function testRetrieveSanitizedCallStackAtStopsAtMultiplicationOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 * $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtDivisionOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 / $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtPlusOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 + $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtModulusOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 % $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtMinusOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 - $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtBitwisoOrOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 | $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtBitwiseAndOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 & $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtBitwiseXorOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 ^ $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtBitwiseNotOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 ~ $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtBooleanLessOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 < $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtBooleanGreaterOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            5 < $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtBooleanNotOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            !$this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
+    public function testRetrieveSanitizedCallStackAtStopsAtSilencingOperator()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            @$this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
     public function testGetInvocationInfoAtWithSingleLineInvocation()
     {
         $sourceCodeHelper = new SourceCodeHelper();
