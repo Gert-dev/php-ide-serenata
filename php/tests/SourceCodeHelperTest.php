@@ -1026,7 +1026,7 @@ SOURCE;
         $this->assertEquals(1, $result['argumentIndex']);
     }
 
-    public function testGetInvocationInfoAtWithConstructorCalls1()
+    public function testGetInvocationInfoAtWithConstructorCallsWithNormalClassName()
     {
         $sourceCodeHelper = new SourceCodeHelper();
 
