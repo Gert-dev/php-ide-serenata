@@ -182,7 +182,7 @@ class SourceCodeHelper
             ) {
                 // NOTE: We may have entered a closure.
                 if (
-                    in_array($code[$i], ['.', ',', '?', ';'], true) ||
+                    in_array($code[$i], ['.', ',', '?', ';', '='], true) ||
                     in_array($token['type'], $expressionBoundaryTokens) ||
                     ($code[$i] === ':' && $token['type'] !== T_DOUBLE_COLON)
                 ) {

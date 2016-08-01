@@ -619,6 +619,24 @@ SOURCE;
         );
     }
 
+    public function testRetrieveSanitizedCallStackAtStopsAtAssignmentSymbol()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            $test = $this->one
+SOURCE;
+
+        $expectedResult = ['$this', 'one'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
     public function testGetInvocationInfoAtWithSingleLineInvocation()
     {
         $sourceCodeHelper = new SourceCodeHelper();
