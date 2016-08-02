@@ -246,7 +246,11 @@ class ProviderCachingProxy implements ProviderInterface
      */
     protected function synchronized($callback)
     {
-        $handle = fopen($this->getLockFile(), "w");
+        $lockFileName = $this->getLockFileName();
+
+        $this->ensurePathExists(dirname($lockFileName));
+
+        $handle = fopen($lockFileName, "w");
         flock($handle, LOCK_EX);
 
         $result = $callback();
@@ -260,9 +264,17 @@ class ProviderCachingProxy implements ProviderInterface
     /**
      * @return string
      */
-    protected function getLockFile()
+    protected function getLockFileName()
     {
         return sys_get_temp_dir() . '/php-integrator-base/accessing_shared_cache.lock';
+    }
+
+    /**
+     * @param string $path
+     */
+    protected function ensurePathExists($path)
+    {
+        @mkdir($path, 0777, true);
     }
 
     /**
