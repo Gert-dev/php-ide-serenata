@@ -108,13 +108,15 @@ class Application
     protected function getFilesystemCache($project)
     {
         if (!$this->filesystemCache instanceof FilesystemCache) {
-            $this->filesystemCache = new FilesystemCache(
-                sys_get_temp_dir() .
+            $cachePath = sys_get_temp_dir() .
                 '/php-integrator-base/' .
                 $project . '/' .
                 Application\Command\AbstractCommand::DATABASE_VERSION .
-                '/'
-            );
+                '/';
+
+            @mkdir($cachePath, 0777, true);
+
+            $this->filesystemCache = new FilesystemCache($cachePath);
         }
 
         return $this->filesystemCache;
