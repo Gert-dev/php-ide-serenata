@@ -37,6 +37,11 @@ class BuiltinIndexer
     protected $loggingStream;
 
     /**
+     * @var array
+     */
+    protected $documentationData;
+
+    /**
      * @param StorageInterface $storage
      */
     public function __construct(StorageInterface $storage)
@@ -199,7 +204,7 @@ class BuiltinIndexer
             return;
         }
 
-        $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, [
+        $functionIndexData = [
             'name'                    => $function->getName(),
             'fqcn'                    => null,
             'file_id'                 => null,
@@ -219,7 +224,14 @@ class BuiltinIndexer
             'throws_serialized'       => serialize([]),
             'parameters_serialized'   => serialize([]),
             'return_types_serialized' => serialize($returnTypes)
-        ]);
+        ];
+
+        $functionIndexData = array_merge(
+            $functionIndexData,
+            $this->getFunctionLikeDataFromDocumentation($function)
+        );
+
+        $functionId = $this->storage->insert(IndexStorageItemEnum::FUNCTIONS, $functionIndexData);
 
         $parameters = [];
 
@@ -282,6 +294,58 @@ class BuiltinIndexer
         ]);
 
         return $functionId;
+    }
+
+    /**
+     * Reflection only provides limited information about functions and methods as PHP does not internally use PHP's
+     * type hinting and its docblocks. The actual documentation on php.net, however, much better reflects the types
+     * and descriptions. Complete the data we receive from reflection with data from the documentation.
+     *
+     * @param ReflectionFunctionAbstract $function
+     */
+    protected function getFunctionLikeDataFromDocumentation(ReflectionFunctionAbstract $function)
+    {
+        $documentationName = $function->getName();
+
+        if ($function instanceof ReflectionMethod) {
+            $documentationName = $function->getDeclaringClass()->getName() . '::' . $documentationName;
+        }
+
+        $documentationData = $this->getDocumentationData();
+        $documentationName = mb_strtolower($documentationName);
+
+        $orig = $documentationName;
+
+        // Some items are simply references to other keys in the array, follow them.
+        $passedList = [];
+
+        while (true) {
+            if (!isset($documentationData[$documentationName])) {
+                return [];
+            }
+
+            $documentation = $documentationData[$documentationName];
+
+            if (!is_string($documentation)) {
+                break;
+            }
+
+            $documentationName = $documentation;
+
+            // Avoid circular references that would result in an infinite loop (i.e. session_set_save_handler).
+            if (isset($passedList[$documentationName])) {
+                return [];
+            }
+
+            $passedList[$documentationName] = true;
+        }
+
+        $data = [
+            'short_description' => isset($documentation['desc'])      ? $documentation['desc'] : null,
+            'long_description'  => isset($documentation['long_desc']) ? $documentation['long_desc'] : null
+        ];
+
+        return $data;
     }
 
     /**
@@ -544,6 +608,18 @@ class BuiltinIndexer
         $shortName = $element->getShortName();
 
         return isset($correctionMap[$shortName]) ? $correctionMap[$shortName] : $shortName;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDocumentationData()
+    {
+        if (!$this->documentationData) {
+            $this->documentationData = json_decode(file_get_contents(__DIR__ . '/Resource/documentation-data.json'), true);
+        }
+
+        return $this->documentationData;
     }
 
     /**
