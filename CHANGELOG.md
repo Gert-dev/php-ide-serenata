@@ -2,6 +2,27 @@
 ### Features and enhancements
 * The remaining parts of the analyzer that were implemented in CoffeeScript have been moved to PHP. This means the base package is now only reliant on PHP itself for processing. This may positively affect performance, but more importantly allows extracting and using the analyzer in its entirety outside Atom as well (i.e. for other editors or projects).
 * For those interested, the wiki now [has an article](https://github.com/Gert-dev/php-integrator-base/wiki/Proper-Documentation-And-Type-Hinting) with information about how analysis of your code happens regarding docblocks and type hinting. Reading it may help you improve your code as well as code assistance from this package.
+* Previously, ternary expressions could only be properly analyzed if they had the same return type:
+
+```php
+$a1 = new A();
+$a2 = new A();
+
+$a3 = some_condition() ? $a1 : $a2;
+
+// $a3 is now an 'A' because both conditions yield the same type.
+```
+
+This restriction has now been lifted. Using ternary operators with conditions resulting in different types will now simply yield multiple return types:
+
+```php
+$a = new A();
+$b = new B();
+
+$c = some_condition() ? $a : $b;
+
+// $c is now of type A|B.
+```
 
 ### Bugs fixed
 * The return type of global functions was being ignored if they had multiple return types.

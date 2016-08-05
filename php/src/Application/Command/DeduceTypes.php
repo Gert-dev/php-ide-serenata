@@ -348,9 +348,7 @@ class DeduceTypes extends AbstractCommand
                     $node->getAttribute('startFilePos')
                 );
 
-                if ($firstOperandType === $secondOperandType) {
-                    return $firstOperandType;
-                }
+                return array_unique(array_merge($firstOperandType, $secondOperandType));
             } else {
                 return $this->deduceTypesFromNode(
                     $file,

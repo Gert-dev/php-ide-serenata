@@ -22,5 +22,7 @@ function foo(C $c = null)
 
     $c = $c ?: bar();
 
+    $d = true ? $a : $c;
+
     // <MARKER>
 }

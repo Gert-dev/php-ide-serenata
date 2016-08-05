@@ -320,19 +320,23 @@ class DeduceTypesTest extends IndexedTest
         $this->assertEquals([], $output);
     }
 
-    public function testCorrectlyAnalyzesTernaryExpressionWhereBothOperandsResultInTheSameType()
+    public function testCorrectlyAnalyzesTernaryExpression()
     {
-        $output = $this->deduceTypes('TernarySameResultingType.php', ['$a']);
+        $output = $this->deduceTypes('TernaryExpression.php', ['$a']);
 
         $this->assertEquals(['\A'], $output);
 
-        $output = $this->deduceTypes('TernarySameResultingType.php', ['$b']);
+        $output = $this->deduceTypes('TernaryExpression.php', ['$b']);
 
         $this->assertEquals(['\B'], $output);
 
-        $output = $this->deduceTypes('TernarySameResultingType.php', ['$c']);
+        $output = $this->deduceTypes('TernaryExpression.php', ['$c']);
 
         $this->assertEquals(['\C', 'null'], $output);
+
+        $output = $this->deduceTypes('TernaryExpression.php', ['$d']);
+
+        $this->assertEquals(['\A', '\C', 'null'], $output);
     }
 
     public function testCorrectlyAnalyzesForeach()
