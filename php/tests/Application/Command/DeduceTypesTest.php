@@ -329,6 +329,10 @@ class DeduceTypesTest extends IndexedTest
         $output = $this->deduceTypes('TernarySameResultingType.php', ['$b']);
 
         $this->assertEquals(['\B'], $output);
+
+        $output = $this->deduceTypes('TernarySameResultingType.php', ['$c']);
+
+        $this->assertEquals(['\C', 'null'], $output);
     }
 
     public function testCorrectlyAnalyzesForeach()

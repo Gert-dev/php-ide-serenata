@@ -1,13 +1,26 @@
 <?php
 
-$a1 = new A();
-$a2 = new A();
+/**
+ * @return C|null
+ */
+function bar() {}
 
-$a = true ? $a1 : $a2;
+/**
+ * @param C|null $c
+ */
+function foo(C $c = null)
+{
+    $a1 = new A();
+    $a2 = new A();
 
-$b1 = new B();
-$b2 = new \B();
+    $a = true ? $a1 : $a2;
 
-$b = $b1 ?: $b2;
+    $b1 = new B();
+    $b2 = new \B();
 
-// <MARKER>
+    $b = $b1 ?: $b2;
+
+    $c = $c ?: bar();
+
+    // <MARKER>
+}
