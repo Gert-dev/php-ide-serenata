@@ -108,6 +108,7 @@ class SourceCodeHelper
         $currentTokenIndex = count($tokens);
         $tokenStartOffset = strlen($code);
 
+        $castBoundaryTokens = $this->getCastBoundaryTokens();
         $expressionBoundaryTokens = $this->getExpressionBoundaryTokens();
 
         // Characters that include operators that are, for some reason, not token types...
@@ -147,6 +148,10 @@ class SourceCodeHelper
                     return ++$i;
                 }
             } elseif ($code[$i] === ')') {
+                if (in_array($token['type'], $castBoundaryTokens)) {
+                    return ++$i;
+                }
+
                 ++$parenthesesClosed;
             }
 
@@ -462,6 +467,20 @@ class SourceCodeHelper
         if (defined('T_SPACESHIP')) {
             $expressionBoundaryTokens[] = T_SPACESHIP;
         }
+
+        return $expressionBoundaryTokens;
+    }
+
+    /**
+     * @see https://secure.php.net/manual/en/tokens.php
+     *
+     * @return int[]
+     */
+    protected function getCastBoundaryTokens()
+    {
+        $expressionBoundaryTokens = [
+            T_INT_CAST, T_UNSET_CAST, T_OBJECT_CAST, T_BOOL_CAST, T_ARRAY_CAST, T_DOUBLE_CAST, T_STRING_CAST
+        ];
 
         return $expressionBoundaryTokens;
     }

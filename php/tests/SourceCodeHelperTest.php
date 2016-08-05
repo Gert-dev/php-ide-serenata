@@ -437,6 +437,24 @@ SOURCE;
         );
     }
 
+    public function testRetrieveSanitizedCallStackAtStopsAtCasts()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+            <?php
+
+            $test = (int) $this->test
+SOURCE;
+
+        $expectedResult = ['$this', 'test'];
+
+        $this->assertEquals(
+            $expectedResult,
+            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+        );
+    }
+
     public function testRetrieveSanitizedCallStackAtStopsWhenTheBracketSyntaxIsUsedForVariablesInsideStrings()
     {
         $sourceCodeHelper = new SourceCodeHelper();
