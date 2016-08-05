@@ -199,16 +199,13 @@ class DeduceTypes extends AbstractCommand
             $types = $this->deduceTypes($file, $code, [$matches[1]], $offset);
         } elseif (preg_match('/^(.*?)\(\)$/', $firstElement, $matches) === 1) {
             // Global PHP function.
-
             // TODO: No need to fetch all global functions here.
             $globalFunctions = $this->getGlobalFunctionsCommand()->getGlobalFunctions();
 
             if (isset($globalFunctions[$matches[1]])) {
                 $returnTypes = $globalFunctions[$matches[1]]['returnTypes'];
 
-                if (count($returnTypes) === 1) {
-                    $types = $this->fetchResolvedTypesFromTypeArrays($returnTypes);
-                }
+                $types = $this->fetchResolvedTypesFromTypeArrays($returnTypes);
             }
         } elseif (preg_match("/((${classRegexPart}))/", $firstElement, $matches) === 1) {
             // Static class name.

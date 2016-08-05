@@ -6,7 +6,7 @@ class B
 }
 
 /**
- * @return B
+ * @return B|null
  */
 function global_function()
 {

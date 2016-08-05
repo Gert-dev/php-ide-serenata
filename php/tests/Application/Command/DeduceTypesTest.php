@@ -441,7 +441,7 @@ class DeduceTypesTest extends IndexedTest
             ['global_function()']
         );
 
-        $this->assertEquals(['\B'], $result);
+        $this->assertEquals(['\B', 'null'], $result);
     }
 
     public function testCorrectlyAnalyzesClosures()

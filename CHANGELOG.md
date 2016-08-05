@@ -4,6 +4,7 @@
 * For those interested, the wiki now [has an article](https://github.com/Gert-dev/php-integrator-base/wiki/Proper-Documentation-And-Type-Hinting) with information about how analysis of your code happens regarding docblocks and type hinting. Reading it may help you improve your code as well as code assistance from this package.
 
 ### Bugs fixed
+* The return type of global functions was being ignored if they had multiple return types.
 * In rare cases, caching would complain that it could not create the `accessing_shared_cache.lock` file.
 * Retrieving available local variables wasn't always using the most up to date version of the editor's contents.
 * When retrieving available variables or deducing types, character offsets were not correctly being translated to byte offsets, sometimes resulting in incorrect results.
