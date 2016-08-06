@@ -172,7 +172,7 @@ class BuiltinIndexer
                     $function = new ReflectionFunction($functionName);
                 } catch (\Exception $e) {
                     $this->logMessage(
-                        '  - WARNING: Could not examine built-in function ' . $function->getName() . ' with Reflection'
+                        '  - WARNING: Could not examine built-in function ' . $functionName . ' with Reflection'
                     );
 
                     continue;
