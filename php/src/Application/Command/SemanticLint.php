@@ -13,10 +13,7 @@ use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpParser\Error;
-use PhpParser\Lexer;
-use PhpParser\Parser;
 use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
 
 /**
  * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the
