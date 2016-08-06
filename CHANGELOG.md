@@ -5,6 +5,7 @@
 * Built-in functions and methods will now have (mostly) proper documentation and return types.
   * This is achieved by keeping an internal list of stubs of the online PHP documentation fetched using [php-doc-parser](https://github.com/martinsik/php-doc-parser).
   * Note that this will never be perfect as, even though the online documentation is much more complete than reflection, it is also not always entirely correct. For example, `DateTime::createFromFormat` can actually return `DateTime|false`, but accordiing to its online documentation signature it always returns a `DateTime`).
+  * Regardless of the previous item, it will still remain a major improvement over the old reflection-only approach. Various built-in functions and methods will now properly show documentation and have proper return types, easing the pain of having to work with PHP's built-in functionality.
 * Previously, ternary expressions could only be properly analyzed if they had the same return type:
 
 ```php
