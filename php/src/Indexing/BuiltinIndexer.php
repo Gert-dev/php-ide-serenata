@@ -330,9 +330,9 @@ class BuiltinIndexer
         $documentation = $this->getDocumentationEntry($documentationName);
 
         $data = [
-            'short_description'  => isset($documentation['desc'])      ? $documentation['desc'] : null,
-            'long_description'   => isset($documentation['long_desc']) ? $documentation['long_desc'] : null,
-            'return_description' => isset($documentation['ret_desc'])  ? $documentation['ret_desc'] : null
+            'short_description'  => isset($documentation['desc'])      ? $this->getNormalizedDocumentation($documentation['desc']) : null,
+            'long_description'   => isset($documentation['long_desc']) ? $this->getNormalizedDocumentation($documentation['long_desc']) : null,
+            'return_description' => isset($documentation['ret_desc'])  ? $this->getNormalizedDocumentation($documentation['ret_desc']) : null
         ];
 
         if (isset($documentation['params'][0])) {
@@ -406,7 +406,7 @@ class BuiltinIndexer
 
                 $data = [
                     'types_serialized' => serialize($types),
-                    'description'      => $parameterInfo['desc']
+                    'description'      => $this->getNormalizedDocumentation($parameterInfo['desc'])
                 ];
 
                 return $data;
@@ -414,6 +414,16 @@ class BuiltinIndexer
         }
 
         return [];
+    }
+
+    /**
+     * @param string $documentation
+     *
+     * @return string
+     */
+    protected function getNormalizedDocumentation($documentation)
+    {
+        return str_replace('\\n', "\n", $documentation);
     }
 
     /**
