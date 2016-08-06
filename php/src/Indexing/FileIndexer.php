@@ -687,6 +687,8 @@ class FileIndexer
         ]);
 
         foreach ($parameters as $parameter) {
+            $parameter['function_id'] = $functionId;
+
             $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameter);
         }
     }
@@ -791,6 +793,8 @@ class FileIndexer
         ]);
 
         foreach ($parameters as $parameter) {
+            $parameter['function_id'] = $functionId;
+
             $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameter);
         }
     }

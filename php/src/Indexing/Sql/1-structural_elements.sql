@@ -222,7 +222,7 @@ CREATE TABLE functions(
 CREATE TABLE functions_parameters(
     id                 integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 
-    function_id        integer unsigned,
+    function_id        integer unsigned NOT NULL,
 
     name               varchar(255) NOT NULL,
 
