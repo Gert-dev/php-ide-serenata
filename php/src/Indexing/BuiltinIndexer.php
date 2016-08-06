@@ -7,6 +7,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 use ReflectionFunction;
+use ReflectionParameter;
 use ReflectionFunctionAbstract;
 
 use PhpIntegrator\TypeAnalyzer;
@@ -291,6 +292,11 @@ class BuiltinIndexer
                 continue;
             }
 
+            $parameterData = array_merge(
+                $parameterData,
+                $this->getFunctionLikeParameterDataFromDocumentation($parameter)
+            );
+
             $this->storage->insert(IndexStorageItemEnum::FUNCTIONS_PARAMETERS, $parameterData);
 
             $parameters[] = $parameterData;
@@ -310,6 +316,8 @@ class BuiltinIndexer
      * and descriptions. Complete the data we receive from reflection with data from the documentation.
      *
      * @param ReflectionFunctionAbstract $function
+     *
+     * @return array
      */
     protected function getFunctionLikeDataFromDocumentation(ReflectionFunctionAbstract $function)
     {
@@ -319,34 +327,7 @@ class BuiltinIndexer
             $documentationName = $function->getDeclaringClass()->getName() . '::' . $documentationName;
         }
 
-        $documentationData = $this->getDocumentationData();
-        $documentationName = mb_strtolower($documentationName);
-
-        $orig = $documentationName;
-
-        // Some items are simply references to other keys in the array, follow them.
-        $passedList = [];
-
-        while (true) {
-            if (!isset($documentationData[$documentationName])) {
-                return [];
-            }
-
-            $documentation = $documentationData[$documentationName];
-
-            if (!is_string($documentation)) {
-                break;
-            }
-
-            $documentationName = $documentation;
-
-            // Avoid circular references that would result in an infinite loop (i.e. session_set_save_handler).
-            if (isset($passedList[$documentationName])) {
-                return [];
-            }
-
-            $passedList[$documentationName] = true;
-        }
+        $documentation = $this->getDocumentationEntry($documentationName);
 
         $data = [
             'short_description'  => isset($documentation['desc'])      ? $documentation['desc'] : null,
@@ -360,7 +341,7 @@ class BuiltinIndexer
             if (isset($extendedInfo['ret_type'])) {
                 $fqcn = $extendedInfo['ret_type'];
 
-                if ($this->typeAnalyzer->isSpecialType($fqcn)) {
+                if (!$this->typeAnalyzer->isSpecialType($fqcn)) {
                     $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn, true);
                 }
 
@@ -373,11 +354,105 @@ class BuiltinIndexer
 
                 $data['return_types_serialized'] = serialize($returnTypes);
             }
-
-            // TODO: Parameter list.
         }
 
         return $data;
+    }
+
+    /**
+     * @param ReflectionParameter $parameter
+     */
+    protected function getFunctionLikeParameterDataFromDocumentation(ReflectionParameter $parameter)
+    {
+        $function = $parameter->getDeclaringFunction();
+
+        $documentationName = $function->getName();
+
+        if ($function instanceof ReflectionMethod) {
+            $documentationName = $function->getDeclaringClass()->getName() . '::' . $documentationName;
+        }
+
+        $documentation = $this->getDocumentationEntry($documentationName);
+
+        if (!isset($documentation['params'][0]['list'])) {
+            return [];
+        }
+
+        $extendedInfo = $documentation['params'][0]['list'];
+
+        $documentationParameterName = '$' . $parameter->name;
+
+        // Requires PHP >= 5.6.
+        if (method_exists($parameter, 'isVariadic')) {
+            if ($parameter->isVariadic()) {
+                $documentationParameterName = '$...';
+            }
+        }
+
+        foreach ($extendedInfo as $parameterInfo) {
+            if ($parameterInfo['var'] === $documentationParameterName) {
+                $fqcn = $parameterInfo['type'];
+
+                if (!$this->typeAnalyzer->isSpecialType($fqcn)) {
+                    $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn, true);
+                }
+
+                $types = [
+                    [
+                        'type' => $parameterInfo['type'],
+                        'fqcn' => $fqcn
+                    ]
+                ];
+
+                $data = [
+                    'types_serialized' => serialize($types),
+                    'description'      => $parameterInfo['desc']
+                ];
+
+                return $data;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Retrieves the documentation data for the specified entry.
+     *
+     * @param string $entryName
+     *
+     * @return array
+     */
+    protected function getDocumentationEntry($entryName)
+    {
+        $documentationData = $this->getDocumentationData();
+        $entryName = mb_strtolower($entryName);
+
+        // Some items are simply references to other keys in the array, follow them.
+        $passedList = [];
+
+        while (true) {
+            if (!isset($documentationData[$entryName])) {
+                return [];
+            }
+
+            $documentation = $documentationData[$entryName];
+
+            if (!is_string($documentation)) {
+                break;
+            }
+
+            $entryName = $documentation;
+
+            // Avoid circular references that would result in an infinite loop (i.e. session_set_save_handler).
+            if (isset($passedList[$entryName])) {
+                return [];
+            }
+
+            $passedList[$entryName] = true;
+        }
+
+        return $documentation;
     }
 
     /**
