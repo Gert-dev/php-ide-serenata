@@ -244,6 +244,7 @@ class BuiltinIndexer
 
         $parameters = [];
 
+        /** @var ReflectionParameter $parameter */
         foreach ($function->getParameters() as $parameter) {
             $isVariadic = false;
 
