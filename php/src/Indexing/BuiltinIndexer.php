@@ -9,6 +9,8 @@ use ReflectionProperty;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
 
+use PhpIntegrator\TypeAnalyzer;
+
 /**
  * Handles indexation of built-in classes, global constants and global functions.
  */
@@ -20,6 +22,11 @@ class BuiltinIndexer
      * @var StorageInterface
      */
     protected $storage;
+
+    /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
 
     /**
      * @var array
@@ -44,9 +51,10 @@ class BuiltinIndexer
     /**
      * @param StorageInterface $storage
      */
-    public function __construct(StorageInterface $storage)
+    public function __construct(StorageInterface $storage, TypeAnalyzer $typeAnalyzer)
     {
         $this->storage = $storage;
+        $this->typeAnalyzer = $typeAnalyzer;
     }
 
     /**
@@ -341,9 +349,33 @@ class BuiltinIndexer
         }
 
         $data = [
-            'short_description' => isset($documentation['desc'])      ? $documentation['desc'] : null,
-            'long_description'  => isset($documentation['long_desc']) ? $documentation['long_desc'] : null
+            'short_description'  => isset($documentation['desc'])      ? $documentation['desc'] : null,
+            'long_description'   => isset($documentation['long_desc']) ? $documentation['long_desc'] : null,
+            'return_description' => isset($documentation['ret_desc'])  ? $documentation['ret_desc'] : null
         ];
+
+        if (isset($documentation['params'][0])) {
+            $extendedInfo = $documentation['params'][0];
+
+            if (isset($extendedInfo['ret_type'])) {
+                $fqcn = $extendedInfo['ret_type'];
+
+                if ($this->typeAnalyzer->isSpecialType($fqcn)) {
+                    $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn, true);
+                }
+
+                $returnTypes = [
+                    [
+                        'type' => $extendedInfo['ret_type'],
+                        'fqcn' => $fqcn
+                    ]
+                ];
+
+                $data['return_types_serialized'] = serialize($returnTypes);
+            }
+
+            // TODO: Parameter list.
+        }
 
         return $data;
     }

@@ -241,7 +241,7 @@ class Reindex extends AbstractCommand
     protected function getBuiltinIndexer()
     {
         if (!$this->builtinIndexer) {
-            $this->builtinIndexer = new BuiltinIndexer($this->getStorageForIndexers());
+            $this->builtinIndexer = new BuiltinIndexer($this->getStorageForIndexers(), $this->getTypeAnalyzer());
         }
 
         return $this->builtinIndexer;
