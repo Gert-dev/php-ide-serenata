@@ -2,6 +2,9 @@
 ### Features and enhancements
 * The remaining parts of the analyzer that were implemented in CoffeeScript have been moved to PHP. This means the base package is now only reliant on PHP itself for processing. This may positively affect performance, but more importantly allows extracting and using the analyzer in its entirety outside Atom as well (i.e. for other editors or projects).
 * For those interested, the wiki now [has an article](https://github.com/Gert-dev/php-integrator-base/wiki/Proper-Documentation-And-Type-Hinting) with information about how analysis of your code happens regarding docblocks and type hinting. Reading it may help you improve your code as well as code assistance from this package.
+* Built-in functions and methods will now have (mostly) proper documentation and return types.
+  * This is achieved by keeping an internal list of stubs of the online PHP documentation fetched using [php-doc-parser](https://github.com/martinsik/php-doc-parser).
+  * Note that this will never be perfect as, even though the online documentation is much more complete than reflection, it is also not always entirely correct. For example, `DateTime::createFromFormat` can actually return `DateTime|false`, but accordiing to its online documentation signature it always returns a `DateTime`).
 * Previously, ternary expressions could only be properly analyzed if they had the same return type:
 
 ```php
