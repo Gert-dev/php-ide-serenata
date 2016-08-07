@@ -58,9 +58,11 @@ module.exports =
     ###*
      * Tests the user's configuration.
      *
+     * @param {boolean} testServices
+     *
      * @return {boolean}
     ###
-    testConfig: () ->
+    testConfig: (testServices = true) ->
         ConfigTester = require './ConfigTester'
 
         configTester = new ConfigTester(@configuration)
@@ -72,6 +74,15 @@ module.exports =
                 "PHP is not correctly set up and as a result PHP integrator will not work. Please visit the settings
                  screen to correct this error. If you are not specifying an absolute path for PHP or Composer, make
                  sure they are in your PATH."
+
+            atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
+
+            return false
+
+        if testServices and not @projectManagerService
+            errorMessage =
+                "There is no project manager service available. Install the atom-project-manager package for project
+                support to work in its full extent."
 
             atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
 
@@ -339,7 +350,7 @@ module.exports =
         # See also atom-autocomplete-php pull request #197 - Disabled for now because it does not allow the user to
         # reactivate or try again.
         # return unless @testConfig()
-        @testConfig()
+        @testConfig(false)
 
         @proxy = new CachingProxy(@configuration)
 
