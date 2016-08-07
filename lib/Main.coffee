@@ -413,8 +413,12 @@ module.exports =
         return if not path
         return if not @activeProject
 
+        {Directory} = require 'atom'
+
         for projectDirectory in @activeProject.props.paths
-            if projectDirectory.contains(path)
+            projectDirectoryObject = new Directory(projectDirectory)
+
+            if projectDirectoryObject.contains(path)
                 @attemptFileIndex(path, editor.getBuffer().getText())
                 return
 
