@@ -395,6 +395,8 @@ module.exports =
 
     ###*
      * Sets the status bar service, which is consumed by this package.
+     *
+     * @param {Object} service
     ###
     setStatusBarService: (service) ->
         @attachStatusBarItems(service)
