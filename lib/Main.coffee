@@ -41,6 +41,11 @@ module.exports =
     statusBarManager: null
 
     ###*
+     * The project manager service.
+    ###
+    projectManagerService: null
+
+    ###*
      * Whether project indexing is currently happening.
     ###
     isProjectIndexBusy: false
@@ -106,27 +111,17 @@ module.exports =
      *
      * @return {Promise}
     ###
-    performDirectoriesIndex: (directories, progressStreamCallback) ->
-        pathArrays = []
+    performProjectDirectoriesIndex: (directories, progressStreamCallback) ->
 
-        for i, project of directories
-            pathArrays.push(project.path)
-
-        md5 = require 'md5'
-
-        indexDatabaseName = md5(pathArrays.join(''))
-
-        @proxy.setProjectName(indexDatabaseName)
-        @proxy.setIndexDatabaseName(indexDatabaseName)
-
-        return @service.reindex(pathArrays, null, progressStreamCallback)
 
     ###*
      * Indexes the project aynschronously.
      *
+     * @param {Object} project
+     *
      * @return {Promise}
     ###
-    performProjectIndex: () ->
+    performProjectIndex: (project) ->
         timerName = @packageName + " - Project indexing"
 
         console.time(timerName);
@@ -156,16 +151,21 @@ module.exports =
                     @statusBarManager.setProgress(progress)
                     @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        directories = @fetchProjectDirectories()
+        pathArrays = project.props.paths
 
-        return @performDirectoriesIndex(directories, progressStreamCallback).then(successHandler, failureHandler)
+        @proxy.setProjectName(project.props._id)
+        @proxy.setIndexDatabaseName(project.props._id)
+
+        return @service.reindex(pathArrays, null, progressStreamCallback).then(successHandler, failureHandler)
 
     ###*
      * Performs a project index, but only if one is not currently already happening.
      *
+     * @param {Object} project
+     *
      * @return {Promise|null}
     ###
-    attemptProjectIndex: () ->
+    attemptProjectIndex: (project) ->
         return null if @isProjectIndexBusy
 
         @isProjectIndexBusy = true
@@ -176,14 +176,16 @@ module.exports =
         successHandler = handler
         failureHandler = handler
 
-        return @performProjectIndex().then(successHandler, failureHandler)
+        return @performProjectIndex(project).then(successHandler, failureHandler)
 
     ###*
      * Forcibly indexes the project in its entirety by removing the existing indexing database first.
      *
+     * @param {Object} project
+     *
      * @return {Promise|null}
     ###
-    forceProjectIndex: () ->
+    forceProjectIndex: (project) ->
         fs = require 'fs'
 
         try
@@ -192,18 +194,20 @@ module.exports =
         catch error
             # If the file doesn't exist, just bail out.
 
-        return @attemptProjectIndex()
+        return @attemptProjectIndex(project)
 
     ###*
      * Forcibly indexes the project in its entirety by removing the existing indexing database first, but only if a
      * project indexing operation is not already busy.
      *
+     * @param {Object} project
+     *
      * @return {Promise|null}
     ###
-    attemptForceProjectIndex: () ->
+    attemptForceProjectIndex: (project) ->
         return null if @isProjectIndexBusy
 
-        return @forceProjectIndex()
+        return @forceProjectIndex(project)
 
     ###*
      * Indexes a file aynschronously.
@@ -263,21 +267,6 @@ module.exports =
         return @performFileIndex(fileName, source).then(successHandler, failureHandler)
 
     ###*
-     * Fetches a list of current project directories (root folders).
-     *
-     * @return {Array}
-    ###
-    fetchProjectDirectories: () ->
-        directories = atom.project.getDirectories()
-
-        # In very rare situations, Atom gives us atom://config as project path. Not sure if this is a bug or intended
-        # behavior.
-        directories = directories.filter (directory) ->
-            return directory.path.indexOf('atom://') != 0
-
-        return directories
-
-    ###*
      * Attaches items to the status bar.
      *
      * @param {mixed} statusBarService
@@ -299,27 +288,32 @@ module.exports =
             @statusBarManager = null
 
     ###*
-     * Synchronizes internally with changes to the current project folders.
+     * @param {Object} project
     ###
-    syncWithAtomProjectFolders: () ->
-        projectDirectories = @fetchProjectDirectories()
+    loadProject: (project) ->
+        projectDirectories = project.props.paths
 
-        if projectDirectories.length > 0
-            @attemptProjectIndex()
+        return if projectDirectories.length == 0
 
-            successHandler = (repository) =>
-                return if not repository?
-                return if not repository.async?
+        @attemptProjectIndex(project)
 
-                # Will trigger on things such as git checkout.
-                repository.async.onDidChangeStatuses () =>
-                    @attemptProjectIndex()
+        successHandler = (repository) =>
+            return if not repository?
+            return if not repository.async?
 
-            failureHandler = () =>
-                return
+            # Will trigger on things such as git checkout.
+            repository.async.onDidChangeStatuses () =>
+                @attemptProjectIndex(project)
 
-            for projectDirectory in projectDirectories
-                atom.project.repositoryForDirectory(projectDirectory).then(successHandler, failureHandler)
+        failureHandler = () =>
+            return
+
+        {Directory} = require 'atom'
+
+        for projectDirectory in projectDirectories
+            projectDirectoryObject = new Directory(projectDirectory)
+
+            atom.project.repositoryForDirectory(projectDirectoryObject).then(successHandler, failureHandler)
 
     ###*
      * Activates the package.
@@ -350,14 +344,6 @@ module.exports =
         @registerCommands()
         @registerConfigListeners()
 
-        # In rare cases, the package is loaded faster than the project gets a chance to load. At that point, no project
-        # directory is returned. The onDidChangePaths listener below will also catch that case.
-        @syncWithAtomProjectFolders()
-
-        @disposables.add atom.project.onDidChangePaths (projectPaths) =>
-            # NOTE: This listener is also invoked at shutdown with an empty array as argument.
-            @syncWithAtomProjectFolders()
-
         @disposables.add atom.workspace.observeTextEditors (editor) =>
             # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
             # because the contents are still loading.
@@ -379,11 +365,13 @@ module.exports =
         path = editor.getPath()
 
         return if not path
+        return if not @projectManagerService
 
-        for projectDirectory in @fetchProjectDirectories()
-            if projectDirectory.contains(path)
-                @attemptFileIndex(path, editor.getBuffer().getText())
-                return
+        @projectManagerService.projects.getCurrent (project) =>
+            for projectDirectory in project.props.paths
+                if projectDirectory.contains(path)
+                    @attemptFileIndex(path, editor.getBuffer().getText())
+                    return
 
     ###*
      * Deactivates the package.
@@ -402,14 +390,24 @@ module.exports =
         @attachStatusBarItems(service)
 
         # This method is usually invoked after the indexing has already started, hence we can't unconditionally hide it
-        # here or it will never be made visible again. However, we also don't want it to be visible for new Atom windows
-        # that don't contain a project.
-        if atom.project.getDirectories().length == 0
+        # here or it will never be made visible again.
+        if not @isProjectIndexBusy
             @statusBarManager.hide()
 
         {Disposable} = require 'atom'
 
         return new Disposable => @detachStatusBarItems()
+
+    ###*
+     * Sets the project manager service.
+     *
+     * @param {Object} service
+    ###
+    setProjectManagerService: (service) ->
+        @projectManagerService = service
+
+        service.projects.getCurrent (project) =>
+            @loadProject(project)
 
     ###*
      * Retrieves the service exposed by this package.

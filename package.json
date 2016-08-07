@@ -20,6 +20,11 @@
       "versions": {
         "^1.0.0": "setStatusBarService"
       }
+    },
+    "project-manager": {
+      "versions": {
+        "^2.3.0": "setProjectManagerService"
+      }
     }
   },
   "dependencies": {
