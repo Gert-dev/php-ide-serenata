@@ -84,10 +84,16 @@ module.exports =
     ###
     registerCommands: () ->
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
-            return @attemptProjectIndex()
+            return if not @projectManagerService
+
+            @projectManagerService.projects.getCurrent (project) =>
+                return @attemptProjectIndex(project)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
-            return @attemptForceProjectIndex()
+            return if not @projectManagerService
+
+            @projectManagerService.projects.getCurrent (project) =>
+                return @attemptForceProjectIndex(project)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
             return unless @testConfig()
