@@ -5,6 +5,7 @@
             {
                 'label': 'PHP Integrator',
                 'submenu': [
+                    {'label': 'Set Up Current Project', 'command': 'php-integrator-base:set-up-current-project'},
                     {'label': '(Re)index Project', 'command': 'php-integrator-base:index-project'},
                     {'label': 'Forcibly (Re)index Project', 'command': 'php-integrator-base:force-index-project'}
                 ]
