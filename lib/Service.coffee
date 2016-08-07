@@ -260,12 +260,17 @@ class Service
                 reject()
                 return
 
-            return @getClassListForFile(path).then (classesInFile) =>
+            successHandler = (classesInFile) =>
                 for name,classInfo of classesInFile
                     if bufferPosition.row >= classInfo.startLine and bufferPosition.row <= classInfo.endLine
                         resolve(name)
 
                 resolve(null)
+
+            failureHandler = () =>
+                reject()
+
+            return @getClassListForFile(path).then(successHandler, failureHandler)
 
     ###*
      * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
