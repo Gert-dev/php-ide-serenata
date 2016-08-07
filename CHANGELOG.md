@@ -1,5 +1,9 @@
 ## 1.2.0
 ### Features and enhancements
+* Project support has (finally) arrived in a basic form. Unfortunately this change **needs user intervention** and will possibly break the workflow of some users:
+  1. Install the [atom-project-manager](https://github.com/danielbrodin/atom-project-manager) package [1].
+  2. Ensure that your projects are saved using `atom-project-manager`.
+  3. Click `Packages → PHP Integrator → Set Up Current Project` (or use the command palette).
 * Built-in functions and methods will now have (mostly) proper documentation and return types.
   * This is achieved by keeping an internal list of stubs of the online PHP documentation fetched using [php-doc-parser](https://github.com/martinsik/php-doc-parser).
   * Note that this will never be perfect as, even though the online documentation is much more complete than reflection, it is also not always entirely correct. For example, `DateTime::createFromFormat` can actually return `DateTime|false`, but accordiing to its online documentation signature it always returns a `DateTime`).
@@ -40,6 +44,9 @@ $c = some_condition() ? $a : $b;
 * `getInvocationInfoAt` will now return an `offset` rather than a `bufferPosition` to be consistent with the other commands.
 * `getResultingTypesAt` is now simply a convenience call to `deduceTypes` as its underlying code has been completely moved to PHP.
 * `deduceTypes` gained a new parameter `ignoreLastElement`, which does the same as the identically-named parameter for `getResultingTypesAt` does.
+
+### Notes
+[1] Why `atom-project-manager`? The truth is that I would have preferred not to select any specific third-party package for project support so users can use the package they prefer. Users familiar with the project discussions will remember that I have long postponed this change for this reason. Unfortunately, as nothing seems to change and project support is feeling more and more like a missing feature, I decided to go ahead and link to the most popular project management package currently out there. `atom-project-manager` also supports other generic project settings in its CSON file, which leaves room for other Atom packages to also save settings to the same file in harmony with this one. In the future, someone could even develop a GUI for managing project settings.
 
 ## 1.1.2
 ### Bugs fixed
