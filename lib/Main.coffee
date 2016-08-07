@@ -46,6 +46,11 @@ module.exports =
     projectManagerService: null
 
     ###*
+     * The currently active project, if any.
+    ###
+    activeProject: null
+
+    ###*
      * Whether project indexing is currently happening.
     ###
     isProjectIndexBusy: false
@@ -54,6 +59,17 @@ module.exports =
      * A list of disposables to dispose when the package deactivates.
     ###
     disposables: null
+
+    ###*
+     * Default
+    ###
+    defaultProjectSettings:
+        enabled: true
+        php_integrator:
+            enabled: true
+            phpVersion: 5.6
+            excludedFolders: []
+            fileExtensions: ['php']
 
     ###*
      * Tests the user's configuration.
@@ -94,17 +110,47 @@ module.exports =
      * Registers any commands that are available to the user.
     ###
     registerCommands: () ->
-        atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
+        atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
             return if not @projectManagerService
 
             @projectManagerService.projects.getCurrent (project) =>
-                return @attemptProjectIndex(project)
+                projectPhpSettings = if project.props.php? then project.props.php else {}
+
+                if projectPhpSettings.php_integrator?
+                    atom.notifications.addError 'Already initialized', {
+                        'detail' : 'The currently active project was already initialized. To prevent existing ' +
+                            'settings from getting lost, the request has been aborted.'
+                    }
+
+                    return
+
+                if not projectPhpSettings.enabled
+                    projectPhpSettings.enabled = true
+
+                if not projectPhpSettings.php_integrator?
+                    projectPhpSettings.php_integrator = @defaultProjectSettings.php_integrator
+
+                project.set('php', projectPhpSettings)
+
+                atom.notifications.addSuccess 'Success', {
+                    'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'
+                }
+
+                @loadProject(project)
+
+        atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
+            return if not @activeProject
+
+            project = @activeProject
+
+            return @attemptProjectIndex(project)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
-            return if not @projectManagerService
+            return if not @activeProject
 
-            @projectManagerService.projects.getCurrent (project) =>
-                return @attemptForceProjectIndex(project)
+            project = @activeProject
+
+            return @attemptForceProjectIndex(project)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
             return unless @testConfig()
@@ -112,24 +158,6 @@ module.exports =
             atom.notifications.addSuccess 'Success', {
                 'detail' : 'Your PHP integrator configuration is working correctly!'
             }
-
-    ###*
-     * Registers listeners for config changes.
-    ###
-    registerConfigListeners: () ->
-        @configuration.onDidChange 'phpCommand', () =>
-            @attemptProjectIndex()
-
-    ###*
-     * Indexes a list of directories.
-     *
-     * @param {Array}    directories
-     * @param {Callback} progressStreamCallback
-     *
-     * @return {Promise}
-    ###
-    performProjectDirectoriesIndex: (directories, progressStreamCallback) ->
-
 
     ###*
      * Indexes the project aynschronously.
@@ -168,12 +196,7 @@ module.exports =
                     @statusBarManager.setProgress(progress)
                     @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        pathArrays = project.props.paths
-
-        @proxy.setProjectName(project.props._id)
-        @proxy.setIndexDatabaseName(project.props._id)
-
-        return @service.reindex(pathArrays, null, progressStreamCallback).then(successHandler, failureHandler)
+        return @service.reindex(project.props.paths, null, progressStreamCallback).then(successHandler, failureHandler)
 
     ###*
      * Performs a project index, but only if one is not currently already happening.
@@ -308,9 +331,16 @@ module.exports =
      * @param {Object} project
     ###
     loadProject: (project) ->
-        projectDirectories = project.props.paths
+        @activeProject = null
 
-        return if projectDirectories.length == 0
+        return if project.props.php?.enabled != true
+        return if project.props.php?.php_integrator?.enabled != true
+        return if project.props.paths.length == 0
+
+        @activeProject = project
+
+        @proxy.setProjectName(project.props._id)
+        @proxy.setIndexDatabaseName(project.props._id)
 
         @attemptProjectIndex(project)
 
@@ -327,7 +357,7 @@ module.exports =
 
         {Directory} = require 'atom'
 
-        for projectDirectory in projectDirectories
+        for projectDirectory in project.props.paths
             projectDirectoryObject = new Directory(projectDirectory)
 
             atom.project.repositoryForDirectory(projectDirectoryObject).then(successHandler, failureHandler)
@@ -359,7 +389,6 @@ module.exports =
         @service = new Service(@proxy, emitter)
 
         @registerCommands()
-        @registerConfigListeners()
 
         @disposables.add atom.workspace.observeTextEditors (editor) =>
             # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
@@ -382,13 +411,12 @@ module.exports =
         path = editor.getPath()
 
         return if not path
-        return if not @projectManagerService
+        return if not @activeProject
 
-        @projectManagerService.projects.getCurrent (project) =>
-            for projectDirectory in project.props.paths
-                if projectDirectory.contains(path)
-                    @attemptFileIndex(path, editor.getBuffer().getText())
-                    return
+        for projectDirectory in @activeProject.props.paths
+            if projectDirectory.contains(path)
+                @attemptFileIndex(path, editor.getBuffer().getText())
+                return
 
     ###*
      * Deactivates the package.

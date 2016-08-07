@@ -122,7 +122,15 @@ class Proxy
     ###
     performRequest: (args, streamCallback = null, stdinData = null) ->
         php = @config.get('phpCommand')
+
+        args.unshift(@projectName)
+        
         parameters = @prepareParameters(args)
+
+        if not @projectName
+            return new Promise (resolve, reject) ->
+                reject()
+
 
         return @performRequestAsync(php, parameters, streamCallback, stdinData)
 
@@ -133,7 +141,6 @@ class Proxy
     ###
     getClassList: () ->
         parameters = [
-            @projectName,
             '--class-list',
             '--database=' + @getIndexDatabasePath()
         ]
@@ -152,7 +159,6 @@ class Proxy
             throw new Error('No file passed!')
 
         parameters = [
-            @projectName,
             '--class-list',
             '--database=' + @getIndexDatabasePath(),
             '--file=' + file
@@ -167,7 +173,6 @@ class Proxy
     ###
     getGlobalConstants: () ->
         parameters = [
-            @projectName,
             '--constants',
             '--database=' + @getIndexDatabasePath()
         ]
@@ -181,7 +186,6 @@ class Proxy
     ###
     getGlobalFunctions: () ->
         parameters = [
-            @projectName,
             '--functions',
             '--database=' + @getIndexDatabasePath()
         ]
@@ -200,7 +204,6 @@ class Proxy
             throw new Error('No class name passed!')
 
         parameters = [
-            @projectName,
             '--class-info',
             '--database=' + @getIndexDatabasePath(),
             '--name=' + className
@@ -223,7 +226,6 @@ class Proxy
         throw new Error('No type passed!') if not type
 
         parameters = [
-            @projectName,
             '--resolve-type',
             '--database=' + @getIndexDatabasePath(),
             '--file=' + file,
@@ -249,7 +251,6 @@ class Proxy
         throw new Error('No type passed!') if not type
 
         parameters = [
-            @projectName,
             '--localize-type',
             '--database=' + @getIndexDatabasePath(),
             '--file=' + file,
@@ -274,7 +275,6 @@ class Proxy
         throw new Error('No file passed!') if not file
 
         parameters = [
-            @projectName,
             '--semantic-lint',
             '--database=' + @getIndexDatabasePath(),
             '--file=' + file,
@@ -325,7 +325,6 @@ class Proxy
             parameter = '--stdin'
 
         parameters = [
-            @projectName,
             '--available-variables',
             '--database=' + @getIndexDatabasePath(),
             parameter,
@@ -372,7 +371,6 @@ class Proxy
             throw 'A path to a file must be passed!'
 
         parameters = [
-            @projectName,
             '--deduce-types',
             '--database=' + @getIndexDatabasePath(),
             '--offset=' + offset,
@@ -418,7 +416,6 @@ class Proxy
             parameter = '--stdin'
 
         parameters = [
-            @projectName,
             '--invocation-info',
             '--database=' + @getIndexDatabasePath(),
             parameter,
@@ -464,7 +461,6 @@ class Proxy
                     progressStreamCallback(percentage)
 
         parameters = [
-            @projectName,
             '--reindex',
             '--database=' + @getIndexDatabasePath(),
             '--stream-progress'
