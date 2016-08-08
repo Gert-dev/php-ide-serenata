@@ -159,6 +159,10 @@ class FileIndexer
              $this->indexConstant($constant, $fileId, null, $useStatementFetchingVisitor);
          }
 
+         foreach ($outlineIndexingVisitor->getGlobalDefines() as $define) {
+             $this->indexConstant($define, $fileId, null, $useStatementFetchingVisitor);
+         }
+
          foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
              $namespaceId = $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES, [
                  'start_line'  => $namespace['startLine'],

@@ -29,6 +29,11 @@ class OutlineIndexingVisitor extends NameResolver
     protected $globalConstants = [];
 
     /**
+     * @var array
+     */
+    protected $globalDefines = [];
+
+    /**
      * @var Node\Stmt\Class_|null
      */
     protected $currentStructure;
@@ -74,6 +79,12 @@ class OutlineIndexingVisitor extends NameResolver
             $this->parseTraitNode($node);
         } elseif ($node instanceof Node\Stmt\TraitUse) {
             $this->parseTraitUseNode($node);
+        } elseif (
+            $node instanceof Node\Expr\FuncCall &&
+            $node->name instanceof Node\Name &&
+            $node->name->toString() === 'define'
+        ) {
+            $this->parseDefineNode($node);
         } else {
             // Resolve the names for other nodes as the nodes we need depend on them being resolved.
             parent::enterNode($node);
@@ -400,6 +411,44 @@ class OutlineIndexingVisitor extends NameResolver
     }
 
     /**
+     * @param Node\Expr\FuncCall $node
+     */
+    protected function parseDefineNode(Node\Expr\FuncCall $node)
+    {
+        parent::enterNode($node);
+
+        if (count($node->args) < 2) {
+            return;
+        }
+
+        $nameValue = $node->args[0]->value;
+
+        if (!$nameValue instanceof Node\Scalar\String_) {
+            return;
+        }
+
+        // Defines can be namespaced if their name contains slashes, see also
+        // https://php.net/manual/en/function.define.php#90282
+        $name = new Node\Name((string) $nameValue->value);
+
+        $this->globalDefines[$name->toString()] = [
+            'name'           => $name->getLast(),
+            'fqcn'           => $name->toString(),
+            'startLine'      => $node->getLine(),
+            'endLine'        => $node->getAttribute('endLine'),
+            'startPosName'   => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,
+            'endPosName'     => $node->getAttribute('endFilePos') ? $node->getAttribute('endFilePos') : null,
+            'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null,
+
+            'defaultValue' => substr(
+                $this->code,
+                $node->args[1]->getAttribute('startFilePos'),
+                $node->args[1]->getAttribute('endFilePos') - $node->args[1]->value->getAttribute('startFilePos') + 1
+            )
+        ];
+    }
+
+    /**
      * @inheritDoc
      */
     public function leaveNode(Node $node)
@@ -455,5 +504,15 @@ class OutlineIndexingVisitor extends NameResolver
     public function getGlobalConstants()
     {
         return $this->globalConstants;
+    }
+
+    /**
+     * Retrieves the list of (global) defines.
+     *
+     * @return array
+     */
+    public function getGlobalDefines()
+    {
+        return $this->globalDefines;
     }
 }
