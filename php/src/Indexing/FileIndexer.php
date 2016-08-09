@@ -84,6 +84,8 @@ class FileIndexer
      *
      * @param string $filePath
      * @param string $code
+     *
+     * @throws IndexingFailedException
      */
     public function index($filePath, $code)
     {
