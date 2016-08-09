@@ -41,19 +41,15 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
         $reindexCommand = new Command\Reindex($this->getParser());
         $reindexCommand->setIndexDatabase($indexDatabase);
 
-        $reindexOutput = $reindexCommand->reindex(
+        $success = $reindexCommand->reindex(
             [$testPath],
             false,
             false,
             false
         );
 
-        $reindexOutput = json_decode($reindexOutput, true);
-
-        $this->assertNotNull($reindexOutput);
-
         if (!$mayFail) {
-            $this->assertTrue($reindexOutput['success']);
+            $this->assertTrue($success);
         }
 
         return $indexDatabase;

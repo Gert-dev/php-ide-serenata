@@ -88,12 +88,14 @@ class Reindex extends AbstractCommand
             throw new UnexpectedValueException('At least one file or directory to index is required for this command.');
         }
 
-        return $this->reindex(
+        $success = $this->reindex(
             $arguments['source']->value,
             isset($arguments['stdin']),
             isset($arguments['verbose']),
             isset($arguments['stream-progress'])
         );
+
+        return $this->outputJson($success, []);
     }
 
     /**
@@ -151,7 +153,7 @@ class Reindex extends AbstractCommand
             throw $exception;
         }
 
-        return $this->outputJson($success, []);
+        return $success;
     }
 
     /**
