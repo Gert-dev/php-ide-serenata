@@ -37,6 +37,7 @@ $c = some_condition() ? $a : $b;
 ### Bugs fixed
 * The return type of global functions was being ignored if they had multiple return types.
 * In rare cases, caching would complain that it could not create the `accessing_shared_cache.lock` file.
+* When force indexing, the cache was not properly invalidated, sometimes leading to the wrong data being fetched.
 * Retrieving locally available variables wasn't always using the most up to date version of the editor's contents.
 * When retrieving available variables or deducing types, character offsets were not correctly being translated to byte offsets, sometimes leading to incorrect results.
 
