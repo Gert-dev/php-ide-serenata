@@ -104,7 +104,7 @@ class Reindex extends AbstractCommand
      * @param bool     $showOutput
      * @param bool     $doStreamProgress
      *
-     * @return string
+     * @return bool
      */
     public function reindex(array $paths, $useStdin, $showOutput, $doStreamProgress)
     {
