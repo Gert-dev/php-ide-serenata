@@ -1,1 +1,0 @@
-<?phtp <?php SomeIncorrectCodedareionsdnarsiodeonarids
