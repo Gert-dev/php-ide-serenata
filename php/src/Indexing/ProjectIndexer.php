@@ -143,9 +143,9 @@ class ProjectIndexer
     /**
      * Indexes the specified project.
      *
-     * @param string $directory
+     * @param string[] $items
      */
-    public function index($directory)
+    public function index(array $items)
     {
         $this->indexBuiltinItemsIfNecessary();
 
@@ -153,7 +153,20 @@ class ProjectIndexer
         $this->pruneRemovedFiles();
 
         $this->logMessage('Scanning for files that need (re)indexing...');
-        $files = $this->scanner->scan($directory);
+
+        $files = [];
+
+        foreach ($items as $item) {
+            if (is_dir($item)) {
+                $filesInDirectory = $this->scanner->scan($item);
+
+                $files = array_merge($files, $filesInDirectory);
+            } elseif (is_file($item)) {
+                $files[] = $item;
+            } else {
+                throw new IndexingFailedException('The specified file or directory "' . $item . '" does not exist!');
+            }
+        }
 
         $this->logMessage('Indexing outline...');
 
@@ -164,16 +177,27 @@ class ProjectIndexer
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
 
-            $code = $this->sourceCodeHelper->getSourceCode($filePath, false);
-
             try {
-                $this->fileIndexer->index($filePath, $code);
+                $this->indexFile($filePath, false);
             } catch (IndexingFailedException $e) {
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
             }
 
             $this->sendProgress($i+1, $totalItems);
         }
+    }
+
+    /**
+     * @param string $filePath
+     * @param bool    $useStdin
+     *
+     * @throws IndexingFailedException
+     */
+    public function indexFile($filePath, $useStdin)
+    {
+        $code = $this->sourceCodeHelper->getSourceCode($filePath, $useStdin);
+
+        $this->fileIndexer->index($filePath, $code);
     }
 
     /**

@@ -106,42 +106,42 @@ class Reindex extends AbstractCommand
      */
     public function reindex(array $paths, $useStdin, $showOutput, $doStreamProgress)
     {
-        $success = true;
-
-        foreach ($paths as $path) {
-            if (!$this->reindexItem($path, $useStdin, $showOutput, $doStreamProgress)) {
-                $success = false;
-                break;
+        if ($useStdin) {
+            if (count($paths) > 1) {
+                throw new UnexpectedValueException('Reading from STDIN is only possible when a single path is specified!');
+            } elseif (!is_file($paths[0])) {
+                throw new UnexpectedValueException('Reading from STDIN is only possible for a single file!');
             }
-        }
-
-        return $this->outputJson($success, []);
-    }
-
-    /**
-     * @param string $path
-     * @param bool   $useStdin
-     * @param bool   $showOutput
-     * @param bool   $doStreamProgress
-     *
-     * @return bool
-     */
-    protected function reindexItem($path, $useStdin, $showOutput, $doStreamProgress)
-    {
-        if (!is_dir($path) && !is_file($path) && !$useStdin) {
-            throw new UnexpectedValueException('The specified file or directory "' . $path . '" does not exist!');
         }
 
         $success = true;
         $exception = null;
 
         try {
-            if (is_dir($path)) {
-                $success = $this->reindexDirectory($path, $showOutput, $doStreamProgress);
-            } else {
-                $code = $this->getSourceCodeHelper()->getSourceCode($path, $useStdin);
+            // Yes, we abuse the error channel...
+            $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
+            $progressStream = $doStreamProgress ? fopen('php://stderr', 'w') : null;
 
-                $success = $this->reindexFile($path, $code);
+            try {
+                $this->getProjectIndexer()
+                    ->setProgressStream($progressStream)
+                    ->setLoggingStream($loggingStream);
+
+                if (!$useStdin) {
+                    $this->getProjectIndexer()->index($paths);
+                } else {
+                    $this->getProjectIndexer()->indexFile($paths[0], $useStdin);
+                }
+            } catch (Indexing\IndexingFailedException $e) {
+                $success = false;
+            }
+
+            if ($loggingStream) {
+                fclose($loggingStream);
+            }
+
+            if ($progressStream) {
+                fclose($progressStream);
             }
         } catch (\Exception $e) {
             $exception = $e;
@@ -151,53 +151,7 @@ class Reindex extends AbstractCommand
             throw $exception;
         }
 
-        return $success;
-    }
-
-    /**
-     * @param string $path
-     * @param bool   $showOutput
-     * @param bool   $doStreamProgress
-     *
-     * @return bool
-     */
-    protected function reindexDirectory($path, $showOutput, $doStreamProgress)
-    {
-        // Yes, we abuse the error channel...
-        $loggingStream = $showOutput ? fopen('php://stdout', 'w') : null;
-        $progressStream = $doStreamProgress ? fopen('php://stderr', 'w') : null;
-
-        $this->getProjectIndexer()
-            ->setProgressStream($progressStream)
-            ->setLoggingStream($loggingStream)
-            ->index($path);
-
-        if ($loggingStream) {
-            fclose($loggingStream);
-        }
-
-        if ($progressStream) {
-            fclose($progressStream);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $path
-     * @param string $code
-     *
-     * @return bool
-     */
-    protected function reindexFile($path, $code)
-    {
-        try {
-            $this->getFileIndexer()->index($path, $code);
-        } catch (Indexing\IndexingFailedException $e) {
-            return false;
-        }
-
-        return true;
+        return $this->outputJson($success, []);
     }
 
     /**
