@@ -124,7 +124,7 @@ class Proxy
         php = @config.get('phpCommand')
 
         args.unshift(@projectName)
-        
+
         parameters = @prepareParameters(args)
 
         if not @projectName
@@ -451,7 +451,14 @@ class Proxy
 
         progressStreamCallbackWrapper = null
 
+        parameters = [
+            '--reindex',
+            '--database=' + @getIndexDatabasePath()
+        ]
+
         if progressStreamCallback?
+            parameters.push('--stream-progress')
+
             progressStreamCallbackWrapper = (output) =>
                 # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
                 percentages = output.toString('ascii').split("\n")
@@ -459,12 +466,6 @@ class Proxy
 
                 for percentage in percentages
                     progressStreamCallback(percentage)
-
-        parameters = [
-            '--reindex',
-            '--database=' + @getIndexDatabasePath(),
-            '--stream-progress'
-        ]
 
         for pathToIndex in pathsToIndex
             parameters.push('--source=' + pathToIndex)
