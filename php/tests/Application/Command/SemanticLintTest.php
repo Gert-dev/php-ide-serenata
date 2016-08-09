@@ -531,15 +531,4 @@ class SemanticLintTest extends IndexedTest
             ]
         ], $output['warnings']['docblockIssues']['deprecatedLinkTag']);
     }
-
-    /**
-     * @expectedException \UnexpectedValueException
-     */
-    public function testThrowsExceptionOnUnknownFile()
-    {
-        $command = new SemanticLint($this->getParser());
-        $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
-
-        $output = $this->lintFile('MissingFile.php');
-    }
 }
