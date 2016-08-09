@@ -109,7 +109,7 @@ abstract class AbstractCommand implements CommandInterface
 
         // Ensure we differentiate caches between databases.
         if ($this->cache) {
-            $this->cache->setCachePrefix(md5($this->databaseFile));
+            $this->cache->setCachePrefix($this->cache->getCachePrefix() . md5($this->databaseFile));
         }
 
         try {
