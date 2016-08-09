@@ -174,6 +174,8 @@ class ProjectIndexer
 
         $this->sendProgress(0, $totalItems);
 
+        $this->storage->beginTransaction();
+
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
 
@@ -185,6 +187,8 @@ class ProjectIndexer
 
             $this->sendProgress($i+1, $totalItems);
         }
+
+        $this->storage->commitTransaction();
     }
 
     /**
