@@ -209,7 +209,7 @@ class Reindex extends AbstractCommand
     protected function getStorageForIndexers()
     {
         if (!$this->storageForIndexers) {
-            $this->storageForIndexers = new CallbackStorageProxy($this->indexDatabase, function ($fqcn) {
+            $this->storageForIndexers = new CallbackStorageProxy($this->getIndexDatabase(), function ($fqcn) {
                 $provider = $this->getIndexDataAdapterProvider();
 
                 if ($provider instanceof ProviderCachingProxy) {
@@ -239,7 +239,7 @@ class Reindex extends AbstractCommand
     protected function getFileModifiedMap()
     {
         if (!$this->fileModifiedMap) {
-            $this->fileModifiedMap = $this->indexDatabase->getFileModifiedMap();
+            $this->fileModifiedMap = $this->getIndexDatabase()->getFileModifiedMap();
         }
 
         return $this->fileModifiedMap;

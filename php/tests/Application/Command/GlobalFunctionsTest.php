@@ -12,8 +12,7 @@ class GlobalFunctionsTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new GlobalFunctions($this->getParser());
-        $command->setIndexDatabase($indexDatabase);
+        $command = new GlobalFunctions($this->getParser(), null, $indexDatabase);
 
         $output = $command->getGlobalFunctions();
 

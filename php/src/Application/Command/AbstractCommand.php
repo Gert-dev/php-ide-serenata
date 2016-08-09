@@ -71,13 +71,15 @@ abstract class AbstractCommand implements CommandInterface
     protected $sourceCodeHelper;
 
     /**
-     * @param Parser     $parser
-     * @param Cache|null $cache
+     * @param Parser        $parser
+     * @param Cache|null    $cache
+     * @param IndexDatabase $indexDatabase = null
      */
-    public function __construct(Parser $parser, Cache $cache = null)
+    public function __construct(Parser $parser, Cache $cache = null, IndexDatabase $indexDatabase = null)
     {
         $this->parser = $parser;
         $this->cache = $cache ? (new CacheIdPrefixDecorator($cache, $this->getCachePrefix())) : null;
+        $this->indexDatabase = $indexDatabase;
     }
 
     /**
@@ -110,8 +112,6 @@ abstract class AbstractCommand implements CommandInterface
             $this->cache->setCachePrefix(md5($this->databaseFile));
         }
 
-        $this->setIndexDatabase($this->createIndexDatabase($this->databaseFile));
-
         try {
             return $this->process($processedArguments);
         } catch (UnexpectedValueException $e) {
@@ -120,28 +120,15 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * Creates an index database instance for the database on the specified path.
-     *
-     * @param string $filePath
-     *
      * @return IndexDatabase
      */
-    protected function createIndexDatabase($filePath)
+    protected function getIndexDatabase()
     {
-        return new IndexDatabase($filePath, static::DATABASE_VERSION);
-    }
+        if (!$this->indexDatabase) {
+            $this->indexDatabase = new IndexDatabase($this->databaseFile, static::DATABASE_VERSION);
+        }
 
-    /**
-     * Sets the indexDatabase to use.
-     *
-     * @param IndexDatabase $indexDatabase
-     *
-     * @return $this
-     */
-    public function setIndexDatabase(IndexDatabase $indexDatabase)
-    {
-        $this->indexDatabase = $indexDatabase;
-        return $this;
+        return $this->indexDatabase;
     }
 
     /**
@@ -207,11 +194,11 @@ abstract class AbstractCommand implements CommandInterface
         if (!$this->indexDataAdapterProvider) {
             if ($this->cache) {
                 $this->indexDataAdapterProvider = new IndexDataAdapter\ProviderCachingProxy(
-                    $this->indexDatabase,
+                    $this->getIndexDatabase(),
                     $this->cache
                 );
             } else {
-                $this->indexDataAdapterProvider = $this->indexDatabase;
+                $this->indexDataAdapterProvider = $this->getIndexDatabase();
             }
         }
 

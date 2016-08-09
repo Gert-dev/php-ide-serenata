@@ -153,7 +153,7 @@ class SemanticLint extends AbstractCommand
             if ($retrieveUnknownClasses) {
                 $unknownClassAnalyzer = new SemanticLint\UnknownClassAnalyzer(
                     $file,
-                    $this->indexDatabase,
+                    $this->getIndexDatabase(),
                     $this->getResolveTypeCommand(),
                     $this->getTypeAnalyzer(),
                     $this->getDocParser()
@@ -225,7 +225,7 @@ class SemanticLint extends AbstractCommand
             $docblockCorrectnessAnalyzer = null;
 
             if ($analyzeDocblockCorrectness) {
-                $fileId = $this->indexDatabase->getFileId($file);
+                $fileId = $this->getIndexDatabase()->getFileId($file);
 
                 if (!$fileId) {
                     throw new UnexpectedValueException('The specified file is not present in the index!');
@@ -236,7 +236,7 @@ class SemanticLint extends AbstractCommand
 
                 $docblockCorrectnessAnalyzer = new SemanticLint\DocblockCorrectnessAnalyzer(
                     $code,
-                    $this->indexDatabase,
+                    $this->getIndexDatabase(),
                     $this->getClassInfoCommand()
                 );
 
@@ -285,25 +285,12 @@ class SemanticLint extends AbstractCommand
     }
 
     /**
-     * @inheritDoc
-     */
-    public function setIndexDatabase(IndexDatabase $indexDatabase)
-    {
-        if ($this->classInfoCommand) {
-            $this->getClassInfoCommand()->setIndexDatabase($indexDatabase);
-        }
-
-        parent::setIndexDatabase($indexDatabase);
-    }
-
-    /**
      * @return ClassInfo
      */
     protected function getClassInfoCommand()
     {
         if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfo($this->getParser(), $this->cache);
-            $this->classInfoCommand->setIndexDatabase($this->indexDatabase);
+            $this->classInfoCommand = new ClassInfo($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->classInfoCommand;
@@ -315,8 +302,7 @@ class SemanticLint extends AbstractCommand
     protected function getDeduceTypesCommand()
     {
         if (!$this->deduceTypesCommand) {
-            $this->deduceTypesCommand = new DeduceTypes($this->getParser(), $this->cache);
-            $this->deduceTypesCommand->setIndexDatabase($this->indexDatabase);
+            $this->deduceTypesCommand = new DeduceTypes($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->deduceTypesCommand;
@@ -328,8 +314,7 @@ class SemanticLint extends AbstractCommand
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache);
-            $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
+            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->resolveTypeCommand;
@@ -341,8 +326,7 @@ class SemanticLint extends AbstractCommand
     protected function getGlobalFunctionsCommand()
     {
         if (!$this->globalFunctions) {
-            $this->globalFunctions = new GlobalFunctions($this->getParser(), $this->cache);
-            $this->globalFunctions->setIndexDatabase($this->indexDatabase);
+            $this->globalFunctions = new GlobalFunctions($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->globalFunctions;
@@ -354,8 +338,7 @@ class SemanticLint extends AbstractCommand
     protected function getGlobalConstantsCommand()
     {
         if (!$this->globalConstants) {
-            $this->globalConstants = new GlobalConstants($this->getParser(), $this->cache);
-            $this->globalConstants->setIndexDatabase($this->indexDatabase);
+            $this->globalConstants = new GlobalConstants($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->globalConstants;

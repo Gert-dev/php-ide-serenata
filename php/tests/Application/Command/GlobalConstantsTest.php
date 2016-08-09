@@ -12,8 +12,7 @@ class GlobalConstantsTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new GlobalConstants($this->getParser());
-        $command->setIndexDatabase($indexDatabase);
+        $command = new GlobalConstants($this->getParser(), null, $indexDatabase);
 
         $output = $command->getGlobalConstants();
 

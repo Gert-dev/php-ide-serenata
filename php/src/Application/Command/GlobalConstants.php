@@ -28,7 +28,7 @@ class GlobalConstants extends AbstractCommand
     {
         $constants = [];
 
-        foreach ($this->indexDatabase->getGlobalConstants() as $constant) {
+        foreach ($this->getIndexDatabase()->getGlobalConstants() as $constant) {
             $constants[$constant['fqcn']] = $this->getIndexDataAdapter()->getConstantInfo($constant);
         }
 

@@ -45,7 +45,7 @@ class ClassList extends AbstractCommand
          $storageProxy = new ClassList\ProxyProvider($this->getIndexDataAdapterProvider());
          $dataAdapter = new IndexDataAdapter($storageProxy);
 
-         foreach ($this->indexDatabase->getAllStructuresRawInfo($file) as $element) {
+         foreach ($this->getIndexDatabase()->getAllStructuresRawInfo($file) as $element) {
              // Directly load in the raw information we already have, this avoids performing a database query for each
              // record.
              $storageProxy->setStructureRawInfo($element);

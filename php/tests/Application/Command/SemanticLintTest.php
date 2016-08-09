@@ -14,8 +14,7 @@ class SemanticLintTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path, $indexingMayFail);
 
-        $command = new SemanticLint($this->getParser());
-        $command->setIndexDatabase($indexDatabase);
+        $command = new SemanticLint($this->getParser(), null, $indexDatabase);
 
         return $command->semanticLint($path, file_get_contents($path));
     }

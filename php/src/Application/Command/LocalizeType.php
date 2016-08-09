@@ -52,13 +52,13 @@ class LocalizeType extends AbstractCommand
      */
     public function localizeType($type, $file, $line)
     {
-        $fileId = $this->indexDatabase->getFileId($file);
+        $fileId = $this->getIndexDatabase()->getFileId($file);
 
         if (!$fileId) {
             throw new UnexpectedValueException('The specified file is not present in the index!');
         }
 
-        $namespace = $this->indexDatabase->getRelevantNamespace($file, $line);
+        $namespace = $this->getIndexDatabase()->getRelevantNamespace($file, $line);
 
         if (!$namespace) {
             throw new LogicException(
@@ -66,7 +66,7 @@ class LocalizeType extends AbstractCommand
             );
         }
 
-        $useStatements = $this->indexDatabase->getUseStatementsByNamespaceId(
+        $useStatements = $this->getIndexDatabase()->getUseStatementsByNamespaceId(
             $namespace['id'],
             $line
         );

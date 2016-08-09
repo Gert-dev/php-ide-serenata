@@ -690,37 +690,12 @@ class DeduceTypes extends AbstractCommand
     }
 
     /**
-     * @inheritDoc
-     */
-    public function setIndexDatabase(IndexDatabase $indexDatabase)
-    {
-        if ($this->classListCommand) {
-            $this->getClassListCommand()->setIndexDatabase($indexDatabase);
-        }
-
-        if ($this->classInfoCommand) {
-            $this->getClassInfoCommand()->setIndexDatabase($indexDatabase);
-        }
-
-        if ($this->resolveTypeCommand) {
-            $this->getResolveTypeCommand()->setIndexDatabase($indexDatabase);
-        }
-
-        if ($this->globalFunctionsCommand) {
-            $this->getGlobalFunctionsCommand()->setIndexDatabase($indexDatabase);
-        }
-
-        parent::setIndexDatabase($indexDatabase);
-    }
-
-    /**
      * @return ClassList
      */
     protected function getClassListCommand()
     {
         if (!$this->classListCommand) {
-            $this->classListCommand = new ClassList($this->getParser(), $this->cache);
-            $this->classListCommand->setIndexDatabase($this->indexDatabase);
+            $this->classListCommand = new ClassList($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->classListCommand;
@@ -732,8 +707,7 @@ class DeduceTypes extends AbstractCommand
     protected function getClassInfoCommand()
     {
         if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfo($this->getParser(), $this->cache);
-            $this->classInfoCommand->setIndexDatabase($this->indexDatabase);
+            $this->classInfoCommand = new ClassInfo($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->classInfoCommand;
@@ -745,8 +719,7 @@ class DeduceTypes extends AbstractCommand
     protected function getGlobalFunctionsCommand()
     {
         if (!$this->globalFunctionsCommand) {
-            $this->globalFunctionsCommand = new GlobalFunctions($this->getParser(), $this->cache);
-            $this->globalFunctionsCommand->setIndexDatabase($this->indexDatabase);
+            $this->globalFunctionsCommand = new GlobalFunctions($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->globalFunctionsCommand;
@@ -758,8 +731,7 @@ class DeduceTypes extends AbstractCommand
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache);
-            $this->resolveTypeCommand->setIndexDatabase($this->indexDatabase);
+            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->resolveTypeCommand;
