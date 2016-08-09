@@ -426,6 +426,19 @@ class Proxy
         return @performRequest(parameters, null, source)
 
     ###*
+     * Truncates the database.
+     *
+     * @return {Promise}
+    ###
+    truncate: () ->
+        parameters = [
+            '--truncate',
+            '--database=' + @getIndexDatabasePath()
+        ]
+
+        return @performRequest(parameters, null, null)
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {String|Array} path                   The full path to the file  or folder to refresh. Alternatively,

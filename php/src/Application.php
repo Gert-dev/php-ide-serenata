@@ -64,7 +64,8 @@ class Application
             '--semantic-lint'       => 'SemanticLint',
             '--available-variables' => 'AvailableVariables',
             '--deduce-types'        => 'DeduceTypes',
-            '--invocation-info'     => 'InvocationInfo'
+            '--invocation-info'     => 'InvocationInfo',
+            '--truncate'            => 'Truncate'
         ];
 
         if (isset($commands[$command])) {

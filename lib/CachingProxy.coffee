@@ -141,6 +141,12 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    truncate: (file, source, offset) ->
+        return @wrapCachedRequestToParent("truncate", 'truncate', arguments)
+
+    ###*
+     * @inherited
+    ###
     reindex: (path, source, progressStreamCallback) ->
         return super(path, source, progressStreamCallback).then (output) =>
             @clearCache()

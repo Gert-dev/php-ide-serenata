@@ -178,6 +178,14 @@ class Service
         return @proxy.getInvocationInfo(file, source, offset)
 
     ###*
+     * Truncates the database.
+     *
+     * @return {Promise}
+    ###
+    truncate: () ->
+        return @proxy.truncate()
+
+    ###*
      * Convenience alias for {@see deduceTypes}.
      *
      * @param {TextEditor} editor

@@ -226,15 +226,13 @@ module.exports =
      * @return {Promise|null}
     ###
     forceProjectIndex: (project) ->
-        fs = require 'fs'
+        handler = () =>
+            @attemptProjectIndex(project)
 
-        try
-            fs.unlinkSync(@proxy.getIndexDatabasePath())
+        successHandler = handler
+        failureHandler = handler
 
-        catch error
-            # If the file doesn't exist, just bail out.
-
-        return @attemptProjectIndex(project)
+        @service.truncate().then(successHandler, failureHandler)
 
     ###*
      * Forcibly indexes the project in its entirety by removing the existing indexing database first, but only if a

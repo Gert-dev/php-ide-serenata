@@ -44,6 +44,7 @@ $c = some_condition() ? $a : $b;
 * `getInvocationInfo` is now also available separately as PHP command.
 * Constants and properties will now also return their default values, if present.
 * `determineCurrentClassName` was not causing a promise rejection when fetching the class list failed internally.
+* A new command `truncate` now does what a force reindex does, but also ensures the cache is properly invalidated.
 * `getInvocationInfoAt` will now return an `offset` rather than a `bufferPosition` to be consistent with the other commands.
 * `getResultingTypesAt` is now simply a convenience call to `deduceTypes` as its underlying code has been completely moved to PHP.
 * `deduceTypes` gained a new parameter `ignoreLastElement`, which does the same as the identically-named parameter for `getResultingTypesAt` does.

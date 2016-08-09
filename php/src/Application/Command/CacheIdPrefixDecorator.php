@@ -3,11 +3,12 @@
 namespace PhpIntegrator\Application\Command;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\ClearableCache;
 
 /**
  * Decorator for cache objects that will automatically prefix cache ID's with a preconfigured string.
  */
-class CacheIdPrefixDecorator implements Cache
+class CacheIdPrefixDecorator implements Cache, ClearableCache
 {
     /**
      * @var Cache
@@ -94,6 +95,16 @@ class CacheIdPrefixDecorator implements Cache
     public function getStats()
     {
         return $this->decoratedObject->getStats();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteAll()
+    {
+        if ($this->decoratedObject instanceof ClearableCache) {
+            $this->decoratedObject->deleteAll();
+        }
     }
 
     /**
