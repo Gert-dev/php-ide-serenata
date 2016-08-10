@@ -68,7 +68,7 @@ module.exports =
         php_integrator:
             enabled: true
             phpVersion: 5.6
-            excludedFolders: []
+            excludedPaths: []
             fileExtensions: ['php']
 
     ###*
