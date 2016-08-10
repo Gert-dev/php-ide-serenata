@@ -1086,6 +1086,27 @@ SOURCE;
         $this->assertEquals(2, $result['argumentIndex']);
     }
 
+    public function testGetInvocationInfoAtWithConstructorCallsWithNormalClassNamePrecededByLeadingSlashAndMultipleParts()
+    {
+        $sourceCodeHelper = new SourceCodeHelper();
+
+        $source = <<<'SOURCE'
+        <?php
+
+        new \MyNamespace\MyObject(
+            1,
+            2,
+            3
+SOURCE;
+
+        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+
+        $this->assertEquals(48, $result['offset']);
+        $this->assertEquals(['\MyNamespace\MyObject'], $result['callStack']);
+        $this->assertEquals('instantiation', $result['type']);
+        $this->assertEquals(2, $result['argumentIndex']);
+    }
+
     public function testGetInvocationInfoAtWithConstructorCalls2()
     {
         $sourceCodeHelper = new SourceCodeHelper();

@@ -396,11 +396,15 @@ class SourceCodeHelper
                     $type = 'function';
 
                     for ($j = $currentTokenIndex - 2; $j >= 0; --$j) {
-                        if (is_array($tokens[$j]) && in_array($tokens[$j][0], [T_WHITESPACE, T_NS_SEPARATOR, T_NEW])) {
+                        if (
+                            is_array($tokens[$j]) &&
+                            in_array($tokens[$j][0], [T_WHITESPACE, T_NS_SEPARATOR, T_NEW, T_STRING])
+                        ) {
                             if ($tokens[$j][0] === T_NEW) {
                                 $type = 'instantiation';
                                 break;
                             }
+
 
                             continue;
                         }
