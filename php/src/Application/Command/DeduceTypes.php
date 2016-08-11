@@ -153,6 +153,10 @@ class DeduceTypes extends AbstractCommand
         $propertyAccessNeedsDollarSign = false;
         $firstElement = array_shift($expressionParts);
 
+        if (!$firstElement) {
+            return [];
+        }
+
         $classRegexPart = "?:\\\\?[a-zA-Z_][a-zA-Z0-9_]*(?:\\\\[a-zA-Z_][a-zA-Z0-9_]*)*";
 
         if ($firstElement[0] === '$') {
