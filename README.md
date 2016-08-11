@@ -24,12 +24,10 @@ The source code was originally based on the php-autocomplete-plus code base, but
 Currently the following is required in order to get the package up and running:
   * **PHP** - To run this package properly, you need at least PHP 5.5. The code you're actually writing can be anything ranging from PHP 5.2 up to (and including) PHP 7.0.
     * **php-sqlite** and SQLite >= 3.7.11 - Required as back end for the indexing database.
-  * **PSR-compliant code** - Write code that follows the PSR standards, especially regarding namespacing.
+  * [atom-project-manager](https://github.com/danielbrodin/atom-project-manager) to manage your projects. When you have a project active, click `Packages → PHP Integrator → Set Up Current Project` (or use the command palette).
   * **Documentation** and **type hinting** - [See our wiki for more information](https://github.com/Gert-dev/php-integrator-base/wiki/Proper-Documentation-And-Type-Hinting).
 
-Note that folders that aren't readable (no permission) will be silently ignored!
-
-Some features may or may not work outside these restrictions. **Don't forget to open the settings page after installing to set up the package!**
+Some features may or may not work outside these restrictions. Codebases without namespacing or that don't follow the PSR standards regarding namespacing are not officially supported, but will most likely work anyway. Note also that folders that aren't readable (no permission) will be silently ignored! **Don't forget to open the settings page after installing to set up the package!**
 
 ## Performance tips
 * Use PHP 7 for the indexer.
