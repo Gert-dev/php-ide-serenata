@@ -193,6 +193,36 @@ class ClassInfoTest extends IndexedTest
         ], $output['properties']['testProperty2']['types']);
     }
 
+    public function testPropertyTypeDeductionFallsBackToUsingItsDefaultValue()
+    {
+        $fileName = 'ClassPropertyDefaultValue.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertEquals([
+            [
+                'type'         => 'string',
+                'fqcn'         => 'string',
+                'resolvedType' => 'string'
+            ]
+        ], $output['properties']['testProperty']['types']);
+    }
+
+    public function testConstantTypeDeductionFallsBackToUsingItsDefaultValue()
+    {
+        $fileName = 'ClassConstantDefaultValue.php';
+
+        $output = $this->getClassInfo($fileName, 'A\TestClass');
+
+        $this->assertEquals([
+            [
+                'type'         => 'array',
+                'fqcn'         => 'array',
+                'resolvedType' => 'array'
+            ]
+        ], $output['constants']['TEST_CONSTANT']['types']);
+    }
+
     public function testDataIsCorrectForClassMethods()
     {
         $fileName = 'ClassMethod.php';
@@ -1419,7 +1449,7 @@ class ClassInfoTest extends IndexedTest
         $this->assertEquals('string', $output['methods']['testMethod']['parameters'][1]['types'][0]['fqcn']);
     }
 
-    public function testItemsWithoutDocblockHaveNoTypes()
+    public function testItemsWithoutDocblockAndDefaultValueHaveNoTypes()
     {
         $fileName = 'ClassMethodNoDocblock.php';
 
@@ -1428,7 +1458,6 @@ class ClassInfoTest extends IndexedTest
         $this->assertEmpty($output['methods']['testMethod']['parameters'][0]['types']);
         $this->assertEmpty($output['methods']['testMethod']['returnTypes']);
         $this->assertEmpty($output['properties']['testProperty']['types']);
-        $this->assertEmpty($output['constants']['TEST_CONSTANT']['types']);
     }
 
     public function testCorrectlyFindsClassesInNamelessNamespace()

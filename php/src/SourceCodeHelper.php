@@ -49,6 +49,10 @@ class SourceCodeHelper
      */
     public function calculateLineByOffset($source, $offset)
     {
+        if (!$offset) {
+            return 1;
+        }
+
         return substr_count($source, "\n", 0, $offset) + 1;
     }
 

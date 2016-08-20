@@ -34,6 +34,25 @@ $c = some_condition() ? $a : $b;
 // $c is now of type A|B.
 ```
 
+* The default value for classlike properties and constants is now used for type deduction. This will improve type guessing in several situations. For example, when generating a docblock for `$foo`:
+
+```php
+// Before:
+
+    /**
+     * @var mixed
+     */
+    protected $foo = 'test';
+
+// After:
+
+    /**
+     * @var string
+     */
+    protected $foo = 'test';
+
+```
+
 ### Bugs fixed
 * The return type of global functions was being ignored if they had multiple return types.
 * In rare cases, caching would complain that it could not create the `accessing_shared_cache.lock` file.

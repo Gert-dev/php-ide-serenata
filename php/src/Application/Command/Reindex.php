@@ -64,6 +64,11 @@ class Reindex extends AbstractCommand
     protected $typeAnalyzer;
 
     /**
+     * @var DeduceTypes
+     */
+    protected $deduceTypes;
+
+    /**
      * @var StorageInterface
      */
     protected $storageForIndexers;
@@ -184,6 +189,7 @@ class Reindex extends AbstractCommand
                 $this->getStorageForIndexers(),
                 $this->getTypeAnalyzer(),
                 $this->getDocParser(),
+                $this->getDeduceTypes(),
                 $this->getParser()
             );
         }
@@ -255,6 +261,18 @@ class Reindex extends AbstractCommand
         }
 
         return $this->typeAnalyzer;
+    }
+
+    /**
+     * @return DeduceTypes
+     */
+    protected function getDeduceTypes()
+    {
+        if (!$this->deduceTypes) {
+            $this->deduceTypes = new DeduceTypes($this->getParser(), $this->cache, $this->getIndexDatabase());
+        }
+
+        return $this->deduceTypes;
     }
 
     /**

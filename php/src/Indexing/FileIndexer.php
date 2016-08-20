@@ -7,14 +7,16 @@ use Exception;
 use UnexpectedValueException;
 
 use PhpIntegrator\DocParser;
-use PhpIntegrator\TypeResolver;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\TypeResolver;
 
-use PhpParser\Lexer;
+use PhpIntegrator\Application\Command\DeduceTypes;
+
 use PhpParser\Error;
+use PhpParser\Lexer;
 use PhpParser\Parser;
-use PhpParser\ParserFactory;
 use PhpParser\NodeTraverser;
+use PhpParser\ParserFactory;
 
 /**
  * Handles indexation of PHP code.
@@ -47,6 +49,11 @@ class FileIndexer
     protected $typeAnalyzer;
 
     /**
+     * @var DeduceTypes
+     */
+    protected $deduceTypes;
+
+    /**
      * @var Parser
      */
     protected $parser;
@@ -71,11 +78,13 @@ class FileIndexer
         StorageInterface $storage,
         TypeAnalyzer $typeAnalyzer,
         DocParser $docParser,
+        DeduceTypes $deduceTypes,
         Parser $parser
     ) {
         $this->storage = $storage;
         $this->typeAnalyzer = $typeAnalyzer;
         $this->docParser = $docParser;
+        $this->deduceTypes = $deduceTypes;
         $this->parser = $parser;
     }
 
@@ -372,8 +381,24 @@ class FileIndexer
         $line,
         Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
     ) {
-        $types = [];
         $typeList = $this->typeAnalyzer->getTypesForTypeSpecification($typeSpecification);
+
+        return $this->getTypeDataForTypeList($typeList, $line, $useStatementFetchingVisitor);
+    }
+
+    /**
+     * @param string[]                            $typeList
+     * @param int                                 $line
+     * @param Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
+     *
+     * @return array[]
+     */
+    protected function getTypeDataForTypeList(
+        array $typeList,
+        $line,
+        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
+    ) {
+        $types = [];
 
         foreach ($typeList as $type) {
             $fqcn = $type;
@@ -431,6 +456,19 @@ class FileIndexer
                 $rawData['startLine'],
                 $useStatementFetchingVisitor
             );
+        } elseif ($rawData['defaultValue']) {
+            try {
+                $typeList = $this->deduceTypes->deduceTypes(
+                    'ignored',
+                    $rawData['defaultValue'],
+                    [$rawData['defaultValue']],
+                    0
+                );
+
+                $types = $this->getTypeDataForTypeList($typeList, $rawData['startLine'], $useStatementFetchingVisitor);
+            } catch (UnexpectedValueException $e) {
+                $types = [];
+            }
         }
 
         $constantId = $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
@@ -500,6 +538,19 @@ class FileIndexer
                     'fqcn' => isset($rawData['fullReturnType']) ? $rawData['fullReturnType'] : $rawData['returnType']
                 ]
             ];
+        } elseif ($rawData['defaultValue']) {
+            try {
+                $typeList = $this->deduceTypes->deduceTypes(
+                    'ignored',
+                    $rawData['defaultValue'],
+                    [$rawData['defaultValue']],
+                    0
+                );
+
+                $types = $this->getTypeDataForTypeList($typeList, $rawData['startLine'], $useStatementFetchingVisitor);
+            } catch (UnexpectedValueException $e) {
+                $types = [];
+            }
         }
 
         $propertyId = $this->storage->insert(IndexStorageItemEnum::PROPERTIES, [
