@@ -446,10 +446,11 @@ class Proxy
      * @param {String|null}  source                 The source code of the file to index. May be null if a directory is
      *                                              passed instead.
      * @param {Callback}     progressStreamCallback A method to invoke each time progress streaming data is received.
+     * @param {Array}        excludedPaths          A list of paths to exclude from indexing.
      *
      * @return {Promise}
     ###
-    reindex: (path, source, progressStreamCallback) ->
+    reindex: (path, source, progressStreamCallback, excludedPaths) ->
         if typeof path == "string"
             pathsToIndex = []
 
@@ -485,6 +486,9 @@ class Proxy
 
         if source?
             parameters.push('--stdin')
+
+        for excludedPath in excludedPaths
+            parameters.push('--exclude=' + excludedPath)
 
         return @performRequest(
             parameters,

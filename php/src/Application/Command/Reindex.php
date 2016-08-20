@@ -79,6 +79,7 @@ class Reindex extends AbstractCommand
     protected function attachOptions(OptionCollection $optionCollection)
     {
         $optionCollection->add('source+', 'The file or directory to index. Can be passed multiple times to process multiple items at once.')->isa('string');
+        $optionCollection->add('exclude+', 'An absolute path to exclude. Can be passed multiple times.')->isa('string');
         $optionCollection->add('stdin?', 'If set, file contents will not be read from disk but the contents from STDIN will be used instead.');
         $optionCollection->add('v|verbose?', 'If set, verbose output will be displayed.');
         $optionCollection->add('s|stream-progress?', 'If set, progress will be streamed. Incompatible with verbose mode.');
@@ -97,7 +98,8 @@ class Reindex extends AbstractCommand
             $arguments['source']->value,
             isset($arguments['stdin']),
             isset($arguments['verbose']),
-            isset($arguments['stream-progress'])
+            isset($arguments['stream-progress']),
+            isset($arguments['exclude']->value) ? $arguments['exclude']->value : []
         );
 
         return $this->outputJson($success, []);
@@ -108,10 +110,11 @@ class Reindex extends AbstractCommand
      * @param bool     $useStdin
      * @param bool     $showOutput
      * @param bool     $doStreamProgress
+     * @param string[] $excludedPaths
      *
      * @return bool
      */
-    public function reindex(array $paths, $useStdin, $showOutput, $doStreamProgress)
+    public function reindex(array $paths, $useStdin, $showOutput, $doStreamProgress, array $excludedPaths = [])
     {
         if ($useStdin) {
             if (count($paths) > 1) {
@@ -134,11 +137,13 @@ class Reindex extends AbstractCommand
                     ->setProgressStream($progressStream)
                     ->setLoggingStream($loggingStream);
 
-                if (!$useStdin) {
-                    $this->getProjectIndexer()->index($paths);
-                } else {
-                    $this->getProjectIndexer()->indexFile($paths[0], $useStdin);
+                $sourceOverrideMap = [];
+
+                if ($useStdin) {
+                    $sourceOverrideMap[$paths[0]] = $this->getSourceCodeHelper()->getSourceCode($paths[0], true);
                 }
+
+                $this->getProjectIndexer()->index($paths, $excludedPaths, $sourceOverrideMap);
             } catch (Indexing\IndexingFailedException $e) {
                 $success = false;
             }

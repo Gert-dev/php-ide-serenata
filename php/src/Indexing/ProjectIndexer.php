@@ -144,8 +144,10 @@ class ProjectIndexer
      * Indexes the specified project.
      *
      * @param string[] $items
+     * @param string[] $excludedPaths
+     * @param array    $sourceOverrideMap
      */
-    public function index(array $items)
+    public function index(array $items, array $excludedPaths = [], $sourceOverrideMap = [])
     {
         $this->indexBuiltinItemsIfNecessary();
 
@@ -153,20 +155,8 @@ class ProjectIndexer
         $this->pruneRemovedFiles();
 
         $this->logMessage('Scanning for files that need (re)indexing...');
-
-        $files = [];
-
-        foreach ($items as $item) {
-            if (is_dir($item)) {
-                $filesInDirectory = $this->scanner->scan($item);
-
-                $files = array_merge($files, $filesInDirectory);
-            } elseif (is_file($item)) {
-                $files[] = $item;
-            } else {
-                throw new IndexingFailedException('The specified file or directory "' . $item . '" does not exist!');
-            }
-        }
+        $files = $this->scanForFilesToIndex($items);
+        $files = $this->getFilteredFilesToIndex($files, $excludedPaths);
 
         $this->logMessage('Indexing outline...');
 
@@ -179,8 +169,12 @@ class ProjectIndexer
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
 
+            $code = isset($sourceOverrideMap[$filePath]) ?
+                $sourceOverrideMap[$filePath] :
+                $this->sourceCodeHelper->getSourceCode($filePath, false);
+
             try {
-                $this->indexFile($filePath, false);
+                $this->fileIndexer->index($filePath, $code);
             } catch (IndexingFailedException $e) {
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
             }
@@ -192,16 +186,55 @@ class ProjectIndexer
     }
 
     /**
-     * @param string $filePath
-     * @param bool    $useStdin
+     * @param string[] $paths
      *
-     * @throws IndexingFailedException
+     * @return string[]
      */
-    public function indexFile($filePath, $useStdin)
+    protected function scanForFilesToIndex(array $paths)
     {
-        $code = $this->sourceCodeHelper->getSourceCode($filePath, $useStdin);
+        $files = [];
 
-        $this->fileIndexer->index($filePath, $code);
+        foreach ($paths as $path) {
+            if (is_dir($path)) {
+                $filesInDirectory = $this->scanner->scan($path);
+
+                $files = array_merge($files, $filesInDirectory);
+            } elseif (is_file($path)) {
+                $files[] = $path;
+            } else {
+                throw new IndexingFailedException('The specified file or directory "' . $path . '" does not exist!');
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * @param string[] $files
+     * @param string[] $excludedDirectories
+     *
+     * @return string[]
+     */
+    protected function getFilteredFilesToIndex(array $files, array $excludedDirectories)
+    {
+        $filteredItems = [];
+
+        foreach ($files as $file) {
+            $skipFile = false;
+
+            foreach ($excludedDirectories as $excludedDirectory) {
+                if (mb_strpos($file, $excludedDirectory) === 0) {
+                    $skipFile = true;
+                    break;
+                }
+            }
+
+            if (!$skipFile) {
+                $filteredItems[] = $file;
+            }
+        }
+
+        return $filteredItems;
     }
 
     /**
