@@ -522,21 +522,21 @@ class DeduceTypesTest extends IndexedTest
             ['$foo1']
         );
 
-        $this->assertEquals(['\Foo'], $result);
+        $this->assertEquals(['\A\Foo'], $result);
 
         $result = $this->deduceTypes(
             'SelfAssign.php',
             ['$foo2']
         );
 
-        $this->assertEquals(['\Foo'], $result);
+        $this->assertEquals(['\A\Foo'], $result);
 
         $result = $this->deduceTypes(
             'SelfAssign.php',
             ['$foo3']
         );
 
-        $this->assertEquals(['\Foo'], $result);
+        $this->assertEquals(['\A\Foo'], $result);
     }
 
     public function testCorrectlyProcessesStaticMethodCallAssignedToVariableWithFqcnWithLeadingSlash()
