@@ -34,40 +34,6 @@ class DeduceTypesTest extends IndexedTest
         return $markerOffset;
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
-    // public function testThrowsExceptionOnUnknownFile()
-    // {
-    //     $command = new DeduceTypes();
-    //     $command->setIndexDatabase(new IndexDatabase(':memory:', 1));
-    //
-    //     $output = $this->deduceTypes('MissingFile.php.test', '$test');
-    // }
-
-    /**
-     * @return Parser
-     */
-    // protected function getParser()
-    // {
-    //     $lexer = new Lexer([
-    //         'usedAttributes' => [
-    //             'comments', 'startLine', 'startFilePos', 'endFilePos'
-    //         ]
-    //     ]);
-    //
-    //     return (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-    // }
-    //
-    // protected function getExpressionNodeFor($code)
-    // {
-    //     $nodes = $this->getParser()->parse($code);
-    //
-    //     assert($nodes);
-    //
-    //     return $nodes;
-    // }
-
     public function testCorrectlyAnalyzesTypeOverrideAnnotations()
     {
         $output = $this->deduceTypes('TypeOverrideAnnotations.php.test', ['$a']);
