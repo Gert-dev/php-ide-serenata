@@ -519,10 +519,24 @@ class DeduceTypesTest extends IndexedTest
     {
         $result = $this->deduceTypes(
             'SelfAssign.php',
-            ['$data', 'getData()']
+            ['$foo1']
         );
 
-        $this->assertEquals([], $result);
+        $this->assertEquals(['\Foo'], $result);
+
+        $result = $this->deduceTypes(
+            'SelfAssign.php',
+            ['$foo2']
+        );
+
+        $this->assertEquals(['\Foo'], $result);
+
+        $result = $this->deduceTypes(
+            'SelfAssign.php',
+            ['$foo3']
+        );
+
+        $this->assertEquals(['\Foo'], $result);
     }
 
     public function testCorrectlyProcessesStaticMethodCallAssignedToVariableWithFqcnWithLeadingSlash()

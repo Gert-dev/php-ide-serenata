@@ -1,11 +1,21 @@
 <?php
 
+class Foo
+{
+    /**
+     * @return Foo
+     */
+    public function foo() {}
+}
+
 class Bar
 {
-    public function test(\DateTime $data)
+    public function test(Foo $foo1, Foo $foo2, Foo $foo3)
     {
-        $data = $data->getOffset();
-
-        // <MARKER>
+        $foo1 = $foo1;
+        $foo2 = $foo2->foo();
+        $foo3 = $foo3->
+            // <MARKER>
+            foo();
     }
 }
