@@ -17,32 +17,26 @@ class Scanner
     protected $fileModifiedMap;
 
     /**
-     * @var string[]
-     */
-    protected $allowedExtensions;
-
-    /**
      * @param array $fileModifiedMap      A mapping of (absolute) file names to DateTime objects with their last
      *                                    modified timestamp.
-     * @param string[] $allowedExtensions
      */
-    public function __construct(array $fileModifiedMap, array $allowedExtensions = ['php'])
+    public function __construct(array $fileModifiedMap)
     {
         $this->fileModifiedMap = $fileModifiedMap;
-        $this->allowedExtensions = $allowedExtensions;
     }
 
     /**
      * Scans the specified directory, returning a list of file names. Only files that have actually been updated since
      * the previous index will be retrieved by default.
      *
-     * @param string $directory
-     * @param bool   $isIncremental Whether to only return files modified since their last index (otherwise: all
+     * @param string   $directory
+     * @param string[] $allowedExtensions
+     * @param bool     $isIncremental Whether to only return files modified since their last index (otherwise: all
      *                              files are returned).
      *
      * @return string[]
      */
-    public function scan($directory, $isIncremental = true)
+    public function scan($directory, array $allowedExtensions = ['.php'], $isIncremental = true)
     {
         $dirIterator = new RecursiveDirectoryIterator(
             $directory,
@@ -59,7 +53,7 @@ class Scanner
 
         /** @var \DirectoryIterator $fileInfo */
         foreach ($iterator as $filename => $fileInfo) {
-            if (!in_array($fileInfo->getExtension(), $this->allowedExtensions, true)) {
+            if (!in_array($fileInfo->getExtension(), $allowedExtensions, true)) {
                 continue;
             }
 
