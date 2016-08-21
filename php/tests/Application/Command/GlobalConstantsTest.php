@@ -8,7 +8,7 @@ class GlobalConstantsTest extends IndexedTest
 {
     public function testGlobalConstants()
     {
-        $path = __DIR__ . '/GlobalConstantsTest/' . 'GlobalConstants.php';
+        $path = __DIR__ . '/GlobalConstantsTest/' . 'GlobalConstants.php.test';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 

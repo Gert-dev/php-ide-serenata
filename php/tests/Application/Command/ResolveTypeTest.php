@@ -10,7 +10,7 @@ class ResolveTypeTest extends IndexedTest
 {
     public function testCorrectlyResolvesVariousTypes()
     {
-        $path = __DIR__ . '/ResolveTypeTest/' . 'ResolveType.php';
+        $path = __DIR__ . '/ResolveTypeTest/' . 'ResolveType.php.test';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 

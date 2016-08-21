@@ -10,7 +10,7 @@ class LocalizeTypeTest extends IndexedTest
 {
     public function testCorrectlyLocalizesVariousTypes()
     {
-        $path = __DIR__ . '/LocalizeTypeTest/' . 'LocalizeType.php';
+        $path = __DIR__ . '/LocalizeTypeTest/' . 'LocalizeType.php.test';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
