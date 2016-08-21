@@ -109,7 +109,7 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
                     $variableName = $node->var->name;
                 }
 
-                if ($variableName) {
+                if ($variableName && $endFilePos <= $this->position) {
                     $this->setBestMatch($variableName, $node);
                 }
             }

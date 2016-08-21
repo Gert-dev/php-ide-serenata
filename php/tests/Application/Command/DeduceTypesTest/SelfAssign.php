@@ -17,6 +17,6 @@ class Bar
         $foo1 = $foo1;
         $foo2 = $foo2->foo();
         $foo3 = $foo3->// <MARKER>
-            foo();
+            shouldNotBeUsed();
     }
 }
