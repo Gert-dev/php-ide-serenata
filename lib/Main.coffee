@@ -338,6 +338,9 @@ module.exports =
         projectPaths = project.props.paths
         excludedPaths = project.props.php?.php_integrator?.excludedPaths
 
+        if not excludedPaths?
+            excludedPaths = []
+
         path = require 'path'
 
         absoluteExcludedPaths = []
