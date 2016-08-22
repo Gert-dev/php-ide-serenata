@@ -362,7 +362,7 @@ class Proxy
      *                                        is still writing code, e.g. "$this->foo()->b" would normally return the
      *                                        type (class) of 'b', as it is the last element, but as the user is still
      *                                        writing code, you may instead be interested in the type of 'foo()'
-     *                                       instead.
+     *                                        instead.
      *
      * @return {Promise}
     ###
