@@ -226,7 +226,12 @@ abstract class AbstractCommand implements CommandInterface
         if (!$output) {
             $errorMessage = json_last_error_msg() ?: 'Unknown';
 
-            throw new RuntimeException('The encoded JSON output was empty, something must have gone wrong! The error message was: "' . $errorMessage . '"');
+            throw new RuntimeException(
+                'The encoded JSON output was empty, something must have gone wrong! The error message was: ' .
+                '"' .
+                $errorMessage .
+                '"'
+            );
         }
 
         return $output;
