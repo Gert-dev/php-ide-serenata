@@ -196,7 +196,13 @@ module.exports =
                     @statusBarManager.setProgress(progress)
                     @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
-        return @service.reindex(project.props.paths, null, progressStreamCallback, @getAbsoluteExcludedPaths(project)).then(successHandler, failureHandler)
+        return @service.reindex(
+            project.props.paths,
+            null,
+            progressStreamCallback,
+            @getAbsoluteExcludedPaths(project),
+            @getFileExtensionsToIndex(project)
+        ).then(successHandler, failureHandler)
 
     ###*
      * Performs a project index, but only if one is not currently already happening.
@@ -263,7 +269,13 @@ module.exports =
         failureHandler = () =>
             return
 
-        return @service.reindex(fileName, source, null, @getAbsoluteExcludedPaths(project)).then(successHandler, failureHandler)
+        return @service.reindex(
+            fileName,
+            source,
+            null,
+            @getAbsoluteExcludedPaths(project),
+            @getFileExtensionsToIndex(project)
+        ).then(successHandler, failureHandler)
 
     ###*
      * Performs a file index, but only if the file is not currently already being indexed (otherwise silently returns).
@@ -365,6 +377,22 @@ module.exports =
                     absoluteExcludedPaths.push(path.normalize(excludedPath))
 
         return absoluteExcludedPaths
+
+    ###*
+     * Retrieves a list of file extensions to include in indexing.
+     *
+     * @param {Object} project
+     *
+     * @return {Array}
+    ###
+    getFileExtensionsToIndex: (project) ->
+        projectPaths = project.props.paths
+        fileExtensions = project.props.php?.php_integrator?.fileExtensions
+
+        if not fileExtensions?
+            fileExtensions = []
+
+        return fileExtensions
 
     ###*
      * @param {Object} project

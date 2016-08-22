@@ -210,10 +210,11 @@ class Service
      *                                              passed instead.
      * @param {Callback}     progressStreamCallback A method to invoke each time progress streaming data is received.
      * @param {Array}        excludedPaths          A list of paths to exclude from indexing.
+     * @param {Array}        fileExtensionsToIndex  A list of file extensions (without leading dot) to index.
      *
      * @return {Promise}
     ###
-    reindex: (path, source, progressStreamCallback, excludedPaths) ->
+    reindex: (path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex) ->
         return new Promise (resolve, reject) =>
             successHandler = (output) =>
                 @indexingEventEmitter.emit('php-integrator-base:indexing-finished', {
@@ -231,7 +232,13 @@ class Service
 
                 reject(error)
 
-            return @proxy.reindex(path, source, progressStreamCallback, excludedPaths).then(successHandler, failureHandler)
+            return @proxy.reindex(
+                path,
+                source,
+                progressStreamCallback,
+                excludedPaths,
+                fileExtensionsToIndex
+            ).then(successHandler, failureHandler)
 
     ###*
      * Attaches a callback to indexing finished event. The returned disposable can be used to detach your event handler.

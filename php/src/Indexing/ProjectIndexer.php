@@ -144,10 +144,11 @@ class ProjectIndexer
      * Indexes the specified project.
      *
      * @param string[] $items
+     * @param string[] $extensionsToIndex
      * @param string[] $excludedPaths
      * @param array    $sourceOverrideMap
      */
-    public function index(array $items, array $excludedPaths = [], $sourceOverrideMap = [])
+    public function index(array $items, array $extensionsToIndex, array $excludedPaths = [], $sourceOverrideMap = [])
     {
         $this->indexBuiltinItemsIfNecessary();
 
@@ -155,7 +156,7 @@ class ProjectIndexer
         $this->pruneRemovedFiles();
 
         $this->logMessage('Scanning for files that need (re)indexing...');
-        $files = $this->scanForFilesToIndex($items);
+        $files = $this->scanForFilesToIndex($items, $extensionsToIndex);
         $files = $this->getFilteredFilesToIndex($files, $excludedPaths);
 
         $this->logMessage('Indexing outline...');
@@ -187,16 +188,17 @@ class ProjectIndexer
 
     /**
      * @param string[] $paths
+     * @param string[] $extensionsToIndex
      *
      * @return string[]
      */
-    protected function scanForFilesToIndex(array $paths)
+    protected function scanForFilesToIndex(array $paths, array $extensionsToIndex)
     {
         $files = [];
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
-                $filesInDirectory = $this->scanner->scan($path);
+                $filesInDirectory = $this->scanner->scan($path, $extensionsToIndex);
 
                 $files = array_merge($files, $filesInDirectory);
             } elseif (is_file($path)) {

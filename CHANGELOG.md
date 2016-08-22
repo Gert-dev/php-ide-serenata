@@ -10,6 +10,7 @@
   * Regardless of the previous item, it will still remain a major improvement over the old reflection-only approach. Various built-in functions and methods will now properly show documentation and have proper return types, easing the pain of having to work with PHP's built-in functionality.
 * Project and folder indexing performance has improved.
 * `define()` statements will now be indexed much like global constants.
+* Specifying the file extensions to index is now supported via project settings.
 * Excluding directories from indexing is now supported via project settings, see also [the wiki](https://github.com/Gert-dev/php-integrator-base/wiki/Excluding-Folders-From-Indexing) for more information.
 * For those interested, the wiki now [has an article](https://github.com/Gert-dev/php-integrator-base/wiki/Proper-Documentation-And-Type-Hinting) with information about how analysis of your code happens regarding docblocks and type hinting. Reading it may help you improve your code as well as code assistance from this package.
 * The remaining parts of the analyzer that were implemented in CoffeeScript have been moved to PHP. This means the base package is now only reliant on PHP itself for processing. This may positively affect performance, but more importantly allows extracting and using the analyzer in its entirety outside Atom as well (i.e. for other editors or projects).

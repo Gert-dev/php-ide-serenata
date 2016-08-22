@@ -147,8 +147,8 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    reindex: (path, source, progressStreamCallback, excludedPaths) ->
-        return super(path, source, progressStreamCallback, excludedPaths).then (output) =>
+    reindex: (path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex) ->
+        return super(path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex).then (output) =>
             @clearCache()
 
             return output
