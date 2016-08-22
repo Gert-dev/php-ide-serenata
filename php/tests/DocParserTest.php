@@ -43,4 +43,21 @@ class DocParserTest extends \PHPUnit_Framework_TestCase
             ]
         ], $result['params']);
     }
+
+    public function testCorrectlyProcessesRussianUnicodeSequences()
+    {
+        $parser = new DocParser();
+        $result = $parser->parse('/**
+     * @param string|null $someString Имя файла пат
+     */', [DocParser::PARAM_TYPE], '');
+
+        $this->assertEquals([
+            '$someString' => [
+                'type'        => 'string|null',
+                'description' => 'Имя файла пат',
+                'isVariadic'  => false,
+                'isReference' => false
+            ]
+        ], $result['params']);
+    }
 }

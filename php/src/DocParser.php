@@ -60,7 +60,7 @@ class DocParser
     {
         if (empty($filters)) {
             return [];
-        }
+        };
 
         $tags = [];
         $result = [];
@@ -95,7 +95,8 @@ class DocParser
                 $previousTag = $tag;
             }
 
-            $segments[] = [$previousTag, $previousStart, mb_strlen($docblock)];
+            // NOTE: preg_match_all returns byte offsets, not character offsets.
+            $segments[] = [$previousTag, $previousStart, strlen($docblock)];
 
             foreach ($segments as $segment) {
                 list($tag, $start, $end) = $segment;
@@ -108,7 +109,6 @@ class DocParser
                     $tags[$tag] = [];
                 }
 
-                // NOTE: preg_match_all returns byte offsets, not character offsets.
                 $tagValue = substr($docblock, $start, $end - $start);
                 $tagValue = $this->normalizeNewlines($tagValue);
 
