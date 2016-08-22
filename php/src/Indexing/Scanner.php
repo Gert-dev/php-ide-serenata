@@ -36,7 +36,7 @@ class Scanner
      *
      * @return string[]
      */
-    public function scan($directory, array $allowedExtensions = ['.php'], $isIncremental = true)
+    public function scan($directory, array $allowedExtensions = ['php'], $isIncremental = true)
     {
         $dirIterator = new RecursiveDirectoryIterator(
             $directory,
