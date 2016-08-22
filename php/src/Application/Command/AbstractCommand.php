@@ -3,6 +3,7 @@
 namespace PhpIntegrator\Application\Command;
 
 use ArrayAccess;
+use RuntimeException;
 use UnexpectedValueException;
 
 use Doctrine\Common\Cache\Cache;
@@ -211,14 +212,22 @@ abstract class AbstractCommand implements CommandInterface
      * @param bool  $success
      * @param mixed $data
      *
+     * @throws RuntimeException When the encoding fails, which should never happen.
+     *
      * @return string
      */
     protected function outputJson($success, $data)
     {
-        return json_encode([
+        $output = json_encode([
             'success' => $success,
             'result'  => $data
         ]);
+
+        if (!$output) {
+            throw new RuntimeException('The encoded JSON output was empty, something must have gone wrong!');
+        }
+
+        return $output;
     }
 
     /**
