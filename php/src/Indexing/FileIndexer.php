@@ -13,10 +13,8 @@ use PhpIntegrator\TypeResolver;
 use PhpIntegrator\Application\Command\DeduceTypes;
 
 use PhpParser\Error;
-use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
 
 /**
  * Handles indexation of PHP code.
