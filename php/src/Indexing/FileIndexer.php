@@ -70,6 +70,7 @@ class FileIndexer
      * @param StorageInterface $storage
      * @param TypeAnalyzer     $typeAnalyzer
      * @param DocParser        $docParser
+     * @param DeduceTypes      $deduceTypes
      * @param Parser           $parser
      */
     public function __construct(
