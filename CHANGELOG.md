@@ -1,3 +1,7 @@
+## 1.2.1
+### Bugs fixed
+* Fixed `exclude` warnings (thanks to [@UziTech](https://github.com/UziTech)).
+
 ## 1.2.0
 ### Features and enhancements
 * Project support has (finally) arrived in a basic form. Unfortunately this change **needs user intervention** and will possibly break the workflow of some users:
