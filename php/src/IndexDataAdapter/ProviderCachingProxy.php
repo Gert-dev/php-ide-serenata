@@ -274,7 +274,9 @@ class ProviderCachingProxy implements ProviderInterface
      */
     protected function ensurePathExists($path)
     {
-        @mkdir($path, 0777, true);
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
     }
 
     /**
