@@ -359,10 +359,9 @@ class ProjectManager
     ###*
      * Indicates if the specified file is part of the current project.
      *
-     * @param {Object} project
      * @param {String} fileName
      *
      * @return {bool}
     ###
-    isFilePartOfCurrentProject: (project, fileName) ->
+    isFilePartOfCurrentProject: (fileName) ->
         return @isFilePartOfProject(@getActiveProject(), fileName)
