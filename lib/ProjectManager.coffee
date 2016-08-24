@@ -277,19 +277,13 @@ class ProjectManager
      * @return {Promise}
     ###
     performFileIndex: (project, fileName, source = null) ->
-        successHandler = () =>
-            return
-
-        failureHandler = () =>
-            return
-
         return @service.reindex(
             fileName,
             source,
             null,
             @getAbsoluteExcludedPaths(project),
             @getFileExtensionsToIndex(project)
-        ).then(successHandler, failureHandler)
+        )
 
     ###*
      * Performs a file index, but only if the file is not currently already being indexed (otherwise silently returns).
