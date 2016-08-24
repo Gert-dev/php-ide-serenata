@@ -115,7 +115,9 @@ class Application
                 Application\Command\AbstractCommand::DATABASE_VERSION .
                 '/';
 
-            @mkdir($cachePath, 0777, true);
+            if (!file_exists($cachePath)) {
+                mkdir($cachePath, 0777, true);
+            }
 
             $this->filesystemCache = new FilesystemCache($cachePath);
         }
