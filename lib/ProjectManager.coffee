@@ -351,7 +351,7 @@ class ProjectManager
         for projectDirectory in project.props.paths
             projectDirectoryObject = new Directory(projectDirectory)
 
-            if projectDirectoryObject.contains(path)
+            if projectDirectoryObject.contains(fileName)
                 return true
 
         return false

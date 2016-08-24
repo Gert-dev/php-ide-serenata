@@ -234,7 +234,7 @@ module.exports =
         return if not fileName
 
         if @projectManager.hasActiveProject() and @projectManager.isFilePartOfCurrentProject(fileName)
-            @projectManager.attemptCurrentProjectFileIndex(path, editor.getBuffer().getText())
+            @projectManager.attemptCurrentProjectFileIndex(fileName, editor.getBuffer().getText())
 
     ###*
      * Deactivates the package.
@@ -271,7 +271,7 @@ module.exports =
 
         service.projects.getCurrent (project) =>
             @projectManager.load(project)
-            
+
             @indexCurrentProject()
 
     ###*
