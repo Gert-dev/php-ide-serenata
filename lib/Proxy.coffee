@@ -441,13 +441,13 @@ class Proxy
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {String|Array} path                   The full path to the file  or folder to refresh. Alternatively,
+     * @param {String|Array}  path                   The full path to the file  or folder to refresh. Alternatively,
      *                                              this can be a list of items to index at the same time.
-     * @param {String|null}  source                 The source code of the file to index. May be null if a directory is
+     * @param {String|null}   source                 The source code of the file to index. May be null if a directory is
      *                                              passed instead.
-     * @param {Callback}     progressStreamCallback A method to invoke each time progress streaming data is received.
-     * @param {Array}        excludedPaths          A list of paths to exclude from indexing.
-     * @param {Array}        fileExtensionsToIndex  A list of file extensions (without leading dot) to index.
+     * @param {Callback|null} progressStreamCallback A method to invoke each time progress streaming data is received.
+     * @param {Array}         excludedPaths          A list of paths to exclude from indexing.
+     * @param {Array}         fileExtensionsToIndex  A list of file extensions (without leading dot) to index.
      *
      * @return {Promise}
     ###
