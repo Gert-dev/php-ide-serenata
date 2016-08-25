@@ -188,6 +188,7 @@ module.exports =
         AtomConfig            = require './AtomConfig'
         CachingProxy          = require './CachingProxy'
         ProjectManager        = require './ProjectManager'
+        IndexingMediator      = require './IndexingMediator'
 
         {Emitter}             = require 'event-kit';
         {CompositeDisposable} = require 'atom';
@@ -204,10 +205,11 @@ module.exports =
         @proxy = new CachingProxy(@configuration)
 
         emitter = new Emitter()
+        indexingMediator = new IndexingMediator(@proxy, emitter)
+        
+        @projectManager = new ProjectManager(@proxy, indexingMediator)
 
-        @service = new Service(@proxy, emitter)
-
-        @projectManager = new ProjectManager(@proxy, @service)
+        @service = new Service(@proxy, indexingMediator)
 
         @registerCommands()
 

@@ -13,17 +13,17 @@ class Service
     proxy: null
 
     ###*
-     * The emitter to use to emit indexing events.
+     * @var {Object}
     ###
-    indexingEventEmitter: null
+    indexingMediator: null
 
     ###*
      * Constructor.
      *
      * @param {CachingProxy} proxy
-     * @param {Emitter}      indexingEventEmitter
+     * @param {Object}       indexingMediator
     ###
-    constructor: (@proxy, @indexingEventEmitter) ->
+    constructor: (@proxy, @indexingMediator) ->
 
     ###*
      * Clears the autocompletion cache. Most fetching operations such as fetching constants, autocompletion, fetching
@@ -178,14 +178,6 @@ class Service
         return @proxy.getInvocationInfo(file, source, offset)
 
     ###*
-     * Truncates the database.
-     *
-     * @return {Promise}
-    ###
-    truncate: () ->
-        return @proxy.truncate()
-
-    ###*
      * Convenience alias for {@see deduceTypes}.
      *
      * @param {TextEditor} editor
@@ -215,30 +207,15 @@ class Service
      * @return {Promise}
     ###
     reindex: (path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex) ->
-        return new Promise (resolve, reject) =>
-            successHandler = (output) =>
-                @indexingEventEmitter.emit('php-integrator-base:indexing-finished', {
-                    output : output
-                    path   : path
-                })
+        return @indexingMediator.reindex(path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex)
 
-                resolve(output)
-
-            failureHandler = (error) =>
-                @indexingEventEmitter.emit('php-integrator-base:indexing-failed', {
-                    error : error
-                    path  : path
-                })
-
-                reject(error)
-
-            return @proxy.reindex(
-                path,
-                source,
-                progressStreamCallback,
-                excludedPaths,
-                fileExtensionsToIndex
-            ).then(successHandler, failureHandler)
+    ###*
+     * Truncates the database.
+     *
+     * @return {Promise}
+    ###
+    truncate: () ->
+        return @indexingMediator.truncate()
 
     ###*
      * Attaches a callback to indexing finished event. The returned disposable can be used to detach your event handler.
@@ -248,7 +225,7 @@ class Service
      * @return {Disposable}
     ###
     onDidFinishIndexing: (callback) ->
-        @indexingEventEmitter.on('php-integrator-base:indexing-finished', callback)
+        return @indexingMediator.onDidFinishIndexing(callback)
 
     ###*
      * Attaches a callback to indexing failed event. The returned disposable can be used to detach your event handler.
@@ -258,7 +235,7 @@ class Service
      * @return {Disposable}
     ###
     onDidFailIndexing: (callback) ->
-        @indexingEventEmitter.on('php-integrator-base:indexing-failed', callback)
+        return @indexingMediator.onDidFailIndexing(callback)
 
     ###*
      * Determines the current class' FQCN based on the specified buffer position.

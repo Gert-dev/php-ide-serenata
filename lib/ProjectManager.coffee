@@ -19,7 +19,7 @@ class ProjectManager
     ###*
      * @var {Object}
     ###
-    service: null
+    indexingMediator: null
 
     ###*
      * The service instance from the project-manager package.
@@ -59,9 +59,9 @@ class ProjectManager
 
     ###*
      * @param {Object} proxy
-     * @param {Object} service
+     * @param {Object} indexingMediator
     ###
-    constructor: (@proxy, @service) ->
+    constructor: (@proxy, @indexingMediator) ->
         @indexMap = {}
 
     ###*
@@ -220,7 +220,7 @@ class ProjectManager
      * @return {Promise}
     ###
     performIndex: (project, progressStreamCallback = null) ->
-        return @service.reindex(
+        return @indexingMediator.reindex(
             project.props.paths,
             null,
             progressStreamCallback,
@@ -265,7 +265,7 @@ class ProjectManager
      * @return {Promise|null}
     ###
     truncateCurrentProject: () ->
-        return @service.truncate()
+        return @indexingMediator.truncate()
 
     ###*
      * Indexes a file asynchronously.
@@ -277,7 +277,7 @@ class ProjectManager
      * @return {Promise}
     ###
     performFileIndex: (project, fileName, source = null) ->
-        return @service.reindex(
+        return @indexingMediator.reindex(
             fileName,
             source,
             null,
