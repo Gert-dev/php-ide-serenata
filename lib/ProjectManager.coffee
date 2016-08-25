@@ -135,6 +135,8 @@ class ProjectManager
 
         return if projectSettings?.enabled != true
 
+        @validateProject(project)
+
         @activeProject = project
 
         @proxy.setProjectName(project.props._id)
@@ -157,6 +159,28 @@ class ProjectManager
             projectDirectoryObject = new Directory(projectDirectory)
 
             atom.project.repositoryForDirectory(projectDirectoryObject).then(successHandler, failureHandler)
+
+    ###*
+     * Validates a project by validating its settings.
+     *
+     * Throws an Error if something is not right with the project.
+     *
+     * @param {Object} project
+    ###
+    validateProject: (project) ->
+        projectSettings = @getProjectSettings(project)
+
+        if not projectSettings?
+            throw new Error(
+                'No project settings were found, a php.php_integrator node must be present in your project settings!'
+            )
+
+        phpVersion = projectSettings.phpVersion
+
+        if isNaN(parseFloat(phpVersion)) or not isFinite(phpVersion)
+            throw new Error('''
+                The PHP version that is set in your project settings is not valid! It must be a number, for example: 5.6
+            ''')
 
     ###*
      * Retrieves a list of file extensions to include in indexing.
