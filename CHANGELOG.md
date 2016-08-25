@@ -1,3 +1,7 @@
+## 1.2.2
+### Bugs fixed
+* Fixed an error related to `JSON_PRESERVE_ZERO_FRACTION`, which needs PHP >= 5.6.
+
 ## 1.2.1
 ### Bugs fixed
 * Fixed `exclude` warnings (thanks to [@UziTech](https://github.com/UziTech)).

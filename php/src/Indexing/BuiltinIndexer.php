@@ -142,13 +142,20 @@ class BuiltinIndexer
      */
     protected function indexConstant($name, $value)
     {
+        $encodingOptions = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
+        // Requires PHP >= 5.6.
+        if (defined('JSON_PRESERVE_ZERO_FRACTION')) {
+            $encodingOptions |= JSON_PRESERVE_ZERO_FRACTION;
+        }
+
         return $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'               => $name,
             'fqcn'               => $name,
             'file_id'            => null,
             'start_line'         => null,
             'end_line'           => null,
-            'default_value'      => json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION),
+            'default_value'      => json_encode($value, $encodingOptions),
             'is_builtin'         => 1,
             'is_deprecated'      => 0,
             'has_docblock'       => 0,
