@@ -1,3 +1,7 @@
+## 1.3.0
+### Changes for developers
+* A new service method, `getCurrentProjectSettings`, allows retrieving the settings (specific to this package) of a project. This includes things such as the PHP version, paths and excluded folders.
+
 ## 1.2.2
 ### Bugs fixed
 * Fixed an error related to `JSON_PRESERVE_ZERO_FRACTION`, which needs PHP >= 5.6.

@@ -206,10 +206,10 @@ module.exports =
 
         emitter = new Emitter()
         indexingMediator = new IndexingMediator(@proxy, emitter)
-        
+
         @projectManager = new ProjectManager(@proxy, indexingMediator)
 
-        @service = new Service(@proxy, indexingMediator)
+        @service = new Service(@proxy, @projectManager, indexingMediator)
 
         @registerCommands()
 

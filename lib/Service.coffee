@@ -15,15 +15,30 @@ class Service
     ###*
      * @var {Object}
     ###
+    projectManager: null
+
+    ###*
+     * @var {Object}
+    ###
     indexingMediator: null
 
     ###*
      * Constructor.
      *
      * @param {CachingProxy} proxy
+     * @param {Object}       projectManager
      * @param {Object}       indexingMediator
     ###
-    constructor: (@proxy, @indexingMediator) ->
+    constructor: (@proxy, @projectManager, @indexingMediator) ->
+
+    ###*
+     * Retrieves the settings (that are specific to this package) for the currently active project. If there is no
+     * active project or the project does not have any settings, null is returned.
+     *
+     * @return {Object|null}
+    ###
+    getCurrentProjectSettings: () ->
+        return @projectManager.getCurrentProjectSettings()
 
     ###*
      * Clears the autocompletion cache. Most fetching operations such as fetching constants, autocompletion, fetching
