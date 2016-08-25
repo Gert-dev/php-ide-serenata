@@ -130,8 +130,10 @@ class ProjectManager
         @activeProject = null
 
         return if project.props.php?.enabled != true
-        return if project.props.php?.php_integrator?.enabled != true
-        return if project.props.paths.length == 0
+
+        projectSettings = @getProjectSettings(project)
+
+        return if projectSettings?.enabled != true
 
         @activeProject = project
 
@@ -151,7 +153,7 @@ class ProjectManager
 
         {Directory} = require 'atom'
 
-        for projectDirectory in project.props.paths
+        for projectDirectory in @getProjectPaths(project)
             projectDirectoryObject = new Directory(projectDirectory)
 
             atom.project.repositoryForDirectory(projectDirectoryObject).then(successHandler, failureHandler)
@@ -164,8 +166,10 @@ class ProjectManager
      * @return {Array}
     ###
     getFileExtensionsToIndex: (project) ->
-        projectPaths = project.props.paths
-        fileExtensions = project.props.php?.php_integrator?.fileExtensions
+        projectPaths = @getProjectPaths(project)
+        projectSettings = @getProjectSettings(project)
+
+        fileExtensions = projectSettings?.fileExtensions
 
         if not fileExtensions?
             fileExtensions = []
@@ -180,8 +184,10 @@ class ProjectManager
      * @return {Array}
     ###
     getAbsoluteExcludedPaths: (project) ->
-        projectPaths = project.props.paths
-        excludedPaths = project.props.php?.php_integrator?.excludedPaths
+        projectPaths = @getProjectPaths(project)
+        projectSettings = @getProjectSettings(project)
+
+        excludedPaths = projectSettings?.excludedPaths
 
         if not excludedPaths?
             excludedPaths = []
@@ -221,7 +227,7 @@ class ProjectManager
     ###
     performIndex: (project, progressStreamCallback = null) ->
         return @indexingMediator.reindex(
-            project.props.paths,
+            @getProjectPaths(project),
             null,
             progressStreamCallback,
             @getAbsoluteExcludedPaths(project),
@@ -338,6 +344,27 @@ class ProjectManager
         return @attemptFileIndex(@getActiveProject(),  fileName, source)
 
     ###*
+     * @return {Object|null}
+    ###
+    getProjectSettings: (project) ->
+        if project.props.php?.php_integrator?
+            return project.props.php.php_integrator
+
+        return null
+
+    ###*
+     * @return {Object|null}
+    ###
+    getCurrentProjectSettings: () ->
+        return @getProjectSettings(@getActiveProject())
+
+    ###*
+     * @return {Array}
+    ###
+    getProjectPaths: (project) ->
+        return project.props.paths
+
+    ###*
      * Indicates if the specified file is part of the project.
      *
      * @param {Object} project
@@ -348,7 +375,7 @@ class ProjectManager
     isFilePartOfProject: (project, fileName) ->
         {Directory} = require 'atom'
 
-        for projectDirectory in project.props.paths
+        for projectDirectory in @getProjectPaths(project)
             projectDirectoryObject = new Directory(projectDirectory)
 
             if projectDirectoryObject.contains(fileName)
