@@ -1,5 +1,4 @@
-Whoa, there! Thanks for contributing by reporting issues, but before you do, check that you can answer all the following
-questions with a firm **Yes**:
+Whoa, there! Thanks for contributing by reporting issues, but before you do, check that you can answer all the following questions with a firm **Yes**:
   * Have I checked the existing open issues?
   * More importantly, have I checked the existing closed issues?
   * If I've just installed or updated...
