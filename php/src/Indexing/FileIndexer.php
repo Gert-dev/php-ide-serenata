@@ -6,9 +6,9 @@ use DateTime;
 use Exception;
 use UnexpectedValueException;
 
-use PhpIntegrator\DocParser;
-use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\TypeResolver;
+use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\Application\Command\DeduceTypes;
 
@@ -37,9 +37,9 @@ class FileIndexer
     protected $storage;
 
     /**
-     * @var DocParser
+     * @var DocblockParser
      */
-    protected $docParser;
+    protected $docblockParser;
 
     /**
      * @var TypeAnalyzer
@@ -69,20 +69,20 @@ class FileIndexer
     /**
      * @param StorageInterface $storage
      * @param TypeAnalyzer     $typeAnalyzer
-     * @param DocParser        $docParser
+     * @param DocblockParser   $docblockParser
      * @param DeduceTypes      $deduceTypes
      * @param Parser           $parser
      */
     public function __construct(
         StorageInterface $storage,
         TypeAnalyzer $typeAnalyzer,
-        DocParser $docParser,
+        DocblockParser $docblockParser,
         DeduceTypes $deduceTypes,
         Parser $parser
     ) {
         $this->storage = $storage;
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->docParser = $docParser;
+        $this->docblockParser = $docblockParser;
         $this->deduceTypes = $deduceTypes;
         $this->parser = $parser;
     }
@@ -212,14 +212,14 @@ class FileIndexer
     ) {
         $structureTypeMap = $this->getStructureTypeMap();
 
-        $documentation = $this->docParser->parse($rawData['docComment'], [
-            DocParser::DEPRECATED,
-            DocParser::ANNOTATION,
-            DocParser::DESCRIPTION,
-            DocParser::METHOD,
-            DocParser::PROPERTY,
-            DocParser::PROPERTY_READ,
-            DocParser::PROPERTY_WRITE
+        $documentation = $this->docblockParser->parse($rawData['docComment'], [
+            DocblockParser::DEPRECATED,
+            DocblockParser::ANNOTATION,
+            DocblockParser::DESCRIPTION,
+            DocblockParser::METHOD,
+            DocblockParser::PROPERTY,
+            DocblockParser::PROPERTY_READ,
+            DocblockParser::PROPERTY_WRITE
         ], $rawData['name']);
 
         $seData = [
@@ -429,10 +429,10 @@ class FileIndexer
         $seId = null,
         Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        $documentation = $this->docParser->parse($rawData['docComment'], [
-            DocParser::VAR_TYPE,
-            DocParser::DEPRECATED,
-            DocParser::DESCRIPTION
+        $documentation = $this->docblockParser->parse($rawData['docComment'], [
+            DocblockParser::VAR_TYPE,
+            DocblockParser::DEPRECATED,
+            DocblockParser::DESCRIPTION
         ], $rawData['name']);
 
         $varDocumentation = isset($documentation['var']['$' . $rawData['name']]) ?
@@ -504,10 +504,10 @@ class FileIndexer
         $amId,
         Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        $documentation = $this->docParser->parse($rawData['docComment'], [
-            DocParser::VAR_TYPE,
-            DocParser::DEPRECATED,
-            DocParser::DESCRIPTION
+        $documentation = $this->docblockParser->parse($rawData['docComment'], [
+            DocblockParser::VAR_TYPE,
+            DocblockParser::DEPRECATED,
+            DocblockParser::DESCRIPTION
         ], $rawData['name']);
 
         $varDocumentation = isset($documentation['var']['$' . $rawData['name']]) ?
@@ -632,12 +632,12 @@ class FileIndexer
         $isMagic = false,
         Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        $documentation = $this->docParser->parse($rawData['docComment'], [
-            DocParser::THROWS,
-            DocParser::PARAM_TYPE,
-            DocParser::DEPRECATED,
-            DocParser::DESCRIPTION,
-            DocParser::RETURN_VALUE
+        $documentation = $this->docblockParser->parse($rawData['docComment'], [
+            DocblockParser::THROWS,
+            DocblockParser::PARAM_TYPE,
+            DocblockParser::DEPRECATED,
+            DocblockParser::DESCRIPTION,
+            DocblockParser::RETURN_VALUE
         ], $rawData['name']);
 
         $returnTypes = [];

@@ -7,6 +7,8 @@ use ArrayObject;
 use Traversable;
 use UnexpectedValueException;
 
+use PhpIntegrator\Parsing\DocblockParser;
+
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
  */
@@ -814,7 +816,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      */
     protected function resolveInheritDoc($description, $parentDescription)
     {
-        return str_replace(DocParser::INHERITDOC, $parentDescription, $description);
+        return str_replace(DocblockParser::INHERITDOC, $parentDescription, $description);
     }
 
     /**

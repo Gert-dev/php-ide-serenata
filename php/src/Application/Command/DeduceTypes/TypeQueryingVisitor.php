@@ -2,8 +2,8 @@
 
 namespace PhpIntegrator\Application\Command\DeduceTypes;
 
-use PhpIntegrator\DocParser;
 use PhpIntegrator\NodeHelpers;
+use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -36,9 +36,9 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
     protected $position;
 
     /**
-     * @var DocParser
+     * @var DocblockParser
      */
-    protected $docParser;
+    protected $docblockParser;
 
     /**
      * @var array
@@ -48,12 +48,12 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
     /**
      * Constructor.
      *
-     * @param DocParser $docParser
+     * @param DocblockParser $docblockParser
      * @param int       $position
      */
-    public function __construct(DocParser $docParser, $position)
+    public function __construct(DocblockParser $docblockParser, $position)
     {
-        $this->docParser = $docParser;
+        $this->docblockParser = $docblockParser;
         $this->position = $position;
     }
 
@@ -296,8 +296,8 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
             $this->variableTypeInfoMap[$variable]['bestTypeOverrideMatch'] = $matches[2];
             $this->variableTypeInfoMap[$variable]['bestTypeOverrideMatchLine'] = $node->getLine();
         } else {
-            $docblockData = $this->docParser->parse((string) $docblock, [
-                DocParser::VAR_TYPE
+            $docblockData = $this->docblockParser->parse((string) $docblock, [
+                DocblockParser::VAR_TYPE
             ], null);
 
             foreach ($docblockData['var'] as $variableName => $data) {

@@ -2,8 +2,8 @@
 
 namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
 
-use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpParser\Node;
 use PhpParser\Comment;
@@ -20,9 +20,9 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
     protected $typeAnalyzer;
 
     /**
-     * @var DocParser
+     * @var DocblockParser
      */
-    protected $docParser;
+    protected $docblockParser;
 
     /**
      * @var array
@@ -36,12 +36,12 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
 
     /**
      * @param TypeAnalyzer $typeAnalyzer
-     * @param DocParser    $docParser
+     * @param DocblockParser    $docblockParser
      */
-    public function __construct(TypeAnalyzer $typeAnalyzer, DocParser $docParser)
+    public function __construct(TypeAnalyzer $typeAnalyzer, DocblockParser $docblockParser)
     {
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->docParser = $docParser;
+        $this->docblockParser = $docblockParser;
     }
 
     /**
@@ -108,7 +108,7 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
      */
     protected function validateType(Comment\Doc $docblock, $typeString, $typeStringOffset)
     {
-        $types = explode(DocParser::TYPE_SPLITTER, $typeString);
+        $types = explode(DocblockParser::TYPE_SPLITTER, $typeString);
         foreach ($types as $type) {
             if (mb_substr($type, -2) === '[]') {
                 $type = mb_substr($type, 0, -2);
@@ -150,7 +150,7 @@ class DocblockClassUsageFetchingVisitor extends NodeVisitorAbstract
      {
          return
             !$this->typeAnalyzer->isSpecialType($type) &&
-            !$this->docParser->isValidTag($type);
+            !$this->docblockParser->isValidTag($type);
      }
 
     /**

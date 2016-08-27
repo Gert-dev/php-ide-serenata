@@ -2,8 +2,8 @@
 
 namespace PhpIntegrator\Application\Command\SemanticLint;
 
-use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\Application\Command\ResolveType;
 
@@ -47,18 +47,18 @@ class UnknownClassAnalyzer implements AnalyzerInterface
     /**
      * Constructor.
      *
-     * @param string        $file
-     * @param IndexDatabase $indexDatabase
-     * @param ResolveType   $resolveType
-     * @param TypeAnalyzer  $typeAnalyzer
-     * @param DocParser     $docParser
+     * @param string         $file
+     * @param IndexDatabase  $indexDatabase
+     * @param ResolveType    $resolveType
+     * @param TypeAnalyzer   $typeAnalyzer
+     * @param DocblockParser $docblockParser
      */
     public function __construct(
         $file,
         IndexDatabase $indexDatabase,
         ResolveType $resolveType,
         TypeAnalyzer $typeAnalyzer,
-        DocParser $docParser
+        DocblockParser $docblockParser
     ) {
         $this->file = $file;
         $this->typeAnalyzer = $typeAnalyzer;
@@ -66,7 +66,7 @@ class UnknownClassAnalyzer implements AnalyzerInterface
         $this->indexDatabase = $indexDatabase;
 
         $this->classUsageFetchingVisitor = new Visitor\ClassUsageFetchingVisitor();
-        $this->docblockClassUsageFetchingVisitor = new Visitor\DocblockClassUsageFetchingVisitor($typeAnalyzer, $docParser);
+        $this->docblockClassUsageFetchingVisitor = new Visitor\DocblockClassUsageFetchingVisitor($typeAnalyzer, $docblockParser);
     }
 
     /**

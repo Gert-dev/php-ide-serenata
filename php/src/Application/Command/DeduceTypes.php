@@ -7,9 +7,9 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\DocParser;
 use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Parsing\DocblockParser;
 use PhpIntegrator\SourceCodeHelpers;
 
 use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
@@ -55,9 +55,9 @@ class DeduceTypes extends AbstractCommand
     protected $typeAnalyzer;
 
     /**
-     * @var DocParser
+     * @var DocblockParser
      */
-    protected $docParser;
+    protected $docblockParser;
 
     /**
      * @var PartialParser
@@ -308,7 +308,7 @@ class DeduceTypes extends AbstractCommand
         }
 
         $scopeLimitingVisitor = new ScopeLimitingVisitor($offset);
-        $this->typeQueryingVisitor = new TypeQueryingVisitor($this->getDocParser(), $offset);
+        $this->typeQueryingVisitor = new TypeQueryingVisitor($this->getDocblockParser(), $offset);
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor($scopeLimitingVisitor);
@@ -397,8 +397,8 @@ class DeduceTypes extends AbstractCommand
                             $name = $node->name;
                         }
 
-                        $result = $this->getDocParser()->parse((string) $docBlock, [
-                            DocParser::PARAM_TYPE
+                        $result = $this->getDocblockParser()->parse((string) $docBlock, [
+                            DocblockParser::PARAM_TYPE
                         ], $name, true);
 
                         if (isset($result['params']['$' . $variable])) {
@@ -746,17 +746,17 @@ class DeduceTypes extends AbstractCommand
     }
 
     /**
-     * Retrieves an instance of DocParser. The object will only be created once if needed.
+     * Retrieves an instance of DocblockParser. The object will only be created once if needed.
      *
-     * @return DocParser
+     * @return DocblockParser
      */
-    protected function getDocParser()
+    protected function getDocblockParser()
     {
-        if (!$this->docParser instanceof DocParser) {
-            $this->docParser = new DocParser();
+        if (!$this->docblockParser instanceof DocblockParser) {
+            $this->docblockParser = new DocblockParser();
         }
 
-        return $this->docParser;
+        return $this->docblockParser;
     }
 
     /**

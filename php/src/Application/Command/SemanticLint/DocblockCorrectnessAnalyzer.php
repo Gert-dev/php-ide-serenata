@@ -4,8 +4,8 @@ namespace PhpIntegrator\Application\Command\SemanticLint;
 
 use UnexpectedValueException;
 
-use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Parsing\DocblockParser;
 use PhpIntegrator\DocblockAnalyzer;
 
 use PhpIntegrator\Application\Command\ClassInfo;
@@ -30,9 +30,9 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     protected $indexDatabase;
 
     /**
-     * @var DocParser
+     * @var DocblockParser
      */
-    protected $docParser;
+    protected $docblockParser;
 
     /**
      * @var TypeAnalyzer
@@ -152,10 +152,10 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         ];
 
         if ($structure['docComment']) {
-            $result = $this->getDocParser()->parse($structure['docComment'], [
-                DocParser::CATEGORY,
-                DocParser::SUBPACKAGE,
-                DocParser::LINK
+            $result = $this->getDocblockParser()->parse($structure['docComment'], [
+                DocblockParser::CATEGORY,
+                DocblockParser::SUBPACKAGE,
+                DocblockParser::LINK
             ], $structure['name']);
 
             if ($result['category']) {
@@ -249,7 +249,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         ];
 
         if ($property['docComment']) {
-            $result = $this->getDocParser()->parse($property['docComment'], [DocParser::VAR_TYPE], $property['name']);
+            $result = $this->getDocblockParser()->parse($property['docComment'], [DocblockParser::VAR_TYPE], $property['name']);
 
             if (!isset($result['var']['$' . $property['name']]['type'])) {
                 $docblockIssues['varTagMissing'][] = [
@@ -292,7 +292,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         ];
 
         if ($constant['docComment']) {
-            $result = $this->getDocParser()->parse($constant['docComment'], [DocParser::VAR_TYPE], $constant['name']);
+            $result = $this->getDocblockParser()->parse($constant['docComment'], [DocblockParser::VAR_TYPE], $constant['name']);
 
             if (!isset($result['var']['$' . $constant['name']]['type'])) {
                 $docblockIssues['varTagMissing'][] = [
@@ -339,9 +339,9 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             return $docblockIssues;
         }
 
-        $result = $this->getDocParser()->parse(
+        $result = $this->getDocblockParser()->parse(
             $function['docComment'],
-            [DocParser::DESCRIPTION, DocParser::PARAM_TYPE],
+            [DocblockParser::DESCRIPTION, DocblockParser::PARAM_TYPE],
             $function['name']
         );
 
@@ -416,15 +416,15 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     }
 
     /**
-     * @return DocParser
+     * @return DocblockParser
      */
-    protected function getDocParser()
+    protected function getDocblockParser()
     {
-        if (!$this->docParser) {
-            $this->docParser = new DocParser();
+        if (!$this->docblockParser) {
+            $this->docblockParser = new DocblockParser();
         }
 
-        return $this->docParser;
+        return $this->docblockParser;
     }
 
     /**

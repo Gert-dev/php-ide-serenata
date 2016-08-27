@@ -1,19 +1,19 @@
 <?php
 
-namespace PhpIntegrator\Test;
+namespace PhpIntegrator\Test\Parsing;
 
-use PhpIntegrator\DocParser;
+use PhpIntegrator\Parsing\DocblockParser;
 
-class DocParserTest extends \PHPUnit_Framework_TestCase
+class DocblockParserTest extends \PHPUnit_Framework_TestCase
 {
     public function testParamTagAtEndIsInterpretedCorrectly()
     {
-        $parser = new DocParser();
+        $parser = new DocblockParser();
         $result = $parser->parse('
             /**
              * @param string $foo Test description.
              */
-        ', [DocParser::PARAM_TYPE], '');
+        ', [DocblockParser::PARAM_TYPE], '');
 
         $this->assertEquals([
             '$foo' => [
@@ -27,12 +27,12 @@ class DocParserTest extends \PHPUnit_Framework_TestCase
 
     public function testParamTagWithAtSymbolIsInterpretedCorrectly()
     {
-        $parser = new DocParser();
+        $parser = new DocblockParser();
         $result = $parser->parse('
             /**
              * @param string $foo Test description with @ sign.
              */
-        ', [DocParser::PARAM_TYPE], '');
+        ', [DocblockParser::PARAM_TYPE], '');
 
         $this->assertEquals([
             '$foo' => [
@@ -46,10 +46,10 @@ class DocParserTest extends \PHPUnit_Framework_TestCase
 
     public function testCorrectlyProcessesRussianUnicodeSequences()
     {
-        $parser = new DocParser();
+        $parser = new DocblockParser();
         $result = $parser->parse('/**
      * @param string|null $someString Имя файла пат
-     */', [DocParser::PARAM_TYPE], '');
+     */', [DocblockParser::PARAM_TYPE], '');
 
         $this->assertEquals([
             '$someString' => [

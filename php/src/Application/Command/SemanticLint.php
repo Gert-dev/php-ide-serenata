@@ -7,8 +7,8 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
@@ -52,9 +52,9 @@ class SemanticLint extends AbstractCommand
     protected $typeAnalyzer;
 
     /**
-     * @var DocParser
+     * @var DocblockParser
      */
-    protected $docParser;
+    protected $docblockParser;
 
     /**
      * @inheritDoc
@@ -159,7 +159,7 @@ class SemanticLint extends AbstractCommand
                     $this->getIndexDatabase(),
                     $this->getResolveTypeCommand(),
                     $this->getTypeAnalyzer(),
-                    $this->getDocParser()
+                    $this->getDocblockParser()
                 );
 
                 foreach ($unknownClassAnalyzer->getVisitors() as $visitor) {
@@ -215,7 +215,7 @@ class SemanticLint extends AbstractCommand
             if ($retrieveUnusedUseStatements) {
                 $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer(
                     $this->getTypeAnalyzer(),
-                    $this->getDocParser()
+                    $this->getDocblockParser()
                 );
 
                 foreach ($unusedUseStatementAnalyzer->getVisitors() as $visitor) {
@@ -360,14 +360,14 @@ class SemanticLint extends AbstractCommand
     }
 
     /**
-     * @return DocParser
+     * @return DocblockParser
      */
-    protected function getDocParser()
+    protected function getDocblockParser()
     {
-        if (!$this->docParser) {
-            $this->docParser = new DocParser();
+        if (!$this->docblockParser) {
+            $this->docblockParser = new DocblockParser();
         }
 
-        return $this->docParser;
+        return $this->docblockParser;
     }
 }

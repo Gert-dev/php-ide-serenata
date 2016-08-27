@@ -1,11 +1,13 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Parsing;
+
+use PhpIntegrator\DocblockAnalyzer;
 
 /**
- * Parser for PHP documentation.
+ * Parser for PHP docblocks.
  */
-class DocParser
+class DocblockParser
 {
     /**
      * PSR-5 and/or phpDocumentor docblock tags.
@@ -42,7 +44,7 @@ class DocParser
     const TAG_START_REGEX = '/^\s*(?:\/\*)?\*\s+(\@.+)(?:\*\/)?$/';
 
     /**
-     * @var DocblockAnalyzer|null
+     * @var DocblockAnalyzer
      */
     protected $docblockAnalyzer;
 

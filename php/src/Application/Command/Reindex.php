@@ -8,17 +8,17 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Indexing;
-use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Parsing\DocblockParser;
 use PhpIntegrator\IndexDataAdapterProviderCachingProxy;
 
 use PhpIntegrator\Indexing\Scanner;
 use PhpIntegrator\Indexing\FileIndexer;
-use PhpIntegrator\Indexing\ProjectIndexer;
 use PhpIntegrator\Indexing\BuiltinIndexer;
+use PhpIntegrator\Indexing\ProjectIndexer;
 use PhpIntegrator\Indexing\StorageInterface;
-use PhpIntegrator\Indexing\IndexStorageItemEnum;
 use PhpIntegrator\Indexing\CallbackStorageProxy;
+use PhpIntegrator\Indexing\IndexStorageItemEnum;
 
 use PhpParser\ParserFactory;
 
@@ -53,9 +53,9 @@ class Reindex extends AbstractCommand
     protected $fileModifiedMap;
 
     /**
-     * @var DocParser
+     * @var DocblockParser
      */
-    protected $docParser;
+    protected $docblockParser;
 
     /**
      * @var TypeAnalyzer
@@ -201,7 +201,7 @@ class Reindex extends AbstractCommand
             $this->fileIndexer = new FileIndexer(
                 $this->getStorageForIndexers(),
                 $this->getTypeAnalyzer(),
-                $this->getDocParser(),
+                $this->getDocblockParser(),
                 $this->getDeduceTypes(),
                 $this->getParser()
             );
@@ -289,14 +289,14 @@ class Reindex extends AbstractCommand
     }
 
     /**
-     * @return DocParser
+     * @return DocblockParser
      */
-    protected function getDocParser()
+    protected function getDocblockParser()
     {
-        if (!$this->docParser) {
-            $this->docParser = new DocParser();
+        if (!$this->docblockParser) {
+            $this->docblockParser = new DocblockParser();
         }
 
-        return $this->docParser;
+        return $this->docblockParser;
     }
 }
