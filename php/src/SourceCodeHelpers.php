@@ -35,10 +35,10 @@ class SourceCodeHelpers
      *
      * @return int
      */
-    public static function getCharacterOffsetFromByteOffset($byteOffset, $string)
-    {
-        return mb_strlen(mb_strcut($string, 0, $byteOffset));
-    }
+    // public static function getCharacterOffsetFromByteOffset($byteOffset, $string)
+    // {
+    //     return mb_strlen(mb_strcut($string, 0, $byteOffset));
+    // }
 
     /**
      * Retrieves the byte offset from the specified character offset in the specified string. The result will always be
