@@ -7,7 +7,7 @@ use UnexpectedValueException;
 
 use Doctrine\Common\Cache\FilesystemCache;
 
-use PhpIntegrator\Application\Command\CachingParserProxy;
+use PhpIntegrator\Parsing\CachingParserProxy;
 
 use PhpParser\Lexer;
 use PhpParser\Parser;
