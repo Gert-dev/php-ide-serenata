@@ -553,21 +553,21 @@ class BuiltinIndexer
 
         foreach ($parents as $parent) {
             $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
-                'structure_id'           => $structureId,
+                'structure_id'          => $structureId,
                 'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($parent)
             ]);
         }
 
         foreach ($interfaces as $interface) {
             $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
-                'structure_id'           => $structureId,
+                'structure_id'          => $structureId,
                 'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($interface)
             ]);
         }
 
         foreach ($traits as $trait) {
             $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
-                'structure_id'           => $structureId,
+                'structure_id'          => $structureId,
                 'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($trait)
             ]);
         }
