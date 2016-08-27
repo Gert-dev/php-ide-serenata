@@ -5,12 +5,12 @@ namespace PhpIntegrator\Indexing;
 use Exception;
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionProperty;
 use ReflectionFunction;
+use ReflectionProperty;
 use ReflectionParameter;
 use ReflectionFunctionAbstract;
 
-use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Handles indexation of built-in classes, global constants and global functions.

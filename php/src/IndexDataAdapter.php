@@ -7,6 +7,10 @@ use ArrayObject;
 use Traversable;
 use UnexpectedValueException;
 
+use PhpIntegrator\Analysis\DocblockAnalyzer;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+
 use PhpIntegrator\Parsing\DocblockParser;
 
 /**

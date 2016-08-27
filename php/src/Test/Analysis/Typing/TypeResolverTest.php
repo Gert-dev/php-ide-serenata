@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpIntegrator\Test;
+namespace PhpIntegrator\Test\Analysis\Typing;
 
-use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\TypeResolver;
+use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 class TypeResolverTest extends \PHPUnit_Framework_TestCase
 {

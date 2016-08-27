@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Analysis\Typing;
 
 /**
  * Provides functionality for analyzing type names.

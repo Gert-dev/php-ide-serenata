@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;

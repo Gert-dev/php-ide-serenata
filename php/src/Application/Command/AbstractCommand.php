@@ -12,11 +12,12 @@ use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\IndexDataAdapter;
-use PhpIntegrator\SourceCodeStreamReader;
 use PhpIntegrator\IndexDataAdapterProviderInterface;
 use PhpIntegrator\IndexDataAdapterProviderCachingProxy;
 
 use PhpIntegrator\Indexing\IndexDatabase;
+
+use PhpIntegrator\Utility\SourceCodeStreamReader;
 
 use PhpParser\Parser;
 

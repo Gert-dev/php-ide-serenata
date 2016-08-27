@@ -7,15 +7,16 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\NodeHelpers;
-use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\SourceCodeHelpers;
-
 use PhpIntegrator\Analysis\Visiting\TypeQueryingVisitor;
 use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
 
 use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+
+use PhpIntegrator\Utility\NodeHelpers;
+use PhpIntegrator\Utility\SourceCodeHelpers;
 
 use PhpParser\Node;
 use PhpParser\Error;

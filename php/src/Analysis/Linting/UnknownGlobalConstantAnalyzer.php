@@ -2,11 +2,11 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
-use PhpIntegrator\TypeAnalyzer;
-
 use PhpIntegrator\Analysis\Visiting\GlobalConstantUsageFetchingVisitor;
 
 use PhpIntegrator\Application\Command\GlobalConstants;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Looks for unknown global constant names.

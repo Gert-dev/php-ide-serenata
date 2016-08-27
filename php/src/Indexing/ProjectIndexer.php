@@ -4,7 +4,7 @@ namespace PhpIntegrator\Indexing;
 
 use UnexpectedValueException;
 
-use PhpIntegrator\SourceCodeStreamReader;
+use PhpIntegrator\Utility\SourceCodeStreamReader;
 
 /**
  * Handles project and folder indexing.

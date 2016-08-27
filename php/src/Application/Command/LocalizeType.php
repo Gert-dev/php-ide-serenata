@@ -8,8 +8,8 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\TypeLocalizer;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+use PhpIntegrator\Analysis\Typing\TypeLocalizer;
 
 /**
  * Command that makes a FQCN relative to local use statements in a file.

@@ -4,8 +4,9 @@ namespace PhpIntegrator\Analysis\Linting;
 
 use UnexpectedValueException;
 
-use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\DocblockAnalyzer;
+use PhpIntegrator\Analysis\DocblockAnalyzer;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 

@@ -7,7 +7,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\SourceCodeHelpers;
+use PhpIntegrator\Utility\SourceCodeHelpers;
 
 use PhpIntegrator\Analysis\VariableScanner;
 

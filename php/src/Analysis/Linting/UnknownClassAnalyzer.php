@@ -2,8 +2,6 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
-use PhpIntegrator\TypeAnalyzer;
-
 use PhpIntegrator\Analysis\Visiting\ClassUsageFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\DocblockClassUsageFetchingVisitor;
 
@@ -12,6 +10,8 @@ use PhpIntegrator\Application\Command\ResolveType;
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Looks for unknown class names.

@@ -2,13 +2,13 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
-use PhpIntegrator\TypeAnalyzer;
-
 use PhpIntegrator\Analysis\Visiting\MemberUsageFetchingVisitor;
 
 use PhpIntegrator\Application\Command\ClassInfo;
-use PhpIntegrator\Application\Command\ResolveType;
 use PhpIntegrator\Application\Command\DeduceTypes;
+use PhpIntegrator\Application\Command\ResolveType;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Looks for unknown member names.

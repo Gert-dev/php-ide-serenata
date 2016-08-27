@@ -7,9 +7,9 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\SourceCodeHelpers;
-
 use PhpIntegrator\Parsing\PartialParser;
+
+use PhpIntegrator\Utility\SourceCodeHelpers;
 
 /**
  * Allows fetching invocation information of a method or function call.

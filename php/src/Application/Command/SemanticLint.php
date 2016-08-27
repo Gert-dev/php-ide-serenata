@@ -7,13 +7,13 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\TypeAnalyzer;
-
 use PhpIntegrator\Analysis\Linting;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpParser\Error;
 use PhpParser\NodeTraverser;

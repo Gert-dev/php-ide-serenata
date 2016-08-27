@@ -6,15 +6,15 @@ use DateTime;
 use Exception;
 use UnexpectedValueException;
 
-use PhpIntegrator\TypeResolver;
-use PhpIntegrator\TypeAnalyzer;
-
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\AssociativeUseStatementFetchingVisitor;
 
 use PhpIntegrator\Application\Command\DeduceTypes;
 
 use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpParser\Error;
 use PhpParser\Parser;

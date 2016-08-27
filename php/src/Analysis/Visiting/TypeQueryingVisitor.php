@@ -2,8 +2,9 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Utility\NodeHelpers;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;

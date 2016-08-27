@@ -2,13 +2,13 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
-use PhpIntegrator\TypeAnalyzer;
-
 use PhpIntegrator\Analysis\Visiting\ClassUsageFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\UseStatementFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\DocblockClassUsageFetchingVisitor;
 
 use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Looks for unused use statements.

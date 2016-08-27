@@ -2,11 +2,11 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
-use PhpIntegrator\TypeAnalyzer;
-
 use PhpIntegrator\Analysis\Visiting\GlobalFunctionUsageFetchingVisitor;
 
 use PhpIntegrator\Application\Command\GlobalFunctions;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Looks for unknown global function names (i.e. used during calls).

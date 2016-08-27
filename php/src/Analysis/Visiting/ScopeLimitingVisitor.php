@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\DummyExprNode;
+use PhpIntegrator\Utility\DummyExprNode;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;

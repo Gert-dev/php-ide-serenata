@@ -4,11 +4,11 @@ namespace PhpIntegrator\Analysis\Visiting;
 
 use UnexpectedValueException;
 
-use PhpIntegrator\TypeAnalyzer;
-
 use PhpIntegrator\Application\Command\ClassInfo;
-use PhpIntegrator\Application\Command\ResolveType;
 use PhpIntegrator\Application\Command\DeduceTypes;
+use PhpIntegrator\Application\Command\ResolveType;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;

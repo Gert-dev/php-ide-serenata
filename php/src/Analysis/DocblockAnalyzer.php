@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Analysis;
 
 /**
  * Provides functionality for analyzing docblocks.

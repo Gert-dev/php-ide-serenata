@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Analysis\Typing;
 
 /**
  * Normalizes types and FQCN's.

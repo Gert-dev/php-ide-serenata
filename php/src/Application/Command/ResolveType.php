@@ -8,8 +8,8 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\TypeResolver;
+use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Command that resolves local types in a file.

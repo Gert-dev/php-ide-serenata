@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Analysis\Typing;
 
 /**
  * Resolves FQCN's back to local types based on use statements and the namespace.

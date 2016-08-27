@@ -7,8 +7,9 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\IndexDataAdapter;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Command that shows information about a class, interface or trait.

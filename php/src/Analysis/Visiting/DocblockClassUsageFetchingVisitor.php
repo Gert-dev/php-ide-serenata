@@ -2,8 +2,9 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpParser\Node;
 use PhpParser\Comment;
