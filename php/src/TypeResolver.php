@@ -86,6 +86,6 @@ class TypeResolver
             $fullName .= $type;
         }
 
-        return $this->typeAnalyzer->getNormalizedFqcn($fullName, true);
+        return $this->typeAnalyzer->getNormalizedFqcn($fullName);
     }
 }

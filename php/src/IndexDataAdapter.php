@@ -583,12 +583,12 @@ class IndexDataAdapter implements IndexDataAdapterInterface
                 // self takes the type from the classlike it is first resolved in, so only resolve it once to ensure
                 // that it doesn't get overwritten.
                 if ($type['resolvedType'] === 'self') {
-                    $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqcn, true);
+                    $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqcn);
                 }
             } elseif ($type['type'] === '$this' || $type['type'] === 'static') {
-                $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqcn, true);
+                $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($elementFqcn);
             } elseif ($typeAnalyzer->isClassType($type['fqcn'])) {
-                $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($type['fqcn'], true);
+                $type['resolvedType'] = $typeAnalyzer->getNormalizedFqcn($type['fqcn']);
             } else {
                 $type['resolvedType'] = $type['fqcn'];
             }

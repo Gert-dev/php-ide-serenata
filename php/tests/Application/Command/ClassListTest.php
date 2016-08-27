@@ -16,7 +16,7 @@ class ClassListTest extends IndexedTest
 
         $output = $command->getClassList($path);
 
-        $this->assertThat($output, $this->arrayHasKey('A\FirstClass'));
-        $this->assertThat($output, $this->arrayHasKey('A\SecondClass'));
+        $this->assertThat($output, $this->arrayHasKey('\A\FirstClass'));
+        $this->assertThat($output, $this->arrayHasKey('\A\SecondClass'));
     }
 }

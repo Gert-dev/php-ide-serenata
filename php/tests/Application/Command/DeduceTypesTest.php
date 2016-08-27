@@ -411,7 +411,7 @@ class DeduceTypesTest extends IndexedTest
     {
         $result = $this->deduceTypes(
             'GlobalFunction.php.test',
-            ['global_function()']
+            ['\global_function()']
         );
 
         $this->assertEquals(['\B', 'null'], $result);

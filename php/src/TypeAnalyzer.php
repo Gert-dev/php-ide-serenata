@@ -5,7 +5,7 @@ namespace PhpIntegrator;
 /**
  * Provides functionality for analyzing type names.
  */
-class TypeAnalyzer
+class TypeAnalyzer implements TypeNormalizerInterface
 {
     /**
      * @var string
@@ -58,21 +58,12 @@ class TypeAnalyzer
     }
 
     /**
-     * Normalizes an FQCN, consistently removing or adding a leading slash.
-     *
-     * @param string $fqcn
-     * @param bool   $withLeadingSlash
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function getNormalizedFqcn($fqcn, $withLeadingSlash = false)
+    public function getNormalizedFqcn($fqcn)
     {
-        if ($fqcn) {
-            if (!$withLeadingSlash && $fqcn[0] === '\\') {
-                return mb_substr($fqcn, 1);
-            } elseif ($withLeadingSlash && $fqcn[0] !== '\\') {
-                return '\\' . $fqcn;
-            }
+        if ($fqcn && $fqcn[0] !== '\\') {
+            return '\\' . $fqcn;
         }
 
         return $fqcn;

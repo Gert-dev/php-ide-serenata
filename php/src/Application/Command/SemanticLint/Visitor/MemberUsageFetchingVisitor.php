@@ -213,9 +213,9 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
      */
     protected function isClassExcluded($className)
     {
-        $className = $this->typeAnalyzer->getNormalizedFqcn($className, false);
+        $className = $this->typeAnalyzer->getNormalizedFqcn($className);
 
-        return ($className === 'stdClass');
+        return ($className === '\stdClass');
     }
 
     /**

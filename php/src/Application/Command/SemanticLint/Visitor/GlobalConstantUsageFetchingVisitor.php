@@ -48,7 +48,7 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $fqcn = $this->typeAnalyzer->getNormalizedFqcn($node->name->toString(), false);
+        $fqcn = $this->typeAnalyzer->getNormalizedFqcn($node->name->toString());
 
         $globalConstants = $this->globalConstants->getGlobalConstants();
 

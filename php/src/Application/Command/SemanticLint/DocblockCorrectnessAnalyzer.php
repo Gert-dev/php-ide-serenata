@@ -66,7 +66,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         $this->indexDatabase = $indexDatabase;
         $this->classInfoCommand = $classInfoCommand;
 
-        $this->outlineIndexingVisitor = new OutlineIndexingVisitor($code);
+        $this->outlineIndexingVisitor = new OutlineIndexingVisitor($this->getTypeAnalyzer(), $code);
     }
 
     /**

@@ -350,7 +350,7 @@ class BuiltinIndexer
                 $fqcn = $extendedInfo['ret_type'];
 
                 if (!$this->typeAnalyzer->isSpecialType($fqcn)) {
-                    $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn, true);
+                    $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn);
                 }
 
                 $returnTypes = [
@@ -402,7 +402,7 @@ class BuiltinIndexer
                 $fqcn = $parameterInfo['type'];
 
                 if (!$this->typeAnalyzer->isSpecialType($fqcn)) {
-                    $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn, true);
+                    $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn);
                 }
 
                 $types = [

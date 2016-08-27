@@ -95,6 +95,6 @@ class TypeLocalizer
             }
         }
 
-        return $bestLocalizedType ?: $this->typeAnalyzer->getNormalizedFqcn($type, true);
+        return $bestLocalizedType ?: $this->typeAnalyzer->getNormalizedFqcn($type);
     }
 }

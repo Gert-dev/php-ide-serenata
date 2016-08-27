@@ -166,7 +166,7 @@ class DeduceTypes extends AbstractCommand
 
             $currentClass = $this->getCurrentClassAt($file, $code, $offset);
 
-            $types = [$this->getTypeAnalyzer()->getNormalizedFqcn($currentClass, true)];
+            $types = [$this->getTypeAnalyzer()->getNormalizedFqcn($currentClass)];
         } elseif ($firstElement === 'parent') {
             $propertyAccessNeedsDollarSign = true;
 
@@ -178,7 +178,7 @@ class DeduceTypes extends AbstractCommand
                 if ($classInfo && !empty($classInfo['parents'])) {
                     $type = $classInfo['parents'][0];
 
-                    $types = [$this->getTypeAnalyzer()->getNormalizedFqcn($type, true)];
+                    $types = [$this->getTypeAnalyzer()->getNormalizedFqcn($type)];
                 }
             }
         } elseif ($firstElement[0] === '[') {
@@ -245,7 +245,7 @@ class DeduceTypes extends AbstractCommand
                     continue; // Can't fetch members of non-class type.
                 }
 
-                $classNameToSearch = ($type && $type[0] === '\\' ? mb_substr($type, 1) : $type);
+                $classNameToSearch = $this->getTypeAnalyzer()->getNormalizedFqcn($type);
 
                 try {
                     $info = $dataAdapter->getStructureInfo($classNameToSearch);

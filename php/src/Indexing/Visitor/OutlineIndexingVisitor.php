@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Indexing\Visitor;
 
+use PhpIntegrator\TypeNormalizerInterface;
+
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 
@@ -39,6 +41,11 @@ class OutlineIndexingVisitor extends NameResolver
     protected $currentStructure;
 
     /**
+     * @var TypeNormalizerInterface
+     */
+    protected $typeNormalizer;
+
+    /**
      * @var string
      */
     protected $code;
@@ -46,8 +53,9 @@ class OutlineIndexingVisitor extends NameResolver
     /**
      * @param string $code
      */
-    public function __construct($code)
+    public function __construct(TypeNormalizerInterface $typeNormalizer, $code)
     {
+        $this->typeNormalizer = $typeNormalizer;
         $this->code = $code;
     }
 
@@ -106,9 +114,11 @@ class OutlineIndexingVisitor extends NameResolver
             $interfaces[] = $this->fetchClassName($implementedName);
         }
 
-        $this->structures[$node->namespacedName->toString()] = [
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn($node->namespacedName->toString());
+
+        $this->structures[$fqcn] = [
             'name'           => $node->name,
-            'fqcn'           => $node->namespacedName->toString(),
+            'fqcn'           => $fqcn,
             'type'           => 'class',
             'startLine'      => $node->getLine(),
             'endLine'        => $node->getAttribute('endLine'),
@@ -145,9 +155,11 @@ class OutlineIndexingVisitor extends NameResolver
             $extendedInterfaces[] = $this->fetchClassName($extends);
         }
 
-        $this->structures[$node->namespacedName->toString()] = [
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn($node->namespacedName->toString());
+
+        $this->structures[$fqcn] = [
             'name'           => $node->name,
-            'fqcn'           => $node->namespacedName->toString(),
+            'fqcn'           => $fqcn,
             'type'           => 'interface',
             'startLine'      => $node->getLine(),
             'endLine'        => $node->getAttribute('endLine'),
@@ -175,9 +187,11 @@ class OutlineIndexingVisitor extends NameResolver
 
         $this->currentStructure = $node;
 
-        $this->structures[$node->namespacedName->toString()] = [
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn($node->namespacedName->toString());
+
+        $this->structures[$fqcn] = [
             'name'           => $node->name,
-            'fqcn'           => $node->namespacedName->toString(),
+            'fqcn'           => $fqcn,
             'type'           => 'trait',
             'startLine'      => $node->getLine(),
             'endLine'        => $node->getAttribute('endLine'),
@@ -197,14 +211,16 @@ class OutlineIndexingVisitor extends NameResolver
     {
         parent::enterNode($node);
 
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn($this->currentStructure->namespacedName->toString());
+
         foreach ($node->traits as $traitName) {
-            $this->structures[$this->currentStructure->namespacedName->toString()]['traits'][] =
+            $this->structures[$fqcn]['traits'][] =
                 $this->fetchClassName($traitName);
         }
 
         foreach ($node->adaptations as $adaptation) {
             if ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Alias) {
-                $this->structures[$this->currentStructure->namespacedName->toString()]['traitAliases'][] = [
+                $this->structures[$fqcn]['traitAliases'][] = [
                     'name'                       => $adaptation->method,
                     'alias'                      => $adaptation->newName,
                     'trait'                      => $adaptation->trait ? $this->fetchClassName($adaptation->trait) : null,
@@ -214,7 +230,7 @@ class OutlineIndexingVisitor extends NameResolver
                     'isInheritingAccessModifier' => ($adaptation->newModifier === null)
                 ];
             } elseif ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Precedence) {
-                $this->structures[$this->currentStructure->namespacedName->toString()]['traitPrecedences'][] = [
+                $this->structures[$fqcn]['traitPrecedences'][] = [
                     'name'  => $adaptation->method,
                     'trait' => $this->fetchClassName($adaptation->trait)
                 ];
@@ -227,8 +243,10 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseClassPropertyNode(Node\Stmt\Property $node)
     {
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn($this->currentStructure->namespacedName->toString());
+
         foreach ($node->props as $property) {
-            $this->structures[$this->currentStructure->namespacedName->toString()]['properties'][$property->name] = [
+            $this->structures[$fqcn]['properties'][$property->name] = [
                 'name'            => $property->name,
                 'startLine'       => $property->getLine(),
                 'endLine'         => $property->getAttribute('endLine'),
@@ -258,8 +276,12 @@ class OutlineIndexingVisitor extends NameResolver
     {
         parent::enterNode($node);
 
-        $this->globalFunctions[$node->name] = $this->extractFunctionLikeNodeData($node) + [
-            'fqcn' => isset($node->namespacedName) ? $node->namespacedName->toString() : $node->name
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn(
+            isset($node->namespacedName) ? $node->namespacedName->toString() : $node->name
+        );
+
+        $this->globalFunctions[$fqcn] = $this->extractFunctionLikeNodeData($node) + [
+            'fqcn' => $fqcn
         ];
     }
 
@@ -268,7 +290,9 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseClassMethodNode(Node\Stmt\ClassMethod $node)
     {
-        $this->structures[$this->currentStructure->namespacedName->toString()]['methods'][$node->name] = $this->extractFunctionLikeNodeData($node) + [
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn($this->currentStructure->namespacedName->toString());
+
+        $this->structures[$fqcn]['methods'][$node->name] = $this->extractFunctionLikeNodeData($node) + [
             'isPublic'       => $node->isPublic(),
             'isPrivate'      => $node->isPrivate(),
             'isProtected'    => $node->isProtected(),
@@ -366,8 +390,10 @@ class OutlineIndexingVisitor extends NameResolver
      */
     protected function parseClassConstantNode(Node\Stmt\ClassConst $node)
     {
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn($this->currentStructure->namespacedName->toString());
+
         foreach ($node->consts as $const) {
-            $this->structures[$this->currentStructure->namespacedName->toString()]['constants'][$const->name] = [
+            $this->structures[$fqcn]['constants'][$const->name] = [
                 'name'           => $const->name,
                 'startLine'      => $const->getLine(),
                 'endLine'        => $const->getAttribute('endLine'),
@@ -392,9 +418,13 @@ class OutlineIndexingVisitor extends NameResolver
         parent::enterNode($node);
 
         foreach ($node->consts as $const) {
-            $this->globalConstants[$const->name] = [
+            $fqcn = $this->typeNormalizer->getNormalizedFqcn(
+                isset($const->namespacedName) ? $const->namespacedName->toString() : $const->name
+            );
+
+            $this->globalConstants[$fqcn] = [
                 'name'           => $const->name,
-                'fqcn'           => isset($const->namespacedName) ? $const->namespacedName->toString() : $const->name,
+                'fqcn'           => $fqcn,
                 'startLine'      => $const->getLine(),
                 'endLine'        => $const->getAttribute('endLine'),
                 'startPosName'   => $const->getAttribute('startFilePos') ? $const->getAttribute('startFilePos') : null,
@@ -431,9 +461,11 @@ class OutlineIndexingVisitor extends NameResolver
         // https://php.net/manual/en/function.define.php#90282
         $name = new Node\Name((string) $nameValue->value);
 
-        $this->globalDefines[$name->toString()] = [
+        $fqcn = $this->typeNormalizer->getNormalizedFqcn($name->toString());
+
+        $this->globalDefines[$fqcn] = [
             'name'           => $name->getLast(),
-            'fqcn'           => $name->toString(),
+            'fqcn'           => $fqcn,
             'startLine'      => $node->getLine(),
             'endLine'        => $node->getAttribute('endLine'),
             'startPosName'   => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos') : null,

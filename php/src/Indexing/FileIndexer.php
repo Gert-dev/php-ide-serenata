@@ -104,7 +104,7 @@ class FileIndexer
                 throw new Error('Unknown syntax error encountered');
             }
 
-            $outlineIndexingVisitor = new Visitor\OutlineIndexingVisitor($code);
+            $outlineIndexingVisitor = new Visitor\OutlineIndexingVisitor($this->typeAnalyzer, $code);
             $useStatementFetchingVisitor = new Visitor\UseStatementFetchingVisitor();
 
             $traverser = new NodeTraverser(false);
