@@ -14,8 +14,6 @@ use PhpIntegrator\SourceCodeHelpers;
 use PhpIntegrator\Analysis\Visiting\TypeQueryingVisitor;
 use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
 
-use PhpIntegrator\Indexing\IndexDatabase;
-
 use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
 
