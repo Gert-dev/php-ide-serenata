@@ -151,7 +151,7 @@ class BuiltinIndexer
 
         return $this->storage->insert(IndexStorageItemEnum::CONSTANTS, [
             'name'               => $name,
-            'fqcn'               => $name,
+            'fqcn'               => $this->typeAnalyzer->getNormalizedFqcn($name),
             'file_id'            => null,
             'start_line'         => null,
             'end_line'           => null,
@@ -206,7 +206,7 @@ class BuiltinIndexer
             if ($returnType) {
                 $returnTypes[] = [
                     'type' => (string) $returnType,
-                    'fqcn' => (string) $returnType
+                    'fqcn' => $this->typeAnalyzer->getNormalizedFqcn((string) $returnType)
                 ];
             }
         }
@@ -271,7 +271,7 @@ class BuiltinIndexer
                 if ($type) {
                     $types[] = [
                         'type' => (string) $type,
-                        'fqcn' => (string) $type
+                        'fqcn' => $this->typeAnalyzer->getNormalizedFqcn((string) $type)
                     ];
                 }
             }
@@ -356,7 +356,7 @@ class BuiltinIndexer
                 $returnTypes = [
                     [
                         'type' => $extendedInfo['ret_type'],
-                        'fqcn' => $fqcn
+                        'fqcn' => $this->typeAnalyzer->getNormalizedFqcn($fqcn)
                     ]
                 ];
 
@@ -408,7 +408,7 @@ class BuiltinIndexer
                 $types = [
                     [
                         'type' => $parameterInfo['type'],
-                        'fqcn' => $fqcn
+                        'fqcn' => $this->typeAnalyzer->getNormalizedFqcn($fqcn)
                     ]
                 ];
 
@@ -554,21 +554,21 @@ class BuiltinIndexer
         foreach ($parents as $parent) {
             $this->storage->insert(IndexStorageItemEnum::STRUCTURES_PARENTS_LINKED, [
                 'structure_id'           => $structureId,
-                'linked_structure_fqcn' => $parent
+                'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($parent)
             ]);
         }
 
         foreach ($interfaces as $interface) {
             $this->storage->insert(IndexStorageItemEnum::STRUCTURES_INTERFACES_LINKED, [
                 'structure_id'           => $structureId,
-                'linked_structure_fqcn' => $interface
+                'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($interface)
             ]);
         }
 
         foreach ($traits as $trait) {
             $this->storage->insert(IndexStorageItemEnum::STRUCTURES_TRAITS_LINKED, [
                 'structure_id'           => $structureId,
-                'linked_structure_fqcn' => $trait
+                'linked_structure_fqcn' => $this->typeAnalyzer->getNormalizedFqcn($trait)
             ]);
         }
 
@@ -593,7 +593,7 @@ class BuiltinIndexer
         $functionId = $this->indexFunctionLike($function);
 
         $this->storage->update(IndexStorageItemEnum::FUNCTIONS, $functionId, [
-            'fqcn' => $function->getName()
+            'fqcn' => $this->typeAnalyzer->getNormalizedFqcn($function->getName())
         ]);
     }
 
@@ -732,7 +732,9 @@ class BuiltinIndexer
 
         $shortName = $element->getShortName();
 
-        return isset($correctionMap[$shortName]) ? $correctionMap[$shortName] : $shortName;
+        $correctedName = isset($correctionMap[$shortName]) ? $correctionMap[$shortName] : $shortName;
+
+        return $this->typeAnalyzer->getNormalizedFqcn($correctedName);
     }
 
     /**
