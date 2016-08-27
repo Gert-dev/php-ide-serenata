@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\ClassList;
+namespace PhpIntegrator;
 
 use PhpIntegrator\IndexDataAdapterProviderInterface;
 
@@ -8,7 +8,7 @@ use PhpIntegrator\IndexDataAdapterProviderInterface;
  * Proxy for a {@see IndexDataAdapterProviderInterface} that does not return any data (is a "white hole") for several
  * methods that are unnecessary when fetching the structural element list to avoid their cost and to improve performance.
  */
-class ProxyProvider implements IndexDataAdapterProviderInterface
+class IndexDataAdapterWhiteHolingProxyProvider implements IndexDataAdapterProviderInterface
 {
     /**
      * @var IndexDataAdapterProviderInterface

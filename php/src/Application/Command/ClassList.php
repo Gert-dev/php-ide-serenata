@@ -7,6 +7,7 @@ use ArrayAccess;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\IndexDataAdapter;
+use PhpIntegrator\IndexDataAdapterWhiteHolingProxyProvider;
 
 /**
  * Command that shows a list of available classes, interfaces and traits.
@@ -42,7 +43,7 @@ class ClassList extends AbstractCommand
      {
          $result = [];
 
-         $storageProxy = new ClassList\ProxyProvider($this->getIndexDataAdapterProvider());
+         $storageProxy = new IndexDataAdapterWhiteHolingProxyProvider($this->getIndexDataAdapterProvider());
          $dataAdapter = new IndexDataAdapter($storageProxy);
 
          foreach ($this->getIndexDatabase()->getAllStructuresRawInfo($file) as $element) {
