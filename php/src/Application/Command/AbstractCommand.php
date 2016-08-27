@@ -13,6 +13,7 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\IndexDataAdapter;
 use PhpIntegrator\SourceCodeHelper;
+use PhpIntegrator\SourceCodeStreamReader;
 use PhpIntegrator\IndexDataAdapterProviderInterface;
 use PhpIntegrator\IndexDataAdapterProviderCachingProxy;
 
@@ -72,6 +73,11 @@ abstract class AbstractCommand implements CommandInterface
      * @var SourceCodeHelper
      */
     protected $sourceCodeHelper;
+
+    /**
+     * @var SourceCodeStreamReader
+     */
+    protected $sourceCodeStreamReader;
 
     /**
      * @param Parser             $parser
@@ -187,6 +193,18 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         return $this->sourceCodeHelper;
+    }
+
+    /**
+     * @return SourceCodeStreamReader
+     */
+    protected function getSourceCodeStreamReader()
+    {
+        if (!$this->sourceCodeStreamReader) {
+            $this->sourceCodeStreamReader = new SourceCodeStreamReader();
+        }
+
+        return $this->sourceCodeStreamReader;
     }
 
     /**

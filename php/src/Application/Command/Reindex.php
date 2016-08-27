@@ -148,7 +148,7 @@ class Reindex extends AbstractCommand
                 $sourceOverrideMap = [];
 
                 if ($useStdin) {
-                    $sourceOverrideMap[$paths[0]] = $this->getSourceCodeHelper()->getSourceCode($paths[0], true);
+                    $sourceOverrideMap[$paths[0]] = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
                 }
 
                 $this->getProjectIndexer()->index($paths, $extensionsToIndex, $excludedPaths, $sourceOverrideMap);
@@ -185,7 +185,7 @@ class Reindex extends AbstractCommand
                 $this->getBuiltinIndexer(),
                 $this->getFileIndexer(),
                 $this->getScanner(),
-                $this->getSourceCodeHelper()
+                $this->getSourceCodeStreamReader()
             );
         }
 

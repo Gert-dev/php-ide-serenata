@@ -30,16 +30,19 @@ class InvocationInfo extends AbstractCommand
      */
     protected function process(ArrayAccess $arguments)
     {
-        if (!isset($arguments['file']) && (!isset($arguments['stdin']) || !$arguments['stdin']->value)) {
-            throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
-        } elseif (!isset($arguments['offset'])) {
+        if (!isset($arguments['offset'])) {
             throw new UnexpectedValueException('An --offset must be supplied into the source code!');
         }
 
-        $code = $this->getSourceCodeHelper()->getSourceCode(
-            isset($arguments['file']) ? $arguments['file']->value : null,
-            isset($arguments['stdin']) && $arguments['stdin']->value
-        );
+        $code = null;
+
+        if (isset($arguments['stdin']) && $arguments['stdin']->value) {
+            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
+        } elseif (isset($arguments['file']) && $arguments['file']->value) {
+            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']);
+        } else {
+            throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
+        }
 
         $offset = $arguments['offset']->value;
 

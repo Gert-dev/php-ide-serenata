@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Indexing;
 
-use PhpIntegrator\SourceCodeHelper;
+use PhpIntegrator\SourceCodeStreamReader;
 
 /**
  * Handles project and folder indexing.
@@ -30,9 +30,9 @@ class ProjectIndexer
     protected $scanner;
 
     /**
-     * @var SourceCodeHelper
+     * @var SourceCodeStreamReader
      */
-    protected $sourceCodeHelper;
+    protected $sourceCodeStreamReader;
 
     /**
      * @var resource|null
@@ -49,20 +49,20 @@ class ProjectIndexer
      * @param BuiltinIndexer   $builtinIndexer
      * @param FileIndexer      $fileIndexer
      * @param Scanner          $scanner
-     * @param SourceCodeHelper $sourceCodeHelper
+     * @param SourceCodeStreamReader $sourceCodeStreamReader
      */
     public function __construct(
         StorageInterface $storage,
         BuiltinIndexer $builtinIndexer,
         FileIndexer $fileIndexer,
         Scanner $scanner,
-        SourceCodeHelper $sourceCodeHelper
+        SourceCodeStreamReader $sourceCodeStreamReader
     ) {
         $this->storage = $storage;
         $this->builtinIndexer = $builtinIndexer;
         $this->fileIndexer = $fileIndexer;
         $this->scanner = $scanner;
-        $this->sourceCodeHelper = $sourceCodeHelper;
+        $this->sourceCodeStreamReader = $sourceCodeStreamReader;
     }
 
     /**
@@ -172,7 +172,7 @@ class ProjectIndexer
 
             $code = isset($sourceOverrideMap[$filePath]) ?
                 $sourceOverrideMap[$filePath] :
-                $this->sourceCodeHelper->getSourceCode($filePath, false);
+                $this->sourceCodeStreamReader->getSourceCodeFromFile($filePath);
 
             try {
                 $this->fileIndexer->index($filePath, $code);

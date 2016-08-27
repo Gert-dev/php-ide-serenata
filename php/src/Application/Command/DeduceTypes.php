@@ -86,10 +86,11 @@ class DeduceTypes extends AbstractCommand
             throw new UnexpectedValueException('An --offset must be supplied into the source code!');
         }
 
-        $code = $this->getSourceCodeHelper()->getSourceCode(
-            isset($arguments['file']) ? $arguments['file']->value : null,
-            isset($arguments['stdin']) && $arguments['stdin']->value
-        );
+        if (isset($arguments['stdin']) && $arguments['stdin']->value) {
+            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
+        } else {
+            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']);
+        }
 
         $offset = $arguments['offset']->value;
 
