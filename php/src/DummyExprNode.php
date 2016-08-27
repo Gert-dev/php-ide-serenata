@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\DeduceTypes;
+namespace PhpIntegrator;
 
 use PhpParser\Node;
 
