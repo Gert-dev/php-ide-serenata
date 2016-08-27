@@ -5,14 +5,15 @@ namespace PhpIntegrator\Application\Command\SemanticLint;
 use UnexpectedValueException;
 
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\Parsing\DocblockParser;
 use PhpIntegrator\DocblockAnalyzer;
+
+use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 
 use PhpIntegrator\Application\Command\ClassInfo;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
-use PhpIntegrator\Indexing\Visitor\OutlineIndexingVisitor;
+use PhpIntegrator\Parsing\DocblockParser;
 
 /**
  * Analyzes the correctness of docblocks.
@@ -20,7 +21,7 @@ use PhpIntegrator\Indexing\Visitor\OutlineIndexingVisitor;
 class DocblockCorrectnessAnalyzer implements AnalyzerInterface
 {
     /**
-     * @var OutlineIndexingVisitor
+     * @var OutlineFetchingVisitor
      */
     protected $outlineIndexingVisitor;
 
@@ -66,7 +67,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         $this->indexDatabase = $indexDatabase;
         $this->classInfoCommand = $classInfoCommand;
 
-        $this->outlineIndexingVisitor = new OutlineIndexingVisitor($this->getTypeAnalyzer(), $code);
+        $this->outlineIndexingVisitor = new OutlineFetchingVisitor($this->getTypeAnalyzer(), $code);
     }
 
     /**

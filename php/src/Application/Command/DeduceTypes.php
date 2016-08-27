@@ -9,16 +9,15 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\Parsing\DocblockParser;
 use PhpIntegrator\SourceCodeHelpers;
 
+use PhpIntegrator\Analysis\Visiting\TypeQueryingVisitor;
 use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
-
-use PhpIntegrator\Application\Command\DeduceTypes\TypeQueryingVisitor;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Parsing\PartialParser;
+use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpParser\Node;
 use PhpParser\Error;

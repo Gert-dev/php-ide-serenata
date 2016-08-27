@@ -8,9 +8,13 @@ use UnexpectedValueException;
 
 use PhpIntegrator\TypeResolver;
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
+use PhpIntegrator\Analysis\Visiting\AssociativeUseStatementFetchingVisitor;
 
 use PhpIntegrator\Application\Command\DeduceTypes;
+
+use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpParser\Error;
 use PhpParser\Parser;
@@ -104,8 +108,8 @@ class FileIndexer
                 throw new Error('Unknown syntax error encountered');
             }
 
-            $outlineIndexingVisitor = new Visitor\OutlineIndexingVisitor($this->typeAnalyzer, $code);
-            $useStatementFetchingVisitor = new Visitor\UseStatementFetchingVisitor();
+            $outlineIndexingVisitor = new OutlineFetchingVisitor($this->typeAnalyzer, $code);
+            $useStatementFetchingVisitor = new AssociativeUseStatementFetchingVisitor();
 
             $traverser = new NodeTraverser(false);
             $traverser->addVisitor($outlineIndexingVisitor);
@@ -142,14 +146,14 @@ class FileIndexer
      * the file. For structural elements, this also includes (direct) members, information about the parent class,
      * used traits, etc.
      *
-     * @param int                                 $fileId
-     * @param Visitor\OutlineIndexingVisitor      $outlineIndexingVisitor
-     * @param Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
+     * @param int                                    $fileId
+     * @param OutlineFetchingVisitor                 $outlineIndexingVisitor
+     * @param AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
      */
     protected function indexVisitorResults(
         $fileId,
-        Visitor\OutlineIndexingVisitor $outlineIndexingVisitor,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
+        OutlineFetchingVisitor $outlineIndexingVisitor,
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
     ) {
          foreach ($outlineIndexingVisitor->getStructures() as $fqcn => $structure) {
              $this->indexStructure(
@@ -195,11 +199,11 @@ class FileIndexer
     /**
      * Indexes the specified structural element.
      *
-     * @param array                                    $rawData
-     * @param int                                      $fileId
-     * @param string                                   $fqcn
-     * @param bool                                     $isBuiltin
-     * @param Visitor\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array                                       $rawData
+     * @param int                                         $fileId
+     * @param string                                      $fqcn
+     * @param bool                                        $isBuiltin
+     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
      * @return int The ID of the structural element.
      */
@@ -208,7 +212,7 @@ class FileIndexer
         $fileId,
         $fqcn,
         $isBuiltin,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
         $structureTypeMap = $this->getStructureTypeMap();
 
@@ -369,16 +373,16 @@ class FileIndexer
     }
 
     /**
-     * @param string                              $typeSpecification
-     * @param int                                 $line
-     * @param Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
+     * @param string                                 $typeSpecification
+     * @param int                                    $line
+     * @param AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
      *
      * @return array[]
      */
     protected function getTypeDataForTypeSpecification(
         $typeSpecification,
         $line,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
     ) {
         $typeList = $this->typeAnalyzer->getTypesForTypeSpecification($typeSpecification);
 
@@ -386,16 +390,16 @@ class FileIndexer
     }
 
     /**
-     * @param string[]                            $typeList
-     * @param int                                 $line
-     * @param Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
+     * @param string[]                               $typeList
+     * @param int                                    $line
+     * @param AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
      *
      * @return array[]
      */
     protected function getTypeDataForTypeList(
         array $typeList,
         $line,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
     ) {
         $types = [];
 
@@ -418,16 +422,16 @@ class FileIndexer
     /**
      * Indexes the specified constant.
      *
-     * @param array                                    $rawData
-     * @param int                                      $fileId
-     * @param int|null                                 $seId
-     * @param Visitor\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array                                       $rawData
+     * @param int                                         $fileId
+     * @param int|null                                    $seId
+     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
     protected function indexConstant(
         array $rawData,
         $fileId,
         $seId = null,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
         $documentation = $this->docblockParser->parse($rawData['docComment'], [
             DocblockParser::VAR_TYPE,
@@ -491,18 +495,18 @@ class FileIndexer
     /**
      * Indexes the specified property.
      *
-     * @param array                                    $rawData
-     * @param int                                      $fileId
-     * @param int                                      $seId
-     * @param int                                      $amId
-     * @param Visitor\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array                                       $rawData
+     * @param int                                         $fileId
+     * @param int                                         $seId
+     * @param int                                         $amId
+     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
     protected function indexProperty(
         array $rawData,
         $fileId,
         $seId,
         $amId,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
         $documentation = $this->docblockParser->parse($rawData['docComment'], [
             DocblockParser::VAR_TYPE,
@@ -572,18 +576,18 @@ class FileIndexer
     }
 
     /**
-     * @param array                                    $rawData
-     * @param int                                      $fileId
-     * @param int                                      $seId
-     * @param int                                      $amId
-     * @param Visitor\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array                                       $rawData
+     * @param int                                         $fileId
+     * @param int                                         $seId
+     * @param int                                         $amId
+     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
     protected function indexMagicProperty(
         array $rawData,
         $fileId,
         $seId,
         $amId,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
         $types = [];
 
@@ -617,12 +621,12 @@ class FileIndexer
     /**
      * Indexes the specified function.
      *
-     * @param array                                    $rawData
-     * @param int                                      $fileId
-     * @param int|null                                 $seId
-     * @param int|null                                 $amId
-     * @param bool                                     $isMagic
-     * @param Visitor\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array                                       $rawData
+     * @param int                                         $fileId
+     * @param int|null                                    $seId
+     * @param int|null                                    $amId
+     * @param bool                                        $isMagic
+     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
     protected function indexFunction(
         array $rawData,
@@ -630,7 +634,7 @@ class FileIndexer
         $seId = null,
         $amId = null,
         $isMagic = false,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
         $documentation = $this->docblockParser->parse($rawData['docComment'], [
             DocblockParser::THROWS,
@@ -750,12 +754,12 @@ class FileIndexer
     }
 
     /**
-     * @param array                                    $rawData
-     * @param int                                      $fileId
-     * @param int|null                                 $seId
-     * @param int|null                                 $amId
-     * @param bool                                     $isMagic
-     * @param Visitor\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array                                       $rawData
+     * @param int                                         $fileId
+     * @param int|null                                    $seId
+     * @param int|null                                    $amId
+     * @param bool                                        $isMagic
+     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
     protected function indexMagicMethod(
         array $rawData,
@@ -763,7 +767,7 @@ class FileIndexer
         $seId = null,
         $amId = null,
         $isMagic = false,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
         $returnTypes = [];
 
@@ -881,16 +885,16 @@ class FileIndexer
     /**
      * Resolves and determines the FQCN of the specified type.
      *
-     * @param string                                   $type
-     * @param int                                      $line
-     * @param Visitor\UseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param string                                      $type
+     * @param int                                         $line
+     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
      *
      * @return string|null
      */
     protected function getFqcnForLocalType(
         $type,
         $line,
-        Visitor\UseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
         // There can be multiple namespaces in each file, check with namespace is active for the specified line.
         $useStatements = [];

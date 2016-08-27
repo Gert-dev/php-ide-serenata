@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\DeduceTypes;
+namespace PhpIntegrator\Analysis\Visiting;
 
 use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\Parsing\DocblockParser;

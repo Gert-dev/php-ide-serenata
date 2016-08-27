@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Indexing\Visitor;
+namespace PhpIntegrator\Analysis\Visiting;
 
 use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\TypeNormalizerInterface;
@@ -11,10 +11,10 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 
 /**
- * Node visitor that indexes the outline of a file, creating a list of structural elements (classes, interfaces, ...)
+ * Node visitor that fetches the outline of a file, creating a list of structural elements (classes, interfaces, ...)
  * with their direct methods, properties, constants, and so on.
  */
-class OutlineIndexingVisitor extends NameResolver
+class OutlineFetchingVisitor extends NameResolver
 {
     /**
      * @var array

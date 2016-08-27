@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Indexing\Visitor;
+namespace PhpIntegrator\Analysis\Visiting;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
@@ -8,7 +8,7 @@ use PhpParser\NodeVisitor;
 /**
  * Node visitor that fetches information about use statements and the namespace.
  */
-class UseStatementFetchingVisitor implements NodeVisitor
+class AssociativeUseStatementFetchingVisitor implements NodeVisitor
 {
     /**
      * @var array[]
