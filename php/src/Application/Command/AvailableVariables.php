@@ -2,12 +2,12 @@
 
 namespace PhpIntegrator\Application\Command;
 
-use Error;
 use ArrayAccess;
 use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpParser\Error;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
