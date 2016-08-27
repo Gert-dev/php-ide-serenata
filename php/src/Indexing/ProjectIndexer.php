@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Indexing;
 
+use UnexpectedValueException;
+
 use PhpIntegrator\SourceCodeStreamReader;
 
 /**
@@ -170,9 +172,17 @@ class ProjectIndexer
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
 
-            $code = isset($sourceOverrideMap[$filePath]) ?
-                $sourceOverrideMap[$filePath] :
-                $this->sourceCodeStreamReader->getSourceCodeFromFile($filePath);
+            $code = null;
+
+            if (isset($sourceOverrideMap[$filePath])) {
+                $code = $sourceOverrideMap[$filePath];
+            } else {
+                try {
+                    $code = $this->sourceCodeStreamReader->getSourceCodeFromFile($filePath);
+                } catch (UnexpectedValueException $e) {
+                    continue; // Skip files that we can't read.
+                }
+            }
 
             try {
                 $this->fileIndexer->index($filePath, $code);
