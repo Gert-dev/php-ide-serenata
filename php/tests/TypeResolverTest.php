@@ -4,34 +4,39 @@ namespace PhpIntegrator;
 
 class TypeResolverTest extends \PHPUnit_Framework_TestCase
 {
+    protected function getTypeAnalyzer()
+    {
+        return new TypeAnalyzer();
+    }
+
     public function testEmptyTypeReturnsNull()
     {
-        $object = new TypeResolver(null, []);
+        $object = new TypeResolver($this->getTypeAnalyzer(), null, []);
 
         $this->assertNull($object->resolve(null));
     }
 
     public function testTypeWithLeadingSlashIsNotResolved()
     {
-        $object = new TypeResolver(null, []);
+        $object = new TypeResolver($this->getTypeAnalyzer(), null, []);
 
         $this->assertEquals('\A\B', $object->resolve('\A\B'));
     }
 
     public function testRelativeTypeIsRelativeToNamespace()
     {
-        $object = new TypeResolver(null, []);
+        $object = new TypeResolver($this->getTypeAnalyzer(), null, []);
 
         $this->assertEquals('\A', $object->resolve('A'));
 
-        $object = new TypeResolver('A', []);
+        $object = new TypeResolver($this->getTypeAnalyzer(), 'A', []);
 
         $this->assertEquals('\A\B', $object->resolve('B'));
     }
 
     public function testRelativeTypeIsRelativeToUseStatements()
     {
-        $object = new TypeResolver('A', [
+        $object = new TypeResolver($this->getTypeAnalyzer(), 'A', [
             [
                 'fqcn' => 'B\C',
                 'alias' => 'Alias'

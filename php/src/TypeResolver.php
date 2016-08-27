@@ -25,14 +25,16 @@ class TypeResolver
     /**
      * Constructor.
      *
-     * @param string|null $namespace The current namespace.
+     * @param TypeAnalyzer $typeAnalyzer
+     * @param string|null  $namespace The current namespace.
      * @param array {
      *     @param string|null $fqcn
      *     @param string      $alias
      * } $imports
      */
-    public function __construct($namespace, array $imports)
+    public function __construct(TypeAnalyzer $typeAnalyzer, $namespace, array $imports)
     {
+        $this->typeAnalyzer = $typeAnalyzer;
         $this->imports = $imports;
         $this->namespace = $namespace;
     }
@@ -84,18 +86,6 @@ class TypeResolver
             $fullName .= $type;
         }
 
-        return $this->getTypeAnalyzer()->getNormalizedFqcn($fullName, true);
-    }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
+        return $this->typeAnalyzer->getNormalizedFqcn($fullName, true);
     }
 }

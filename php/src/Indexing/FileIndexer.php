@@ -918,7 +918,7 @@ class FileIndexer
             }
         }
 
-        $typeResolver = new TypeResolver($namespaceName, $useStatements);
+        $typeResolver = new TypeResolver($this->typeAnalyzer, $namespaceName, $useStatements);
 
         return $typeResolver->resolve($type);
     }

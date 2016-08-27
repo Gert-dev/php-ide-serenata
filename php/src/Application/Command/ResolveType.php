@@ -8,6 +8,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\TypeResolver;
 
 /**
@@ -73,7 +74,8 @@ class ResolveType extends AbstractCommand
 
         $useStatements = iterator_to_array($useStatements);
 
-        $typeResolver = new TypeResolver($namespace['namespace'], $useStatements);
+        $typeAnalyzer = new TypeAnalyzer();
+        $typeResolver = new TypeResolver($typeAnalyzer, $namespace['namespace'], $useStatements);
 
         return $typeResolver->resolve($type);
     }
