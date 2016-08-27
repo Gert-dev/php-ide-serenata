@@ -1,8 +1,10 @@
 <?php
 
-namespace PhpIntegrator\Application\Command;
+namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\IndexedTest;
+use PhpIntegrator\Application\Command\GlobalConstants;
+
+use PhpIntegrator\Test\IndexedTest;
 
 class GlobalConstantsTest extends IndexedTest
 {

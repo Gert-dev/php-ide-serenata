@@ -1,8 +1,10 @@
 <?php
 
-namespace PhpIntegrator\Application\Command;
+namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\IndexedTest;
+use PhpIntegrator\Application\Command\SemanticLint;
+
+use PhpIntegrator\Test\IndexedTest;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 

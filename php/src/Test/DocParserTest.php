@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Test;
 
 use PhpIntegrator\DocParser;
 

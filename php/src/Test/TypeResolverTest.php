@@ -1,6 +1,9 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Test;
+
+use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\TypeResolver;
 
 class TypeResolverTest extends \PHPUnit_Framework_TestCase
 {

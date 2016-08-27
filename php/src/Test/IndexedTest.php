@@ -1,8 +1,10 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\Test;
 
 use ReflectionClass;
+
+use PhpIntegrator\Application;
 
 use PhpIntegrator\Application\Command;
 
