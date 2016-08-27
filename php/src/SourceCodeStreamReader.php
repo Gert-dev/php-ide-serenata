@@ -30,7 +30,7 @@ class SourceCodeStreamReader
     public function getSourceCodeFromStdin()
     {
         $code = file_get_contents('php://stdin');
-        
+
         $code = $this->convertEncodingIfNecessary($code);
 
         return $code;
