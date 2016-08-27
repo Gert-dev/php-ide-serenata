@@ -8,9 +8,12 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Linting;
 
 use PhpIntegrator\Indexing\IndexDatabase;
+
+use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpParser\Error;
 use PhpParser\NodeTraverser;
@@ -154,7 +157,7 @@ class SemanticLint extends AbstractCommand
             $unknownClassAnalyzer = null;
 
             if ($retrieveUnknownClasses) {
-                $unknownClassAnalyzer = new SemanticLint\UnknownClassAnalyzer(
+                $unknownClassAnalyzer = new Linting\UnknownClassAnalyzer(
                     $file,
                     $this->getIndexDatabase(),
                     $this->getResolveTypeCommand(),
@@ -170,7 +173,7 @@ class SemanticLint extends AbstractCommand
             $unknownMemberAnalyzer = null;
 
             if ($retrieveUnknownMembers) {
-                $unknownMemberAnalyzer = new SemanticLint\UnknownMemberAnalyzer(
+                $unknownMemberAnalyzer = new Linting\UnknownMemberAnalyzer(
                     $this->getDeduceTypesCommand(),
                     $this->getClassInfoCommand(),
                     $this->getResolveTypeCommand(),
@@ -187,7 +190,7 @@ class SemanticLint extends AbstractCommand
             $unknownGlobalFunctionAnalyzer = null;
 
             if ($retrieveUnknownGlobalFunctions) {
-                $unknownGlobalFunctionAnalyzer = new SemanticLint\UnknownGlobalFunctionAnalyzer(
+                $unknownGlobalFunctionAnalyzer = new Linting\UnknownGlobalFunctionAnalyzer(
                     $this->getGlobalFunctionsCommand(),
                     $this->getTypeAnalyzer()
                 );
@@ -200,7 +203,7 @@ class SemanticLint extends AbstractCommand
             $unknownGlobalConstantAnalyzer = null;
 
             if ($retrieveUnknownGlobalFunctions) {
-                $unknownGlobalConstantAnalyzer = new SemanticLint\UnknownGlobalConstantAnalyzer(
+                $unknownGlobalConstantAnalyzer = new Linting\UnknownGlobalConstantAnalyzer(
                     $this->getGlobalConstantsCommand(),
                     $this->getTypeAnalyzer()
                 );
@@ -213,7 +216,7 @@ class SemanticLint extends AbstractCommand
             $unusedUseStatementAnalyzer = null;
 
             if ($retrieveUnusedUseStatements) {
-                $unusedUseStatementAnalyzer = new SemanticLint\UnusedUseStatementAnalyzer(
+                $unusedUseStatementAnalyzer = new Linting\UnusedUseStatementAnalyzer(
                     $this->getTypeAnalyzer(),
                     $this->getDocblockParser()
                 );
@@ -237,7 +240,7 @@ class SemanticLint extends AbstractCommand
                 // This analyzer needs to traverse the nodes separately as it modifies them.
                 $traverser = new NodeTraverser(false);
 
-                $docblockCorrectnessAnalyzer = new SemanticLint\DocblockCorrectnessAnalyzer(
+                $docblockCorrectnessAnalyzer = new Linting\DocblockCorrectnessAnalyzer(
                     $code,
                     $this->getIndexDatabase(),
                     $this->getClassInfoCommand()

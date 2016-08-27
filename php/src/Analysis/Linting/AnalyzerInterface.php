@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\SemanticLint;
+namespace PhpIntegrator\Analysis\Linting;
 
 /**
  * Interface for analyzers.
