@@ -51,6 +51,7 @@ class BuiltinIndexer
 
     /**
      * @param StorageInterface $storage
+     * @param TypeAnalyzer     $typeAnalyzer
      */
     public function __construct(StorageInterface $storage, TypeAnalyzer $typeAnalyzer)
     {
