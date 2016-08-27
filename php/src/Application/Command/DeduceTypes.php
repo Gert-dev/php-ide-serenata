@@ -18,6 +18,8 @@ use PhpIntegrator\Application\Command\DeduceTypes\TypeQueryingVisitor;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
+use PhpIntegrator\Parsing\PartialParser;
+
 use PhpParser\Node;
 use PhpParser\Error;
 use PhpParser\NodeTraverser;
@@ -56,6 +58,11 @@ class DeduceTypes extends AbstractCommand
      * @var DocParser
      */
     protected $docParser;
+
+    /**
+     * @var PartialParser
+     */
+    protected $partialParser;
 
     /**
      * @var TypeQueryingVisitor
@@ -103,7 +110,7 @@ class DeduceTypes extends AbstractCommand
         if (isset($arguments['part'])) {
             $parts = $arguments['part']->value;
         } else {
-            $parts = $this->getSourceCodeHelper()->retrieveSanitizedCallStackAt(substr($code, 0, $offset));
+            $parts = $this->getPartialParser()->retrieveSanitizedCallStackAt(substr($code, 0, $offset));
 
             if (!empty($parts) && isset($arguments['ignore-last-element']) && $arguments['ignore-last-element']) {
                 array_pop($parts);
@@ -750,5 +757,19 @@ class DeduceTypes extends AbstractCommand
         }
 
         return $this->docParser;
+    }
+
+    /**
+     * Retrieves an instance of PartialParser. The object will only be created once if needed.
+     *
+     * @return PartialParser
+     */
+    protected function getPartialParser()
+    {
+        if (!$this->partialParser instanceof PartialParser) {
+            $this->partialParser = new PartialParser();
+        }
+
+        return $this->partialParser;
     }
 }

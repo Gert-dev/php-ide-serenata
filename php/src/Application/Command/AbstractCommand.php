@@ -12,7 +12,6 @@ use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\IndexDataAdapter;
-use PhpIntegrator\SourceCodeHelper;
 use PhpIntegrator\SourceCodeStreamReader;
 use PhpIntegrator\IndexDataAdapterProviderInterface;
 use PhpIntegrator\IndexDataAdapterProviderCachingProxy;
@@ -68,11 +67,6 @@ abstract class AbstractCommand implements CommandInterface
      * @var IndexDataAdapterProviderCachingProxy
      */
     protected $indexDataAdapterProvider;
-
-    /**
-     * @var SourceCodeHelper
-     */
-    protected $sourceCodeHelper;
 
     /**
      * @var SourceCodeStreamReader
@@ -181,18 +175,6 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         return $this->indexDataAdapter;
-    }
-
-    /**
-     * @return SourceCodeHelper
-     */
-    protected function getSourceCodeHelper()
-    {
-        if (!$this->sourceCodeHelper) {
-            $this->sourceCodeHelper = new SourceCodeHelper();
-        }
-
-        return $this->sourceCodeHelper;
     }
 
     /**

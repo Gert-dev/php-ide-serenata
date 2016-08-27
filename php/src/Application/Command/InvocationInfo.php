@@ -9,11 +9,18 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\SourceCodeHelpers;
 
+use PhpIntegrator\Parsing\PartialParser;
+
 /**
  * Allows fetching invocation information of a method or function call.
  */
 class InvocationInfo extends AbstractCommand
 {
+    /**
+     * @var PartialParser
+     */
+    protected $partialParser;
+
     /**
      * @inheritDoc
      */
@@ -73,6 +80,20 @@ class InvocationInfo extends AbstractCommand
      */
     public function getInvocationInfo($code)
     {
-        return $this->getSourceCodeHelper()->getInvocationInfoAt($code);
+        return $this->getPartialParser()->getInvocationInfoAt($code);
+    }
+
+    /**
+     * Retrieves an instance of PartialParser. The object will only be created once if needed.
+     *
+     * @return PartialParser
+     */
+    protected function getPartialParser()
+    {
+        if (!$this->partialParser instanceof PartialParser) {
+            $this->partialParser = new PartialParser();
+        }
+
+        return $this->partialParser;
     }
 }

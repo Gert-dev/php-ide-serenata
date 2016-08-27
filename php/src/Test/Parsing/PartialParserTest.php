@@ -1,18 +1,18 @@
 <?php
 
-namespace PhpIntegrator\Test;
+namespace PhpIntegrator\Test\Parsing;
 
 use ReflectionClass;
 
-use PhpIntegrator\SourceCodeHelper;
+use PhpIntegrator\Parsing\PartialParser;
 
-class SourceCodeHelperTest extends \PHPUnit_Framework_TestCase
+class PartialParserTest extends \PHPUnit_Framework_TestCase
 {
     public function testStripPairContentCorrectlyStripsParantheses()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
-        $reflectionClass = new ReflectionClass(get_class($sourceCodeHelper));
+        $reflectionClass = new ReflectionClass(get_class($partialParser));
         $reflectionMethod = $reflectionClass->getMethod('stripPairContent');
         $reflectionMethod->setAccessible(true);
 
@@ -66,15 +66,15 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $reflectionMethod->invoke($sourceCodeHelper, $source, '(', ')')
+            $reflectionMethod->invoke($partialParser, $source, '(', ')')
         );
     }
 
     public function testRetrieveSanitizedCallStackCorrectlyStopsWithNoText()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
-        $reflectionClass = new ReflectionClass(get_class($sourceCodeHelper));
+        $reflectionClass = new ReflectionClass(get_class($partialParser));
         $reflectionMethod = $reflectionClass->getMethod('retrieveSanitizedCallStack');
         $reflectionMethod->setAccessible(true);
 
@@ -86,15 +86,15 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $reflectionMethod->invoke($sourceCodeHelper, $source)
+            $reflectionMethod->invoke($partialParser, $source)
         );
     }
 
     public function testRetrieveSanitizedCallStackSanitizesCommentsAtTheStartOfTheCallStack()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
-        $reflectionClass = new ReflectionClass(get_class($sourceCodeHelper));
+        $reflectionClass = new ReflectionClass(get_class($partialParser));
         $reflectionMethod = $reflectionClass->getMethod('retrieveSanitizedCallStack');
         $reflectionMethod->setAccessible(true);
 
@@ -110,15 +110,15 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $reflectionMethod->invoke($sourceCodeHelper, $source)
+            $reflectionMethod->invoke($partialParser, $source)
         );
     }
 
     public function testRetrieveSanitizedCallStackSanitizesCallStacksThatStartWithANewInstance()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
-        $reflectionClass = new ReflectionClass(get_class($sourceCodeHelper));
+        $reflectionClass = new ReflectionClass(get_class($partialParser));
         $reflectionMethod = $reflectionClass->getMethod('retrieveSanitizedCallStack');
         $reflectionMethod->setAccessible(true);
 
@@ -130,15 +130,15 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $reflectionMethod->invoke($sourceCodeHelper, $source)
+            $reflectionMethod->invoke($partialParser, $source)
         );
     }
 
     public function testRetrieveSanitizedCallStackSanitizesCallStacksThatStartWithANewInstanceSpreadOverSeveralLines()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
-        $reflectionClass = new ReflectionClass(get_class($sourceCodeHelper));
+        $reflectionClass = new ReflectionClass(get_class($partialParser));
         $reflectionMethod = $reflectionClass->getMethod('retrieveSanitizedCallStack');
         $reflectionMethod->setAccessible(true);
 
@@ -152,15 +152,15 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $reflectionMethod->invoke($sourceCodeHelper, $source)
+            $reflectionMethod->invoke($partialParser, $source)
         );
     }
 
     public function testRetrieveSanitizedCallStackSanitizesClosures()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
-        $reflectionClass = new ReflectionClass(get_class($sourceCodeHelper));
+        $reflectionClass = new ReflectionClass(get_class($partialParser));
         $reflectionMethod = $reflectionClass->getMethod('retrieveSanitizedCallStack');
         $reflectionMethod->setAccessible(true);
 
@@ -174,15 +174,15 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $reflectionMethod->invoke($sourceCodeHelper, $source)
+            $reflectionMethod->invoke($partialParser, $source)
         );
     }
 
     public function testRetrieveSanitizedCallStackSanitizesComplexCallStacks()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
-        $reflectionClass = new ReflectionClass(get_class($sourceCodeHelper));
+        $reflectionClass = new ReflectionClass(get_class($partialParser));
         $reflectionMethod = $reflectionClass->getMethod('retrieveSanitizedCallStack');
         $reflectionMethod->setAccessible(true);
 
@@ -229,13 +229,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $reflectionMethod->invoke($sourceCodeHelper, $source)
+            $reflectionMethod->invoke($partialParser, $source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBasicFunctionCalls()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -247,13 +247,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtStaticClassNames()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -269,13 +269,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtStaticClassNamesContainingANamespace()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -291,13 +291,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtControlKeywords()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -313,13 +313,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBuiltinConstructs()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -335,13 +335,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtKeywordsSuchAsSelfAndParent()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -357,13 +357,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtTernaryOperatorsFirstOperand()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -375,13 +375,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtTernaryOperatorsLastOperand()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -393,13 +393,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtConcatenationOperators()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -411,13 +411,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsWhenTheBracketSyntaxIsUsedForDynamicAccessToMembers()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -433,13 +433,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtCasts()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -451,13 +451,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsWhenTheBracketSyntaxIsUsedForVariablesInsideStrings()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -472,13 +472,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtTheNewKeyword()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -490,13 +490,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsWhenTheFirstElementIsAnInstantiationWrappedInParantheses()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -512,13 +512,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsWhenTheFirstElementIsAnInstantiationAsArrayValueInAKeyValuePair()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -531,13 +531,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsWhenTheFirstElementIsAnInstantiationWrappedInParaenthesesAndItIsInsideAnArray()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -550,13 +550,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsWhenTheFirstElementInAnInstantiationWrappedInParanthesesAndItIsInsideAFunctionCall()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -568,13 +568,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtSanitizesComplexCallStack()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -615,13 +615,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtSanitizesStaticCallWithStaticKeyword()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -633,13 +633,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtAssignmentSymbol()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -651,13 +651,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtMultiplicationOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -669,13 +669,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtDivisionOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -687,13 +687,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtPlusOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -705,13 +705,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtModulusOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -723,13 +723,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtMinusOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -741,13 +741,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBitwisoOrOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -759,13 +759,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBitwiseAndOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -777,13 +777,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBitwiseXorOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -795,13 +795,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBitwiseNotOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -813,13 +813,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBooleanLessOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -831,13 +831,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBooleanGreaterOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -849,13 +849,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtBooleanNotOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -867,13 +867,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testRetrieveSanitizedCallStackAtStopsAtSilencingOperator()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -885,13 +885,13 @@ SOURCE;
 
         $this->assertEquals(
             $expectedResult,
-            $sourceCodeHelper->retrieveSanitizedCallStackAt($source)
+            $partialParser->retrieveSanitizedCallStackAt($source)
         );
     }
 
     public function testGetInvocationInfoAtWithSingleLineInvocation()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
             <?php
@@ -899,7 +899,7 @@ SOURCE;
             $this->test(1, 2, 3
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(42, $result['offset']);
         $this->assertEquals(['$this', 'test'], $result['callStack']);
@@ -908,7 +908,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithMultiLineInvocation()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -919,7 +919,7 @@ SOURCE;
             3
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(34, $result['offset']);
         $this->assertEquals(['$this', 'test'], $result['callStack']);
@@ -928,7 +928,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithMoreComplexNestedArguments1()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -942,7 +942,7 @@ SOURCE;
             3
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(35, $result['offset']);
         $this->assertEquals(['builtin_func'], $result['callStack']);
@@ -951,7 +951,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithMoreComplexNestedArguments2()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -962,7 +962,7 @@ SOURCE;
             ['test'
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(35, $result['offset']);
         $this->assertEquals(['builtin_func'], $result['callStack']);
@@ -972,7 +972,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithMoreComplexNestedArguments3()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -983,7 +983,7 @@ SOURCE;
             $array['ke
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(35, $result['offset']);
         $this->assertEquals(['builtin_func'], $result['callStack']);
@@ -993,7 +993,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithTrailingCommas()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1004,14 +1004,14 @@ SOURCE;
                 'Trailing comma',
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(1, $result['argumentIndex']);
     }
 
     public function testGetInvocationInfoAtWithNestedParantheses()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1021,7 +1021,7 @@ SOURCE;
             ($a + $b
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(35, $result['offset']);
         $this->assertEquals(['builtin_func'], $result['callStack']);
@@ -1031,7 +1031,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithSqlStringArguments()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1039,14 +1039,14 @@ SOURCE;
         foo("SELECT a.one, a.two, a.three FROM test", second
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(1, $result['argumentIndex']);
     }
 
     public function testGetInvocationInfoAtWithConstructorCallsWithNormalClassName()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1057,7 +1057,7 @@ SOURCE;
             3
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(35, $result['offset']);
         $this->assertEquals(['MyObject'], $result['callStack']);
@@ -1067,7 +1067,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithConstructorCallsWithNormalClassNamePrecededByLeadingSlash()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1078,7 +1078,7 @@ SOURCE;
             3
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(36, $result['offset']);
         $this->assertEquals(['\MyObject'], $result['callStack']);
@@ -1088,7 +1088,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithConstructorCallsWithNormalClassNamePrecededByLeadingSlashAndMultipleParts()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1099,7 +1099,7 @@ SOURCE;
             3
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(48, $result['offset']);
         $this->assertEquals(['\MyNamespace\MyObject'], $result['callStack']);
@@ -1109,7 +1109,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithConstructorCalls2()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1120,7 +1120,7 @@ SOURCE;
             3
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(33, $result['offset']);
         $this->assertEquals(['static'], $result['callStack']);
@@ -1130,7 +1130,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtWithConstructorCalls3()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1141,7 +1141,7 @@ SOURCE;
             3
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertEquals(31, $result['offset']);
         $this->assertEquals(['self'], $result['callStack']);
@@ -1151,7 +1151,7 @@ SOURCE;
 
     public function testGetInvocationInfoAtReturnsNullWhenNotInInvocation1()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1163,14 +1163,14 @@ SOURCE;
         }
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertNull($result);
     }
 
     public function testGetInvocationInfoAtReturnsNullWhenNotInInvocation2()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1178,14 +1178,14 @@ SOURCE;
         $this->test();
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertNull($result);
     }
 
     public function testGetInvocationInfoAtReturnsNullWhenNotInInvocation3()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1195,14 +1195,14 @@ SOURCE;
 
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertNull($result);
     }
 
     public function testGetInvocationInfoAtReturnsNullWhenNotInInvocation4()
     {
-        $sourceCodeHelper = new SourceCodeHelper();
+        $partialParser = new PartialParser();
 
         $source = <<<'SOURCE'
         <?php
@@ -1212,7 +1212,7 @@ SOURCE;
         } elseif (
 SOURCE;
 
-        $result = $sourceCodeHelper->getInvocationInfoAt($source);
+        $result = $partialParser->getInvocationInfoAt($source);
 
         $this->assertNull($result);
     }

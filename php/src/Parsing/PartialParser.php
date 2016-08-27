@@ -1,13 +1,15 @@
 <?php
 
-namespace PhpIntegrator;
-
-use UnexpectedValueException;
+namespace PhpIntegrator\Parsing;
 
 /**
- * Contains utility functionality for dealing with source code.
+ * Parses partial (incomplete) PHP code.
+ *
+ * This class can parse PHP code that is incomplete (and thus erroneous), which is only partially supported by
+ * php-parser. This is necessary for being able to deal with incomplete expressions such as "$this->" to see what the
+ * type of the expression is. This information can in turn be used by client functionality such as autocompletion.
  */
-class SourceCodeHelper
+class PartialParser
 {
     /**
      * Retrieves the start of the expression (as byte offset) that ends at the end of the specified source code string.
