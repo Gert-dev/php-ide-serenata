@@ -244,4 +244,26 @@ abstract class AbstractCommand implements CommandInterface
     {
         return $this->parser;
     }
+
+    /**
+     * @param string $code
+     *
+     * @throws UnexpectedValueException
+     *
+     * @return \PhpParser\Node[]
+     */
+    protected function parse($code)
+    {
+        try {
+            $nodes = $this->parser->parse($code);
+        } catch (\PhpParser\Error $e) {
+            throw new UnexpectedValueException('Parsing the file failed!');
+        }
+
+        if ($nodes === null) {
+            throw new UnexpectedValueException('Parsing the file failed!');
+        }
+
+        return $nodes;
+    }
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\AvailableVariables;
+namespace PhpIntegrator\Analysis;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * Visitor that queries the nodes for information about an invoked function or method.
+ * Visitor that queries the nodes for information about available (set) variables.
  */
-class QueryingVisitor extends NodeVisitorAbstract
+class VariableScanningVisitor extends NodeVisitorAbstract
 {
     /**
      * @var string[]

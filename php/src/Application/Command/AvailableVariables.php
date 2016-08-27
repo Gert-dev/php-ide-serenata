@@ -7,17 +7,18 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpParser\Error;
-use PhpParser\Lexer;
-use PhpParser\Parser;
-use PhpParser\ParserFactory;
-use PhpParser\NodeTraverser;
+use PhpIntegrator\Analysis\VariableScanner;
 
 /**
  * Command that shows information about the scopes at a specific position in a file.
  */
 class AvailableVariables extends AbstractCommand
 {
+    /**
+     * @var VariableScanner
+     */
+    protected $variableScanner;
+
     /**
      * @inheritDoc
      */
@@ -56,44 +57,30 @@ class AvailableVariables extends AbstractCommand
         return $this->outputJson(true, $result);
      }
 
-     /**
-      * @param string $code
-      * @param int    $offset
-      */
+    /**
+     * @param string $code
+     * @param int    $offset
+     *
+     * @return array
+     */
      public function getAvailableVariables($code, $offset)
      {
-         $parser = $this->getParser();
+         $nodes = $this->parse($code);
 
-         try {
-             $nodes = $parser->parse($code);
-         } catch (Error $e) {
-             throw new UnexpectedValueException('Parsing the file failed!');
+         return $this->getVariableScanner()->getAvailableVariables($nodes, $offset);
+     }
+
+     /**
+      * Retrieves an instance of VariableScanner. The object will only be created once if needed.
+      *
+      * @return VariableScanner
+      */
+     protected function getVariableScanner()
+     {
+         if (!$this->variableScanner instanceof VariableScanner) {
+             $this->variableScanner = new VariableScanner();
          }
 
-         if ($nodes === null) {
-             throw new UnexpectedValueException('Parsing the file failed!');
-         }
-
-         $queryingVisitor = new AvailableVariables\QueryingVisitor($offset);
-         $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
-
-         $traverser = new NodeTraverser(false);
-         $traverser->addVisitor($scopeLimitingVisitor);
-         $traverser->addVisitor($queryingVisitor);
-         $traverser->traverse($nodes);
-
-         $variables = $queryingVisitor->getVariablesSortedByProximity();
-
-         // We don't do any type resolution at the moment, but we maintain this format for backwards compatibility.
-         $outputVariables = [];
-
-         foreach ($variables as $variable) {
-             $outputVariables[$variable] = [
-                'name' => $variable,
-                'type' => null
-             ];
-         }
-
-         return $outputVariables;
+         return $this->variableScanner;
      }
 }
