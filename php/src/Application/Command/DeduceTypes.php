@@ -81,7 +81,7 @@ class DeduceTypes extends AbstractCommand
     protected function process(ArrayAccess $arguments)
     {
         if (!isset($arguments['file'])) {
-            throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
+            throw new UnexpectedValueException('A --file must be supplied!');
         } elseif (!isset($arguments['offset'])) {
             throw new UnexpectedValueException('An --offset must be supplied into the source code!');
         }
