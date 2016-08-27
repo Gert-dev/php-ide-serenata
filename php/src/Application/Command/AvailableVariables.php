@@ -7,6 +7,8 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\SourceCodeHelpers;
+
 use PhpIntegrator\Analysis\VariableScanner;
 
 /**
@@ -49,7 +51,7 @@ class AvailableVariables extends AbstractCommand
         $offset = $arguments['offset']->value;
 
         if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
-            $offset = $this->getSourceCodeHelper()->getByteOffsetFromCharacterOffset($offset, $code);
+            $offset = SourceCodeHelpers::getByteOffsetFromCharacterOffset($offset, $code);
         }
 
         $result = $this->getAvailableVariables($code, $offset);

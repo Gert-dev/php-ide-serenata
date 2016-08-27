@@ -10,6 +10,7 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\SourceCodeHelpers;
 
 use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
 
@@ -93,7 +94,7 @@ class DeduceTypes extends AbstractCommand
         $offset = $arguments['offset']->value;
 
         if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
-            $offset = $this->getSourceCodeHelper()->getByteOffsetFromCharacterOffset($offset, $code);
+            $offset = SourceCodeHelpers::getByteOffsetFromCharacterOffset($offset, $code);
         }
 
         $parts = [];
@@ -218,7 +219,7 @@ class DeduceTypes extends AbstractCommand
             // Static class name.
             $propertyAccessNeedsDollarSign = true;
 
-            $line = $this->getSourceCodeHelper()->calculateLineByOffset($code, $offset);
+            $line = SourceCodeHelpers::calculateLineByOffset($code, $offset);
 
             $types = [$this->getResolveTypeCommand()->resolveType($matches[1], $file, $line)];
         }
@@ -322,7 +323,7 @@ class DeduceTypes extends AbstractCommand
         $variableName = mb_substr($name, 1);
 
         $variableTypeInfoMap = $this->typeQueryingVisitor->getVariableTypeInfoMap();
-        $offsetLine = $this->getSourceCodeHelper()->calculateLineByOffset($code, $offset);
+        $offsetLine = SourceCodeHelpers::calculateLineByOffset($code, $offset);
 
         return $this->getResolvedTypes($variableTypeInfoMap, $variableName, $file, $offsetLine, $code);
     }
@@ -651,7 +652,7 @@ class DeduceTypes extends AbstractCommand
      */
     protected function getCurrentClassAt($file, $source, $offset)
     {
-        $line = $this->getSourceCodeHelper()->calculateLineByOffset($source, $offset);
+        $line = SourceCodeHelpers::calculateLineByOffset($source, $offset);
 
         return $this->getCurrentClassAtLine($file, $source, $line);
     }

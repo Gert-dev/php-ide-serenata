@@ -7,6 +7,8 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\SourceCodeHelpers;
+
 /**
  * Allows fetching invocation information of a method or function call.
  */
@@ -42,7 +44,7 @@ class InvocationInfo extends AbstractCommand
         $offset = $arguments['offset']->value;
 
         if (isset($arguments['charoffset']) && $arguments['charoffset']->value == true) {
-            $offset = $this->getSourceCodeHelper()->getByteOffsetFromCharacterOffset($offset, $code);
+            $offset = SourceCodeHelpers::getByteOffsetFromCharacterOffset($offset, $code);
         }
 
         $result = $this->getInvocationInfoAt($code, $offset);
@@ -67,7 +69,7 @@ class InvocationInfo extends AbstractCommand
      * @return array
      */
     public function getInvocationInfo($code)
-    {        
+    {
         return $this->getSourceCodeHelper()->getInvocationInfoAt($code);
     }
 }
