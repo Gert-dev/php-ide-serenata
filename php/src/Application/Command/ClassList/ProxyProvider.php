@@ -2,16 +2,16 @@
 
 namespace PhpIntegrator\Application\Command\ClassList;
 
-use PhpIntegrator\IndexDataAdapter\ProviderInterface;
+use PhpIntegrator\IndexDataAdapterProviderInterface;
 
 /**
- * Proxy for a ProviderInterface that does not return any data (is a "white hole") for several methods that are
- * unnecessary when fetching the structural element list to avoid their cost and to improve performance.
+ * Proxy for a {@see IndexDataAdapterProviderInterface} that does not return any data (is a "white hole") for several
+ * methods that are unnecessary when fetching the structural element list to avoid their cost and to improve performance.
  */
-class ProxyProvider implements ProviderInterface
+class ProxyProvider implements IndexDataAdapterProviderInterface
 {
     /**
-     * @var ProviderInterface
+     * @var IndexDataAdapterProviderInterface
      */
     protected $proxiedObject;
 
@@ -23,9 +23,9 @@ class ProxyProvider implements ProviderInterface
     /**
      * Constructor.
      *
-     * @param ProviderInterface $proxiedObject
+     * @param IndexDataAdapterProviderInterface $proxiedObject
      */
-    public function __construct(ProviderInterface $proxiedObject)
+    public function __construct(IndexDataAdapterProviderInterface $proxiedObject)
     {
         $this->proxiedObject = $proxiedObject;
     }

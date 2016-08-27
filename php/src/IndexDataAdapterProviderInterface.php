@@ -1,11 +1,11 @@
 <?php
 
-namespace PhpIntegrator\IndexDataAdapter;
+namespace PhpIntegrator;
 
 /**
  * Defines functionality that must be exposed by classes that provide data to an IndexDataAdapter.
  */
-interface ProviderInterface
+interface IndexDataAdapterProviderInterface
 {
     /**
      * @param string $fqcn

@@ -11,8 +11,9 @@ use Doctrine\Common\Cache\Cache;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\SourceCodeHelper;
 use PhpIntegrator\IndexDataAdapter;
+use PhpIntegrator\SourceCodeHelper;
+use PhpIntegrator\IndexDataAdapterProviderInterface;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
@@ -188,7 +189,7 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @return IndexDataAdapter\ProviderInterface
+     * @return IndexDataAdapterProviderInterface
      */
     protected function getIndexDataAdapterProvider()
     {

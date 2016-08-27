@@ -4,13 +4,15 @@ namespace PhpIntegrator\IndexDataAdapter;
 
 use Doctrine\Common\Cache\Cache;
 
+use PhpIntegrator\IndexDataAdapterProviderInterface;
+
 /**
  * Proxy for providers that introduces a caching layer.
  */
-class ProviderCachingProxy implements ProviderInterface
+class ProviderCachingProxy implements IndexDataAdapterProviderInterface
 {
     /**
-     * @var ProviderInterface
+     * @var IndexDataAdapterProviderInterface
      */
     protected $provider;
 
@@ -20,10 +22,10 @@ class ProviderCachingProxy implements ProviderInterface
     protected $cache;
 
     /**
-     * @param ProviderInterface $provider
+     * @param IndexDataAdapterProviderInterface $provider
      * @param Cache             $cache
      */
-    public function __construct(ProviderInterface $provider, Cache $cache)
+    public function __construct(IndexDataAdapterProviderInterface $provider, Cache $cache)
     {
         $this->provider = $provider;
         $this->cache = $cache;
