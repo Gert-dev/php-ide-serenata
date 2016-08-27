@@ -8,6 +8,7 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\DocParser;
+use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\TypeAnalyzer;
 
 use PhpIntegrator\Application\Command\DeduceTypes\TypeQueryingVisitor;
@@ -397,7 +398,7 @@ class DeduceTypes extends AbstractCommand
                     }
 
                     if ($param->type instanceof Node\Name) {
-                        return [$this->fetchClassName($param->type)];
+                        return [NodeHelpers::fetchClassName($param->type)];
                     }
 
                     return $param->type ? [$param->type] : [];
@@ -406,7 +407,7 @@ class DeduceTypes extends AbstractCommand
         } elseif ($node instanceof Node\Stmt\ClassLike) {
             return [(string) $node->name];
         } elseif ($node instanceof Node\Name) {
-            return [$this->fetchClassName($node)];
+            return [NodeHelpers::fetchClassName($node)];
         }
 
         return [];
@@ -615,7 +616,7 @@ class DeduceTypes extends AbstractCommand
             }
         } elseif ($node instanceof Node\Expr\StaticCall) {
             if (is_string($node->name) && $node->class instanceof Node\Name) {
-                return [$this->fetchClassName($node->class), $node->name . '()'];
+                return [NodeHelpers::fetchClassName($node->class), $node->name . '()'];
             }
         } elseif ($node instanceof Node\Expr\PropertyFetch) {
             if (is_string($node->name)) {
@@ -633,28 +634,10 @@ class DeduceTypes extends AbstractCommand
                 return [$node->name->toString() . '()'];
             }
         } elseif ($node instanceof Node\Name) {
-            return [$this->fetchClassName($node)];
+            return [NodeHelpers::fetchClassName($node)];
         }
 
         return null;
-    }
-
-    /**
-     * Takes a class name and turns it into a string.
-     *
-     * @param Node\Name $name
-     *
-     * @return string
-     */
-    protected function fetchClassName(Node\Name $name)
-    {
-        $newName = (string) $name;
-
-        if ($name->isFullyQualified() && $newName[0] !== '\\') {
-            $newName = '\\' . $newName;
-        }
-
-        return $newName;
     }
 
     /**

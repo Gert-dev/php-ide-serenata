@@ -2,6 +2,7 @@
 
 namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
 
+use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\TypeAnalyzer;
 
 use PhpIntegrator\Application\Command\GlobalFunctions;
@@ -54,29 +55,11 @@ class GlobalFunctionUsageFetchingVisitor extends NodeVisitorAbstract
 
         if (!isset($globalFunctions[$fqcn])) {
             $this->globalFunctionCallList[] = [
-                'name'  => $this->fetchClassName($node->name),
+                'name'  => NodeHelpers::fetchClassName($node->name),
                 'start' => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
                 'end'   => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
             ];
         }
-    }
-
-    /**
-     * Takes a class name and turns it into a string.
-     *
-     * @param Node\Name $name
-     *
-     * @return string
-     */
-    protected function fetchClassName(Node\Name $name)
-    {
-        $newName = (string) $name;
-
-        if ($name->isFullyQualified() && $newName[0] !== '\\') {
-            $newName = '\\' . $newName;
-        }
-
-        return $newName;
     }
 
     /**

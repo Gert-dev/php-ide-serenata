@@ -2,6 +2,7 @@
 
 namespace PhpIntegrator\Indexing\Visitor;
 
+use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\TypeNormalizerInterface;
 
 use PhpParser\Node;
@@ -112,7 +113,7 @@ class OutlineIndexingVisitor extends NameResolver
         $interfaces = [];
 
         foreach ($node->implements as $implementedName) {
-            $interfaces[] = $this->fetchClassName($implementedName);
+            $interfaces[] = NodeHelpers::fetchClassName($implementedName);
         }
 
         $fqcn = $this->typeNormalizer->getNormalizedFqcn($node->namespacedName->toString());
@@ -128,7 +129,7 @@ class OutlineIndexingVisitor extends NameResolver
             'isAbstract'     => $node->isAbstract(),
             'isFinal'        => $node->isFinal(),
             'docComment'     => $node->getDocComment() ? $node->getDocComment()->getText() : null,
-            'parents'        => $node->extends ? [$this->fetchClassName($node->extends)] : [],
+            'parents'        => $node->extends ? [NodeHelpers::fetchClassName($node->extends)] : [],
             'interfaces'     => $interfaces,
             'traits'         => [],
             'methods'        => [],
@@ -153,7 +154,7 @@ class OutlineIndexingVisitor extends NameResolver
         $extendedInterfaces = [];
 
         foreach ($node->extends as $extends) {
-            $extendedInterfaces[] = $this->fetchClassName($extends);
+            $extendedInterfaces[] = NodeHelpers::fetchClassName($extends);
         }
 
         $fqcn = $this->typeNormalizer->getNormalizedFqcn($node->namespacedName->toString());
@@ -216,7 +217,7 @@ class OutlineIndexingVisitor extends NameResolver
 
         foreach ($node->traits as $traitName) {
             $this->structures[$fqcn]['traits'][] =
-                $this->fetchClassName($traitName);
+                NodeHelpers::fetchClassName($traitName);
         }
 
         foreach ($node->adaptations as $adaptation) {
@@ -224,7 +225,7 @@ class OutlineIndexingVisitor extends NameResolver
                 $this->structures[$fqcn]['traitAliases'][] = [
                     'name'                       => $adaptation->method,
                     'alias'                      => $adaptation->newName,
-                    'trait'                      => $adaptation->trait ? $this->fetchClassName($adaptation->trait) : null,
+                    'trait'                      => $adaptation->trait ? NodeHelpers::fetchClassName($adaptation->trait) : null,
                     'isPublic'                   => ($adaptation->newModifier === 1),
                     'isPrivate'                  => ($adaptation->newModifier === 4),
                     'isProtected'                => ($adaptation->newModifier === 2),
@@ -233,7 +234,7 @@ class OutlineIndexingVisitor extends NameResolver
             } elseif ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Precedence) {
                 $this->structures[$fqcn]['traitPrecedences'][] = [
                     'name'  => $adaptation->method,
-                    'trait' => $this->fetchClassName($adaptation->trait)
+                    'trait' => NodeHelpers::fetchClassName($adaptation->trait)
                 ];
             }
         }
@@ -314,7 +315,7 @@ class OutlineIndexingVisitor extends NameResolver
             $localType = null;
 
             if ($param->type instanceof Node\Name) {
-                $localType = $this->fetchClassName($param->type);
+                $localType = NodeHelpers::fetchClassName($param->type);
             } elseif ($param->type) {
                 $localType = (string) $param->type;
             }
@@ -345,7 +346,7 @@ class OutlineIndexingVisitor extends NameResolver
         $nodeType = $node->getReturnType();
 
         if ($nodeType instanceof Node\Name) {
-            $localType = $this->fetchClassName($nodeType);
+            $localType = NodeHelpers::fetchClassName($nodeType);
         } elseif ($nodeType) {
             $localType = (string) $nodeType;
         }
@@ -356,7 +357,7 @@ class OutlineIndexingVisitor extends NameResolver
             $resolvedType = null;
 
             if ($param->type instanceof Node\Name) {
-                $resolvedType = $this->fetchClassName($param->type);
+                $resolvedType = NodeHelpers::fetchClassName($param->type);
             } elseif ($param->type) {
                 $resolvedType = (string) $param->type;
             }
@@ -368,7 +369,7 @@ class OutlineIndexingVisitor extends NameResolver
         $nodeType = $node->getReturnType();
 
         if ($nodeType instanceof Node\Name) {
-            $resolvedType = $this->fetchClassName($nodeType);
+            $resolvedType = NodeHelpers::fetchClassName($nodeType);
         } elseif ($nodeType) {
             $resolvedType = (string) $nodeType;
         }
@@ -489,24 +490,6 @@ class OutlineIndexingVisitor extends NameResolver
         if ($this->currentStructure === $node) {
             $this->currentStructure = null;
         }
-    }
-
-    /**
-     * Takes a class name and turns it into a string.
-     *
-     * @param Node\Name $name
-     *
-     * @return string
-     */
-    protected function fetchClassName(Node\Name $name)
-    {
-        $newName = (string) $name;
-
-        if ($name->isFullyQualified() && $newName[0] !== '\\') {
-            $newName = '\\' . $newName;
-        }
-
-        return $newName;
     }
 
     /**

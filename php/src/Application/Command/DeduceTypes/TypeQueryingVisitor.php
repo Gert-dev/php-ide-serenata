@@ -3,6 +3,7 @@
 namespace PhpIntegrator\Application\Command\DeduceTypes;
 
 use PhpIntegrator\DocParser;
+use PhpIntegrator\NodeHelpers;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -227,7 +228,7 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
         } elseif ($node instanceof Node\Expr\Instanceof_) {
             if ($node->expr instanceof Node\Expr\Variable) {
                 if ($node->class instanceof Node\Name) {
-                    $types[$node->expr->name][$this->fetchClassName($node->class)] = self::TYPE_CONDITIONALLY_GUARANTEED;
+                    $types[$node->expr->name][NodeHelpers::fetchClassName($node->class)] = self::TYPE_CONDITIONALLY_GUARANTEED;
                 } else {
                     // This is an expression, we could fetch its return type, but that still won't tell us what
                     // the actual class is, so it's useless at the moment.
@@ -306,24 +307,6 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
                 }
             }
         }
-    }
-
-    /**
-     * Takes a class name and turns it into a string.
-     *
-     * @param Node\Name $name
-     *
-     * @return string
-     */
-    protected function fetchClassName(Node\Name $name)
-    {
-        $newName = (string) $name;
-
-        if ($name->isFullyQualified() && $newName[0] !== '\\') {
-            $newName = '\\' . $newName;
-        }
-
-        return $newName;
     }
 
     /**
