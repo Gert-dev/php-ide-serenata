@@ -261,8 +261,8 @@ class BuiltinIndexer
                 $isVariadic = $parameter->isVariadic();
             }
 
-            $type = null;
             $types = [];
+            $isNullable = false;
 
             // Requires PHP >= 7, good thing this only affects built-in functions, which don't have any type
             // hinting yet anyways (at least in PHP < 7).
@@ -270,6 +270,8 @@ class BuiltinIndexer
                 $type = $parameter->getType();
 
                 if ($type) {
+                    $isNullable = $type->allowsNull();
+
                     $types[] = [
                         'type' => (string) $type,
                         'fqcn' => $this->typeAnalyzer->getNormalizedFqcn((string) $type)
@@ -284,7 +286,7 @@ class BuiltinIndexer
                 'types_serialized' => serialize($types),
                 'description'      => null,
                 'default_value'    => null, // Fetching this is not possible due to "implementation details" (PHP docs).
-                'is_nullable'      => $type && $type->allowsNull() ? 1 : 0,
+                'is_nullable'      => $isNullable ? 1 : 0,
                 'is_reference'     => $parameter->isPassedByReference() ? 1 : 0,
                 'is_optional'      => $parameter->isOptional() ? 1 : 0,
                 'is_variadic'      => $isVariadic ? 1 : 0
