@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\Visitor;
+namespace PhpIntegrator\Analysis\Visiting;
 
 use PhpIntegrator\DummyExprNode;
 

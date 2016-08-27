@@ -11,6 +11,8 @@ use PhpIntegrator\DocParser;
 use PhpIntegrator\NodeHelpers;
 use PhpIntegrator\TypeAnalyzer;
 
+use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
+
 use PhpIntegrator\Application\Command\DeduceTypes\TypeQueryingVisitor;
 
 use PhpIntegrator\Indexing\IndexDatabase;
@@ -296,7 +298,7 @@ class DeduceTypes extends AbstractCommand
             throw new UnexpectedValueException('Parsing the file failed!');
         }
 
-        $scopeLimitingVisitor = new Visitor\ScopeLimitingVisitor($offset);
+        $scopeLimitingVisitor = new ScopeLimitingVisitor($offset);
         $this->typeQueryingVisitor = new TypeQueryingVisitor($this->getDocParser(), $offset);
 
         $traverser = new NodeTraverser();

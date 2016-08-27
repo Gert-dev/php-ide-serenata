@@ -4,7 +4,7 @@ namespace PhpIntegrator\Analysis;
 
 use UnexpectedValueException;
 
-use PhpIntegrator\Application\Command\Visitor\ScopeLimitingVisitor;
+use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
