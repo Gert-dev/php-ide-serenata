@@ -8,7 +8,8 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\TypeResolver;
+use PhpIntegrator\TypeAnalyzer;
+use PhpIntegrator\TypeLocalizer;
 
 /**
  * Command that makes a FQCN relative to local use statements in a file.
@@ -73,8 +74,9 @@ class LocalizeType extends AbstractCommand
 
         $useStatements = iterator_to_array($useStatements);
 
-        $typeResolver = new TypeResolver($namespace['namespace'], $useStatements);
+        $typeAnalyzer = new TypeAnalyzer();
+        $typeLocalizer = new TypeLocalizer($typeAnalyzer, $namespace['namespace'], $useStatements);
 
-        return $typeResolver->localize($type);
+        return $typeLocalizer->localize($type);
     }
 }
