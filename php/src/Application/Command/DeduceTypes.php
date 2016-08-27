@@ -245,10 +245,8 @@ class DeduceTypes extends AbstractCommand
                     continue; // Can't fetch members of non-class type.
                 }
 
-                $classNameToSearch = $this->getTypeAnalyzer()->getNormalizedFqcn($type);
-
                 try {
-                    $info = $dataAdapter->getStructureInfo($classNameToSearch);
+                    $info = $dataAdapter->getStructureInfo($type);
                 } catch (UnexpectedValueException $e) {
                     continue;
                 }
