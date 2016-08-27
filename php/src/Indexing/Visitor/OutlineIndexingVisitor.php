@@ -51,7 +51,8 @@ class OutlineIndexingVisitor extends NameResolver
     protected $code;
 
     /**
-     * @param string $code
+     * @param TypeNormalizerInterface $typeNormalizer
+     * @param string                  $code
      */
     public function __construct(TypeNormalizerInterface $typeNormalizer, $code)
     {
