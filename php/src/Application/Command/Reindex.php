@@ -10,16 +10,15 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\Indexing;
 use PhpIntegrator\DocParser;
 use PhpIntegrator\TypeAnalyzer;
-
-use PhpIntegrator\IndexDataAdapter\ProviderCachingProxy;
+use PhpIntegrator\IndexDataAdapterProviderCachingProxy;
 
 use PhpIntegrator\Indexing\Scanner;
 use PhpIntegrator\Indexing\FileIndexer;
-use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\ProjectIndexer;
+use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\StorageInterface;
-use PhpIntegrator\Indexing\CallbackStorageProxy;
 use PhpIntegrator\Indexing\IndexStorageItemEnum;
+use PhpIntegrator\Indexing\CallbackStorageProxy;
 
 use PhpParser\ParserFactory;
 
@@ -232,7 +231,7 @@ class Reindex extends AbstractCommand
             $this->storageForIndexers = new CallbackStorageProxy($this->getIndexDatabase(), function ($fqcn) {
                 $provider = $this->getIndexDataAdapterProvider();
 
-                if ($provider instanceof ProviderCachingProxy) {
+                if ($provider instanceof IndexDataAdapterProviderCachingProxy) {
                     $provider->clearCacheFor($fqcn);
                 }
             });

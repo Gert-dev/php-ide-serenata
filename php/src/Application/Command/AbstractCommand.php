@@ -14,6 +14,7 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\IndexDataAdapter;
 use PhpIntegrator\SourceCodeHelper;
 use PhpIntegrator\IndexDataAdapterProviderInterface;
+use PhpIntegrator\IndexDataAdapterProviderCachingProxy;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
@@ -63,7 +64,7 @@ abstract class AbstractCommand implements CommandInterface
     protected $cachingParserProxy;
 
     /**
-     * @var IndexDataAdapter\ProviderCachingProxy
+     * @var IndexDataAdapterProviderCachingProxy
      */
     protected $indexDataAdapterProvider;
 
@@ -195,7 +196,7 @@ abstract class AbstractCommand implements CommandInterface
     {
         if (!$this->indexDataAdapterProvider) {
             if ($this->cache) {
-                $this->indexDataAdapterProvider = new IndexDataAdapter\ProviderCachingProxy(
+                $this->indexDataAdapterProvider = new IndexDataAdapterProviderCachingProxy(
                     $this->getIndexDatabase(),
                     $this->cache
                 );

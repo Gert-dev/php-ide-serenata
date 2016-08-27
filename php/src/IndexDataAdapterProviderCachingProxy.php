@@ -1,15 +1,13 @@
 <?php
 
-namespace PhpIntegrator\IndexDataAdapter;
+namespace PhpIntegrator;
 
 use Doctrine\Common\Cache\Cache;
-
-use PhpIntegrator\IndexDataAdapterProviderInterface;
 
 /**
  * Proxy for providers that introduces a caching layer.
  */
-class ProviderCachingProxy implements IndexDataAdapterProviderInterface
+class IndexDataAdapterProviderCachingProxy implements IndexDataAdapterProviderInterface
 {
     /**
      * @var IndexDataAdapterProviderInterface
