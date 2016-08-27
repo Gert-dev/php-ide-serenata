@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command\SemanticLint\Visitor;
+namespace PhpIntegrator\Analysis\Visiting;
 
 use PhpIntegrator\TypeAnalyzer;
 use PhpIntegrator\Parsing\DocblockParser;

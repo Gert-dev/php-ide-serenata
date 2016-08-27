@@ -4,6 +4,8 @@ namespace PhpIntegrator\Application\Command\SemanticLint;
 
 use PhpIntegrator\TypeAnalyzer;
 
+use PhpIntegrator\Analysis\Visiting\GlobalConstantUsageFetchingVisitor;
+
 use PhpIntegrator\Application\Command\GlobalConstants;
 
 /**
@@ -12,7 +14,7 @@ use PhpIntegrator\Application\Command\GlobalConstants;
 class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
 {
     /**
-     * @var Visitor\GlobalConstantUsageFetchingVisitor
+     * @var GlobalConstantUsageFetchingVisitor
      */
     protected $globalConstantUsageFetchingVisitor;
 
@@ -22,7 +24,7 @@ class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
      */
     public function __construct(GlobalConstants $globalConstants, TypeAnalyzer $typeAnalyzer)
     {
-        $this->globalConstantUsageFetchingVisitor = new Visitor\GlobalConstantUsageFetchingVisitor(
+        $this->globalConstantUsageFetchingVisitor = new GlobalConstantUsageFetchingVisitor(
             $globalConstants,
             $typeAnalyzer
         );

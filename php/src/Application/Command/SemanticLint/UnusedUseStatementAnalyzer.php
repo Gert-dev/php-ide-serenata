@@ -3,6 +3,11 @@
 namespace PhpIntegrator\Application\Command\SemanticLint;
 
 use PhpIntegrator\TypeAnalyzer;
+
+use PhpIntegrator\Analysis\Visiting\ClassUsageFetchingVisitor;
+use PhpIntegrator\Analysis\Visiting\UseStatementFetchingVisitor;
+use PhpIntegrator\Analysis\Visiting\DocblockClassUsageFetchingVisitor;
+
 use PhpIntegrator\Parsing\DocblockParser;
 
 /**
@@ -11,17 +16,17 @@ use PhpIntegrator\Parsing\DocblockParser;
 class UnusedUseStatementAnalyzer implements AnalyzerInterface
 {
     /**
-     * @var Visitor\ClassUsageFetchingVisitor
+     * @var ClassUsageFetchingVisitor
      */
     protected $classUsageFetchingVisitor;
 
     /**
-     * @var Visitor\UseStatementFetchingVisitor
+     * @var UseStatementFetchingVisitor
      */
     protected $useStatementFetchingVisitor;
 
     /**
-     * @var Visitor\DocblockClassUsageFetchingVisitor
+     * @var DocblockClassUsageFetchingVisitor
      */
     protected $docblockClassUsageFetchingVisitor;
 
@@ -33,9 +38,9 @@ class UnusedUseStatementAnalyzer implements AnalyzerInterface
      */
     public function __construct(TypeAnalyzer $typeAnalyzer, DocblockParser $docblockParser)
     {
-        $this->classUsageFetchingVisitor = new Visitor\ClassUsageFetchingVisitor();
-        $this->useStatementFetchingVisitor = new Visitor\UseStatementFetchingVisitor();
-        $this->docblockClassUsageFetchingVisitor = new Visitor\DocblockClassUsageFetchingVisitor($typeAnalyzer, $docblockParser);
+        $this->classUsageFetchingVisitor = new ClassUsageFetchingVisitor();
+        $this->useStatementFetchingVisitor = new UseStatementFetchingVisitor();
+        $this->docblockClassUsageFetchingVisitor = new DocblockClassUsageFetchingVisitor($typeAnalyzer, $docblockParser);
     }
 
     /**

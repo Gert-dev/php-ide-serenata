@@ -3,11 +3,15 @@
 namespace PhpIntegrator\Application\Command\SemanticLint;
 
 use PhpIntegrator\TypeAnalyzer;
-use PhpIntegrator\Parsing\DocblockParser;
+
+use PhpIntegrator\Analysis\Visiting\ClassUsageFetchingVisitor;
+use PhpIntegrator\Analysis\Visiting\DocblockClassUsageFetchingVisitor;
 
 use PhpIntegrator\Application\Command\ResolveType;
 
 use PhpIntegrator\Indexing\IndexDatabase;
+
+use PhpIntegrator\Parsing\DocblockParser;
 
 /**
  * Looks for unknown class names.
@@ -15,12 +19,12 @@ use PhpIntegrator\Indexing\IndexDatabase;
 class UnknownClassAnalyzer implements AnalyzerInterface
 {
     /**
-     * @var Visitor\ClassUsageFetchingVisitor
+     * @var ClassUsageFetchingVisitor
      */
     protected $classUsageFetchingVisitor;
 
     /**
-     * @var Visitor\DocblockClassUsageFetchingVisitor
+     * @var DocblockClassUsageFetchingVisitor
      */
     protected $docblockClassUsageFetchingVisitor;
 
@@ -65,8 +69,8 @@ class UnknownClassAnalyzer implements AnalyzerInterface
         $this->resolveType = $resolveType;
         $this->indexDatabase = $indexDatabase;
 
-        $this->classUsageFetchingVisitor = new Visitor\ClassUsageFetchingVisitor();
-        $this->docblockClassUsageFetchingVisitor = new Visitor\DocblockClassUsageFetchingVisitor($typeAnalyzer, $docblockParser);
+        $this->classUsageFetchingVisitor = new ClassUsageFetchingVisitor();
+        $this->docblockClassUsageFetchingVisitor = new DocblockClassUsageFetchingVisitor($typeAnalyzer, $docblockParser);
     }
 
     /**

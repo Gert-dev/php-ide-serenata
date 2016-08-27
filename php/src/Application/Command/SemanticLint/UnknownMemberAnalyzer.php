@@ -4,6 +4,8 @@ namespace PhpIntegrator\Application\Command\SemanticLint;
 
 use PhpIntegrator\TypeAnalyzer;
 
+use PhpIntegrator\Analysis\Visiting\MemberUsageFetchingVisitor;
+
 use PhpIntegrator\Application\Command\ClassInfo;
 use PhpIntegrator\Application\Command\ResolveType;
 use PhpIntegrator\Application\Command\DeduceTypes;
@@ -14,7 +16,7 @@ use PhpIntegrator\Application\Command\DeduceTypes;
 class UnknownMemberAnalyzer implements AnalyzerInterface
 {
     /**
-     * @var Visitor\MemberUsageFetchingVisitor
+     * @var MemberUsageFetchingVisitor
      */
     protected $methodUsageFetchingVisitor;
 
@@ -34,7 +36,7 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
         $file,
         $code
     ) {
-        $this->methodUsageFetchingVisitor = new Visitor\MemberUsageFetchingVisitor(
+        $this->methodUsageFetchingVisitor = new MemberUsageFetchingVisitor(
             $deduceTypes,
             $classInfo,
             $resolveType,
@@ -78,13 +80,13 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
 
             unset ($memberCall['type']);
 
-            if ($type === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_HAS_NO_TYPE) {
+            if ($type === MemberUsageFetchingVisitor::TYPE_EXPRESSION_HAS_NO_TYPE) {
                 $output['errors']['expressionHasNoType'][] = $memberCall;
-            } elseif ($type === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_IS_NOT_CLASSLIKE) {
+            } elseif ($type === MemberUsageFetchingVisitor::TYPE_EXPRESSION_IS_NOT_CLASSLIKE) {
                 $output['errors']['expressionIsNotClasslike'][] = $memberCall;
-            } elseif ($type === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER) {
+            } elseif ($type === MemberUsageFetchingVisitor::TYPE_EXPRESSION_HAS_NO_SUCH_MEMBER) {
                 $output['errors']['expressionHasNoSuchMember'][] = $memberCall;
-            } elseif ($type === Visitor\MemberUsageFetchingVisitor::TYPE_EXPRESSION_NEW_MEMBER_WILL_BE_CREATED) {
+            } elseif ($type === MemberUsageFetchingVisitor::TYPE_EXPRESSION_NEW_MEMBER_WILL_BE_CREATED) {
                 $output['warnings']['expressionNewMemberWillBeCreated'][] = $memberCall;
             }
         }

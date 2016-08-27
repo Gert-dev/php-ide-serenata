@@ -4,6 +4,8 @@ namespace PhpIntegrator\Application\Command\SemanticLint;
 
 use PhpIntegrator\TypeAnalyzer;
 
+use PhpIntegrator\Analysis\Visiting\GlobalFunctionUsageFetchingVisitor;
+
 use PhpIntegrator\Application\Command\GlobalFunctions;
 
 /**
@@ -12,7 +14,7 @@ use PhpIntegrator\Application\Command\GlobalFunctions;
 class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
 {
     /**
-     * @var Visitor\GlobalFunctionUsageFetchingVisitor
+     * @var GlobalFunctionUsageFetchingVisitor
      */
     protected $globalFunctionUsageFetchingVisitor;
 
@@ -22,7 +24,7 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
      */
     public function __construct(GlobalFunctions $globalFunctions, TypeAnalyzer $typeAnalyzer)
     {
-        $this->globalFunctionUsageFetchingVisitor = new Visitor\GlobalFunctionUsageFetchingVisitor(
+        $this->globalFunctionUsageFetchingVisitor = new GlobalFunctionUsageFetchingVisitor(
             $globalFunctions,
             $typeAnalyzer
         );
