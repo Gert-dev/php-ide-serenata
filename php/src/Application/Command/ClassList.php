@@ -6,8 +6,8 @@ use ArrayAccess;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\IndexDataAdapter;
-use PhpIntegrator\IndexDataAdapterWhiteHolingProxyProvider;
+use PhpIntegrator\UserInterface\IndexDataAdapter;
+use PhpIntegrator\UserInterface\IndexDataAdapterWhiteHolingProxyProvider;
 
 /**
  * Command that shows a list of available classes, interfaces and traits.

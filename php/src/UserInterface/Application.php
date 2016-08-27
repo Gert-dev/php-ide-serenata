@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\UserInterface;
 
 use Exception;
 use UnexpectedValueException;
@@ -112,7 +112,7 @@ class Application
             $cachePath = sys_get_temp_dir() .
                 '/php-integrator-base/' .
                 $project . '/' .
-                Application\Command\AbstractCommand::DATABASE_VERSION .
+                \PhpIntegrator\Application\Command\AbstractCommand::DATABASE_VERSION .
                 '/';
 
             if (!file_exists($cachePath)) {

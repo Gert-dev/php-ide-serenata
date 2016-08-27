@@ -8,19 +8,20 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Indexing;
-use PhpIntegrator\IndexDataAdapterProviderCachingProxy;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpIntegrator\Indexing\Scanner;
 use PhpIntegrator\Indexing\FileIndexer;
-use PhpIntegrator\Indexing\ProjectIndexer;
 use PhpIntegrator\Indexing\BuiltinIndexer;
+use PhpIntegrator\Indexing\ProjectIndexer;
 use PhpIntegrator\Indexing\StorageInterface;
-use PhpIntegrator\Indexing\IndexStorageItemEnum;
 use PhpIntegrator\Indexing\CallbackStorageProxy;
+use PhpIntegrator\Indexing\IndexStorageItemEnum;
 
 use PhpIntegrator\Parsing\DocblockParser;
 
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+use PhpIntegrator\UserInterface\IndexDataAdapterProviderCachingProxy;
 
 use PhpParser\ParserFactory;
 

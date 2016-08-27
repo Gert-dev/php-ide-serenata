@@ -7,7 +7,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\IndexDataAdapter;
+use PhpIntegrator\UserInterface\IndexDataAdapter;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 

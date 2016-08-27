@@ -1,7 +1,5 @@
 <?php
 
-use PhpIntegrator\Application;
-
 if (version_compare(PHP_VERSION, '5.5.0') === -1) {
     die('You need at least PHP 5.5, your current version is PHP ' . PHP_VERSION);
 }
@@ -64,6 +62,6 @@ try {
 
 $arguments = $argv;
 
-$response = (new Application())->handle($arguments);
+$response = (new \PhpIntegrator\UserInterface\Application())->handle($arguments);
 
 echo $response;

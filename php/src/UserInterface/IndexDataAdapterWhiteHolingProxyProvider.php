@@ -1,8 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
-
-use PhpIntegrator\IndexDataAdapterProviderInterface;
+namespace PhpIntegrator\UserInterface;
 
 /**
  * Proxy for a {@see IndexDataAdapterProviderInterface} that does not return any data (is a "white hole") for several

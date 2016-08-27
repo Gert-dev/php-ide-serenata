@@ -11,9 +11,9 @@ use Doctrine\Common\Cache\Cache;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\IndexDataAdapter;
-use PhpIntegrator\IndexDataAdapterProviderInterface;
-use PhpIntegrator\IndexDataAdapterProviderCachingProxy;
+use PhpIntegrator\UserInterface\IndexDataAdapter;
+use PhpIntegrator\UserInterface\IndexDataAdapterProviderInterface;
+use PhpIntegrator\UserInterface\IndexDataAdapterProviderCachingProxy;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 

@@ -4,12 +4,12 @@ namespace PhpIntegrator\Test;
 
 use ReflectionClass;
 
-use PhpIntegrator\Application;
-
 use PhpIntegrator\Application\Command;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 use PhpIntegrator\Indexing\IndexStorageItemEnum;
+
+use PhpIntegrator\UserInterface\Application;
 
 /**
  * Abstract base class for tests that need to test functionality that requires an indexing database to be set up with

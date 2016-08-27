@@ -4,7 +4,7 @@ namespace PhpIntegrator\Application\Command;
 
 use ArrayAccess;
 
-use PhpIntegrator\IndexDataAdapter;
+use PhpIntegrator\UserInterface\IndexDataAdapter;
 
 /**
  * Command that shows a list of global constants.

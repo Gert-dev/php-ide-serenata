@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator;
+namespace PhpIntegrator\UserInterface;
 
 /**
  * Defines functionality that must be exposed by classes that provide data to an IndexDataAdapter.
