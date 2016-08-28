@@ -243,7 +243,8 @@ abstract class AbstractCommand implements CommandInterface
                 $this->getInheritanceResolver(),
                 $this->getInterfaceImplementationResolver(),
                 $this->getTraitUsageResolver(),
-                $this->getIndexDataAdapterProvider()
+                $this->getIndexDataAdapterProvider(),
+                $this->getTypeAnalyzer()
             );
         }
 

@@ -55,7 +55,8 @@ class ClassListCommand extends AbstractCommand
             $this->getInheritanceResolver(),
             $this->getInterfaceImplementationResolver(),
             $this->getTraitUsageResolver(),
-            $storageProxy
+            $storageProxy,
+            $this->getTypeAnalyzer()
         );
 
         foreach ($this->getIndexDatabase()->getAllStructuresRawInfo($file) as $element) {

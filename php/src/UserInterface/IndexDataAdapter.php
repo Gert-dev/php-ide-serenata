@@ -6,7 +6,6 @@ use ArrayObject;
 use UnexpectedValueException;
 
 use PhpIntegrator\Analysis\Relations;
-use PhpIntegrator\Analysis\DocblockAnalyzer;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -68,11 +67,6 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected $storage;
 
     /**
-     * @var DocblockAnalyzer
-     */
-    protected $docblockAnalyzer;
-
-    /**
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
@@ -93,6 +87,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      * @param Relations\InterfaceImplementationResolver $interfaceImplementationResolver
      * @param Relations\TraitUsageResolver              $traitUsageResolver
      * @param IndexDataAdapterProviderInterface         $storage
+     * @param TypeAnalyzer                              $typeAnalyzer
      */
     public function __construct(
         Conversion\ConstantConverter $constantConverter,
@@ -104,7 +99,8 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         Relations\InheritanceResolver $inheritanceResolver,
         Relations\InterfaceImplementationResolver $interfaceImplementationResolver,
         Relations\TraitUsageResolver $traitUsageResolver,
-        IndexDataAdapterProviderInterface $storage
+        IndexDataAdapterProviderInterface $storage,
+        TypeAnalyzer $typeAnalyzer
     ) {
         $this->constantConverter = $constantConverter;
         $this->classlikeConstantConverter = $classlikeConstantConverter;
@@ -118,6 +114,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         $this->traitUsageResolver = $traitUsageResolver;
 
         $this->storage = $storage;
+        $this->typeAnalyzer = $typeAnalyzer;
     }
 
     /**
@@ -176,7 +173,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
 
         $id = $rawInfo['id'];
 
-        return $this->resolveStructure(
+        $classlike = $this->fetchFlatClasslikeInfo(
             $rawInfo,
             $this->storage->getStructureRawParents($id),
             $this->storage->getStructureRawChildren($id),
@@ -188,81 +185,51 @@ class IndexDataAdapter implements IndexDataAdapterInterface
             $this->storage->getStructureRawProperties($id),
             $this->storage->getStructureRawMethods($id)
         );
-    }
-
-    /**
-     * Resolves structural element information from the specified raw data.
-     *
-     * @param array $element
-     * @param array $parents
-     * @param array $children
-     * @param array $interfaces
-     * @param array $implementors
-     * @param array $traits
-     * @param array $traitUsers
-     * @param array $constants
-     * @param array $properties
-     * @param array $methods
-     *
-     * @return ArrayObject
-     */
-    protected function resolveStructure(
-        array $element,
-        array $parents,
-        array $children,
-        array $interfaces,
-        array $implementors,
-        array $traits,
-        array $traitUsers,
-        array $constants,
-        array $properties,
-        array $methods
-    ) {
-        $result = $this->getDirectUnresolvedStructureInfo(
-            $element,
-            $parents,
-            $children,
-            $interfaces,
-            $implementors,
-            $traits,
-            $traitUsers,
-            $constants,
-            $properties,
-            $methods
-        );
-
-        foreach ($parents as $parent) {
-            $parentInfo = $this->getCheckedStructureInfo($parent['fqcn'], $result['name']);
-
-            $this->inheritanceResolver->resolveInheritanceOf($parentInfo, $result);
-        }
-
-        foreach ($interfaces as $interface) {
-            $interfaceInfo = $this->getCheckedStructureInfo($interface['fqcn'], $result['name']);
-
-            $this->interfaceImplementationResolver->resolveImplementationOf($interfaceInfo, $result);
-        }
 
         $traitAliases = [];
         $traitPrecedences = [];
 
-        if (!empty($traits)) {
-            $traitAliases = $this->storage->getStructureTraitAliasesAssoc($element['id']);
-            $traitPrecedences = $this->storage->getStructureTraitPrecedencesAssoc($element['id']);
+        if (!empty($classlike['directTraits'])) {
+            $traitAliases = $this->storage->getStructureTraitAliasesAssoc($id);
+            $traitPrecedences = $this->storage->getStructureTraitPrecedencesAssoc($id);
         }
 
-        foreach ($traits as $trait) {
-            $traitInfo = $this->getCheckedStructureInfo($trait['fqcn'], $result['name']);
+        $this->resolveClasslikeRelations($classlike, $traitAliases, $traitPrecedences);
+        $this->resolveSpecialTypes($classlike, $classlike['name']);
 
-            $this->traitUsageResolver->resolveUseOf($traitInfo, $result, $traitAliases, $traitPrecedences);
-        }
-
-        $this->resolveSpecialTypes($result, $element['fqcn']);
-
-        return $result;
+        return $classlike;
     }
 
     /**
+     * @param ArrayObject $classlike
+     * @param array       $traitAliases
+     * @param array       $traitPrecedences
+     */
+    protected function resolveClasslikeRelations(ArrayObject $classlike, array $traitAliases, array $traitPrecedences)
+    {
+        foreach ($classlike['directParents'] as $parent) {
+            $parentInfo = $this->getCheckedStructureInfo($parent, $classlike['name']);
+
+            $this->inheritanceResolver->resolveInheritanceOf($parentInfo, $classlike);
+        }
+
+        foreach ($classlike['directInterfaces'] as $interface) {
+            $interfaceInfo = $this->getCheckedStructureInfo($interface, $classlike['name']);
+
+            $this->interfaceImplementationResolver->resolveImplementationOf($interfaceInfo, $classlike);
+        }
+
+        foreach ($classlike['directTraits'] as $trait) {
+            $traitInfo = $this->getCheckedStructureInfo($trait, $classlike['name']);
+
+            $this->traitUsageResolver->resolveUseOf($traitInfo, $classlike, $traitAliases, $traitPrecedences);
+        }
+    }
+
+    /**
+     * Builds information about a classlike in a flat structure, meaning it doesn't resolve any inheritance or interface
+     * implementations. Instead, it will only list members and data directly relevant to the classlike.
+     *
      * @param array $element
      * @param array $parents
      * @param array $children
@@ -276,7 +243,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      *
      * @return ArrayObject
      */
-    public function getDirectUnresolvedStructureInfo(
+    public function fetchFlatClasslikeInfo(
         array $element,
         array $parents,
         array $children,
@@ -362,12 +329,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      */
     protected function resolveSpecialTypes(ArrayObject $result, $elementFqcn)
     {
-        // TODO: Revise this, needs to be dependency injected.
-        $typeAnalyzer = new \PhpIntegrator\Analysis\Typing\TypeAnalyzer();
-        // $typeAnalyzer = $this->getTypeAnalyzer();
-
-
-
+        $typeAnalyzer = $this->typeAnalyzer;
 
         $doResolveTypes = function (array &$type) use ($elementFqcn, $typeAnalyzer) {
             if ($type['type'] === 'self') {
