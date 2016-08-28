@@ -64,7 +64,7 @@ class ClassListCommand extends AbstractCommand
             // record.
             $storageProxy->setStructureRawInfo($element);
 
-            $info = $dataAdapter->getStructureInfo($element['name']);
+            $info = $dataAdapter->getClasslikeInfo($element['name']);
 
             unset($info['constants'], $info['properties'], $info['methods']);
 

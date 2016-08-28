@@ -13,5 +13,5 @@ interface IndexDataAdapterInterface
      *
      * @return array
      */
-    public function getStructureInfo($id);
+    public function getClasslikeInfo($id);
 }

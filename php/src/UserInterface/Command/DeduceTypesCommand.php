@@ -256,7 +256,7 @@ class DeduceTypesCommand extends AbstractCommand
                 }
 
                 try {
-                    $info = $dataAdapter->getStructureInfo($type);
+                    $info = $dataAdapter->getClasslikeInfo($type);
                 } catch (UnexpectedValueException $e) {
                     continue;
                 }

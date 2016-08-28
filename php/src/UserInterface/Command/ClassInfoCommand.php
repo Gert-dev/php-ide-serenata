@@ -54,7 +54,7 @@ class ClassInfoCommand extends AbstractCommand
     {
         $fqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($fqcn);
 
-        return $this->getIndexDataAdapter()->getStructureInfo($fqcn);
+        return $this->getIndexDataAdapter()->getClasslikeInfo($fqcn);
     }
 
     /**

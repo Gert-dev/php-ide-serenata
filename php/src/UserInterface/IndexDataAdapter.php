@@ -126,7 +126,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      *
      * @return array
      */
-    public function getStructureInfo($fqcn)
+    public function getClasslikeInfo($fqcn)
     {
         $this->resolutionStack = [];
 
