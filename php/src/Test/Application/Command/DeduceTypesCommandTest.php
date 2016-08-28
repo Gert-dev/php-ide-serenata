@@ -16,7 +16,7 @@ class DeduceTypesCommandTest extends IndexedTest
 {
     protected function deduceTypes($file, array $expressionParts)
     {
-        $path = __DIR__ . '/DeduceTypesTest/' . $file;
+        $path = __DIR__ . '/DeduceTypesCommandTest/' . $file;
 
         $markerOffset = $this->getMarkerOffset($path, '<MARKER>');
 

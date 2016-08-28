@@ -21,7 +21,7 @@ class ClassInfoCommandTest extends IndexedTest
 
     protected function getPathFor($file)
     {
-        return __DIR__ . '/ClassInfoTest/' . $file;
+        return __DIR__ . '/ClassInfoCommandTest/' . $file;
     }
 
     /**

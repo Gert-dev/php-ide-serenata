@@ -12,7 +12,7 @@ class SemanticLintCommandTest extends IndexedTest
 {
     protected function lintFile($file, $indexingMayFail = false)
     {
-        $path = __DIR__ . '/SemanticLintTest/' . $file;
+        $path = __DIR__ . '/SemanticLintCommandTest/' . $file;
 
         $indexDatabase = $this->getDatabaseForTestFile($path, $indexingMayFail);
 

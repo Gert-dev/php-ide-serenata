@@ -23,7 +23,7 @@ class AvailableVariablesCommandTest extends IndexedTest
 
     protected function getTestFilePath($name)
     {
-        return __DIR__ . '/AvailableVariablesTest/' . $name;
+        return __DIR__ . '/AvailableVariablesCommandTest/' . $name;
     }
 
     protected function getAvailableVariables($file, $mayIndexingFail = false)

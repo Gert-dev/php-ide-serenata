@@ -10,7 +10,7 @@ class GlobalFunctionsCommandTest extends IndexedTest
 {
     public function testGlobalFunctions()
     {
-        $path = __DIR__ . '/GlobalFunctionsTest/' . 'GlobalFunctions.php.test';
+        $path = __DIR__ . '/GlobalFunctionsCommandTest/' . 'GlobalFunctions.php.test';
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
