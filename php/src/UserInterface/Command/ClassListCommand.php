@@ -53,6 +53,8 @@ class ClassListCommand extends AbstractCommand
             $this->getMethodConverter(),
             $this->getClasslikeConverter(),
             $this->getInheritanceResolver(),
+            $this->getInterfaceImplementationResolver(),
+            $this->getTraitUsageResolver(),
             $storageProxy
         );
 

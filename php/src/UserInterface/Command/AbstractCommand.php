@@ -11,8 +11,8 @@ use Doctrine\Common\Cache\Cache;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\Analysis\Relations;
 use PhpIntegrator\Analysis\DocblockAnalyzer;
-use PhpIntegrator\Analysis\InheritanceResolver;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -111,6 +111,21 @@ abstract class AbstractCommand implements CommandInterface
     protected $methodConverter;
 
     /**
+     * @var Relations\InheritanceResolver
+     */
+    protected $inheritanceResolver;
+
+    /**
+     * @var Relations\InterfaceImplementationResolver
+     */
+    protected $interfaceImplementationResolver;
+
+    /**
+     * @var Relations\TraitUsageResolver
+     */
+    protected $traitUsageResolver;
+
+    /**
      * @var DocblockAnalyzer
      */
     protected $docblockAnalyzer;
@@ -119,11 +134,6 @@ abstract class AbstractCommand implements CommandInterface
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
-
-    /**
-     * @var InheritanceResolver
-     */
-    protected $inheritanceResolver;
 
     /**
      * @param Parser             $parser
@@ -231,6 +241,8 @@ abstract class AbstractCommand implements CommandInterface
                 $this->getMethodConverter(),
                 $this->getClasslikeConverter(),
                 $this->getInheritanceResolver(),
+                $this->getInterfaceImplementationResolver(),
+                $this->getTraitUsageResolver(),
                 $this->getIndexDataAdapterProvider()
             );
         }
@@ -323,6 +335,57 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
+     * Retrieves an instance of Relations\InheritanceResolver. The object will only be created once if needed.
+     *
+     * @return Relations\InheritanceResolver
+     */
+    protected function getInheritanceResolver()
+    {
+        if (!$this->inheritanceResolver instanceof Relations\InheritanceResolver) {
+            $this->inheritanceResolver = new Relations\InheritanceResolver(
+                $this->getDocblockAnalyzer(),
+                $this->getTypeAnalyzer()
+            );
+        }
+
+        return $this->inheritanceResolver;
+    }
+
+    /**
+     * Retrieves an instance of Relations\InterfaceImplementationResolver. The object will only be created once if needed.
+     *
+     * @return Relations\InterfaceImplementationResolver
+     */
+    protected function getInterfaceImplementationResolver()
+    {
+        if (!$this->interfaceImplementationResolver instanceof Relations\InterfaceImplementationResolver) {
+            $this->interfaceImplementationResolver = new Relations\InterfaceImplementationResolver(
+                $this->getDocblockAnalyzer(),
+                $this->getTypeAnalyzer()
+            );
+        }
+
+        return $this->interfaceImplementationResolver;
+    }
+
+    /**
+     * Retrieves an instance of Relations\TraitUsageResolver. The object will only be created once if needed.
+     *
+     * @return Relations\TraitUsageResolver
+     */
+    protected function getTraitUsageResolver()
+    {
+        if (!$this->traitUsageResolver instanceof Relations\TraitUsageResolver) {
+            $this->traitUsageResolver = new Relations\TraitUsageResolver(
+                $this->getDocblockAnalyzer(),
+                $this->getTypeAnalyzer()
+            );
+        }
+
+        return $this->traitUsageResolver;
+    }
+
+    /**
      * @return DocblockAnalyzer
      */
     protected function getDocblockAnalyzer()
@@ -344,21 +407,6 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         return $this->typeAnalyzer;
-    }
-
-    /**
-     * @return InheritanceResolver
-     */
-    protected function getInheritanceResolver()
-    {
-        if (!$this->inheritanceResolver) {
-            $this->inheritanceResolver = new InheritanceResolver(
-                $this->getDocblockAnalyzer(),
-                $this->getTypeAnalyzer()
-            );
-        }
-
-        return $this->inheritanceResolver;
     }
 
     /**

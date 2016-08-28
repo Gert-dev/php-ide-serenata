@@ -2,17 +2,13 @@
 
 namespace PhpIntegrator\UserInterface;
 
-use ArrayAccess;
 use ArrayObject;
-use Traversable;
 use UnexpectedValueException;
 
+use PhpIntegrator\Analysis\Relations;
 use PhpIntegrator\Analysis\DocblockAnalyzer;
-use PhpIntegrator\Analysis\InheritanceResolver;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
-use PhpIntegrator\Parsing\DocblockParser;
 
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
@@ -50,9 +46,19 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected $classlikeConverter;
 
     /**
-     * @var InheritanceResolver
+     * @var Relations\InheritanceResolver
      */
     protected $inheritanceResolver;
+
+    /**
+     * @var Relations\InterfaceImplementationResolver
+     */
+    protected $interfaceImplementationResolver;
+
+    /**
+     * @var Relations\TraitUsageResolver
+     */
+    protected $traitUsageResolver;
 
     /**
      * The storage to use for accessing index data.
@@ -77,13 +83,16 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected $resolutionStack = [];
 
     /**
-     * @param Conversion\ConstantConverter      $constantConverter
-     * @param Conversion\PropertyConverter      $propertyConverter
-     * @param Conversion\FunctionConverter      $functionConverter
-     * @param Conversion\MethodConverter        $methodConverter
-     * @param Conversion\ClasslikeConverter     $classlikeConverter
-     * @param InheritanceResolver               $inheritanceResolver
-     * @param IndexDataAdapterProviderInterface $storage
+     * @param Conversion\ConstantConverter              $constantConverter
+     * @param Conversion\ClasslikeConstantConverter     $classlikeConstantConverter
+     * @param Conversion\PropertyConverter              $propertyConverter
+     * @param Conversion\FunctionConverter              $functionConverter
+     * @param Conversion\MethodConverter                $methodConverter
+     * @param Conversion\ClasslikeConverter             $classlikeConverter
+     * @param Relations\InheritanceResolver             $inheritanceResolver
+     * @param Relations\InterfaceImplementationResolver $interfaceImplementationResolver
+     * @param Relations\TraitUsageResolver              $traitUsageResolver
+     * @param IndexDataAdapterProviderInterface         $storage
      */
     public function __construct(
         Conversion\ConstantConverter $constantConverter,
@@ -92,7 +101,9 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         Conversion\FunctionConverter $functionConverter,
         Conversion\MethodConverter $methodConverter,
         Conversion\ClasslikeConverter $classlikeConverter,
-        InheritanceResolver $inheritanceResolver,
+        Relations\InheritanceResolver $inheritanceResolver,
+        Relations\InterfaceImplementationResolver $interfaceImplementationResolver,
+        Relations\TraitUsageResolver $traitUsageResolver,
         IndexDataAdapterProviderInterface $storage
     ) {
         $this->constantConverter = $constantConverter;
@@ -101,7 +112,11 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         $this->functionConverter = $functionConverter;
         $this->methodConverter = $methodConverter;
         $this->classlikeConverter = $classlikeConverter;
+
         $this->inheritanceResolver = $inheritanceResolver;
+        $this->interfaceImplementationResolver = $interfaceImplementationResolver;
+        $this->traitUsageResolver = $traitUsageResolver;
+
         $this->storage = $storage;
     }
 
@@ -178,21 +193,21 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     /**
      * Resolves structural element information from the specified raw data.
      *
-     * @param array|ArrayAccess $element
-     * @param array             $parents
-     * @param array             $children
-     * @param array             $interfaces
-     * @param array             $implementors
-     * @param array             $traits
-     * @param array             $traitUsers
-     * @param array             $constants
-     * @param array             $properties
-     * @param array             $methods
+     * @param array $element
+     * @param array $parents
+     * @param array $children
+     * @param array $interfaces
+     * @param array $implementors
+     * @param array $traits
+     * @param array $traitUsers
+     * @param array $constants
+     * @param array $properties
+     * @param array $methods
      *
      * @return ArrayObject
      */
     public function resolveStructure(
-        $element,
+        array $element,
         array $parents,
         array $children,
         array $interfaces,
@@ -225,7 +240,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         foreach ($interfaces as $interface) {
             $interfaceInfo = $this->getCheckedStructureInfo($interface['fqcn'], $result['name']);
 
-            $this->inheritanceResolver->resolveImplementationOf($interfaceInfo, $result);
+            $this->interfaceImplementationResolver->resolveImplementationOf($interfaceInfo, $result);
         }
 
         $traitAliases = [];
@@ -239,7 +254,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         foreach ($traits as $trait) {
             $traitInfo = $this->getCheckedStructureInfo($trait['fqcn'], $result['name']);
 
-            $this->inheritanceResolver->resolveUseOf($traitInfo, $result, $traitAliases, $traitPrecedences);
+            $this->traitUsageResolver->resolveUseOf($traitInfo, $result, $traitAliases, $traitPrecedences);
         }
 
         $this->resolveSpecialTypes($result, $element['fqcn']);
@@ -247,19 +262,22 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         return $result;
     }
 
-
-
-
-
-
-
-
-
-
-
-    // TODO: Naming needs refactoring.
+    /**
+     * @param array $element
+     * @param array $parents
+     * @param array $children
+     * @param array $interfaces
+     * @param array $implementors
+     * @param array $traits
+     * @param array $traitUsers
+     * @param array $constants
+     * @param array $properties
+     * @param array $methods
+     *
+     * @return ArrayObject
+     */
     public function getDirectUnresolvedStructureInfo(
-        $element,
+        array $element,
         array $parents,
         array $children,
         array $interfaces,
