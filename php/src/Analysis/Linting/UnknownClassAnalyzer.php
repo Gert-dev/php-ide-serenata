@@ -7,7 +7,7 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Analysis\Visiting\ClassUsageFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\DocblockClassUsageFetchingVisitor;
 
-use PhpIntegrator\Application\Command\ResolveTypeCommand;
+use PhpIntegrator\UserInterface\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpIntegrator\Test\Application\Command;
+namespace PhpIntegrator\Test\UserInterface\Command;
 
-use PhpIntegrator\Application\Command\AvailableVariablesCommand;
+use PhpIntegrator\UserInterface\Command\AvailableVariablesCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 

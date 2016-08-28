@@ -69,9 +69,9 @@ class Application
         ];
 
         if (isset($commands[$command])) {
-            $className = "\\PhpIntegrator\\Application\\Command\\{$commands[$command]}Command";
+            $className = "\\PhpIntegrator\\UserInterface\\Command\\{$commands[$command]}Command";
 
-            /** @var \PhpIntegrator\Application\Command\CommandInterface $command */
+            /** @var \PhpIntegrator\UserInterface\Command\CommandInterface $command */
             $command = new $className(
                 $this->getCachingParserProxy(),
                 $this->getFilesystemCache($projectName)
@@ -112,7 +112,7 @@ class Application
             $cachePath = sys_get_temp_dir() .
                 '/php-integrator-base/' .
                 $project . '/' .
-                \PhpIntegrator\Application\Command\AbstractCommand::DATABASE_VERSION .
+                Command\AbstractCommand::DATABASE_VERSION .
                 '/';
 
             if (!file_exists($cachePath)) {

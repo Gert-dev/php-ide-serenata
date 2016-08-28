@@ -10,7 +10,7 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 
-use PhpIntegrator\Application\Command\ClassInfoCommand;
+use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 

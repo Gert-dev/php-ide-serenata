@@ -9,7 +9,7 @@ use UnexpectedValueException;
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\AssociativeUseStatementFetchingVisitor;
 
-use PhpIntegrator\Application\Command\DeduceTypesCommand;
+use PhpIntegrator\UserInterface\Command\DeduceTypesCommand;
 
 use PhpIntegrator\Parsing\DocblockParser;
 

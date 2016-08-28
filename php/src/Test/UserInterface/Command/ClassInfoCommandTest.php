@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpIntegrator\Test\Application\Command;
+namespace PhpIntegrator\Test\UserInterface\Command;
 
-use PhpIntegrator\Application\Command\ClassInfoCommand;
+use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 

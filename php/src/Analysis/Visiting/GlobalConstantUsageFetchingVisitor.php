@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\Application\Command\GlobalConstantsCommand;
+use PhpIntegrator\UserInterface\Command\GlobalConstantsCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpIntegrator\Test\Application\Command;
+namespace PhpIntegrator\Test\UserInterface\Command;
 
-use PhpIntegrator\Application\Command\GlobalFunctionsCommand;
+use PhpIntegrator\UserInterface\Command\GlobalFunctionsCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 

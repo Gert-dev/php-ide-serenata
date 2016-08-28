@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpIntegrator\Test\Application\Command;
+namespace PhpIntegrator\Test\UserInterface\Command;
 
-use PhpIntegrator\Application\Command\ResolveTypeCommand;
+use PhpIntegrator\UserInterface\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 

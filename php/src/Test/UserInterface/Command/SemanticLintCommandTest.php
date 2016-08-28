@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpIntegrator\Test\Application\Command;
+namespace PhpIntegrator\Test\UserInterface\Command;
 
-use PhpIntegrator\Application\Command\SemanticLintCommand;
+use PhpIntegrator\UserInterface\Command\SemanticLintCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 

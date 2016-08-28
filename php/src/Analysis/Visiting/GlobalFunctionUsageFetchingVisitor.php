@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\Application\Command\GlobalFunctionsCommand;
+use PhpIntegrator\UserInterface\Command\GlobalFunctionsCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 

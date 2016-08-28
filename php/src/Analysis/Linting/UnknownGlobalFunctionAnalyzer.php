@@ -4,7 +4,7 @@ namespace PhpIntegrator\Analysis\Linting;
 
 use PhpIntegrator\Analysis\Visiting\GlobalFunctionUsageFetchingVisitor;
 
-use PhpIntegrator\Application\Command\GlobalFunctionsCommand;
+use PhpIntegrator\UserInterface\Command\GlobalFunctionsCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpIntegrator\Test\Application\Command;
+namespace PhpIntegrator\Test\UserInterface\Command;
 
-use PhpIntegrator\Application\Command\LocalizeTypeCommand;
+use PhpIntegrator\UserInterface\Command\LocalizeTypeCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 

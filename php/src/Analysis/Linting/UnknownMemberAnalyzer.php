@@ -4,9 +4,9 @@ namespace PhpIntegrator\Analysis\Linting;
 
 use PhpIntegrator\Analysis\Visiting\MemberUsageFetchingVisitor;
 
-use PhpIntegrator\Application\Command\ClassInfoCommand;
-use PhpIntegrator\Application\Command\DeduceTypesCommand;
-use PhpIntegrator\Application\Command\ResolveTypeCommand;
+use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
+use PhpIntegrator\UserInterface\Command\DeduceTypesCommand;
+use PhpIntegrator\UserInterface\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 

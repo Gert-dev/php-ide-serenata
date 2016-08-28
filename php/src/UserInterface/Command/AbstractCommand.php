@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\Application\Command;
+namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
 use RuntimeException;
