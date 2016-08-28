@@ -209,8 +209,13 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         $this->parseTraitUsersData($result, $traitUsers);
 
         $this->parseParentData($result, $parents);
+        $this->resolveParentData($result, $parents);
+
         $this->parseInterfaceData($result, $interfaces);
+        $this->resolveInterfaceData($result, $interfaces);
+
         $this->parseTraitData($result, $traits, $element);
+        $this->resolveTraitData($result, $traits, $element);
 
         $this->parseConstantData($result, $constants, $element);
         $this->parsePropertyData($result, $properties, $element);
@@ -219,6 +224,39 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         $this->resolveSpecialTypes($result, $element['fqcn']);
 
         return $result->getArrayCopy();
+    }
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $children
+     */
+    protected function parseChildrenData(ArrayObject $result, $children)
+    {
+        foreach ($children as $child) {
+            $result['directChildren'][] = $child['fqcn'];
+        }
+    }
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $implementors
+     */
+    protected function parseImplementorsData(ArrayObject $result, $implementors)
+    {
+        foreach ($implementors as $implementor) {
+            $result['directImplementors'][] = $implementor['fqcn'];
+        }
+    }
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $traitUsers
+     */
+    protected function parseTraitUsersData(ArrayObject $result, $traitUsers)
+    {
+        foreach ($traitUsers as $trait) {
+            $result['directTraitUsers'][] = $trait['fqcn'];
+        }
     }
 
     /**
@@ -399,34 +437,13 @@ class IndexDataAdapter implements IndexDataAdapterInterface
 
     /**
      * @param ArrayObject       $result
-     * @param array|Traversable $children
+     * @param array|Traversable $parents One or more base classes to inherit from (interfaces can have multiple parents).
      */
-    protected function parseChildrenData(ArrayObject $result, $children)
+    protected function parseParentData(ArrayObject $result, $parents)
     {
-        foreach ($children as $child) {
-            $result['directChildren'][] = $child['fqcn'];
-        }
-    }
-
-    /**
-     * @param ArrayObject       $result
-     * @param array|Traversable $implementors
-     */
-    protected function parseImplementorsData(ArrayObject $result, $implementors)
-    {
-        foreach ($implementors as $implementor) {
-            $result['directImplementors'][] = $implementor['fqcn'];
-        }
-    }
-
-    /**
-     * @param ArrayObject       $result
-     * @param array|Traversable $traitUsers
-     */
-    protected function parseTraitUsersData(ArrayObject $result, $traitUsers)
-    {
-        foreach ($traitUsers as $trait) {
-            $result['directTraitUsers'][] = $trait['fqcn'];
+        foreach ($parents as $parent) {
+            $result['parents'][] = $parent['fqcn'];
+            $result['directParents'][] = $parent['fqcn'];
         }
     }
 
@@ -436,7 +453,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      * @param ArrayObject       $result
      * @param array|Traversable $parents One or more base classes to inherit from (interfaces can have multiple parents).
      */
-    protected function parseParentData(ArrayObject $result, $parents)
+    protected function resolveParentData(ArrayObject $result, $parents)
     {
         foreach ($parents as $parent) {
             $parentInfo = $this->getCheckedStructureInfo($parent['fqcn'], $result['name']);
@@ -463,10 +480,20 @@ class IndexDataAdapter implements IndexDataAdapterInterface
 
                 $result['traits']     = array_merge($result['traits'], $parentInfo['traits']);
                 $result['interfaces'] = array_merge($result['interfaces'], $parentInfo['interfaces']);
-                $result['parents']    = array_merge($result['parents'], [$parentInfo['name']], $parentInfo['parents']);
-
-                $result['directParents'][] = $parentInfo['name'];
+                $result['parents']    = array_merge($result['parents'], $parentInfo['parents']);
             }
+        }
+    }
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $interfaces
+     */
+    protected function parseInterfaceData(ArrayObject $result, $interfaces)
+    {
+        foreach ($interfaces as $interface) {
+            $result['interfaces'][] = $interface['fqcn'];
+            $result['directInterfaces'][] = $interface['fqcn'];
         }
     }
 
@@ -477,13 +504,10 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      * @param ArrayObject       $result
      * @param array|Traversable $interfaces
      */
-    protected function parseInterfaceData(ArrayObject $result, $interfaces)
+    protected function resolveInterfaceData(ArrayObject $result, $interfaces)
     {
         foreach ($interfaces as $interface) {
             $interface = $this->getCheckedStructureInfo($interface['fqcn'], $result['name']);
-
-            $result['interfaces'][] = $interface['name'];
-            $result['directInterfaces'][] = $interface['name'];
 
             foreach ($interface['constants'] as $constant) {
                 if (!isset($result['constants'][$constant['name']])) {
@@ -508,6 +532,21 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      */
     protected function parseTraitData(ArrayObject $result, $traits, $element)
     {
+        foreach ($traits as $trait) {
+            $result['traits'][] = $trait['fqcn'];
+            $result['directTraits'][] = $trait['fqcn'];
+        }
+    }
+
+    /**
+     * @param ArrayObject       $result
+     * @param array|Traversable $traits
+     * @param array             $element
+     *
+     * @return array
+     */
+    protected function resolveTraitData(ArrayObject $result, $traits, $element)
+    {
         if (empty($traits)) {
             return;
         }
@@ -517,9 +556,6 @@ class IndexDataAdapter implements IndexDataAdapterInterface
 
         foreach ($traits as $trait) {
             $trait = $this->getCheckedStructureInfo($trait['fqcn'], $result['name']);
-
-            $result['traits'][] = $trait['name'];
-            $result['directTraits'][] = $trait['name'];
 
             foreach ($trait['properties'] as $property) {
                 $inheritedData = [];
