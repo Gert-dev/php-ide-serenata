@@ -206,7 +206,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      *
      * @return ArrayObject
      */
-    public function resolveStructure(
+    protected function resolveStructure(
         array $element,
         array $parents,
         array $children,
