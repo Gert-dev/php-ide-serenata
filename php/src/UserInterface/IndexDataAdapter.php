@@ -138,6 +138,29 @@ class IndexDataAdapter implements IndexDataAdapterInterface
 
     /**
      * @param string $fqcn
+     * @param string $originFqcn
+     *
+     * @return ArrayObject
+     */
+    protected function getCheckedStructureInfo($fqcn, $originFqcn)
+    {
+        if (in_array($fqcn, $this->resolutionStack)) {
+            throw new CircularDependencyException(
+                "Circular dependency detected from {$originFqcn} to {$fqcn}!"
+            );
+        }
+
+        $this->resolutionStack[] = $fqcn;
+
+        $data = $this->getDirectStructureInfo($fqcn);
+
+        array_pop($this->resolutionStack);
+
+        return $data;
+    }
+
+    /**
+     * @param string $fqcn
      *
      * @throws UnexpectedValueException
      *
@@ -165,29 +188,6 @@ class IndexDataAdapter implements IndexDataAdapterInterface
             $this->storage->getStructureRawProperties($id),
             $this->storage->getStructureRawMethods($id)
         );
-    }
-
-    /**
-     * @param string $fqcn
-     * @param string $originFqcn
-     *
-     * @return ArrayObject
-     */
-    protected function getCheckedStructureInfo($fqcn, $originFqcn)
-    {
-        if (in_array($fqcn, $this->resolutionStack)) {
-            throw new CircularDependencyException(
-                "Circular dependency detected from {$originFqcn} to {$fqcn}!"
-            );
-        }
-
-        $this->resolutionStack[] = $fqcn;
-
-        $data = $this->getDirectStructureInfo($fqcn);
-
-        array_pop($this->resolutionStack);
-
-        return $data;
     }
 
     /**
