@@ -2,19 +2,22 @@
 
 namespace PhpIntegrator\UserInterface\Conversion;
 
+use ArrayAccess;
+
 /**
  * Converts raw property data from the index to more useful data.
  */
 class PropertyConverter extends AbstractConverter
 {
     /**
-     * @param array $rawInfo
+     * @param array       $rawInfo
+     * @param ArrayAccess $class
      *
      * @return array
      */
-    public function convert(array $rawInfo)
+    public function convertForClass(array $rawInfo, ArrayAccess $class)
     {
-        return [
+        $data = [
             'name'               => $rawInfo['name'],
             'startLine'          => (int) $rawInfo['start_line'],
             'endLine'            => (int) $rawInfo['end_line'],
@@ -32,7 +35,29 @@ class PropertyConverter extends AbstractConverter
             'longDescription'   => $rawInfo['long_description'],
             'typeDescription'   => $rawInfo['type_description'],
 
-            'types'             => $this->getReturnTypeDataForSerializedTypes($rawInfo['types_serialized'])
+            'types'             => $this->getReturnTypeDataForSerializedTypes($rawInfo['types_serialized']),
         ];
+
+        return array_merge($data, [
+            'override'          => null,
+
+            'declaringClass' => [
+                'name'            => $class['name'],
+                'filename'        => $class['filename'],
+                'startLine'       => $class['startLine'],
+                'endLine'         => $class['endLine'],
+                'type'            => $class['type'],
+            ],
+
+            'declaringStructure' => [
+                'name'            => $class['name'],
+                'filename'        => $class['filename'],
+                'startLine'       => $class['startLine'],
+                'endLine'         => $class['endLine'],
+                'type'            => $class['type'],
+                'startLineMember' => $data['startLine'],
+                'endLineMember'   => $data['endLine']
+            ]
+        ]);
     }
 }

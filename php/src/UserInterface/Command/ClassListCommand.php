@@ -47,10 +47,12 @@ class ClassListCommand extends AbstractCommand
 
         $dataAdapter = new IndexDataAdapter(
             $this->getConstantConverter(),
+            $this->getClasslikeConstantConverter(),
             $this->getPropertyConverter(),
             $this->getFunctionConverter(),
             $this->getMethodConverter(),
             $this->getClasslikeConverter(),
+            $this->getInheritanceResolver(),
             $storageProxy
         );
 

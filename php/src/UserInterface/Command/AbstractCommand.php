@@ -11,6 +11,11 @@ use Doctrine\Common\Cache\Cache;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\Analysis\DocblockAnalyzer;
+use PhpIntegrator\Analysis\InheritanceResolver;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\UserInterface\Conversion;
@@ -81,6 +86,11 @@ abstract class AbstractCommand implements CommandInterface
     protected $constantConverter;
 
     /**
+     * @var Conversion\ClasslikeConstantConverter
+     */
+    protected $classlikeConstantConverter;
+
+    /**
      * @var Conversion\PropertyConverter
      */
     protected $propertyConverter;
@@ -99,6 +109,21 @@ abstract class AbstractCommand implements CommandInterface
      * @var Conversion\MethodConverter
      */
     protected $methodConverter;
+
+    /**
+     * @var DocblockAnalyzer
+     */
+    protected $docblockAnalyzer;
+
+    /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
+     * @var InheritanceResolver
+     */
+    protected $inheritanceResolver;
 
     /**
      * @param Parser             $parser
@@ -200,10 +225,12 @@ abstract class AbstractCommand implements CommandInterface
         if (!$this->indexDataAdapter) {
             $this->indexDataAdapter = new IndexDataAdapter(
                 $this->getConstantConverter(),
+                $this->getClasslikeConstantConverter(),
                 $this->getPropertyConverter(),
                 $this->getFunctionConverter(),
                 $this->getMethodConverter(),
                 $this->getClasslikeConverter(),
+                $this->getInheritanceResolver(),
                 $this->getIndexDataAdapterProvider()
             );
         }
@@ -223,6 +250,20 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         return $this->constantConverter;
+    }
+
+    /**
+     * Retrieves an instance of Conversion\ClasslikeConstantConverter. The object will only be created once if needed.
+     *
+     * @return Conversion\ClasslikeConstantConverter
+     */
+    protected function getClasslikeConstantConverter()
+    {
+        if (!$this->classlikeConstantConverter instanceof Conversion\ClasslikeConstantConverter) {
+            $this->classlikeConstantConverter = new Conversion\ClasslikeConstantConverter();
+        }
+
+        return $this->classlikeConstantConverter;
     }
 
     /**
@@ -279,6 +320,45 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         return $this->methodConverter;
+    }
+
+    /**
+     * @return DocblockAnalyzer
+     */
+    protected function getDocblockAnalyzer()
+    {
+        if (!$this->docblockAnalyzer) {
+            $this->docblockAnalyzer = new DocblockAnalyzer();
+        }
+
+        return $this->docblockAnalyzer;
+    }
+
+    /**
+     * @return TypeAnalyzer
+     */
+    protected function getTypeAnalyzer()
+    {
+        if (!$this->typeAnalyzer) {
+            $this->typeAnalyzer = new TypeAnalyzer();
+        }
+
+        return $this->typeAnalyzer;
+    }
+
+    /**
+     * @return InheritanceResolver
+     */
+    protected function getInheritanceResolver()
+    {
+        if (!$this->inheritanceResolver) {
+            $this->inheritanceResolver = new InheritanceResolver(
+                $this->getDocblockAnalyzer(),
+                $this->getTypeAnalyzer()
+            );
+        }
+
+        return $this->inheritanceResolver;
     }
 
     /**

@@ -861,11 +861,11 @@ class ClassInfoCommandTest extends IndexedTest
             'endLine'   => 7,
 
             'declaringClass' => [
-                'name'      => '\A\ParentInterface',
+                'name'      => '\A\ParentClass',
                 'filename'  => $this->getPathFor($fileName),
-                'startLine' => 5,
-                'endLine'   => 8,
-                'type'      => 'interface'
+                'startLine' => 10,
+                'endLine'   => 13,
+                'type'      => 'class'
             ],
 
             'declaringStructure' => [
@@ -911,11 +911,11 @@ class ClassInfoCommandTest extends IndexedTest
             'endLine'   => 17,
 
             'declaringClass' => [
-                'name'      => '\A\TestInterface',
+                'name'      => '\A\ChildClass',
                 'filename'  => $this->getPathFor($fileName),
-                'startLine' => 15,
-                'endLine'   => 18,
-                'type'      => 'interface'
+                'startLine' => 20,
+                'endLine'   => 31,
+                'type'      => 'class'
             ],
 
             'declaringStructure' => [
@@ -1207,8 +1207,8 @@ class ClassInfoCommandTest extends IndexedTest
 
         $output = $this->getClassInfo($fileName, 'A\TestClass');
 
-        $this->assertEquals($output['interfaces'], ['\A\BaseInterface', '\A\FirstInterface', '\A\SecondInterface']);
-        $this->assertEquals($output['directInterfaces'], ['\A\FirstInterface', '\A\SecondInterface']);
+        $this->assertEquals(['\A\FirstInterface', '\A\SecondInterface', '\A\BaseInterface'], $output['interfaces']);
+        $this->assertEquals(['\A\FirstInterface', '\A\SecondInterface'], $output['directInterfaces']);
 
         $this->assertThat($output['constants'], $this->arrayHasKey('FIRST_INTERFACE_CONSTANT'));
         $this->assertThat($output['constants'], $this->arrayHasKey('SECOND_INTERFACE_CONSTANT'));
@@ -1224,8 +1224,8 @@ class ClassInfoCommandTest extends IndexedTest
         $output = $this->getClassInfo($fileName, 'A\TestClass');
         $baseClassOutput = $this->getClassInfo($fileName, 'A\BaseClass');
 
-        $this->assertEquals($output['traits'], ['\A\BaseTrait', '\A\FirstTrait', '\A\SecondTrait']);
-        $this->assertEquals($output['directTraits'], ['\A\FirstTrait', '\A\SecondTrait']);
+        $this->assertEquals(['\A\FirstTrait', '\A\SecondTrait', '\A\BaseTrait'], $output['traits']);
+        $this->assertEquals(['\A\FirstTrait', '\A\SecondTrait'], $output['directTraits']);
 
         $this->assertThat($output['properties'], $this->arrayHasKey('baseTraitProperty'));
         $this->assertThat($output['properties'], $this->arrayHasKey('firstTraitProperty'));
