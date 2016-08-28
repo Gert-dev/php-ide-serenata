@@ -13,8 +13,6 @@ use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
 use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
 
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
 use PhpIntegrator\Utility\NodeHelpers;
 use PhpIntegrator\Utility\SourceCodeHelpers;
 
@@ -46,11 +44,6 @@ class DeduceTypesCommand extends AbstractCommand
      * @var GlobalFunctionsCommand
      */
     protected $globalFunctionsCommand;
-
-    /**
-     * @var TypeAnalyzer
-     */
-    protected $typeAnalyzer;
 
     /**
      * @var DocblockParser
@@ -729,18 +722,6 @@ class DeduceTypesCommand extends AbstractCommand
         }
 
         return $this->resolveTypeCommand;
-    }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
     }
 
     /**

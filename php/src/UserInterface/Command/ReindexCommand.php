@@ -9,8 +9,6 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Indexing;
 
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
 use PhpIntegrator\Indexing\Scanner;
 use PhpIntegrator\Indexing\FileIndexer;
 use PhpIntegrator\Indexing\BuiltinIndexer;
@@ -59,11 +57,6 @@ class ReindexCommand extends AbstractCommand
      * @var DocblockParser
      */
     protected $docblockParser;
-
-    /**
-     * @var TypeAnalyzer
-     */
-    protected $typeAnalyzer;
 
     /**
      * @var DeduceTypesCommand
@@ -265,18 +258,6 @@ class ReindexCommand extends AbstractCommand
         }
 
         return $this->fileModifiedMap;
-    }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
     }
 
     /**

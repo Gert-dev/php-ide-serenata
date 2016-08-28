@@ -13,8 +13,6 @@ use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Parsing\DocblockParser;
 
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
 use PhpParser\Error;
 use PhpParser\NodeTraverser;
 
@@ -48,11 +46,6 @@ class SemanticLintCommand extends AbstractCommand
      * @var ResolveTypeCommand
      */
     protected $resolveTypeCommand;
-
-    /**
-     * @var TypeAnalyzer
-     */
-    protected $typeAnalyzer;
 
     /**
      * @var DocblockParser
@@ -348,18 +341,6 @@ class SemanticLintCommand extends AbstractCommand
         }
 
         return $this->globalConstants;
-    }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
     }
 
     /**

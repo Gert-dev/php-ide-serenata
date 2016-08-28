@@ -7,18 +7,11 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
 /**
  * Command that shows information about a class, interface or trait.
  */
 class ClassInfoCommand extends AbstractCommand
 {
-    /**
-     * @var TypeAnalyzer
-     */
-    protected $typeAnalyzer;
-
     /**
      * @inheritDoc
      */
@@ -53,19 +46,5 @@ class ClassInfoCommand extends AbstractCommand
         $fqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($fqcn);
 
         return $this->getClasslikeInfoBuilder()->getClasslikeInfo($fqcn);
-    }
-
-    /**
-     * Retrieves an instance of TypeAnalyzer. The object will only be created once if needed.
-     *
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer instanceof TypeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
     }
 }
