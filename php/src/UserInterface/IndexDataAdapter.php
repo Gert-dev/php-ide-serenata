@@ -12,7 +12,7 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
  */
-class IndexDataAdapter implements IndexDataAdapterInterface
+class IndexDataAdapter
 {
     /**
      * @var Conversion\ConstantConverter
