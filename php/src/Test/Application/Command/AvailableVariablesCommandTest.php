@@ -6,8 +6,6 @@ use PhpIntegrator\Application\Command\AvailableVariablesCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
-use PhpIntegrator\Indexing\IndexDatabase;
-
 class AvailableVariablesCommandTest extends IndexedTest
 {
     protected function getCommand($file, $mayFail = false)
