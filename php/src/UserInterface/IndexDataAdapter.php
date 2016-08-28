@@ -141,7 +141,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      *
      * @throws UnexpectedValueException
      *
-     * @return array
+     * @return ArrayObject
      */
     protected function getDirectStructureInfo($fqcn)
     {
@@ -171,7 +171,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      * @param string $fqcn
      * @param string $originFqcn
      *
-     * @return array
+     * @return ArrayObject
      */
     protected function getCheckedStructureInfo($fqcn, $originFqcn)
     {
