@@ -6,8 +6,8 @@ use ArrayAccess;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\UserInterface\IndexDataAdapter;
-use PhpIntegrator\UserInterface\IndexDataAdapterWhiteHolingProxyProvider;
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilder;
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilderWhiteHolingProxyProvider;
 
 /**
  * Command that shows a list of available classes, interfaces and traits.
@@ -43,9 +43,9 @@ class ClassListCommand extends AbstractCommand
     {
         $result = [];
 
-        $storageProxy = new IndexDataAdapterWhiteHolingProxyProvider($this->getIndexDataAdapterProvider());
+        $storageProxy = new ClasslikeInfoBuilderWhiteHolingProxyProvider($this->getClasslikeInfoBuilderProvider());
 
-        $dataAdapter = new IndexDataAdapter(
+        $dataAdapter = new ClasslikeInfoBuilder(
             $this->getConstantConverter(),
             $this->getClasslikeConstantConverter(),
             $this->getPropertyConverter(),

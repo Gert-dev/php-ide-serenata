@@ -3,9 +3,9 @@
 namespace PhpIntegrator\UserInterface;
 
 /**
- * Defines functionality that must be exposed by classes that provide data to an IndexDataAdapter.
+ * Defines functionality that must be exposed by classes that provide data to an ClasslikeInfoBuilder.
  */
-interface IndexDataAdapterProviderInterface
+interface ClasslikeInfoBuilderProviderInterface
 {
     /**
      * @param string $fqcn

@@ -3,13 +3,13 @@
 namespace PhpIntegrator\UserInterface;
 
 /**
- * Proxy for a {@see IndexDataAdapterProviderInterface} that does not return any data (is a "white hole") for several
+ * Proxy for a {@see ClasslikeInfoBuilderProviderInterface} that does not return any data (is a "white hole") for several
  * methods that are unnecessary when fetching the structural element list to avoid their cost and to improve performance.
  */
-class IndexDataAdapterWhiteHolingProxyProvider implements IndexDataAdapterProviderInterface
+class ClasslikeInfoBuilderWhiteHolingProxyProvider implements ClasslikeInfoBuilderProviderInterface
 {
     /**
-     * @var IndexDataAdapterProviderInterface
+     * @var ClasslikeInfoBuilderProviderInterface
      */
     protected $proxiedObject;
 
@@ -21,9 +21,9 @@ class IndexDataAdapterWhiteHolingProxyProvider implements IndexDataAdapterProvid
     /**
      * Constructor.
      *
-     * @param IndexDataAdapterProviderInterface $proxiedObject
+     * @param ClasslikeInfoBuilderProviderInterface $proxiedObject
      */
-    public function __construct(IndexDataAdapterProviderInterface $proxiedObject)
+    public function __construct(ClasslikeInfoBuilderProviderInterface $proxiedObject)
     {
         $this->proxiedObject = $proxiedObject;
     }

@@ -21,7 +21,7 @@ use PhpIntegrator\Indexing\IndexStorageItemEnum;
 
 use PhpIntegrator\Parsing\DocblockParser;
 
-use PhpIntegrator\UserInterface\IndexDataAdapterProviderCachingProxy;
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
 
 use PhpParser\ParserFactory;
 
@@ -232,9 +232,9 @@ class ReindexCommand extends AbstractCommand
     {
         if (!$this->storageForIndexers) {
             $this->storageForIndexers = new CallbackStorageProxy($this->getIndexDatabase(), function ($fqcn) {
-                $provider = $this->getIndexDataAdapterProvider();
+                $provider = $this->getClasslikeInfoBuilderProvider();
 
-                if ($provider instanceof IndexDataAdapterProviderCachingProxy) {
+                if ($provider instanceof ClasslikeInfoBuilderProviderCachingProxy) {
                     $provider->clearCacheFor($fqcn);
                 }
             });

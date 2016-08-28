@@ -7,7 +7,7 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\UserInterface\IndexDataAdapter;
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilder;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -54,7 +54,7 @@ class ClassInfoCommand extends AbstractCommand
     {
         $fqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($fqcn);
 
-        return $this->getIndexDataAdapter()->getClasslikeInfo($fqcn);
+        return $this->getClasslikeInfoBuilder()->getClasslikeInfo($fqcn);
     }
 
     /**

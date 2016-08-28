@@ -12,7 +12,7 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
  */
-class IndexDataAdapter
+class ClasslikeInfoBuilder
 {
     /**
      * @var Conversion\ConstantConverter
@@ -62,7 +62,7 @@ class IndexDataAdapter
     /**
      * The storage to use for accessing index data.
      *
-     * @var IndexDataAdapterProviderInterface
+     * @var ClasslikeInfoBuilderProviderInterface
      */
     protected $storage;
 
@@ -86,7 +86,7 @@ class IndexDataAdapter
      * @param Relations\InheritanceResolver             $inheritanceResolver
      * @param Relations\InterfaceImplementationResolver $interfaceImplementationResolver
      * @param Relations\TraitUsageResolver              $traitUsageResolver
-     * @param IndexDataAdapterProviderInterface         $storage
+     * @param ClasslikeInfoBuilderProviderInterface         $storage
      * @param TypeAnalyzer                              $typeAnalyzer
      */
     public function __construct(
@@ -99,7 +99,7 @@ class IndexDataAdapter
         Relations\InheritanceResolver $inheritanceResolver,
         Relations\InterfaceImplementationResolver $interfaceImplementationResolver,
         Relations\TraitUsageResolver $traitUsageResolver,
-        IndexDataAdapterProviderInterface $storage,
+        ClasslikeInfoBuilderProviderInterface $storage,
         TypeAnalyzer $typeAnalyzer
     ) {
         $this->constantConverter = $constantConverter;

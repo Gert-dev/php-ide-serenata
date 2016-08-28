@@ -6,12 +6,12 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 
-use PhpIntegrator\UserInterface\IndexDataAdapterProviderInterface;
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderInterface;
 
 /**
  * Represents that database that is used for indexing.
  */
-class IndexDatabase implements StorageInterface, IndexDataAdapterProviderInterface
+class IndexDatabase implements StorageInterface, ClasslikeInfoBuilderProviderInterface
 {
     /**
      * @var Connection

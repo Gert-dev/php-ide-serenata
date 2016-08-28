@@ -19,9 +19,9 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\UserInterface\Conversion;
-use PhpIntegrator\UserInterface\IndexDataAdapter;
-use PhpIntegrator\UserInterface\IndexDataAdapterProviderInterface;
-use PhpIntegrator\UserInterface\IndexDataAdapterProviderCachingProxy;
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilder;
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderInterface;
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;
 
@@ -46,9 +46,9 @@ abstract class AbstractCommand implements CommandInterface
     protected $indexDatabase;
 
     /**
-     * @var IndexDataAdapter
+     * @var ClasslikeInfoBuilder
      */
-    protected $indexDataAdapter;
+    protected $classlikeInfoBuilder;
 
     /**
      * @var string
@@ -71,9 +71,9 @@ abstract class AbstractCommand implements CommandInterface
     protected $cachingParserProxy;
 
     /**
-     * @var IndexDataAdapterProviderCachingProxy
+     * @var ClasslikeInfoBuilderProviderCachingProxy
      */
-    protected $indexDataAdapterProvider;
+    protected $classlikeInfoBuilderProvider;
 
     /**
      * @var SourceCodeStreamReader
@@ -228,12 +228,12 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @return IndexDataAdapter
+     * @return ClasslikeInfoBuilder
      */
-    protected function getIndexDataAdapter()
+    protected function getClasslikeInfoBuilder()
     {
-        if (!$this->indexDataAdapter) {
-            $this->indexDataAdapter = new IndexDataAdapter(
+        if (!$this->classlikeInfoBuilder) {
+            $this->classlikeInfoBuilder = new ClasslikeInfoBuilder(
                 $this->getConstantConverter(),
                 $this->getClasslikeConstantConverter(),
                 $this->getPropertyConverter(),
@@ -243,12 +243,12 @@ abstract class AbstractCommand implements CommandInterface
                 $this->getInheritanceResolver(),
                 $this->getInterfaceImplementationResolver(),
                 $this->getTraitUsageResolver(),
-                $this->getIndexDataAdapterProvider(),
+                $this->getClasslikeInfoBuilderProvider(),
                 $this->getTypeAnalyzer()
             );
         }
 
-        return $this->indexDataAdapter;
+        return $this->classlikeInfoBuilder;
     }
 
     /**
@@ -423,22 +423,22 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @return IndexDataAdapterProviderInterface
+     * @return ClasslikeInfoBuilderProviderInterface
      */
-    protected function getIndexDataAdapterProvider()
+    protected function getClasslikeInfoBuilderProvider()
     {
-        if (!$this->indexDataAdapterProvider) {
+        if (!$this->classlikeInfoBuilderProvider) {
             if ($this->cache) {
-                $this->indexDataAdapterProvider = new IndexDataAdapterProviderCachingProxy(
+                $this->classlikeInfoBuilderProvider = new ClasslikeInfoBuilderProviderCachingProxy(
                     $this->getIndexDatabase(),
                     $this->cache
                 );
             } else {
-                $this->indexDataAdapterProvider = $this->getIndexDatabase();
+                $this->classlikeInfoBuilderProvider = $this->getIndexDatabase();
             }
         }
 
-        return $this->indexDataAdapterProvider;
+        return $this->classlikeInfoBuilderProvider;
     }
 
     /**

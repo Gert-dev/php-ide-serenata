@@ -7,10 +7,10 @@ use Doctrine\Common\Cache\Cache;
 /**
  * Proxy for providers that introduces a caching layer.
  */
-class IndexDataAdapterProviderCachingProxy implements IndexDataAdapterProviderInterface
+class ClasslikeInfoBuilderProviderCachingProxy implements ClasslikeInfoBuilderProviderInterface
 {
     /**
-     * @var IndexDataAdapterProviderInterface
+     * @var ClasslikeInfoBuilderProviderInterface
      */
     protected $provider;
 
@@ -20,10 +20,10 @@ class IndexDataAdapterProviderCachingProxy implements IndexDataAdapterProviderIn
     protected $cache;
 
     /**
-     * @param IndexDataAdapterProviderInterface $provider
+     * @param ClasslikeInfoBuilderProviderInterface $provider
      * @param Cache             $cache
      */
-    public function __construct(IndexDataAdapterProviderInterface $provider, Cache $cache)
+    public function __construct(ClasslikeInfoBuilderProviderInterface $provider, Cache $cache)
     {
         $this->provider = $provider;
         $this->cache = $cache;
