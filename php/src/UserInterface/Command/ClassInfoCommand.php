@@ -7,8 +7,6 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
-
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
