@@ -131,9 +131,9 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      */
     public function getStructureInfo($fqcn)
     {
-        $this->resolutionStack = [$fqcn];
+        $this->resolutionStack = [];
 
-        return $this->getDirectStructureInfo($fqcn)->getArrayCopy();
+        return $this->getCheckedStructureInfo($fqcn, '')->getArrayCopy();
     }
 
     /**
