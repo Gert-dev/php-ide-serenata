@@ -481,18 +481,18 @@ class ClassInfoCommandTest extends IndexedTest
         }
 
         $this->assertEquals(
-            $childClassOutput['methods']['inheritDocBaseClassTest']['longDescription'],
-            'Pre. ' . $parentClassOutput['methods']['inheritDocBaseClassTest']['longDescription'] . ' Post.'
+            'Pre. ' . $parentClassOutput['methods']['inheritDocBaseClassTest']['longDescription'] . ' Post.',
+            $childClassOutput['methods']['inheritDocBaseClassTest']['longDescription']
         );
 
         $this->assertEquals(
-            $childClassOutput['methods']['inheritDocInterfaceTest']['longDescription'],
-            'Pre. ' . $interfaceOutput['methods']['inheritDocInterfaceTest']['longDescription'] . ' Post.'
+            'Pre. ' . $interfaceOutput['methods']['inheritDocInterfaceTest']['longDescription'] . ' Post.',
+            $childClassOutput['methods']['inheritDocInterfaceTest']['longDescription']
         );
 
         $this->assertEquals(
-            $childClassOutput['methods']['inheritDocTraitTest']['longDescription'],
-            'Pre. ' . $traitOutput['methods']['inheritDocTraitTest']['longDescription'] . ' Post.'
+            'Pre. ' . $traitOutput['methods']['inheritDocTraitTest']['longDescription'] . ' Post.',
+            $childClassOutput['methods']['inheritDocTraitTest']['longDescription']
         );
     }
 
