@@ -9,8 +9,6 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Linting;
 
-use PhpIntegrator\Indexing\IndexDatabase;
-
 use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpParser\Error;
