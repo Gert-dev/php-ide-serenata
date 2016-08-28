@@ -130,7 +130,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     {
         $this->resolutionStack = [];
 
-        return $this->getCheckedStructureInfo($fqcn, '')->getArrayCopy();
+        return $this->getCheckedClasslikeInfo($fqcn, '')->getArrayCopy();
     }
 
     /**
@@ -139,7 +139,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      *
      * @return ArrayObject
      */
-    protected function getCheckedStructureInfo($fqcn, $originFqcn)
+    protected function getCheckedClasslikeInfo($fqcn, $originFqcn)
     {
         if (in_array($fqcn, $this->resolutionStack)) {
             throw new CircularDependencyException(
@@ -149,7 +149,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
 
         $this->resolutionStack[] = $fqcn;
 
-        $data = $this->getDirectStructureInfo($fqcn);
+        $data = $this->getUncheckedClasslikeInfo($fqcn);
 
         array_pop($this->resolutionStack);
 
@@ -163,7 +163,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
      *
      * @return ArrayObject
      */
-    protected function getDirectStructureInfo($fqcn)
+    protected function getUncheckedClasslikeInfo($fqcn)
     {
         $rawInfo = $this->storage->getStructureRawInfo($fqcn);
 
@@ -208,19 +208,19 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected function resolveClasslikeRelations(ArrayObject $classlike, array $traitAliases, array $traitPrecedences)
     {
         foreach ($classlike['directParents'] as $parent) {
-            $parentInfo = $this->getCheckedStructureInfo($parent, $classlike['name']);
+            $parentInfo = $this->getCheckedClasslikeInfo($parent, $classlike['name']);
 
             $this->inheritanceResolver->resolveInheritanceOf($parentInfo, $classlike);
         }
 
         foreach ($classlike['directInterfaces'] as $interface) {
-            $interfaceInfo = $this->getCheckedStructureInfo($interface, $classlike['name']);
+            $interfaceInfo = $this->getCheckedClasslikeInfo($interface, $classlike['name']);
 
             $this->interfaceImplementationResolver->resolveImplementationOf($interfaceInfo, $classlike);
         }
 
         foreach ($classlike['directTraits'] as $trait) {
-            $traitInfo = $this->getCheckedStructureInfo($trait, $classlike['name']);
+            $traitInfo = $this->getCheckedClasslikeInfo($trait, $classlike['name']);
 
             $this->traitUsageResolver->resolveUseOf($traitInfo, $classlike, $traitAliases, $traitPrecedences);
         }
