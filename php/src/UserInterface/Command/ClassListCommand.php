@@ -25,39 +25,47 @@ class ClassListCommand extends AbstractCommand
     /**
      * @inheritDoc
      */
-     protected function process(ArrayAccess $arguments)
-     {
-         $file = isset($arguments['file']) ? $arguments['file']->value : null;
+    protected function process(ArrayAccess $arguments)
+    {
+        $file = isset($arguments['file']) ? $arguments['file']->value : null;
 
-         $classList = $this->getClassList($file);
+        $classList = $this->getClassList($file);
 
-         return $this->outputJson(true, $classList);
-     }
+        return $this->outputJson(true, $classList);
+    }
 
-     /**
-      * @param string|null $file
-      *
-      * @return array
-      */
-     public function getClassList($file)
-     {
-         $result = [];
+    /**
+     * @param string|null $file
+     *
+     * @return array
+     */
+    public function getClassList($file)
+    {
+        $result = [];
 
-         $storageProxy = new IndexDataAdapterWhiteHolingProxyProvider($this->getIndexDataAdapterProvider());
-         $dataAdapter = new IndexDataAdapter($storageProxy);
+        $storageProxy = new IndexDataAdapterWhiteHolingProxyProvider($this->getIndexDataAdapterProvider());
 
-         foreach ($this->getIndexDatabase()->getAllStructuresRawInfo($file) as $element) {
-             // Directly load in the raw information we already have, this avoids performing a database query for each
-             // record.
-             $storageProxy->setStructureRawInfo($element);
+        $dataAdapter = new IndexDataAdapter(
+            $this->getConstantConverter(),
+            $this->getPropertyConverter(),
+            $this->getFunctionConverter(),
+            $this->getMethodConverter(),
+            $this->getClasslikeConverter(),
+            $storageProxy
+        );
 
-             $info = $dataAdapter->getStructureInfo($element['name']);
+        foreach ($this->getIndexDatabase()->getAllStructuresRawInfo($file) as $element) {
+            // Directly load in the raw information we already have, this avoids performing a database query for each
+            // record.
+            $storageProxy->setStructureRawInfo($element);
 
-             unset($info['constants'], $info['properties'], $info['methods']);
+            $info = $dataAdapter->getStructureInfo($element['name']);
 
-             $result[$element['fqcn']] = $info;
-         }
+            unset($info['constants'], $info['properties'], $info['methods']);
 
-         return $result;
-     }
+            $result[$element['fqcn']] = $info;
+        }
+
+        return $result;
+    }
 }

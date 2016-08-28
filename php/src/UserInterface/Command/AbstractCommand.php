@@ -11,11 +11,12 @@ use Doctrine\Common\Cache\Cache;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\Indexing\IndexDatabase;
+
+use PhpIntegrator\UserInterface\Conversion;
 use PhpIntegrator\UserInterface\IndexDataAdapter;
 use PhpIntegrator\UserInterface\IndexDataAdapterProviderInterface;
 use PhpIntegrator\UserInterface\IndexDataAdapterProviderCachingProxy;
-
-use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;
 
@@ -73,6 +74,31 @@ abstract class AbstractCommand implements CommandInterface
      * @var SourceCodeStreamReader
      */
     protected $sourceCodeStreamReader;
+
+    /**
+     * @var Conversion\ConstantConverter
+     */
+    protected $constantConverter;
+
+    /**
+     * @var Conversion\PropertyConverter
+     */
+    protected $propertyConverter;
+
+    /**
+     * @var Conversion\ClasslikeConverter
+     */
+    protected $classlikeConverter;
+
+    /**
+     * @var Conversion\FunctionConverter
+     */
+    protected $functionConverter;
+
+    /**
+     * @var Conversion\MethodConverter
+     */
+    protected $methodConverter;
 
     /**
      * @param Parser             $parser
@@ -172,10 +198,87 @@ abstract class AbstractCommand implements CommandInterface
     protected function getIndexDataAdapter()
     {
         if (!$this->indexDataAdapter) {
-            $this->indexDataAdapter = new IndexDataAdapter($this->getIndexDataAdapterProvider());
+            $this->indexDataAdapter = new IndexDataAdapter(
+                $this->getConstantConverter(),
+                $this->getPropertyConverter(),
+                $this->getFunctionConverter(),
+                $this->getMethodConverter(),
+                $this->getClasslikeConverter(),
+                $this->getIndexDataAdapterProvider()
+            );
         }
 
         return $this->indexDataAdapter;
+    }
+
+    /**
+     * Retrieves an instance of Conversion\ConstantConverter. The object will only be created once if needed.
+     *
+     * @return Conversion\ConstantConverter
+     */
+    protected function getConstantConverter()
+    {
+        if (!$this->constantConverter instanceof Conversion\ConstantConverter) {
+            $this->constantConverter = new Conversion\ConstantConverter();
+        }
+
+        return $this->constantConverter;
+    }
+
+    /**
+     * Retrieves an instance of Conversion\PropertyConverter. The object will only be created once if needed.
+     *
+     * @return Conversion\PropertyConverter
+     */
+    protected function getPropertyConverter()
+    {
+        if (!$this->propertyConverter instanceof Conversion\PropertyConverter) {
+            $this->propertyConverter = new Conversion\PropertyConverter();
+        }
+
+        return $this->propertyConverter;
+    }
+
+    /**
+     * Retrieves an instance of Conversion\ClasslikeConverter. The object will only be created once if needed.
+     *
+     * @return Conversion\ClasslikeConverter
+     */
+    protected function getClasslikeConverter()
+    {
+        if (!$this->classlikeConverter instanceof Conversion\ClasslikeConverter) {
+            $this->classlikeConverter = new Conversion\ClasslikeConverter();
+        }
+
+        return $this->classlikeConverter;
+    }
+
+    /**
+     * Retrieves an instance of Conversion\FunctionConverter. The object will only be created once if needed.
+     *
+     * @return Conversion\FunctionConverter
+     */
+    protected function getFunctionConverter()
+    {
+        if (!$this->functionConverter instanceof Conversion\FunctionConverter) {
+            $this->functionConverter = new Conversion\FunctionConverter();
+        }
+
+        return $this->functionConverter;
+    }
+
+    /**
+     * Retrieves an instance of Conversion\MethodConverter. The object will only be created once if needed.
+     *
+     * @return Conversion\MethodConverter
+     */
+    protected function getMethodConverter()
+    {
+        if (!$this->methodConverter instanceof Conversion\MethodConverter) {
+            $this->methodConverter = new Conversion\MethodConverter();
+        }
+
+        return $this->methodConverter;
     }
 
     /**

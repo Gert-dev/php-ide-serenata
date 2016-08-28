@@ -19,6 +19,31 @@ use PhpIntegrator\Parsing\DocblockParser;
 class IndexDataAdapter implements IndexDataAdapterInterface
 {
     /**
+     * @var Conversion\ConstantConverter
+     */
+    protected $constantConverter;
+
+    /**
+     * @var Conversion\PropertyConverter
+     */
+    protected $propertyConverter;
+
+    /**
+     * @var Conversion\FunctionConverter
+     */
+    protected $functionConverter;
+
+    /**
+     * @var Conversion\MethodConverter
+     */
+    protected $methodConverter;
+
+    /**
+     * @var Conversion\ClasslikeConverter
+     */
+    protected $classlikeConverter;
+
+    /**
      * The storage to use for accessing index data.
      *
      * @var IndexDataAdapterProviderInterface
@@ -41,12 +66,26 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected $resolutionStack = [];
 
     /**
-     * Constructor.
-     *
+     * @param Conversion\ConstantConverter      $constantConverter
+     * @param Conversion\PropertyConverter      $propertyConverter
+     * @param Conversion\FunctionConverter      $functionConverter
+     * @param Conversion\MethodConverter        $methodConverter
+     * @param Conversion\ClasslikeConverter     $classlikeConverter
      * @param IndexDataAdapterProviderInterface $storage
      */
-    public function __construct(IndexDataAdapterProviderInterface $storage)
-    {
+    public function __construct(
+        Conversion\ConstantConverter $constantConverter,
+        Conversion\PropertyConverter $propertyConverter,
+        Conversion\FunctionConverter $functionConverter,
+        Conversion\MethodConverter $methodConverter,
+        Conversion\ClasslikeConverter $classlikeConverter,
+        IndexDataAdapterProviderInterface $storage
+    ) {
+        $this->constantConverter = $constantConverter;
+        $this->propertyConverter = $propertyConverter;
+        $this->functionConverter = $functionConverter;
+        $this->methodConverter = $methodConverter;
+        $this->classlikeConverter = $classlikeConverter;
         $this->storage = $storage;
     }
 
@@ -148,24 +187,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
         $properties,
         $methods
     ) {
-        $result = new ArrayObject([
-            'name'               => $element['fqcn'],
-            'startLine'          => (int) $element['start_line'],
-            'endLine'            => (int) $element['end_line'],
-            'shortName'          => $element['name'],
-            'filename'           => $element['path'],
-            'type'               => $element['type_name'],
-            'isAbstract'         => !!$element['is_abstract'],
-            'isFinal'            => !!$element['is_final'],
-            'isBuiltin'          => !!$element['is_builtin'],
-            'isDeprecated'       => !!$element['is_deprecated'],
-            'isAnnotation'       => !!$element['is_annotation'],
-            'hasDocblock'        => !!$element['has_docblock'],
-            'hasDocumentation'   => !!$element['has_docblock'],
-
-            'shortDescription'   => $element['short_description'],
-            'longDescription'    => $element['long_description'],
-
+        $result = new ArrayObject($this->classlikeConverter->convert($element) + [
             'parents'            => [],
             'interfaces'         => [],
             'traits'             => [],
@@ -207,7 +229,7 @@ class IndexDataAdapter implements IndexDataAdapterInterface
     protected function parseConstantData(ArrayObject $result, $constants, $element)
     {
         foreach ($constants as $rawConstantData) {
-            $result['constants'][$rawConstantData['name']] = array_merge($this->getConstantInfo($rawConstantData), [
+            $result['constants'][$rawConstantData['name']] = array_merge($this->constantConverter->convert($rawConstantData), [
                 'declaringClass' => [
                     'name'      => $element['fqcn'],
                     'filename'  => $element['path'],
@@ -241,7 +263,11 @@ class IndexDataAdapter implements IndexDataAdapterInterface
             $existingProperty = null;
             $overriddenPropertyData = null;
 
-            $property = $this->getPropertyInfo($rawPropertyData);
+            $property = $this->propertyConverter->convert($rawPropertyData) + [
+                'override'           => null,
+                'declaringClass'     => null,
+                'declaringStructure' => null
+            ];
 
             if (isset($result['properties'][$property['name']])) {
                 $existingProperty = $result['properties'][$property['name']];
@@ -304,7 +330,13 @@ class IndexDataAdapter implements IndexDataAdapterInterface
             $overriddenMethodData = null;
             $implementedMethodData = null;
 
-            $method = $this->getMethodInfo($rawMethodData);
+            $method = $this->methodConverter->convert($rawMethodData) + [
+                'override'           => null,
+                'implementation'     => null,
+
+                'declaringClass'     => null,
+                'declaringStructure' => null
+            ];
 
             if (isset($result['methods'][$method['name']])) {
                 $existingMethod = $result['methods'][$method['name']];
@@ -623,151 +655,6 @@ class IndexDataAdapter implements IndexDataAdapterInterface
                 $doResolveTypes($type);
             }
         }
-    }
-
-    /**
-     * @param array $rawInfo
-     *
-     * @return array
-     */
-    public function getMethodInfo(array $rawInfo)
-    {
-        return array_merge($this->getFunctionInfo($rawInfo), [
-            'isMagic'            => !!$rawInfo['is_magic'],
-            'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
-            'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
-            'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
-            'isStatic'           => !!$rawInfo['is_static'],
-            'isAbstract'         => !!$rawInfo['is_abstract'],
-            'isFinal'            => !!$rawInfo['is_final'],
-
-            'override'           => null,
-            'implementation'     => null,
-
-            'declaringClass'     => null,
-            'declaringStructure' => null
-        ]);
-    }
-
-    /**
-     * @param array $rawInfo
-     *
-     * @return array
-     */
-    public function getFunctionInfo(array $rawInfo)
-    {
-        $rawParameters = unserialize($rawInfo['parameters_serialized']);
-
-        $parameters = [];
-
-        foreach ($rawParameters as $rawParameter) {
-            $parameters[] = [
-                'name'         => $rawParameter['name'],
-                'typeHint'     => $rawParameter['type_hint'],
-                'types'        => $this->getReturnTypeDataForSerializedTypes($rawParameter['types_serialized']),
-                'description'  => $rawParameter['description'],
-                'defaultValue' => $rawParameter['default_value'],
-                'isNullable'   => !!$rawParameter['is_nullable'],
-                'isReference'  => !!$rawParameter['is_reference'],
-                'isVariadic'   => !!$rawParameter['is_variadic'],
-                'isOptional'   => !!$rawParameter['is_optional']
-            ];
-        }
-
-        $throws = unserialize($rawInfo['throws_serialized']);
-
-        $throwsAssoc = [];
-
-        foreach ($throws as $throws) {
-            $throwsAssoc[$throws['type']] = $throws['description'];
-        }
-
-        return [
-            'name'              => $rawInfo['name'],
-            'fqcn'              => $rawInfo['fqcn'],
-            'isBuiltin'         => !!$rawInfo['is_builtin'],
-            'startLine'         => (int) $rawInfo['start_line'],
-            'endLine'           => (int) $rawInfo['end_line'],
-            'filename'          => $rawInfo['path'],
-
-            'parameters'        => $parameters,
-            'throws'            => $throwsAssoc,
-            'isDeprecated'      => !!$rawInfo['is_deprecated'],
-            'hasDocblock'       => !!$rawInfo['has_docblock'],
-            'hasDocumentation'  => !!$rawInfo['has_docblock'],
-
-            'shortDescription'  => $rawInfo['short_description'],
-            'longDescription'   => $rawInfo['long_description'],
-            'returnDescription' => $rawInfo['return_description'],
-
-            'returnTypeHint'    => $rawInfo['return_type_hint'],
-            'returnTypes'       => $this->getReturnTypeDataForSerializedTypes($rawInfo['return_types_serialized'])
-        ];
-    }
-
-    /**
-     * @param array $rawInfo
-     *
-     * @return array
-     */
-    public function getPropertyInfo(array $rawInfo)
-    {
-        return [
-            'name'               => $rawInfo['name'],
-            'startLine'          => (int) $rawInfo['start_line'],
-            'endLine'            => (int) $rawInfo['end_line'],
-            'defaultValue'       => $rawInfo['default_value'],
-            'isMagic'            => !!$rawInfo['is_magic'],
-            'isPublic'           => ($rawInfo['access_modifier'] === 'public'),
-            'isProtected'        => ($rawInfo['access_modifier'] === 'protected'),
-            'isPrivate'          => ($rawInfo['access_modifier'] === 'private'),
-            'isStatic'           => !!$rawInfo['is_static'],
-            'isDeprecated'       => !!$rawInfo['is_deprecated'],
-            'hasDocblock'        => !!$rawInfo['has_docblock'],
-            'hasDocumentation'   => !!$rawInfo['has_docblock'],
-
-            'shortDescription'  => $rawInfo['short_description'],
-            'longDescription'   => $rawInfo['long_description'],
-            'typeDescription'   => $rawInfo['type_description'],
-
-            'types'             => $this->getReturnTypeDataForSerializedTypes($rawInfo['types_serialized']),
-
-            'override'           => null,
-            'declaringClass'     => null,
-            'declaringStructure' => null
-        ];
-    }
-
-    /**
-     * @param array $rawInfo
-     *
-     * @return array
-     */
-    public function getConstantInfo(array $rawInfo)
-    {
-        return [
-            'name'              => $rawInfo['name'],
-            'fqcn'              => $rawInfo['fqcn'],
-            'isBuiltin'         => !!$rawInfo['is_builtin'],
-            'startLine'         => (int) $rawInfo['start_line'],
-            'endLine'           => (int) $rawInfo['end_line'],
-            'defaultValue'      => $rawInfo['default_value'],
-            'filename'          => $rawInfo['path'],
-
-            'isPublic'          => true,
-            'isProtected'       => false,
-            'isPrivate'         => false,
-            'isStatic'          => true,
-            'isDeprecated'      => !!$rawInfo['is_deprecated'],
-            'hasDocblock'       => !!$rawInfo['has_docblock'],
-            'hasDocumentation'  => !!$rawInfo['has_docblock'],
-
-            'shortDescription'  => $rawInfo['short_description'],
-            'longDescription'   => $rawInfo['long_description'],
-            'typeDescription'   => $rawInfo['type_description'],
-
-            'types'             => $this->getReturnTypeDataForSerializedTypes($rawInfo['types_serialized'])
-        ];
     }
 
     /**
