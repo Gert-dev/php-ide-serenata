@@ -1,13 +1,9 @@
 <?php
 
-namespace PhpIntegrator\UserInterface;
+namespace PhpIntegrator\Analysis;
 
 use ArrayObject;
 use UnexpectedValueException;
-
-use PhpIntegrator\Analysis\Relations;
-
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Adapts and resolves data from the index as needed to receive an appropriate output data format.
@@ -67,7 +63,7 @@ class ClasslikeInfoBuilder
     protected $storage;
 
     /**
-     * @var TypeAnalyzer
+     * @var Typing\TypeAnalyzer
      */
     protected $typeAnalyzer;
 
@@ -86,8 +82,8 @@ class ClasslikeInfoBuilder
      * @param Relations\InheritanceResolver             $inheritanceResolver
      * @param Relations\InterfaceImplementationResolver $interfaceImplementationResolver
      * @param Relations\TraitUsageResolver              $traitUsageResolver
-     * @param ClasslikeInfoBuilderProviderInterface         $storage
-     * @param TypeAnalyzer                              $typeAnalyzer
+     * @param ClasslikeInfoBuilderProviderInterface     $storage
+     * @param Typing\TypeAnalyzer                       $typeAnalyzer
      */
     public function __construct(
         Conversion\ConstantConverter $constantConverter,
@@ -100,7 +96,7 @@ class ClasslikeInfoBuilder
         Relations\InterfaceImplementationResolver $interfaceImplementationResolver,
         Relations\TraitUsageResolver $traitUsageResolver,
         ClasslikeInfoBuilderProviderInterface $storage,
-        TypeAnalyzer $typeAnalyzer
+        Typing\TypeAnalyzer $typeAnalyzer
     ) {
         $this->constantConverter = $constantConverter;
         $this->classlikeConstantConverter = $classlikeConstantConverter;

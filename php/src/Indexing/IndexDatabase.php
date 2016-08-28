@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderInterface;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilderProviderInterface;
 
 /**
  * Represents that database that is used for indexing.

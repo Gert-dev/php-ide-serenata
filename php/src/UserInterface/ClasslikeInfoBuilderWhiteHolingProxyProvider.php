@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\UserInterface;
 
+use PhpIntegrator\Analysis\ClasslikeInfoBuilderProviderInterface;
+
 /**
  * Proxy for a {@see ClasslikeInfoBuilderProviderInterface} that does not return any data (is a "white hole") for several
  * methods that are unnecessary when fetching the structural element list to avoid their cost and to improve performance.

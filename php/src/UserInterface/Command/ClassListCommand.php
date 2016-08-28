@@ -6,7 +6,7 @@ use ArrayAccess;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilder;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
 use PhpIntegrator\UserInterface\ClasslikeInfoBuilderWhiteHolingProxyProvider;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\UserInterface;
+namespace PhpIntegrator\Analysis;
 
 /**
  * Defines functionality that must be exposed by classes that provide data to an ClasslikeInfoBuilder.

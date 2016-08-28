@@ -4,6 +4,8 @@ namespace PhpIntegrator\UserInterface;
 
 use Doctrine\Common\Cache\Cache;
 
+use PhpIntegrator\Analysis\ClasslikeInfoBuilderProviderInterface;
+
 /**
  * Proxy for providers that introduces a caching layer.
  */

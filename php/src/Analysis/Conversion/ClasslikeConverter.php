@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\UserInterface\Conversion;
+namespace PhpIntegrator\Analysis\Conversion;
 
 /**
  * Converts raw classlike data from the index to more useful data.

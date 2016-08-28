@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\UserInterface\Conversion;
+namespace PhpIntegrator\Analysis\Conversion;
 
 /**
  * Base class for converters.

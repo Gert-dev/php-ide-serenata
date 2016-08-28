@@ -13,14 +13,14 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Relations;
 use PhpIntegrator\Analysis\DocblockAnalyzer;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilderProviderInterface;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
-use PhpIntegrator\UserInterface\Conversion;
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilder;
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderInterface;
+use PhpIntegrator\Analysis\Conversion;
 use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;

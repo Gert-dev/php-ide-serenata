@@ -4,7 +4,7 @@ namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
 
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilder;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
 
 /**
  * Command that shows a list of global constants.

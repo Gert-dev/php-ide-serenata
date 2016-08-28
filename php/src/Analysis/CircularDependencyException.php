@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIntegrator\UserInterface;
+namespace PhpIntegrator\Analysis;
 
 use Exception;
 

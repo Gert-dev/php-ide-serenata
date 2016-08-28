@@ -1462,7 +1462,7 @@ class ClassInfoCommandTest extends IndexedTest
     }
 
     /**
-     * @expectedException \PhpIntegrator\UserInterface\CircularDependencyException
+     * @expectedException \PhpIntegrator\Analysis\CircularDependencyException
      */
     public function testThrowsExceptionOnCircularDependencyWithClassExtendingItself()
     {
@@ -1472,7 +1472,7 @@ class ClassInfoCommandTest extends IndexedTest
     }
 
     /**
-     * @expectedException \PhpIntegrator\UserInterface\CircularDependencyException
+     * @expectedException \PhpIntegrator\Analysis\CircularDependencyException
      */
     public function testThrowsExceptionOnCircularDependencyWithClassImplementingItself()
     {
@@ -1482,7 +1482,7 @@ class ClassInfoCommandTest extends IndexedTest
     }
 
     /**
-     * @expectedException \PhpIntegrator\UserInterface\CircularDependencyException
+     * @expectedException \PhpIntegrator\Analysis\CircularDependencyException
      */
     public function testThrowsExceptionOnCircularDependencyWithClassUsingItselfAsTrait()
     {
