@@ -1235,16 +1235,6 @@ class ClassInfoCommandTest extends IndexedTest
         $this->assertThat($output['methods'], $this->arrayHasKey('testAmbiguousAsWell'));
         $this->assertThat($output['methods'], $this->arrayHasKey('baseTraitMethod'));
 
-        $this->assertEquals(
-            $output['properties']['inheritDocTest']['longDescription'],
-            'Pre. ' . $baseClassOutput['properties']['inheritDocTest']['longDescription'] . ' Post.'
-        );
-
-        $this->assertEquals(
-            $output['properties']['inheritEntireDocblockTest']['longDescription'],
-            $baseClassOutput['properties']['inheritEntireDocblockTest']['longDescription']
-        );
-
         // Test the 'as' keyword for renaming trait method.
         $this->assertThat($output['methods'], $this->arrayHasKey('test1'));
         $this->assertThat($output['methods'], $this->logicalNot($this->arrayHasKey('test')));
