@@ -2,11 +2,11 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\ClassList;
+use PhpIntegrator\Application\Command\ClassListCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
-class ClassListTest extends IndexedTest
+class ClassListCommandTest extends IndexedTest
 {
     public function testClassList()
     {
@@ -14,7 +14,7 @@ class ClassListTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new ClassList($this->getParser(), null, $indexDatabase);
+        $command = new ClassListCommand($this->getParser(), null, $indexDatabase);
 
         $output = $command->getClassList($path);
 

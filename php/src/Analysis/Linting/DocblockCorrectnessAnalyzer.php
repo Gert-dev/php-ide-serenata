@@ -10,7 +10,7 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 
-use PhpIntegrator\Application\Command\ClassInfo;
+use PhpIntegrator\Application\Command\ClassInfoCommand;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
@@ -47,7 +47,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     protected $docblockAnalyzer;
 
     /**
-     * @var ClassInfo
+     * @var ClassInfoCommand
      */
     protected $classInfoCommand;
 
@@ -59,11 +59,11 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     /**
      * Constructor.
      *
-     * @param string        $code
-     * @param IndexDatabase $indexDatabase
-     * @param ClassInfo     $classInfoCommand
+     * @param string           $code
+     * @param IndexDatabase    $indexDatabase
+     * @param ClassInfoCommand $classInfoCommand
      */
-    public function __construct($code, IndexDatabase $indexDatabase, ClassInfo $classInfoCommand)
+    public function __construct($code, IndexDatabase $indexDatabase, ClassInfoCommand $classInfoCommand)
     {
         $this->indexDatabase = $indexDatabase;
         $this->classInfoCommand = $classInfoCommand;

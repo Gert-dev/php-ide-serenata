@@ -8,13 +8,13 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+use PhpIntegrator\Analysis\Typing\TypeLocalizer;
 
 /**
- * Command that resolves local types in a file.
+ * Command that makes a FQCN relative to local use statements in a file.
  */
-class ResolveType extends AbstractCommand
+class LocalizeTypeCommand extends AbstractCommand
 {
     /**
      * @inheritDoc
@@ -39,7 +39,7 @@ class ResolveType extends AbstractCommand
             throw new UnexpectedValueException('A line number is required for this command.');
         }
 
-        $type = $this->resolveType($arguments['type']->value, $arguments['file']->value, $arguments['line']->value);
+        $type = $this->localizeType($arguments['type']->value, $arguments['file']->value, $arguments['line']->value);
 
         return $this->outputJson(true, $type);
     }
@@ -51,7 +51,7 @@ class ResolveType extends AbstractCommand
      * @param string $file
      * @param int    $line
      */
-    public function resolveType($type, $file, $line)
+    public function localizeType($type, $file, $line)
     {
         $fileId = $this->getIndexDatabase()->getFileId($file);
 
@@ -75,8 +75,8 @@ class ResolveType extends AbstractCommand
         $useStatements = iterator_to_array($useStatements);
 
         $typeAnalyzer = new TypeAnalyzer();
-        $typeResolver = new TypeResolver($typeAnalyzer, $namespace['namespace'], $useStatements);
+        $typeLocalizer = new TypeLocalizer($typeAnalyzer, $namespace['namespace'], $useStatements);
 
-        return $typeResolver->resolve($type);
+        return $typeLocalizer->localize($type);
     }
 }

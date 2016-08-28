@@ -40,7 +40,7 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
             'value' => 1
         ]);
 
-        $reindexCommand = new Command\Reindex($this->getParser(), null, $indexDatabase);
+        $reindexCommand = new Command\ReindexCommand($this->getParser(), null, $indexDatabase);
 
         $success = $reindexCommand->reindex(
             [$testPath],

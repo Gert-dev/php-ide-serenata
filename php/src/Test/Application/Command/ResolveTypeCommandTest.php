@@ -2,13 +2,13 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\ResolveType;
+use PhpIntegrator\Application\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
-class ResolveTypeTest extends IndexedTest
+class ResolveTypeCommandTest extends IndexedTest
 {
     public function testCorrectlyResolvesVariousTypes()
     {
@@ -16,7 +16,7 @@ class ResolveTypeTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new ResolveType($this->getParser(), null, $indexDatabase);
+        $command = new ResolveTypeCommand($this->getParser(), null, $indexDatabase);
 
         $this->assertEquals('\C', $command->resolveType('C', $path, 1));
         $this->assertEquals('\A\C', $command->resolveType('C', $path, 5));
@@ -33,7 +33,7 @@ class ResolveTypeTest extends IndexedTest
      */
     public function testThrowsExceptionOnUnknownFile()
     {
-        $command = new ResolveType($this->getParser(), null, new IndexDatabase(':memory:', 1));
+        $command = new ResolveTypeCommand($this->getParser(), null, new IndexDatabase(':memory:', 1));
 
         $command->resolveType('\C', 'MissingFile.php', 1);
     }

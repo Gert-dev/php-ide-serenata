@@ -2,16 +2,16 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+
 use PhpIntegrator\Analysis\Visiting\ClassUsageFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\DocblockClassUsageFetchingVisitor;
 
-use PhpIntegrator\Application\Command\ResolveType;
+use PhpIntegrator\Application\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Parsing\DocblockParser;
-
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Looks for unknown class names.
@@ -44,29 +44,29 @@ class UnknownClassAnalyzer implements AnalyzerInterface
     protected $typeAnalyzer;
 
     /**
-     * @var ResolveType
+     * @var ResolveTypeCommand
      */
-    protected $resolveType;
+    protected $resolveTypeCommand;
 
     /**
      * Constructor.
      *
-     * @param string         $file
-     * @param IndexDatabase  $indexDatabase
-     * @param ResolveType    $resolveType
-     * @param TypeAnalyzer   $typeAnalyzer
-     * @param DocblockParser $docblockParser
+     * @param string             $file
+     * @param IndexDatabase      $indexDatabase
+     * @param ResolveTypeCommand $resolveTypeCommand
+     * @param TypeAnalyzer       $typeAnalyzer
+     * @param DocblockParser     $docblockParser
      */
     public function __construct(
         $file,
         IndexDatabase $indexDatabase,
-        ResolveType $resolveType,
+        ResolveTypeCommand $resolveTypeCommand,
         TypeAnalyzer $typeAnalyzer,
         DocblockParser $docblockParser
     ) {
         $this->file = $file;
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->resolveType = $resolveType;
+        $this->resolveTypeCommand = $resolveTypeCommand;
         $this->indexDatabase = $indexDatabase;
 
         $this->classUsageFetchingVisitor = new ClassUsageFetchingVisitor();
@@ -108,7 +108,7 @@ class UnknownClassAnalyzer implements AnalyzerInterface
             if ($classUsage['isFullyQualified']) {
                 $fqcn = $classUsage['name'];
             } else {
-                $fqcn = $this->resolveType->resolveType(
+                $fqcn = $this->resolveTypeCommand->resolveType(
                     $classUsage['name'],
                     $this->file,
                     $classUsage['line']

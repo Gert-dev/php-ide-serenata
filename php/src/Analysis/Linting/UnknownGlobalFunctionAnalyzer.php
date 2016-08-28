@@ -4,7 +4,7 @@ namespace PhpIntegrator\Analysis\Linting;
 
 use PhpIntegrator\Analysis\Visiting\GlobalFunctionUsageFetchingVisitor;
 
-use PhpIntegrator\Application\Command\GlobalFunctions;
+use PhpIntegrator\Application\Command\GlobalFunctionsCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -22,10 +22,10 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
      * @param GlobalFunctions $globalFunctions
      * @param TypeAnalyzer    $typeAnalyzer
      */
-    public function __construct(GlobalFunctions $globalFunctions, TypeAnalyzer $typeAnalyzer)
+    public function __construct(GlobalFunctionsCommand $globalFunctionsCommand, TypeAnalyzer $typeAnalyzer)
     {
         $this->globalFunctionUsageFetchingVisitor = new GlobalFunctionUsageFetchingVisitor(
-            $globalFunctions,
+            $globalFunctionsCommand,
             $typeAnalyzer
         );
     }

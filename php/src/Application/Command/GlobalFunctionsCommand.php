@@ -7,7 +7,7 @@ use ArrayAccess;
 /**
  * Command that shows a list of global functions.
  */
-class GlobalFunctions extends AbstractCommand
+class GlobalFunctionsCommand extends AbstractCommand
 {
     /**
      * @inheritDoc

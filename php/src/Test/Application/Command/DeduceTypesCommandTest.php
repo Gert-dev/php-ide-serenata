@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\DeduceTypes;
+use PhpIntegrator\Application\Command\DeduceTypesCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
@@ -12,7 +12,7 @@ use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 
-class DeduceTypesTest extends IndexedTest
+class DeduceTypesCommandTest extends IndexedTest
 {
     protected function deduceTypes($file, array $expressionParts)
     {
@@ -22,7 +22,7 @@ class DeduceTypesTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new DeduceTypes($this->getParser(), null, $indexDatabase);
+        $command = new DeduceTypesCommand($this->getParser(), null, $indexDatabase);
 
         return $command->deduceTypes($path, file_get_contents($path), $expressionParts, $markerOffset);
     }

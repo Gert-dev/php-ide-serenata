@@ -12,7 +12,7 @@ use PhpIntegrator\UserInterface\IndexDataAdapterWhiteHolingProxyProvider;
 /**
  * Command that shows a list of available classes, interfaces and traits.
  */
-class ClassList extends AbstractCommand
+class ClassListCommand extends AbstractCommand
 {
     /**
      * @inheritDoc

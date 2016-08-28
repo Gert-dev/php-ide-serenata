@@ -2,11 +2,11 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\ClassInfo;
+use PhpIntegrator\Application\Command\ClassInfoCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
-class ClassInfoTest extends IndexedTest
+class ClassInfoCommandTest extends IndexedTest
 {
     protected function getClassInfo($file, $fqcn)
     {
@@ -14,7 +14,7 @@ class ClassInfoTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new ClassInfo($this->getParser(), null, $indexDatabase);
+        $command = new ClassInfoCommand($this->getParser(), null, $indexDatabase);
 
         return $command->getClassInfo($fqcn);
     }

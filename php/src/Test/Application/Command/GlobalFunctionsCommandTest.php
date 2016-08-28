@@ -2,11 +2,11 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\GlobalFunctions;
+use PhpIntegrator\Application\Command\GlobalFunctionsCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
-class GlobalFunctionsTest extends IndexedTest
+class GlobalFunctionsCommandTest extends IndexedTest
 {
     public function testGlobalFunctions()
     {
@@ -14,7 +14,7 @@ class GlobalFunctionsTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new GlobalFunctions($this->getParser(), null, $indexDatabase);
+        $command = new GlobalFunctionsCommand($this->getParser(), null, $indexDatabase);
 
         $output = $command->getGlobalFunctions();
 

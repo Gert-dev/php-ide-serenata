@@ -2,13 +2,13 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\AvailableVariables;
+use PhpIntegrator\Application\Command\AvailableVariablesCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
-class AvailableVariablesTest extends IndexedTest
+class AvailableVariablesCommandTest extends IndexedTest
 {
     protected function getCommand($file, $mayFail = false)
     {
@@ -16,7 +16,7 @@ class AvailableVariablesTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path, $mayFail);
 
-        $command = new AvailableVariables($this->getParser(), null, $indexDatabase);
+        $command = new AvailableVariablesCommand($this->getParser(), null, $indexDatabase);
 
         return $command;
     }

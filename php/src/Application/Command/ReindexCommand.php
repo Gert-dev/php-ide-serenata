@@ -28,7 +28,7 @@ use PhpParser\ParserFactory;
 /**
  * Command that reindexes a file or folder.
  */
-class Reindex extends AbstractCommand
+class ReindexCommand extends AbstractCommand
 {
     /**
      * @var ProjectIndexer
@@ -66,9 +66,9 @@ class Reindex extends AbstractCommand
     protected $typeAnalyzer;
 
     /**
-     * @var DeduceTypes
+     * @var DeduceTypesCommand
      */
-    protected $deduceTypes;
+    protected $deduceTypesCommand;
 
     /**
      * @var StorageInterface
@@ -205,7 +205,7 @@ class Reindex extends AbstractCommand
                 $this->getStorageForIndexers(),
                 $this->getTypeAnalyzer(),
                 $this->getDocblockParser(),
-                $this->getDeduceTypes(),
+                $this->getDeduceTypesCommand(),
                 $this->getParser()
             );
         }
@@ -280,15 +280,15 @@ class Reindex extends AbstractCommand
     }
 
     /**
-     * @return DeduceTypes
+     * @return DeduceTypesCommand
      */
-    protected function getDeduceTypes()
+    protected function getDeduceTypesCommand()
     {
-        if (!$this->deduceTypes) {
-            $this->deduceTypes = new DeduceTypes($this->getParser(), $this->cache, $this->getIndexDatabase());
+        if (!$this->deduceTypesCommand) {
+            $this->deduceTypesCommand = new DeduceTypesCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
-        return $this->deduceTypes;
+        return $this->deduceTypesCommand;
     }
 
     /**

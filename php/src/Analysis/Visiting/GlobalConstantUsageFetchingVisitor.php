@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\Application\Command\GlobalConstants;
+use PhpIntegrator\Application\Command\GlobalConstantsCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -22,9 +22,9 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
     protected $globalConstantCallList = [];
 
     /**
-     * @var GlobalConstants
+     * @var GlobalConstantsCommand
      */
-    protected $globalConstants;
+    protected $globalConstantsCommand;
 
     /**
      * @var TypeAnalyzer
@@ -32,12 +32,12 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
     protected $typeAnalyzer;
 
     /**
-     * @param GlobalConstants $globalConstants
-     * @param TypeAnalyzer    $typeAnalyzer
+     * @param GlobalConstantsCommand $globalConstantsCommand
+     * @param TypeAnalyzer           $typeAnalyzer
      */
-    public function __construct(GlobalConstants $globalConstants, TypeAnalyzer $typeAnalyzer)
+    public function __construct(GlobalConstantsCommand $globalConstantsCommand, TypeAnalyzer $typeAnalyzer)
     {
-        $this->globalConstants = $globalConstants;
+        $this->globalConstantsCommand = $globalConstantsCommand;
         $this->typeAnalyzer = $typeAnalyzer;
     }
 
@@ -52,7 +52,7 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
 
         $fqcn = $this->typeAnalyzer->getNormalizedFqcn($node->name->toString());
 
-        $globalConstants = $this->globalConstants->getGlobalConstants();
+        $globalConstants = $this->globalConstantsCommand->getGlobalConstants();
 
         if (!isset($globalConstants[$fqcn]) && !$this->isConstantExcluded($node->name->toString())) {
             $this->globalConstantCallList[] = [

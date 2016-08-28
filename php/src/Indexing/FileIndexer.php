@@ -9,7 +9,7 @@ use UnexpectedValueException;
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\AssociativeUseStatementFetchingVisitor;
 
-use PhpIntegrator\Application\Command\DeduceTypes;
+use PhpIntegrator\Application\Command\DeduceTypesCommand;
 
 use PhpIntegrator\Parsing\DocblockParser;
 
@@ -51,9 +51,9 @@ class FileIndexer
     protected $typeAnalyzer;
 
     /**
-     * @var DeduceTypes
+     * @var DeduceTypesCommand
      */
-    protected $deduceTypes;
+    protected $deduceTypesCommand;
 
     /**
      * @var Parser
@@ -71,23 +71,23 @@ class FileIndexer
     protected $structureTypeMap;
 
     /**
-     * @param StorageInterface $storage
-     * @param TypeAnalyzer     $typeAnalyzer
-     * @param DocblockParser   $docblockParser
-     * @param DeduceTypes      $deduceTypes
-     * @param Parser           $parser
+     * @param StorageInterface   $storage
+     * @param TypeAnalyzer       $typeAnalyzer
+     * @param DocblockParser     $docblockParser
+     * @param DeduceTypesCommand $deduceTypesCommand
+     * @param Parser             $parser
      */
     public function __construct(
         StorageInterface $storage,
         TypeAnalyzer $typeAnalyzer,
         DocblockParser $docblockParser,
-        DeduceTypes $deduceTypes,
+        DeduceTypesCommand $deduceTypesCommand,
         Parser $parser
     ) {
         $this->storage = $storage;
         $this->typeAnalyzer = $typeAnalyzer;
         $this->docblockParser = $docblockParser;
-        $this->deduceTypes = $deduceTypes;
+        $this->deduceTypesCommand = $deduceTypesCommand;
         $this->parser = $parser;
     }
 
@@ -461,7 +461,7 @@ class FileIndexer
             );
         } elseif ($rawData['defaultValue']) {
             try {
-                $typeList = $this->deduceTypes->deduceTypes(
+                $typeList = $this->deduceTypesCommand->deduceTypes(
                     'ignored',
                     $rawData['defaultValue'],
                     [$rawData['defaultValue']],
@@ -543,7 +543,7 @@ class FileIndexer
             ];
         } elseif ($rawData['defaultValue']) {
             try {
-                $typeList = $this->deduceTypes->deduceTypes(
+                $typeList = $this->deduceTypesCommand->deduceTypes(
                     'ignored',
                     $rawData['defaultValue'],
                     [$rawData['defaultValue']],

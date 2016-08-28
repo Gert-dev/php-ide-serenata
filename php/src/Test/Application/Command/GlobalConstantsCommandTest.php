@@ -2,11 +2,11 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\GlobalConstants;
+use PhpIntegrator\Application\Command\GlobalConstantsCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
-class GlobalConstantsTest extends IndexedTest
+class GlobalConstantsCommandTest extends IndexedTest
 {
     public function testGlobalConstants()
     {
@@ -14,7 +14,7 @@ class GlobalConstantsTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new GlobalConstants($this->getParser(), null, $indexDatabase);
+        $command = new GlobalConstantsCommand($this->getParser(), null, $indexDatabase);
 
         $output = $command->getGlobalConstants();
 

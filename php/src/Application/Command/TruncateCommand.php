@@ -11,7 +11,7 @@ use GetOptionKit\OptionCollection;
 /**
  * Command that truncates the database.
  */
-class Truncate extends AbstractCommand
+class TruncateCommand extends AbstractCommand
 {
     /**
      * @inheritDoc

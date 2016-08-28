@@ -4,9 +4,9 @@ namespace PhpIntegrator\Analysis\Visiting;
 
 use UnexpectedValueException;
 
-use PhpIntegrator\Application\Command\ClassInfo;
-use PhpIntegrator\Application\Command\DeduceTypes;
-use PhpIntegrator\Application\Command\ResolveType;
+use PhpIntegrator\Application\Command\ClassInfoCommand;
+use PhpIntegrator\Application\Command\DeduceTypesCommand;
+use PhpIntegrator\Application\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -59,14 +59,14 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     protected $code;
 
     /**
-     * @var DeduceTypes
+     * @var DeduceTypesCommand
      */
-    protected $deduceTypes;
+    protected $deduceTypesCommand;
 
     /**
-     * @var ResolveType
+     * @var ResolveTypeCommand
      */
-    protected $resolveType;
+    protected $resolveTypeCommand;
 
     /**
      * @var TypeAnalyzer
@@ -74,30 +74,30 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     protected $typeAnalyzer;
 
     /**
-     * @var ClassInfo
+     * @var ClassInfoCommand
      */
-    protected $classInfo;
+    protected $classInfoCommand;
 
     /**
-     * @param DeduceTypes  $deduceTypes
-     * @param ClassInfo    $classInfo
-     * @param ResolveType  $resolveType
-     * @param TypeAnalyzer $typeAnalyzer
-     * @param string       $file
-     * @param string       $code
+     * @param DeduceTypesCommand $deduceTypesCommand
+     * @param ClassInfoCommand   $classInfoCommand
+     * @param ResolveTypeCommand $resolveTypeCommand
+     * @param TypeAnalyzer       $typeAnalyzer
+     * @param string             $file
+     * @param string             $code
      */
     public function __construct(
-        DeduceTypes $deduceTypes,
-        ClassInfo $classInfo,
-        ResolveType $resolveType,
+        DeduceTypesCommand $deduceTypesCommand,
+        ClassInfoCommand $classInfoCommand,
+        ResolveTypeCommand $resolveTypeCommand,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
     ) {
-        $this->deduceTypes = $deduceTypes;
-        $this->classInfo = $classInfo;
+        $this->deduceTypesCommand = $deduceTypesCommand;
+        $this->classInfoCommand = $classInfoCommand;
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->resolveType = $resolveType;
+        $this->resolveTypeCommand = $resolveTypeCommand;
         $this->file = $file;
         $this->code = $code;
     }
@@ -132,7 +132,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
             $nodeToDeduceTypeFrom = $node->class;
         }
 
-        $objectTypes = $this->deduceTypes->deduceTypesFromNode(
+        $objectTypes = $this->deduceTypesCommand->deduceTypesFromNode(
             $this->file,
             $this->code,
             $nodeToDeduceTypeFrom,
@@ -163,7 +163,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                 $classInfo = null;
 
                 try {
-                    $classInfo = $this->classInfo->getClassInfo($objectType);
+                    $classInfo = $this->classInfoCommand->getClassInfo($objectType);
                 } catch (UnexpectedValueException $e) {
                     // Ignore exception, no class information means we return an error anyhow.
                 }

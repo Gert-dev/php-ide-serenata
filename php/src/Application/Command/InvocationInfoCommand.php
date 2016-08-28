@@ -14,7 +14,7 @@ use PhpIntegrator\Utility\SourceCodeHelpers;
 /**
  * Allows fetching invocation information of a method or function call.
  */
-class InvocationInfo extends AbstractCommand
+class InvocationInfoCommand extends AbstractCommand
 {
     /**
      * @var PartialParser

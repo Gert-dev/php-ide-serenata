@@ -14,7 +14,7 @@ use PhpIntegrator\Analysis\VariableScanner;
 /**
  * Command that shows information about the scopes at a specific position in a file.
  */
-class AvailableVariables extends AbstractCommand
+class AvailableVariablesCommand extends AbstractCommand
 {
     /**
      * @var VariableScanner

@@ -14,7 +14,7 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 /**
  * Command that shows information about a class, interface or trait.
  */
-class ClassInfo extends AbstractCommand
+class ClassInfoCommand extends AbstractCommand
 {
     /**
      * @var TypeAnalyzer

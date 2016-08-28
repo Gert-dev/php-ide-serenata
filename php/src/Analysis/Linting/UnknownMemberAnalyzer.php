@@ -4,9 +4,9 @@ namespace PhpIntegrator\Analysis\Linting;
 
 use PhpIntegrator\Analysis\Visiting\MemberUsageFetchingVisitor;
 
-use PhpIntegrator\Application\Command\ClassInfo;
-use PhpIntegrator\Application\Command\DeduceTypes;
-use PhpIntegrator\Application\Command\ResolveType;
+use PhpIntegrator\Application\Command\ClassInfoCommand;
+use PhpIntegrator\Application\Command\DeduceTypesCommand;
+use PhpIntegrator\Application\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -21,25 +21,25 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
     protected $methodUsageFetchingVisitor;
 
     /**
-     * @param DeduceTypes  $deduceTypes
-     * @param ClassInfo    $classInfo
-     * @param ResolveType  $resolveType
-     * @param TypeAnalyzer $typeAnalyzer
-     * @param string       $file
-     * @param string       $code
+     * @param DeduceTypesCommand $deduceTypesCommand
+     * @param ClassInfoCommand   $classInfoCommand
+     * @param ResolveTypeCommand $resolveTypeCommand
+     * @param TypeAnalyzer       $typeAnalyzer
+     * @param string             $file
+     * @param string             $code
      */
     public function __construct(
-        DeduceTypes $deduceTypes,
-        ClassInfo $classInfo,
-        ResolveType $resolveType,
+        DeduceTypesCommand $deduceTypesCommand,
+        ClassInfoCommand $classInfoCommand,
+        ResolveTypeCommand $resolveTypeCommand,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
     ) {
         $this->methodUsageFetchingVisitor = new MemberUsageFetchingVisitor(
-            $deduceTypes,
-            $classInfo,
-            $resolveType,
+            $deduceTypesCommand,
+            $classInfoCommand,
+            $resolveTypeCommand,
             $typeAnalyzer,
             $file,
             $code

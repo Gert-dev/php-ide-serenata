@@ -2,13 +2,13 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\SemanticLint;
+use PhpIntegrator\Application\Command\SemanticLintCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
-class SemanticLintTest extends IndexedTest
+class SemanticLintCommandTest extends IndexedTest
 {
     protected function lintFile($file, $indexingMayFail = false)
     {
@@ -16,7 +16,7 @@ class SemanticLintTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path, $indexingMayFail);
 
-        $command = new SemanticLint($this->getParser(), null, $indexDatabase);
+        $command = new SemanticLintCommand($this->getParser(), null, $indexDatabase);
 
         return $command->semanticLint($path, file_get_contents($path));
     }

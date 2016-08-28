@@ -69,7 +69,7 @@ class Application
         ];
 
         if (isset($commands[$command])) {
-            $className = "\\PhpIntegrator\\Application\\Command\\{$commands[$command]}";
+            $className = "\\PhpIntegrator\\Application\\Command\\{$commands[$command]}Command";
 
             /** @var \PhpIntegrator\Application\Command\CommandInterface $command */
             $command = new $className(

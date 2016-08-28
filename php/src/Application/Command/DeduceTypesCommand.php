@@ -25,25 +25,25 @@ use PhpParser\NodeTraverser;
 /**
  * Allows deducing the types of an expression (e.g. a call chain, a simple string, ...).
  */
-class DeduceTypes extends AbstractCommand
+class DeduceTypesCommand extends AbstractCommand
 {
     /**
-     * @var ClassList
+     * @var ClassListCommand
      */
     protected $classListCommand;
 
     /**
-     * @var ClassInfo
+     * @var ClassInfoCommand
      */
     protected $classInfoCommand;
 
     /**
-     * @var ResolveType
+     * @var ResolveTypeCommand
      */
     protected $resolveTypeCommand;
 
     /**
-     * @var GlobalFunctions
+     * @var GlobalFunctionsCommand
      */
     protected $globalFunctionsCommand;
 
@@ -684,48 +684,48 @@ class DeduceTypes extends AbstractCommand
     }
 
     /**
-     * @return ClassList
+     * @return ClassListCommand
      */
     protected function getClassListCommand()
     {
         if (!$this->classListCommand) {
-            $this->classListCommand = new ClassList($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->classListCommand = new ClassListCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->classListCommand;
     }
 
     /**
-     * @return ClassInfo
+     * @return ClassInfoCommand
      */
     protected function getClassInfoCommand()
     {
         if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfo($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->classInfoCommand = new ClassInfoCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->classInfoCommand;
     }
 
     /**
-     * @return GlobalFunctions
+     * @return GlobalFunctionsCommand
      */
     protected function getGlobalFunctionsCommand()
     {
         if (!$this->globalFunctionsCommand) {
-            $this->globalFunctionsCommand = new GlobalFunctions($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->globalFunctionsCommand = new GlobalFunctionsCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->globalFunctionsCommand;
     }
 
     /**
-     * @return ResolveType
+     * @return ResolveTypeCommand
      */
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->resolveTypeCommand = new ResolveTypeCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->resolveTypeCommand;

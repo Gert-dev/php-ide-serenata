@@ -4,7 +4,7 @@ namespace PhpIntegrator\Analysis\Linting;
 
 use PhpIntegrator\Analysis\Visiting\GlobalConstantUsageFetchingVisitor;
 
-use PhpIntegrator\Application\Command\GlobalConstants;
+use PhpIntegrator\Application\Command\GlobalConstantsCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -19,13 +19,13 @@ class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
     protected $globalConstantUsageFetchingVisitor;
 
     /**
-     * @param GlobalConstants $globalConstants
-     * @param TypeAnalyzer    $typeAnalyzer
+     * @param GlobalConstantsCommand $globalConstantsCommand
+     * @param TypeAnalyzer           $typeAnalyzer
      */
-    public function __construct(GlobalConstants $globalConstants, TypeAnalyzer $typeAnalyzer)
+    public function __construct(GlobalConstantsCommand $globalConstantsCommand, TypeAnalyzer $typeAnalyzer)
     {
         $this->globalConstantUsageFetchingVisitor = new GlobalConstantUsageFetchingVisitor(
-            $globalConstants,
+            $globalConstantsCommand,
             $typeAnalyzer
         );
     }

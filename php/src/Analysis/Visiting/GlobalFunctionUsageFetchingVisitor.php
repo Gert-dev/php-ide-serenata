@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\Application\Command\GlobalFunctions;
+use PhpIntegrator\Application\Command\GlobalFunctionsCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -22,9 +22,9 @@ class GlobalFunctionUsageFetchingVisitor extends NodeVisitorAbstract
     protected $globalFunctionCallList = [];
 
     /**
-     * @var GlobalFunctions
+     * @var GlobalFunctionsCommand
      */
-    protected $globalFunctions;
+    protected $globalFunctionsCommand;
 
     /**
      * @var TypeAnalyzer
@@ -32,12 +32,12 @@ class GlobalFunctionUsageFetchingVisitor extends NodeVisitorAbstract
     protected $typeAnalyzer;
 
     /**
-     * @param GlobalFunctions $globalFunctions
-     * @param TypeAnalyzer    $typeAnalyzer
+     * @param GlobalFunctionsCommand $globalFunctionsCommand
+     * @param TypeAnalyzer           $typeAnalyzer
      */
-    public function __construct(GlobalFunctions $globalFunctions, TypeAnalyzer $typeAnalyzer)
+    public function __construct(GlobalFunctionsCommand $globalFunctionsCommand, TypeAnalyzer $typeAnalyzer)
     {
-        $this->globalFunctions = $globalFunctions;
+        $this->globalFunctionsCommand = $globalFunctionsCommand;
         $this->typeAnalyzer = $typeAnalyzer;
     }
 
@@ -52,7 +52,7 @@ class GlobalFunctionUsageFetchingVisitor extends NodeVisitorAbstract
 
         $fqcn = $this->typeAnalyzer->getNormalizedFqcn($node->name->toString());
 
-        $globalFunctions = $this->globalFunctions->getGlobalFunctions();
+        $globalFunctions = $this->globalFunctionsCommand->getGlobalFunctions();
 
         if (!isset($globalFunctions[$fqcn])) {
             $this->globalFunctionCallList[] = [

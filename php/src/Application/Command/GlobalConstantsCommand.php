@@ -9,7 +9,7 @@ use PhpIntegrator\UserInterface\IndexDataAdapter;
 /**
  * Command that shows a list of global constants.
  */
-class GlobalConstants extends AbstractCommand
+class GlobalConstantsCommand extends AbstractCommand
 {
     /**
      * @inheritDoc

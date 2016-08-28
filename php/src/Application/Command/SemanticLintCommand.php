@@ -22,30 +22,30 @@ use PhpParser\NodeTraverser;
  * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the
  * indexer).
  */
-class SemanticLint extends AbstractCommand
+class SemanticLintCommand extends AbstractCommand
 {
     /**
-     * @var ClassInfo
+     * @var ClassInfoCommand
      */
     protected $classInfoCommand;
 
     /**
-     * @var DeduceTypes
+     * @var DeduceTypesCommand
      */
     protected $deduceTypesCommand;
 
     /**
-     * @var GlobalFunctions
+     * @var GlobalFunctionsCommand
      */
     protected $globalFunctions;
 
     /**
-     * @var GlobalConstants
+     * @var GlobalConstantsCommand
      */
     protected $globalConstants;
 
     /**
-     * @var ResolveType
+     * @var ResolveTypeCommand
      */
     protected $resolveTypeCommand;
 
@@ -291,60 +291,60 @@ class SemanticLint extends AbstractCommand
     }
 
     /**
-     * @return ClassInfo
+     * @return ClassInfoCommand
      */
     protected function getClassInfoCommand()
     {
         if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfo($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->classInfoCommand = new ClassInfoCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->classInfoCommand;
     }
 
     /**
-     * @return DeduceTypes
+     * @return DeduceTypesCommand
      */
     protected function getDeduceTypesCommand()
     {
         if (!$this->deduceTypesCommand) {
-            $this->deduceTypesCommand = new DeduceTypes($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->deduceTypesCommand = new DeduceTypesCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->deduceTypesCommand;
     }
 
     /**
-     * @return ResolveType
+     * @return ResolveTypeCommand
      */
     protected function getResolveTypeCommand()
     {
         if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveType($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->resolveTypeCommand = new ResolveTypeCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->resolveTypeCommand;
     }
 
     /**
-     * @return GlobalFunctions
+     * @return GlobalFunctionsCommand
      */
     protected function getGlobalFunctionsCommand()
     {
         if (!$this->globalFunctions) {
-            $this->globalFunctions = new GlobalFunctions($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->globalFunctions = new GlobalFunctionsCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->globalFunctions;
     }
 
     /**
-     * @return GlobalConstants
+     * @return GlobalConstantsCommand
      */
     protected function getGlobalConstantsCommand()
     {
         if (!$this->globalConstants) {
-            $this->globalConstants = new GlobalConstants($this->getParser(), $this->cache, $this->getIndexDatabase());
+            $this->globalConstants = new GlobalConstantsCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
         }
 
         return $this->globalConstants;

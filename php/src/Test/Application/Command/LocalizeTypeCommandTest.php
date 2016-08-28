@@ -2,13 +2,13 @@
 
 namespace PhpIntegrator\Test\Application\Command;
 
-use PhpIntegrator\Application\Command\LocalizeType;
+use PhpIntegrator\Application\Command\LocalizeTypeCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
-class LocalizeTypeTest extends IndexedTest
+class LocalizeTypeCommandTest extends IndexedTest
 {
     public function testCorrectlyLocalizesVariousTypes()
     {
@@ -16,7 +16,7 @@ class LocalizeTypeTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new LocalizeType($this->getParser(), null, $indexDatabase);
+        $command = new LocalizeTypeCommand($this->getParser(), null, $indexDatabase);
 
         $this->assertEquals('\C', $command->localizeType('C', $path, 1));
         $this->assertEquals('\C', $command->localizeType('\C', $path, 5));
@@ -36,7 +36,7 @@ class LocalizeTypeTest extends IndexedTest
      */
     public function testThrowsExceptionOnUnknownFile()
     {
-        $command = new LocalizeType($this->getParser(), null, new IndexDatabase(':memory:', 1));
+        $command = new LocalizeTypeCommand($this->getParser(), null, new IndexDatabase(':memory:', 1));
 
         $command->localizeType('C', 'MissingFile.php', 1);
     }
