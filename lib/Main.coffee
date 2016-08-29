@@ -41,6 +41,13 @@ module.exports =
     disposables: null
 
     ###*
+     * The service instance from the project-manager package.
+     *
+     * @var {Object|null}
+    ###
+    projectManagerService: null
+
+    ###*
      * Tests the user's configuration.
      *
      * @param {bool} testServices
@@ -64,7 +71,7 @@ module.exports =
 
             return false
 
-        if testServices and not @projectManager.getProjectManagerService()?
+        if testServices and not @projectManager.projectManagerService?
             errorMessage =
                 "There is no project manager service available. Install the atom-project-manager package for project
                 support to work in its full extent."
@@ -80,9 +87,9 @@ module.exports =
     ###
     registerCommands: () ->
         atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
-            return if not @projectManager.getProjectManagerService()?
+            return if not @projectManager.projectManagerService?
 
-            @projectManager.getProjectManagerService().projects.getCurrent (project) =>
+            @projectManager.projectManagerService.projects.getCurrent (project) =>
                 try
                     @projectManager.setUpProject(project)
 
@@ -269,7 +276,7 @@ module.exports =
      * @param {Object} service
     ###
     setProjectManagerService: (service) ->
-        @projectManager.setProjectManagerService(service)
+        @projectManagerService = service
 
         service.projects.getCurrent (project) =>
             @projectManager.load(project)

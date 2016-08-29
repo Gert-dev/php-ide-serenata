@@ -5,13 +5,6 @@ module.exports =
 ##
 class ProjectManager
     ###*
-     * The service instance from the project-manager package.
-     *
-     * @var {Object|null}
-    ###
-    projectManagerService: null
-
-    ###*
      * @var {Object}
     ###
     proxy: null
@@ -63,17 +56,6 @@ class ProjectManager
     ###
     constructor: (@proxy, @indexingMediator) ->
         @indexMap = {}
-
-    ###*
-     * @return {Object}
-    ###
-    getProjectManagerService: () ->
-        return @projectManagerService
-
-    ###*
-     * @param {Object} projectManagerService
-    ###
-    setProjectManagerService: (@projectManagerService) ->
 
     ###*
      * @return {Object|null}
