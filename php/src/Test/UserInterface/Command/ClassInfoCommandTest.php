@@ -587,6 +587,9 @@ class ClassInfoCommandTest extends IndexedTest
             ]
         ], $output['methods']['__construct']['override']);
 
+        $this->assertEquals(42, $output['methods']['__construct']['startLine']);
+        $this->assertEquals(45, $output['methods']['__construct']['endLine']);
+
         $this->assertEquals([
             [
                 'name'         => 'foo',
@@ -637,6 +640,9 @@ class ClassInfoCommandTest extends IndexedTest
                 'endLineMember'   => 10
             ]
         ], $output['methods']['parentTraitMethod']['override']);
+
+        $this->assertEquals(47, $output['methods']['parentTraitMethod']['startLine']);
+        $this->assertEquals(50, $output['methods']['parentTraitMethod']['endLine']);
 
         $this->assertEquals([
             [
@@ -689,6 +695,9 @@ class ClassInfoCommandTest extends IndexedTest
             ]
         ], $output['methods']['parentMethod']['override']);
 
+        $this->assertEquals(52, $output['methods']['parentMethod']['startLine']);
+        $this->assertEquals(55, $output['methods']['parentMethod']['endLine']);
+
         $this->assertEquals([
             [
                 'name'         => 'foo',
@@ -739,6 +748,9 @@ class ClassInfoCommandTest extends IndexedTest
                 'endLineMember'   => 33
             ]
         ], $output['methods']['traitMethod']['override']);
+
+        $this->assertEquals(57, $output['methods']['traitMethod']['startLine']);
+        $this->assertEquals(60, $output['methods']['traitMethod']['endLine']);
 
         $this->assertEquals([
             [

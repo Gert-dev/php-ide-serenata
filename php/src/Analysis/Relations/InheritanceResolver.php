@@ -99,9 +99,11 @@ class InheritanceResolver extends AbstractResolver
                     $parentPropertyData['longDescription']
                 );
             }
+        } else {
+            $childProperty = [];
         }
 
-        $class['properties'][$parentPropertyData['name']] = array_merge($parentPropertyData, $inheritedData, [
+        $class['properties'][$parentPropertyData['name']] = array_merge($parentPropertyData, $childProperty, $inheritedData, [
             'override'       => $overriddenPropertyData,
 
             'declaringClass' => [
@@ -132,7 +134,6 @@ class InheritanceResolver extends AbstractResolver
     {
         $inheritedData = [];
         $childMethod = null;
-        $dataToMaintain = [];
         $overriddenMethodData = null;
         $implementedMethodData = null;
 
@@ -159,18 +160,16 @@ class InheritanceResolver extends AbstractResolver
             if ($parentMethodData['hasDocumentation'] && $this->isInheritingFullDocumentation($childMethod)) {
                 $inheritedData = $this->extractInheritedMethodInfo($parentMethodData, $childMethod);
             } else {
-                // Overridden methods usually have the same parameter list as the parent method, but they can add
-                // optional parameters or, for methods such as __construct, even used completely different parameters.
-                $dataToMaintain['parameters'] = $childMethod['parameters'];
-
-                $dataToMaintain['longDescription'] = $this->resolveInheritDoc(
+                $inheritedData['longDescription'] = $this->resolveInheritDoc(
                     $childMethod['longDescription'],
                     $parentMethodData['longDescription']
                 );
             }
+        } else {
+            $childMethod = [];
         }
 
-        $class['methods'][$parentMethodData['name']] = array_merge($parentMethodData, $inheritedData, $dataToMaintain, [
+        $class['methods'][$parentMethodData['name']] = array_merge($parentMethodData, $childMethod, $inheritedData, [
             'override'       => $overriddenMethodData,
             'implementation' => $implementedMethodData,
 

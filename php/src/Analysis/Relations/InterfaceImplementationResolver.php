@@ -61,7 +61,6 @@ class InterfaceImplementationResolver extends AbstractResolver
     {
         $inheritedData = [];
         $childMethod = null;
-        $dataToMaintain = [];
         $overriddenMethodData = null;
         $implementedMethodData = null;
 
@@ -88,18 +87,16 @@ class InterfaceImplementationResolver extends AbstractResolver
             if ($parentMethodData['hasDocumentation'] && $this->isInheritingFullDocumentation($childMethod)) {
                 $inheritedData = $this->extractInheritedMethodInfo($parentMethodData, $childMethod);
             } else {
-                // Overridden methods usually have the same parameter list as the parent method, but they can add
-                // optional parameters or, for methods such as __construct, even used completely different parameters.
-                $dataToMaintain['parameters'] = $childMethod['parameters'];
-
-                $dataToMaintain['longDescription'] = $this->resolveInheritDoc(
+                $inheritedData['longDescription'] = $this->resolveInheritDoc(
                     $childMethod['longDescription'],
                     $parentMethodData['longDescription']
                 );
             }
+        } else {
+            $childMethod = [];
         }
 
-        $class['methods'][$parentMethodData['name']] = array_merge($parentMethodData, $inheritedData, $dataToMaintain, [
+        $class['methods'][$parentMethodData['name']] = array_merge($parentMethodData, $childMethod, $inheritedData, [
             'override'       => $overriddenMethodData,
             'implementation' => $implementedMethodData,
 
