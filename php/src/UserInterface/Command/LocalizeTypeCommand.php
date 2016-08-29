@@ -8,7 +8,6 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Analysis\Typing\TypeLocalizer;
 
 /**
@@ -74,8 +73,7 @@ class LocalizeTypeCommand extends AbstractCommand
 
         $useStatements = iterator_to_array($useStatements);
 
-        $typeAnalyzer = new TypeAnalyzer();
-        $typeLocalizer = new TypeLocalizer($typeAnalyzer, $namespace['namespace'], $useStatements);
+        $typeLocalizer = new TypeLocalizer($this->getTypeAnalyzer(), $namespace['namespace'], $useStatements);
 
         return $typeLocalizer->localize($type);
     }

@@ -9,7 +9,6 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Typing\TypeResolver;
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Command that resolves local types in a file.
@@ -74,8 +73,7 @@ class ResolveTypeCommand extends AbstractCommand
 
         $useStatements = iterator_to_array($useStatements);
 
-        $typeAnalyzer = new TypeAnalyzer();
-        $typeResolver = new TypeResolver($typeAnalyzer, $namespace['namespace'], $useStatements);
+        $typeResolver = new TypeResolver($this->getTypeAnalyzer(), $namespace['namespace'], $useStatements);
 
         return $typeResolver->resolve($type);
     }
