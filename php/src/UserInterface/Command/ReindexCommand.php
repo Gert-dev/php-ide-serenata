@@ -15,13 +15,10 @@ use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\ProjectIndexer;
 use PhpIntegrator\Indexing\StorageInterface;
 use PhpIntegrator\Indexing\CallbackStorageProxy;
-use PhpIntegrator\Indexing\IndexStorageItemEnum;
 
 use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
-
-use PhpParser\ParserFactory;
 
 /**
  * Command that reindexes a file or folder.
