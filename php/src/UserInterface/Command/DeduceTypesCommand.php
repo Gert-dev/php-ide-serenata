@@ -223,8 +223,6 @@ class DeduceTypesCommand extends AbstractCommand
 
         // We now know what types we need to start from, now it's just a matter of fetching the return types of members
         // in the call stack.
-        $dataAdapter = $this->getClasslikeInfoBuilder();
-
         foreach ($expressionParts as $element) {
             $isMethod = false;
             $isValidPropertyAccess = false;
@@ -247,7 +245,7 @@ class DeduceTypesCommand extends AbstractCommand
                 }
 
                 try {
-                    $info = $dataAdapter->getClasslikeInfo($type);
+                    $info = $this->getClasslikeInfoBuilder()->getClasslikeInfo($type);
                 } catch (UnexpectedValueException $e) {
                     continue;
                 }
