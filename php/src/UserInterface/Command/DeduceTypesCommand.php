@@ -7,6 +7,10 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\FileTypeResolver;
+use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
+
 use PhpIntegrator\Analysis\Visiting\TypeQueryingVisitor;
 use PhpIntegrator\Analysis\Visiting\ScopeLimitingVisitor;
 
@@ -56,6 +60,16 @@ class DeduceTypesCommand extends AbstractCommand
     protected $partialParser;
 
     /**
+     * @var TypeResolver
+     */
+    protected $typeResolver;
+
+    /**
+     * @var FileTypeResolverFactory
+     */
+    protected $fileTypeResolverFactory;
+
+    /**
      * @var TypeQueryingVisitor
      */
     protected $typeQueryingVisitor;
@@ -66,6 +80,13 @@ class DeduceTypesCommand extends AbstractCommand
      * @var array
      */
     protected $fileClassListMap = [];
+
+    /**
+     * Serves as cache to avoid rebuilding file type resolvers for the same file multiple times.
+     *
+     * @var array
+     */
+    protected $fileTypeResolverMap = [];
 
     /**
      * @inheritDoc
@@ -225,7 +246,7 @@ class DeduceTypesCommand extends AbstractCommand
 
             $line = SourceCodeHelpers::calculateLineByOffset($code, $offset);
 
-            $types = [$this->getResolveTypeCommand()->resolveType($matches[1], $file, $line)];
+            $types = [$this->getTypeResolverForFile($file)->resolve($matches[1], $line)];
         }
 
         // We now know what types we need to start from, now it's just a matter of fetching the return types of members
@@ -538,7 +559,7 @@ class DeduceTypesCommand extends AbstractCommand
                     $variableTypeInfo['bestTypeOverrideMatchLine'] :
                     $line;
 
-                $type = $this->getResolveTypeCommand()->resolveType($type, $file, $typeLine);
+                $type = $this->getTypeResolverForFile($file)->resolve($type, $typeLine);
             }
 
             $resolvedTypes[] = $type;
@@ -694,6 +715,20 @@ class DeduceTypesCommand extends AbstractCommand
     }
 
     /**
+     * @param string $file
+     *
+     * @return FileTypeResolver
+     */
+    protected function getTypeResolverForFile($file)
+    {
+        if (!isset($this->fileTypeResolverMap[$file])) {
+            $this->fileTypeResolverMap[$file] = $this->getFileTypeResolverFactory()->create($file);
+        }
+
+        return $this->fileTypeResolverMap[$file];
+    }
+
+    /**
      * @return ClassListCommand
      */
     protected function getClassListCommand()
@@ -715,18 +750,6 @@ class DeduceTypesCommand extends AbstractCommand
         }
 
         return $this->classInfoCommand;
-    }
-
-    /**
-     * @return ResolveTypeCommand
-     */
-    protected function getResolveTypeCommand()
-    {
-        if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveTypeCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->resolveTypeCommand;
     }
 
     /**
@@ -755,5 +778,36 @@ class DeduceTypesCommand extends AbstractCommand
         }
 
         return $this->partialParser;
+    }
+
+    /**
+     * Retrieves an instance of FileTypeResolverFactory. The object will only be created once if needed.
+     *
+     * @return FileTypeResolverFactory
+     */
+    protected function getFileTypeResolverFactory()
+    {
+        if (!$this->fileTypeResolverFactory instanceof FileTypeResolverFactory) {
+            $this->fileTypeResolverFactory = new FileTypeResolverFactory(
+                $this->getTypeResolver(),
+                $this->getIndexDatabase()
+            );
+        }
+
+        return $this->fileTypeResolverFactory;
+    }
+
+    /**
+     * Retrieves an instance of TypeResolver. The object will only be created once if needed.
+     *
+     * @return TypeResolver
+     */
+    protected function getTypeResolver()
+    {
+        if (!$this->typeResolver instanceof TypeResolver) {
+            $this->typeResolver = new TypeResolver($this->getTypeAnalyzer());
+        }
+
+        return $this->typeResolver;
     }
 }
