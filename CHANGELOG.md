@@ -1,6 +1,6 @@
 ## 1.3.0
 ### Features and improvements
-* Performance has improved when deducing the types of variables that were assigned the return value of a global function.
+* Performance has improved.
 
 ### Changes for developers
 * Previously a fix was applied to make FQCN's actually contain a leading slash to clearly indicate that they were fully qualified. This still didn't happen everywhere, which has been corrected now.
