@@ -79,7 +79,7 @@ class SemanticLintCommand extends AbstractCommand
         if (isset($arguments['stdin']) && $arguments['stdin']->value) {
             $code = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
         } else {
-            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']);
+            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']->value);
         }
 
         $output = $this->semanticLint(

@@ -46,7 +46,7 @@ class AvailableVariablesCommand extends AbstractCommand
          if (isset($arguments['stdin']) && $arguments['stdin']->value) {
              $code = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
          } elseif (isset($arguments['file']) && $arguments['file']->value) {
-             $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']);
+             $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']->value);
          } else {
              throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
          }
