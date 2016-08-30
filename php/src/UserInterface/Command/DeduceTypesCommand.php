@@ -200,7 +200,7 @@ class DeduceTypesCommand extends AbstractCommand
             $types = ['array'];
         } elseif (preg_match('/^function\s*\(/', $firstElement) === 1) {
             $types = ['\Closure'];
-        } elseif (preg_match("/^new\s+((${classRegexPart}))(?:\(\))?/", $firstElement, $matches) === 1) {
+        } elseif (preg_match("/^new\s+(({$classRegexPart}))(?:\(\))?/", $firstElement, $matches) === 1) {
             $types = $this->deduceTypes($file, $code, [$matches[1]], $offset);
         } elseif (preg_match('/^clone\s+(\$[a-zA-Z0-9_]+)/', $firstElement, $matches) === 1) {
             $types = $this->deduceTypes($file, $code, [$matches[1]], $offset);
@@ -214,7 +214,7 @@ class DeduceTypesCommand extends AbstractCommand
 
                 $types = $this->fetchResolvedTypesFromTypeArrays($returnTypes);
             }
-        } elseif (preg_match("/((${classRegexPart}))/", $firstElement, $matches) === 1) {
+        } elseif (preg_match("/(({$classRegexPart}))/", $firstElement, $matches) === 1) {
             // Static class name.
             $propertyAccessNeedsDollarSign = true;
 
