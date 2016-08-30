@@ -61,6 +61,13 @@ class DeduceTypesCommand extends AbstractCommand
     protected $typeQueryingVisitor;
 
     /**
+     * Serves as cache to avoid refetching class lists for the same file multiple times.
+     *
+     * @var array
+     */
+    protected $fileClassListMap = [];
+
+    /**
      * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
@@ -661,7 +668,7 @@ class DeduceTypesCommand extends AbstractCommand
      */
     protected function getCurrentClassAtLine($file, $source, $line)
     {
-        $classes = $this->getClassListCommand()->getClassList($file);
+        $classes = $this->getClassListForFile($file);
 
         foreach ($classes as $fqcn => $class) {
             if ($line >= $class['startLine'] && $line <= $class['endLine']) {
@@ -670,6 +677,20 @@ class DeduceTypesCommand extends AbstractCommand
         }
 
         return null;
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return array
+     */
+    protected function getClassListForFile($file)
+    {
+        if (!isset($this->fileClassListMap[$file])) {
+            $this->fileClassListMap[$file] = $this->getClassListCommand()->getClassList($file);
+        }
+
+        return $this->fileClassListMap[$file];
     }
 
     /**
