@@ -131,7 +131,6 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject()
 
-
         return @performRequestAsync(php, parameters, streamCallback, stdinData)
 
     ###*
