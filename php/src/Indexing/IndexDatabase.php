@@ -8,10 +8,12 @@ use Doctrine\DBAL\DriverManager;
 
 use PhpIntegrator\Analysis\ClasslikeInfoBuilderProviderInterface;
 
+use PhpIntegrator\Analysis\Typing\NamespaceImportProviderInterface;
+
 /**
  * Represents that database that is used for indexing.
  */
-class IndexDatabase implements StorageInterface, ClasslikeInfoBuilderProviderInterface
+class IndexDatabase implements StorageInterface, ClasslikeInfoBuilderProviderInterface, NamespaceImportProviderInterface
 {
     /**
      * @var Connection
@@ -558,9 +560,7 @@ class IndexDatabase implements StorageInterface, ClasslikeInfoBuilderProviderInt
     }
 
     /**
-     * @param string $filePath
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getNamespacesForFile($filePath)
     {
@@ -575,14 +575,12 @@ class IndexDatabase implements StorageInterface, ClasslikeInfoBuilderProviderInt
     }
 
     /**
-     * @param string $filePath
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getUseStatementsForFile($filePath)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('fni.*')
+            ->select('fni.fqcn', 'fni.alias', 'fni.line')
             ->from(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, 'fni')
             ->join('fni', IndexStorageItemEnum::FILES_NAMESPACES, 'fn', 'fn.id = fni.files_namespace_id')
             ->join('fn', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fn.file_id')

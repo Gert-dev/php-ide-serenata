@@ -3,13 +3,12 @@
 namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
-use LogicException;
 use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Typing\TypeLocalizer;
-use PhpIntegrator\Analysis\Typing\FileTypeLocalizer;
+use PhpIntegrator\Analysis\Typing\FileTypeLocalizerFactory;
 
 /**
  * Command that makes a FQCN relative to local use statements in a file.
@@ -20,7 +19,12 @@ class LocalizeTypeCommand extends AbstractCommand
      * @var TypeLocalizer
      */
     protected $typeLocalizer;
-    
+
+    /**
+     * @var FileTypeLocalizerFactory
+     */
+    protected $fileTypeLocalizerFactory;
+
     /**
      * @inheritDoc
      */
@@ -58,25 +62,30 @@ class LocalizeTypeCommand extends AbstractCommand
      */
     public function localizeType($type, $file, $line)
     {
-        $namespaces = $this->getIndexDatabase()->getNamespacesForFile($file);
+        $fileId = $this->getIndexDatabase()->getFileId($file);
 
-        if (empty($namespaces)) {
-            $fileId = $this->getIndexDatabase()->getFileId($file);
+        if (!$fileId) {
+            throw new UnexpectedValueException('The specified file is not present in the index!');
+        }
 
-            if (!$fileId) {
-                throw new UnexpectedValueException('The specified file is not present in the index!');
-            }
+        return $this->getFileTypeLocalizerFactory()->create($file)->resolve($type, $line);
+    }
 
-            throw new LogicException(
-                'No namespace found, but there should always exist at least one namespace row in the database!'
+    /**
+     * Retrieves an instance of FileTypeLocalizerFactory. The object will only be created once if needed.
+     *
+     * @return FileTypeLocalizerFactory
+     */
+    protected function getFileTypeLocalizerFactory()
+    {
+        if (!$this->fileTypeLocalizerFactory instanceof FileTypeLocalizerFactory) {
+            $this->fileTypeLocalizerFactory = new FileTypeLocalizerFactory(
+                $this->getTypeLocalizer(),
+                $this->getIndexDatabase()
             );
         }
 
-        $useStatements = $this->getIndexDatabase()->getUseStatementsForFile($file);
-
-        $fileTypeLocalizer = new FileTypeLocalizer($this->getTypeLocalizer(), $namespaces, $useStatements);
-
-        return $fileTypeLocalizer->resolve($type, $line);
+        return $this->fileTypeLocalizerFactory;
     }
 
     /**

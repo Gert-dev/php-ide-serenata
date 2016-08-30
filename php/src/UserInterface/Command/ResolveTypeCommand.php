@@ -3,13 +3,12 @@
 namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
-use LogicException;
 use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Typing\TypeResolver;
-use PhpIntegrator\Analysis\Typing\FileTypeResolver;
+use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 
 /**
  * Command that resolves local types in a file.
@@ -20,6 +19,11 @@ class ResolveTypeCommand extends AbstractCommand
      * @var TypeResolver
      */
     protected $typeResolver;
+
+    /**
+     * @var FileTypeResolverFactory
+     */
+    protected $fileTypeResolverFactory;
 
     /**
      * @inheritDoc
@@ -55,28 +59,37 @@ class ResolveTypeCommand extends AbstractCommand
      * @param string $type
      * @param string $file
      * @param int    $line
+     *
+     * @throws UnexpectedValueException
+     *
+     * @return string|null
      */
     public function resolveType($type, $file, $line)
     {
-        $namespaces = $this->getIndexDatabase()->getNamespacesForFile($file);
+        $fileId = $this->getIndexDatabase()->getFileId($file);
 
-        if (empty($namespaces)) {
-            $fileId = $this->getIndexDatabase()->getFileId($file);
+        if (!$fileId) {
+            throw new UnexpectedValueException('The specified file is not present in the index!');
+        }
 
-            if (!$fileId) {
-                throw new UnexpectedValueException('The specified file is not present in the index!');
-            }
+        return $this->getFileTypeResolverFactory()->create($file)->resolve($type, $line);
+    }
 
-            throw new LogicException(
-                'No namespace found, but there should always exist at least one namespace row in the database!'
+    /**
+     * Retrieves an instance of FileTypeResolverFactory. The object will only be created once if needed.
+     *
+     * @return FileTypeResolverFactory
+     */
+    protected function getFileTypeResolverFactory()
+    {
+        if (!$this->fileTypeResolverFactory instanceof FileTypeResolverFactory) {
+            $this->fileTypeResolverFactory = new FileTypeResolverFactory(
+                $this->getTypeResolver(),
+                $this->getIndexDatabase()
             );
         }
 
-        $useStatements = $this->getIndexDatabase()->getUseStatementsForFile($file);
-
-        $fileTypeResolver = new FileTypeResolver($this->getTypeResolver(), $namespaces, $useStatements);
-
-        return $fileTypeResolver->resolve($type, $line);
+        return $this->fileTypeResolverFactory;
     }
 
     /**
