@@ -35,8 +35,8 @@ class TypeResolver
     public function __construct(TypeAnalyzer $typeAnalyzer, $namespace, array $imports)
     {
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->imports = $imports;
         $this->namespace = $namespace;
+        $this->imports = $imports;
     }
 
     /**
