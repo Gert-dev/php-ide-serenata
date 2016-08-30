@@ -28,8 +28,8 @@ class TypeResolver
      * @param TypeAnalyzer $typeAnalyzer
      * @param string|null  $namespace The current namespace.
      * @param array {
-     *     @param string|null $fqcn
-     *     @param string      $alias
+     *     @var string|null $fqcn
+     *     @var string      $alias
      * } $imports
      */
     public function __construct(TypeAnalyzer $typeAnalyzer, $namespace, array $imports)
