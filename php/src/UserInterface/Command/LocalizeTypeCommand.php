@@ -17,6 +17,11 @@ use PhpIntegrator\Analysis\Typing\FileTypeLocalizer;
 class LocalizeTypeCommand extends AbstractCommand
 {
     /**
+     * @var TypeLocalizer
+     */
+    protected $typeLocalizer;
+    
+    /**
      * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
@@ -61,7 +66,7 @@ class LocalizeTypeCommand extends AbstractCommand
             if (!$fileId) {
                 throw new UnexpectedValueException('The specified file is not present in the index!');
             }
-            
+
             throw new LogicException(
                 'No namespace found, but there should always exist at least one namespace row in the database!'
             );
@@ -69,9 +74,22 @@ class LocalizeTypeCommand extends AbstractCommand
 
         $useStatements = $this->getIndexDatabase()->getUseStatementsForFile($file);
 
-        $typeLocalizer = new TypeLocalizer($this->getTypeAnalyzer());
-        $fileTypeLocalizer = new FileTypeLocalizer($typeLocalizer, $namespaces, $useStatements);
+        $fileTypeLocalizer = new FileTypeLocalizer($this->getTypeLocalizer(), $namespaces, $useStatements);
 
         return $fileTypeLocalizer->resolve($type, $line);
+    }
+
+    /**
+     * Retrieves an instance of TypeLocalizer. The object will only be created once if needed.
+     *
+     * @return TypeLocalizer
+     */
+    protected function getTypeLocalizer()
+    {
+        if (!$this->typeLocalizer instanceof TypeLocalizer) {
+            $this->typeLocalizer = new TypeLocalizer($this->getTypeAnalyzer());
+        }
+
+        return $this->typeLocalizer;
     }
 }

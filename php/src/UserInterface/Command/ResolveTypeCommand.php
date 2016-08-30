@@ -17,6 +17,11 @@ use PhpIntegrator\Analysis\Typing\FileTypeResolver;
 class ResolveTypeCommand extends AbstractCommand
 {
     /**
+     * @var TypeResolver
+     */
+    protected $typeResolver;
+
+    /**
      * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
@@ -69,9 +74,22 @@ class ResolveTypeCommand extends AbstractCommand
 
         $useStatements = $this->getIndexDatabase()->getUseStatementsForFile($file);
 
-        $typeResolver = new TypeResolver($this->getTypeAnalyzer());
-        $fileTypeResolver = new FileTypeResolver($typeResolver, $namespaces, $useStatements);
+        $fileTypeResolver = new FileTypeResolver($this->getTypeResolver(), $namespaces, $useStatements);
 
         return $fileTypeResolver->resolve($type, $line);
+    }
+
+    /**
+     * Retrieves an instance of TypeResolver. The object will only be created once if needed.
+     *
+     * @return TypeResolver
+     */
+    protected function getTypeResolver()
+    {
+        if (!$this->typeResolver instanceof TypeResolver) {
+            $this->typeResolver = new TypeResolver($this->getTypeAnalyzer());
+        }
+
+        return $this->typeResolver;
     }
 }
