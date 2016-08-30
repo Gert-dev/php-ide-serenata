@@ -1,6 +1,6 @@
 ## 1.3.0
 ### Features and improvements
-* Performance has improved.
+* A great deal of refactoring has occurred, which paved the way for performance improvements in several areas, such as type deduction. Everything should feel a bit more responsive.
 
 ### Changes for developers
 * Previously a fix was applied to make FQCN's actually contain a leading slash to clearly indicate that they were fully qualified. This still didn't happen everywhere, which has been corrected now.
