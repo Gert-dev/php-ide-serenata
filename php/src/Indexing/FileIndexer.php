@@ -130,7 +130,7 @@ class FileIndexer
         ]);
 
         try {
-            $this->indexVisitorResults($fileId, $outlineIndexingVisitor, $useStatementFetchingVisitor);
+            $this->indexVisitorResults($filePath, $fileId, $outlineIndexingVisitor, $useStatementFetchingVisitor);
 
             $this->storage->commitTransaction();
         } catch (Exception $e) {
@@ -147,18 +147,39 @@ class FileIndexer
      * the file. For structural elements, this also includes (direct) members, information about the parent class,
      * used traits, etc.
      *
+     * @param string                                 $filePath
      * @param int                                    $fileId
      * @param OutlineFetchingVisitor                 $outlineIndexingVisitor
      * @param AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
      */
     protected function indexVisitorResults(
+        $filePath,
         $fileId,
         OutlineFetchingVisitor $outlineIndexingVisitor,
         AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
     ) {
-         foreach ($outlineIndexingVisitor->getStructures() as $fqcn => $structure) {
+        foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
+            $namespaceId = $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES, [
+                'start_line'  => $namespace['startLine'],
+                'end_line'    => $namespace['endLine'],
+                'namespace'   => $namespace['name'],
+                'file_id'     => $fileId
+            ]);
+
+            foreach ($namespace['useStatements'] as $useStatement) {
+                $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
+                    'line'               => $useStatement['line'],
+                    'alias'              => $useStatement['alias'] ?: null,
+                    'fqcn'               => $useStatement['fqcn'],
+                    'files_namespace_id' => $namespaceId
+                ]);
+            }
+        }
+
+        foreach ($outlineIndexingVisitor->getStructures() as $fqcn => $structure) {
              $this->indexStructure(
                  $structure,
+                 $filePath,
                  $fileId,
                  $fqcn,
                  false,
@@ -171,29 +192,11 @@ class FileIndexer
          }
 
          foreach ($outlineIndexingVisitor->getGlobalConstants() as $constant) {
-             $this->indexConstant($constant, $fileId, null, $useStatementFetchingVisitor);
+             $this->indexConstant($constant, $filePath, $fileId, null, $useStatementFetchingVisitor);
          }
 
          foreach ($outlineIndexingVisitor->getGlobalDefines() as $define) {
-             $this->indexConstant($define, $fileId, null, $useStatementFetchingVisitor);
-         }
-
-         foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
-             $namespaceId = $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES, [
-                 'start_line'  => $namespace['startLine'],
-                 'end_line'    => $namespace['endLine'],
-                 'namespace'   => $namespace['name'],
-                 'file_id'     => $fileId
-             ]);
-
-             foreach ($namespace['useStatements'] as $useStatement) {
-                 $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
-                     'line'               => $useStatement['line'],
-                     'alias'              => $useStatement['alias'] ?: null,
-                     'fqcn'               => $useStatement['fqcn'],
-                     'files_namespace_id' => $namespaceId
-                 ]);
-             }
+             $this->indexConstant($define, $filePath, $fileId, null, $useStatementFetchingVisitor);
          }
      }
 
@@ -201,6 +204,7 @@ class FileIndexer
      * Indexes the specified structural element.
      *
      * @param array                                       $rawData
+     * @param string                                      $filePath
      * @param int                                         $fileId
      * @param string                                      $fqcn
      * @param bool                                        $isBuiltin
@@ -210,6 +214,7 @@ class FileIndexer
      */
     protected function indexStructure(
         array $rawData,
+        $filePath,
         $fileId,
         $fqcn,
         $isBuiltin,
@@ -304,6 +309,7 @@ class FileIndexer
 
             $this->indexProperty(
                 $property,
+                $filePath,
                 $fileId,
                 $seId,
                 $accessModifierMap[$accessModifier],
@@ -327,6 +333,7 @@ class FileIndexer
         foreach ($rawData['constants'] as $constant) {
             $this->indexConstant(
                 $constant,
+                $filePath,
                 $fileId,
                 $seId,
                 $useStatementFetchingVisitor
@@ -424,12 +431,14 @@ class FileIndexer
      * Indexes the specified constant.
      *
      * @param array                                       $rawData
+     * @param string                                      $filePath
      * @param int                                         $fileId
      * @param int|null                                    $seId
      * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
      */
     protected function indexConstant(
         array $rawData,
+        $filePath,
         $fileId,
         $seId = null,
         AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
@@ -463,7 +472,7 @@ class FileIndexer
         } elseif ($rawData['defaultValue']) {
             try {
                 $typeList = $this->deduceTypesCommand->deduceTypes(
-                    'ignored',
+                    $filePath,
                     $rawData['defaultValue'],
                     [$rawData['defaultValue']],
                     0
@@ -497,6 +506,7 @@ class FileIndexer
      * Indexes the specified property.
      *
      * @param array                                       $rawData
+     * @param string                                      $filePath
      * @param int                                         $fileId
      * @param int                                         $seId
      * @param int                                         $amId
@@ -504,6 +514,7 @@ class FileIndexer
      */
     protected function indexProperty(
         array $rawData,
+        $filePath,
         $fileId,
         $seId,
         $amId,
@@ -545,7 +556,7 @@ class FileIndexer
         } elseif ($rawData['defaultValue']) {
             try {
                 $typeList = $this->deduceTypesCommand->deduceTypes(
-                    'ignored',
+                    $filePath,
                     $rawData['defaultValue'],
                     [$rawData['defaultValue']],
                     0
