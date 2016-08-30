@@ -82,22 +82,8 @@ class TraitUsageResolver extends AbstractResolver
                     $parentPropertyData['longDescription']
                 );
             }
-        } else {
-            $childProperty = [];
-        }
 
-        $class['properties'][$parentPropertyData['name']] = array_merge($parentPropertyData, $childProperty, $inheritedData, [
-            'override'       => $overriddenPropertyData,
-
-            'declaringClass' => [
-                'name'            => $class['name'],
-                'filename'        => $class['filename'],
-                'startLine'       => $class['startLine'],
-                'endLine'         => $class['endLine'],
-                'type'            => $class['type'],
-            ],
-
-            'declaringStructure' => [
+            $childProperty['declaringStructure'] = [
                 'name'            => $parentPropertyData['declaringStructure']['name'],
                 'filename'        => $parentPropertyData['declaringStructure']['filename'],
                 'startLine'       => $parentPropertyData['declaringStructure']['startLine'],
@@ -105,6 +91,20 @@ class TraitUsageResolver extends AbstractResolver
                 'type'            => $parentPropertyData['declaringStructure']['type'],
                 'startLineMember' => $parentPropertyData['startLine'],
                 'endLineMember'   => $parentPropertyData['endLine']
+            ];
+        } else {
+            $childProperty = [];
+        }
+
+        $class['properties'][$parentPropertyData['name']] = array_merge($parentPropertyData, $childProperty, $inheritedData, [
+            'override' => $overriddenPropertyData,
+
+            'declaringClass' => [
+                'name'            => $class['name'],
+                'filename'        => $class['filename'],
+                'startLine'       => $class['startLine'],
+                'endLine'         => $class['endLine'],
+                'type'            => $class['type']
             ]
         ]);
     }
@@ -148,6 +148,16 @@ class TraitUsageResolver extends AbstractResolver
                     $parentMethodData['longDescription']
                 );
             }
+
+            $childMethod['declaringStructure'] = [
+                'name'            => $parentMethodData['declaringStructure']['name'],
+                'filename'        => $parentMethodData['declaringStructure']['filename'],
+                'startLine'       => $parentMethodData['declaringStructure']['startLine'],
+                'endLine'         => $parentMethodData['declaringStructure']['endLine'],
+                'type'            => $parentMethodData['declaringStructure']['type'],
+                'startLineMember' => $parentMethodData['startLine'],
+                'endLineMember'   => $parentMethodData['endLine']
+            ];
         } else {
             $childMethod = [];
         }
@@ -161,17 +171,7 @@ class TraitUsageResolver extends AbstractResolver
                 'filename'        => $class['filename'],
                 'startLine'       => $class['startLine'],
                 'endLine'         => $class['endLine'],
-                'type'            => $class['type'],
-            ],
-
-            'declaringStructure' => [
-                'name'            => $parentMethodData['declaringStructure']['name'],
-                'filename'        => $parentMethodData['declaringStructure']['filename'],
-                'startLine'       => $parentMethodData['declaringStructure']['startLine'],
-                'endLine'         => $parentMethodData['declaringStructure']['endLine'],
-                'type'            => $parentMethodData['declaringStructure']['type'],
-                'startLineMember' => $parentMethodData['startLine'],
-                'endLineMember'   => $parentMethodData['endLine']
+                'type'            => $class['type']
             ]
         ]);
     }

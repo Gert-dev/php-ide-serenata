@@ -1207,6 +1207,15 @@ class ClassInfoCommandTest extends IndexedTest
         $this->assertThat($output['methods'], $this->arrayHasKey('inheritedMethod'));
         $this->assertThat($output['methods'], $this->arrayHasKey('childMethod'));
 
+        // Do a couple of sanity checks.
+        $this->assertEquals('\A\BaseClass', $output['constants']['INHERITED_CONSTANT']['declaringClass']['name']);
+        $this->assertEquals('\A\BaseClass', $output['properties']['inheritedProperty']['declaringClass']['name']);
+        $this->assertEquals('\A\BaseClass', $output['methods']['inheritedMethod']['declaringClass']['name']);
+
+        $this->assertEquals('\A\BaseClass', $output['constants']['INHERITED_CONSTANT']['declaringStructure']['name']);
+        $this->assertEquals('\A\BaseClass', $output['properties']['inheritedProperty']['declaringStructure']['name']);
+        $this->assertEquals('\A\BaseClass', $output['methods']['inheritedMethod']['declaringStructure']['name']);
+
         $output = $this->getClassInfo($fileName, 'A\BaseClass');
 
         $this->assertEquals($output['directChildren'], ['\A\ChildClass']);
@@ -1227,6 +1236,17 @@ class ClassInfoCommandTest extends IndexedTest
 
         $this->assertThat($output['methods'], $this->arrayHasKey('methodFromFirstInterface'));
         $this->assertThat($output['methods'], $this->arrayHasKey('methodFromSecondInterface'));
+
+        // Do a couple of sanity checks.
+        $this->assertEquals('\A\FirstInterface', $output['constants']['FIRST_INTERFACE_CONSTANT']['declaringClass']['name']);
+        $this->assertEquals('\A\FirstInterface', $output['constants']['FIRST_INTERFACE_CONSTANT']['declaringStructure']['name']);
+        $this->assertEquals('\A\TestClass', $output['methods']['methodFromFirstInterface']['declaringClass']['name']);
+        $this->assertEquals('\A\FirstInterface', $output['methods']['methodFromFirstInterface']['declaringStructure']['name']);
+
+        $this->assertEquals('\A\FirstInterface', $output['constants']['FIRST_INTERFACE_CONSTANT']['declaringClass']['name']);
+        $this->assertEquals('\A\FirstInterface', $output['constants']['FIRST_INTERFACE_CONSTANT']['declaringStructure']['name']);
+        $this->assertEquals('\A\TestClass', $output['methods']['methodFromFirstInterface']['declaringClass']['name']);
+        $this->assertEquals('\A\FirstInterface', $output['methods']['methodFromFirstInterface']['declaringStructure']['name']);
     }
 
     public function testTraitUsageIsCorrectlyProcessed()
@@ -1246,6 +1266,13 @@ class ClassInfoCommandTest extends IndexedTest
         $this->assertThat($output['methods'], $this->arrayHasKey('testAmbiguous'));
         $this->assertThat($output['methods'], $this->arrayHasKey('testAmbiguousAsWell'));
         $this->assertThat($output['methods'], $this->arrayHasKey('baseTraitMethod'));
+
+        // Do a couple of sanity checks.
+        $this->assertEquals('\A\BaseClass', $output['properties']['baseTraitProperty']['declaringClass']['name']);
+        $this->assertEquals('\A\BaseClass', $output['methods']['baseTraitMethod']['declaringClass']['name']);
+
+        $this->assertEquals('\A\BaseTrait', $output['properties']['baseTraitProperty']['declaringStructure']['name']);
+        $this->assertEquals('\A\BaseTrait', $output['methods']['baseTraitMethod']['declaringStructure']['name']);
 
         // Test the 'as' keyword for renaming trait method.
         $this->assertThat($output['methods'], $this->arrayHasKey('test1'));

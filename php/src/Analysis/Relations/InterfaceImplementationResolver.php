@@ -92,6 +92,16 @@ class InterfaceImplementationResolver extends AbstractResolver
                     $parentMethodData['longDescription']
                 );
             }
+
+            $childMethod['declaringStructure'] = [
+                'name'            => $parentMethodData['declaringStructure']['name'],
+                'filename'        => $parentMethodData['declaringStructure']['filename'],
+                'startLine'       => $parentMethodData['declaringStructure']['startLine'],
+                'endLine'         => $parentMethodData['declaringStructure']['endLine'],
+                'type'            => $parentMethodData['declaringStructure']['type'],
+                'startLineMember' => $parentMethodData['startLine'],
+                'endLineMember'   => $parentMethodData['endLine']
+            ];
         } else {
             $childMethod = [];
         }
@@ -105,17 +115,7 @@ class InterfaceImplementationResolver extends AbstractResolver
                 'filename'        => $class['filename'],
                 'startLine'       => $class['startLine'],
                 'endLine'         => $class['endLine'],
-                'type'            => $class['type'],
-            ],
-
-            'declaringStructure' => [
-                'name'            => $parentMethodData['declaringStructure']['name'],
-                'filename'        => $parentMethodData['declaringStructure']['filename'],
-                'startLine'       => $parentMethodData['declaringStructure']['startLine'],
-                'endLine'         => $parentMethodData['declaringStructure']['endLine'],
-                'type'            => $parentMethodData['declaringStructure']['type'],
-                'startLineMember' => $parentMethodData['startLine'],
-                'endLineMember'   => $parentMethodData['endLine']
+                'type'            => $class['type']
             ]
         ]);
     }

@@ -99,22 +99,16 @@ class InheritanceResolver extends AbstractResolver
                     $parentPropertyData['longDescription']
                 );
             }
-        } else {
-            $childProperty = [];
-        }
 
-        $class['properties'][$parentPropertyData['name']] = array_merge($parentPropertyData, $childProperty, $inheritedData, [
-            'override'       => $overriddenPropertyData,
-
-            'declaringClass' => [
+            $childProperty['declaringClass'] = [
                 'name'            => $class['name'],
                 'filename'        => $class['filename'],
                 'startLine'       => $class['startLine'],
                 'endLine'         => $class['endLine'],
-                'type'            => $class['type'],
-            ],
+                'type'            => $class['type']
+            ];
 
-            'declaringStructure' => [
+            $childProperty['declaringStructure'] = [
                 'name'            => $class['name'],
                 'filename'        => $class['filename'],
                 'startLine'       => $class['startLine'],
@@ -122,7 +116,13 @@ class InheritanceResolver extends AbstractResolver
                 'type'            => $class['type'],
                 'startLineMember' => $parentPropertyData['startLine'],
                 'endLineMember'   => $parentPropertyData['endLine']
-            ]
+            ];
+        } else {
+            $childProperty = [];
+        }
+
+        $class['properties'][$parentPropertyData['name']] = array_merge($parentPropertyData, $childProperty, $inheritedData, [
+            'override' => $overriddenPropertyData
         ]);
     }
 
@@ -165,23 +165,16 @@ class InheritanceResolver extends AbstractResolver
                     $parentMethodData['longDescription']
                 );
             }
-        } else {
-            $childMethod = [];
-        }
 
-        $class['methods'][$parentMethodData['name']] = array_merge($parentMethodData, $childMethod, $inheritedData, [
-            'override'       => $overriddenMethodData,
-            'implementation' => $implementedMethodData,
-
-            'declaringClass' => [
+            $childMethod['declaringClass'] = [
                 'name'            => $class['name'],
                 'filename'        => $class['filename'],
                 'startLine'       => $class['startLine'],
                 'endLine'         => $class['endLine'],
-                'type'            => $class['type'],
-            ],
+                'type'            => $class['type']
+            ];
 
-            'declaringStructure' => [
+            $childMethod['declaringStructure'] = [
                 'name'            => $class['name'],
                 'filename'        => $class['filename'],
                 'startLine'       => $class['startLine'],
@@ -189,7 +182,14 @@ class InheritanceResolver extends AbstractResolver
                 'type'            => $class['type'],
                 'startLineMember' => $parentMethodData['startLine'],
                 'endLineMember'   => $parentMethodData['endLine']
-            ]
+            ];
+        } else {
+            $childMethod = [];
+        }
+
+        $class['methods'][$parentMethodData['name']] = array_merge($parentMethodData, $childMethod, $inheritedData, [
+            'override'       => $overriddenMethodData,
+            'implementation' => $implementedMethodData
         ]);
     }
 }
