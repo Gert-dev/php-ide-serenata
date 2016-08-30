@@ -540,6 +540,24 @@ class IndexDatabase implements StorageInterface, ClasslikeInfoBuilderProviderInt
     }
 
     /**
+     * @param string $fqcn
+     *
+     * @return array|null
+     */
+    public function getGlobalFunctionByFqcn($fqcn)
+    {
+        return $this->getConnection()->createQueryBuilder()
+            ->select('fu.*', 'fi.path')
+            ->from(IndexStorageItemEnum::FUNCTIONS, 'fu')
+            ->leftJoin('fu', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fu.file_id')
+            ->where('structure_id IS NULL')
+            ->andWhere('fqcn = ?')
+            ->setParameter(0, $fqcn)
+            ->execute()
+            ->fetch();
+    }
+
+    /**
      * Fetches the namespace that applies to the specified line in the specified file.
      *
      * @param string $filePath

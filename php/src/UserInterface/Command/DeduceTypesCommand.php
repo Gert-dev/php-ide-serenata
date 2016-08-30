@@ -205,14 +205,12 @@ class DeduceTypesCommand extends AbstractCommand
         } elseif (preg_match('/^clone\s+(\$[a-zA-Z0-9_]+)/', $firstElement, $matches) === 1) {
             $types = $this->deduceTypes($file, $code, [$matches[1]], $offset);
         } elseif (preg_match('/^(.*?)\(\)$/', $firstElement, $matches) === 1) {
-            // Global PHP function.
-            // TODO: No need to fetch all global functions here.
-            $globalFunctions = $this->getGlobalFunctionsCommand()->getGlobalFunctions();
+            $globalFunction = $this->getIndexDatabase()->getGlobalFunctionByFqcn($matches[1]);
 
-            if (isset($globalFunctions[$matches[1]])) {
-                $returnTypes = $globalFunctions[$matches[1]]['returnTypes'];
+            if ($globalFunction) {
+                $convertedGlobalFunction = $this->getFunctionConverter()->convert($globalFunction);
 
-                $types = $this->fetchResolvedTypesFromTypeArrays($returnTypes);
+                $types = $this->fetchResolvedTypesFromTypeArrays($convertedGlobalFunction['returnTypes']);
             }
         } elseif (preg_match("/(({$classRegexPart}))/", $firstElement, $matches) === 1) {
             // Static class name.
@@ -698,18 +696,6 @@ class DeduceTypesCommand extends AbstractCommand
         }
 
         return $this->classInfoCommand;
-    }
-
-    /**
-     * @return GlobalFunctionsCommand
-     */
-    protected function getGlobalFunctionsCommand()
-    {
-        if (!$this->globalFunctionsCommand) {
-            $this->globalFunctionsCommand = new GlobalFunctionsCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->globalFunctionsCommand;
     }
 
     /**
