@@ -558,50 +558,38 @@ class IndexDatabase implements StorageInterface, ClasslikeInfoBuilderProviderInt
     }
 
     /**
-     * Fetches the namespace that applies to the specified line in the specified file.
-     *
      * @param string $filePath
-     * @param int    $line
      *
      * @return array
      */
-    public function getRelevantNamespace($filePath, $line)
+    public function getNamespacesForFile($filePath)
     {
         return $this->getConnection()->createQueryBuilder()
-            ->select('fn.*')
+            ->select('fn.namespace AS name', 'fn.start_line AS startLine', 'fn.end_line AS endLine')
             ->from(IndexStorageItemEnum::FILES_NAMESPACES, 'fn')
             ->join('fn', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fn.file_id')
             ->andWhere('fi.path = ?')
-            ->andWhere('? >= fn.start_line')
-            ->andWhere('(? <= fn.end_line OR fn.end_line IS NULL)')
             ->setParameter(0, $filePath)
-            ->setParameter(1, $line)
-            ->setParameter(2, $line)
             ->execute()
-            ->fetch();
+            ->fetchAll();
     }
 
     /**
-     * Fetches a list of use statements that apply to the specified namespace.
+     * @param string $filePath
      *
-     * @param int      $namespaceId
-     * @param int|null $maxLine
-     *
-     * @return \Traversable
+     * @return array
      */
-    public function getUseStatementsByNamespaceId($namespaceId, $maxLine = null)
+    public function getUseStatementsForFile($filePath)
     {
-        $queryBuilder = $this->getConnection()->createQueryBuilder()
+        return $this->getConnection()->createQueryBuilder()
             ->select('fni.*')
             ->from(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, 'fni')
-            ->where('fni.files_namespace_id = ?')
-            ->setParameter(0, $namespaceId);
-
-        if ($maxLine !== null) {
-            $queryBuilder->andWhere('fni.line <= ?')->setParameter(1, $maxLine);
-        }
-
-        return $queryBuilder->execute();
+            ->join('fni', IndexStorageItemEnum::FILES_NAMESPACES, 'fn', 'fn.id = fni.files_namespace_id')
+            ->join('fn', IndexStorageItemEnum::FILES, 'fi', 'fi.id = fn.file_id')
+            ->andWhere('fi.path = ?')
+            ->setParameter(0, $filePath)
+            ->execute()
+            ->fetchAll();
     }
 
     /**

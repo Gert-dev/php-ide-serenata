@@ -9,6 +9,7 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Typing\TypeLocalizer;
+use PhpIntegrator\Analysis\Typing\FileTypeLocalizer;
 
 /**
  * Command that makes a FQCN relative to local use statements in a file.
@@ -58,23 +59,19 @@ class LocalizeTypeCommand extends AbstractCommand
             throw new UnexpectedValueException('The specified file is not present in the index!');
         }
 
-        $namespace = $this->getIndexDatabase()->getRelevantNamespace($file, $line);
+        $namespaces = $this->getIndexDatabase()->getNamespacesForFile($file);
 
-        if (!$namespace) {
+        if (empty($namespaces)) {
             throw new LogicException(
                 'No namespace found, but there should always exist at least one namespace row in the database!'
             );
         }
 
-        $useStatements = $this->getIndexDatabase()->getUseStatementsByNamespaceId(
-            $namespace['id'],
-            $line
-        );
+        $useStatements = $this->getIndexDatabase()->getUseStatementsForFile($file);
 
-        $useStatements = iterator_to_array($useStatements);
+        $typeLocalizer = new TypeLocalizer($this->getTypeAnalyzer());
+        $fileTypeLocalizer = new FileTypeLocalizer($typeLocalizer, $namespaces, $useStatements);
 
-        $typeLocalizer = new TypeLocalizer($this->getTypeAnalyzer(), $namespace['namespace'], $useStatements);
-
-        return $typeLocalizer->localize($type);
+        return $fileTypeLocalizer->resolve($type, $line);
     }
 }

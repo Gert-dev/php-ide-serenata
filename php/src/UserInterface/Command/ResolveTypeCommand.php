@@ -9,6 +9,7 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\FileTypeResolver;
 
 /**
  * Command that resolves local types in a file.
@@ -58,23 +59,19 @@ class ResolveTypeCommand extends AbstractCommand
             throw new UnexpectedValueException('The specified file is not present in the index!');
         }
 
-        $namespace = $this->getIndexDatabase()->getRelevantNamespace($file, $line);
+        $namespaces = $this->getIndexDatabase()->getNamespacesForFile($file);
 
-        if (!$namespace) {
+        if (empty($namespaces)) {
             throw new LogicException(
                 'No namespace found, but there should always exist at least one namespace row in the database!'
             );
         }
 
-        $useStatements = $this->getIndexDatabase()->getUseStatementsByNamespaceId(
-            $namespace['id'],
-            $line
-        );
+        $useStatements = $this->getIndexDatabase()->getUseStatementsForFile($file);
 
-        $useStatements = iterator_to_array($useStatements);
+        $typeResolver = new TypeResolver($this->getTypeAnalyzer());
+        $fileTypeResolver = new FileTypeResolver($typeResolver, $namespaces, $useStatements);
 
-        $typeResolver = new TypeResolver($this->getTypeAnalyzer(), $namespace['namespace'], $useStatements);
-
-        return $typeResolver->resolve($type);
+        return $fileTypeResolver->resolve($type, $line);
     }
 }

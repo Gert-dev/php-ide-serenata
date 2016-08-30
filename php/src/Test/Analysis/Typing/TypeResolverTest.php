@@ -14,32 +14,33 @@ class TypeResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyTypeReturnsNull()
     {
-        $object = new TypeResolver($this->getTypeAnalyzer(), null, []);
+        $object = new TypeResolver($this->getTypeAnalyzer());
 
-        $this->assertNull($object->resolve(null));
+        $this->assertNull($object->resolve(null, null, []));
     }
 
     public function testTypeWithLeadingSlashIsNotResolved()
     {
-        $object = new TypeResolver($this->getTypeAnalyzer(), null, []);
+        $object = new TypeResolver($this->getTypeAnalyzer());
 
-        $this->assertEquals('\A\B', $object->resolve('\A\B'));
+        $this->assertEquals('\A\B', $object->resolve('\A\B', null, []));
     }
 
     public function testRelativeTypeIsRelativeToNamespace()
     {
-        $object = new TypeResolver($this->getTypeAnalyzer(), null, []);
+        $object = new TypeResolver($this->getTypeAnalyzer());
 
-        $this->assertEquals('\A', $object->resolve('A'));
+        $this->assertEquals('\A', $object->resolve('A', null, []));
 
-        $object = new TypeResolver($this->getTypeAnalyzer(), 'A', []);
+        $object = new TypeResolver($this->getTypeAnalyzer());
 
-        $this->assertEquals('\A\B', $object->resolve('B'));
+        $this->assertEquals('\A\B', $object->resolve('B', 'A', []));
     }
 
     public function testRelativeTypeIsRelativeToUseStatements()
     {
-        $object = new TypeResolver($this->getTypeAnalyzer(), 'A', [
+        $namespace = 'A';
+        $imports = [
             [
                 'fqcn' => 'B\C',
                 'alias' => 'Alias'
@@ -49,11 +50,13 @@ class TypeResolverTest extends \PHPUnit_Framework_TestCase
                 'fqcn' => 'B\C\D',
                 'alias' => 'D'
             ]
-        ]);
+        ];
 
-        $this->assertEquals('\B\C', $object->resolve('Alias'));
-        $this->assertEquals('\B\C\E', $object->resolve('Alias\E'));
-        $this->assertEquals('\B\C\D', $object->resolve('D'));
-        $this->assertEquals('\B\C\D\E', $object->resolve('D\E'));
+        $object = new TypeResolver($this->getTypeAnalyzer());
+
+        $this->assertEquals('\B\C', $object->resolve('Alias', $namespace, $imports));
+        $this->assertEquals('\B\C\E', $object->resolve('Alias\E', $namespace, $imports));
+        $this->assertEquals('\B\C\D', $object->resolve('D', $namespace, $imports));
+        $this->assertEquals('\B\C\D\E', $object->resolve('D\E', $namespace, $imports));
     }
 }

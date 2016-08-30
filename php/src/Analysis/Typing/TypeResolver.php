@@ -8,16 +8,6 @@ namespace PhpIntegrator\Analysis\Typing;
 class TypeResolver
 {
     /**
-     * @var string|null
-     */
-    protected $namespace;
-
-    /**
-     * @var array
-     */
-    protected $imports;
-
-    /**
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
@@ -26,27 +16,25 @@ class TypeResolver
      * Constructor.
      *
      * @param TypeAnalyzer $typeAnalyzer
-     * @param string|null  $namespace The current namespace.
-     * @param array {
-     *     @var string|null $fqcn
-     *     @var string      $alias
-     * } $imports
      */
-    public function __construct(TypeAnalyzer $typeAnalyzer, $namespace, array $imports)
+    public function __construct(TypeAnalyzer $typeAnalyzer)
     {
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->namespace = $namespace;
-        $this->imports = $imports;
     }
 
     /**
      * Resolves and determines the FQCN of the specified type.
      *
-     * @param string $type
+     * @param string      $type
+     * @param string|null $namespaceFqcn
+     * @param array {
+     *     @var string|null $fqcn
+     *     @var string      $alias
+     * } $imports
      *
      * @return string|null
      */
-    public function resolve($type)
+    public function resolve($type, $namespaceFqcn, array $imports)
     {
         if (empty($type)) {
             return null;
@@ -57,7 +45,7 @@ class TypeResolver
         $fullName = null;
         $typeParts = explode('\\', $type);
 
-        foreach ($this->imports as $import) {
+        foreach ($imports as $import) {
             if ($import['alias'] === $typeParts[0]) {
                 array_shift($typeParts);
 
@@ -82,7 +70,7 @@ class TypeResolver
 
         if (!$fullName) {
             // Still here? There must be no explicit use statement, default to the current namespace.
-            $fullName = $this->namespace ? ($this->namespace . '\\') : '';
+            $fullName = $namespaceFqcn ? ($namespaceFqcn . '\\') : '';
             $fullName .= $type;
         }
 

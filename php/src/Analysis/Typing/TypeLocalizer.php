@@ -8,16 +8,6 @@ namespace PhpIntegrator\Analysis\Typing;
 class TypeLocalizer
 {
     /**
-     * @var string|null
-     */
-    protected $namespace;
-
-    /**
-     * @var array
-     */
-    protected $imports;
-
-    /**
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
@@ -26,30 +16,28 @@ class TypeLocalizer
      * Constructor.
      *
      * @param TypeAnalyzer $typeAnalyzer
-     * @param string|null  $namespace The current namespace.
-     * @param array {
-     *     @var string|null $fqcn
-     *     @var string      $alias
-     * } $imports
      */
-    public function __construct(TypeAnalyzer $typeAnalyzer, $namespace, array $imports)
+    public function __construct(TypeAnalyzer $typeAnalyzer)
     {
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->imports = $imports;
-        $this->namespace = $namespace;
     }
 
     /**
      * "Unresolves" a FQCN, turning it back into a name relative to local use statements. If no local type could be
      * determined, the FQCN is returned (as that is the only way the type can be referenced locally).
      *
-     * @param string $type
+     * @param string      $type
+     * @param string|null $namespaceFqcn
+     * @param array {
+     *     @var string|null $fqcn
+     *     @var string      $alias
+     * } $imports
      *
      * @example With use statement "use A\B as AliasB", unresolving "A\B\C\D" will yield "AliasB\C\D".
      *
      * @return string|null
      */
-    public function localize($type)
+    public function localize($type, $namespaceFqcn, array $imports)
     {
         $bestLocalizedType = null;
 
@@ -57,12 +45,10 @@ class TypeLocalizer
             return null;
         }
 
-        $imports = $this->imports;
-
         $typeFqcn = $this->typeAnalyzer->getNormalizedFqcn($type);
 
-        if ($this->namespace) {
-            $namespaceFqcn = $this->typeAnalyzer->getNormalizedFqcn($this->namespace);
+        if ($namespaceFqcn) {
+            $namespaceFqcn = $this->typeAnalyzer->getNormalizedFqcn($namespaceFqcn);
 
             $namespaceParts = explode('\\', $namespaceFqcn);
 

@@ -6,15 +6,16 @@ use DateTime;
 use Exception;
 use UnexpectedValueException;
 
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\FileTypeResolver;
+
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\AssociativeUseStatementFetchingVisitor;
 
-use PhpIntegrator\UserInterface\Command\DeduceTypesCommand;
-
 use PhpIntegrator\Parsing\DocblockParser;
 
-use PhpIntegrator\Analysis\Typing\TypeResolver;
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+use PhpIntegrator\UserInterface\Command\DeduceTypesCommand;
 
 use PhpParser\Error;
 use PhpParser\Parser;
@@ -896,35 +897,25 @@ class FileIndexer
         $line,
         AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
     ) {
-        // There can be multiple namespaces in each file, check with namespace is active for the specified line.
-        $useStatements = [];
-        $namespaceName = null;
+        $imports = [];
+        $namespaces = [];
 
         if ($useStatementFetchingVisitor) {
             if (!$line) {
                 throw new UnexpectedValueException('The passed line number must not be null!');
             }
 
+            $namespaces = $useStatementFetchingVisitor->getNamespaces();
+
             foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
-                if ($line >= $namespace['startLine'] &&
-                   ($line <= $namespace['endLine'] || $namespace['endLine'] === null)) {
-                    $namespaceName = $namespace['name'];
-
-                    // Only use statements before the current line actually apply.
-                    foreach ($namespace['useStatements'] as $useStatement) {
-                        if ($useStatement['line'] <= $line) {
-                            $useStatements[] = $useStatement;
-                        }
-                    }
-
-                    break;
-                }
+                $imports = array_merge($imports, $namespace['useStatements']);
             }
         }
 
-        $typeResolver = new TypeResolver($this->typeAnalyzer, $namespaceName, $useStatements);
+        $typeResolver = new TypeResolver($this->typeAnalyzer);
+        $fileTypeResolver = new FileTypeResolver($typeResolver, $namespaces, $imports);
 
-        return $typeResolver->resolve($type);
+        return $fileTypeResolver->resolve($type, $line);
     }
 
     /**
