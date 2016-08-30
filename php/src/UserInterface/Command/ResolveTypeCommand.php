@@ -53,15 +53,15 @@ class ResolveTypeCommand extends AbstractCommand
      */
     public function resolveType($type, $file, $line)
     {
-        $fileId = $this->getIndexDatabase()->getFileId($file);
-
-        if (!$fileId) {
-            throw new UnexpectedValueException('The specified file is not present in the index!');
-        }
-
         $namespaces = $this->getIndexDatabase()->getNamespacesForFile($file);
 
         if (empty($namespaces)) {
+            $fileId = $this->getIndexDatabase()->getFileId($file);
+
+            if (!$fileId) {
+                throw new UnexpectedValueException('The specified file is not present in the index!');
+            }
+
             throw new LogicException(
                 'No namespace found, but there should always exist at least one namespace row in the database!'
             );
