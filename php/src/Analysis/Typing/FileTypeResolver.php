@@ -50,6 +50,7 @@ class FileTypeResolver
      * Resolves and determines the FQCN of the specified type.
      *
      * @param string $type
+     * @param int    $line
      *
      * @return string|null
      */
