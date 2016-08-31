@@ -158,7 +158,10 @@ class FileIndexer
         OutlineFetchingVisitor $outlineIndexingVisitor,
         AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
     ) {
-        foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
+        $imports = [];
+        $namespaces = $useStatementFetchingVisitor->getNamespaces();
+
+        foreach ($namespaces as $namespace) {
             $namespaceId = $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES, [
                 'start_line'  => $namespace['startLine'],
                 'end_line'    => $namespace['endLine'],
@@ -167,6 +170,8 @@ class FileIndexer
             ]);
 
             foreach ($namespace['useStatements'] as $useStatement) {
+                $imports[] = $useStatement;
+
                 $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
                     'line'               => $useStatement['line'],
                     'alias'              => $useStatement['alias'] ?: null,
@@ -176,6 +181,9 @@ class FileIndexer
             }
         }
 
+        $typeResolver = new TypeResolver($this->typeAnalyzer);
+        $fileTypeResolver = new FileTypeResolver($typeResolver, $namespaces, $imports);
+
         foreach ($outlineIndexingVisitor->getStructures() as $fqcn => $structure) {
              $this->indexStructure(
                  $structure,
@@ -183,32 +191,32 @@ class FileIndexer
                  $fileId,
                  $fqcn,
                  false,
-                 $useStatementFetchingVisitor
+                 $fileTypeResolver
              );
          }
 
          foreach ($outlineIndexingVisitor->getGlobalFunctions() as $function) {
-             $this->indexFunction($function, $fileId, null, null, false, $useStatementFetchingVisitor);
+             $this->indexFunction($function, $fileId, null, null, false, $fileTypeResolver);
          }
 
          foreach ($outlineIndexingVisitor->getGlobalConstants() as $constant) {
-             $this->indexConstant($constant, $filePath, $fileId, null, $useStatementFetchingVisitor);
+             $this->indexConstant($constant, $filePath, $fileId, null, $fileTypeResolver);
          }
 
          foreach ($outlineIndexingVisitor->getGlobalDefines() as $define) {
-             $this->indexConstant($define, $filePath, $fileId, null, $useStatementFetchingVisitor);
+             $this->indexConstant($define, $filePath, $fileId, null, $fileTypeResolver);
          }
      }
 
     /**
      * Indexes the specified structural element.
      *
-     * @param array                                       $rawData
-     * @param string                                      $filePath
-     * @param int                                         $fileId
-     * @param string                                      $fqcn
-     * @param bool                                        $isBuiltin
-     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array            $rawData
+     * @param string           $filePath
+     * @param int              $fileId
+     * @param string           $fqcn
+     * @param bool             $isBuiltin
+     * @param FileTypeResolver $fileTypeResolver
      *
      * @return int The ID of the structural element.
      */
@@ -218,7 +226,7 @@ class FileIndexer
         $fileId,
         $fqcn,
         $isBuiltin,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        FileTypeResolver $fileTypeResolver
     ) {
         $structureTypeMap = $this->getStructureTypeMap();
 
@@ -313,7 +321,7 @@ class FileIndexer
                 $fileId,
                 $seId,
                 $accessModifierMap[$accessModifier],
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         }
 
@@ -326,7 +334,7 @@ class FileIndexer
                 $seId,
                 $accessModifierMap[$accessModifier],
                 false,
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         }
 
@@ -336,7 +344,7 @@ class FileIndexer
                 $filePath,
                 $fileId,
                 $seId,
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         }
 
@@ -357,7 +365,7 @@ class FileIndexer
                 $fileId,
                 $seId,
                 $accessModifierMap['public'],
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         }
 
@@ -373,7 +381,7 @@ class FileIndexer
                 $seId,
                 $accessModifierMap['public'],
                 true,
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         }
 
@@ -381,41 +389,35 @@ class FileIndexer
     }
 
     /**
-     * @param string                                 $typeSpecification
-     * @param int                                    $line
-     * @param AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
+     * @param string           $typeSpecification
+     * @param int              $line
+     * @param FileTypeResolver $fileTypeResolver
      *
      * @return array[]
      */
-    protected function getTypeDataForTypeSpecification(
-        $typeSpecification,
-        $line,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
-    ) {
+    protected function getTypeDataForTypeSpecification($typeSpecification, $line, FileTypeResolver $fileTypeResolver)
+    {
         $typeList = $this->typeAnalyzer->getTypesForTypeSpecification($typeSpecification);
 
-        return $this->getTypeDataForTypeList($typeList, $line, $useStatementFetchingVisitor);
+        return $this->getTypeDataForTypeList($typeList, $line, $fileTypeResolver);
     }
 
     /**
-     * @param string[]                               $typeList
-     * @param int                                    $line
-     * @param AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
+     * @param string[]         $typeList
+     * @param int              $line
+     * @param FileTypeResolver $fileTypeResolver
      *
      * @return array[]
      */
-    protected function getTypeDataForTypeList(
-        array $typeList,
-        $line,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
-    ) {
+    protected function getTypeDataForTypeList(array $typeList, $line, FileTypeResolver $fileTypeResolver)
+    {
         $types = [];
 
         foreach ($typeList as $type) {
             $fqcn = $type;
 
             if ($this->typeAnalyzer->isClassType($type)) {
-                $fqcn = $this->getFqcnForLocalType($type, $line, $useStatementFetchingVisitor);
+                $fqcn = $fileTypeResolver->resolve($type, $line);
             }
 
             $types[] = [
@@ -430,18 +432,18 @@ class FileIndexer
     /**
      * Indexes the specified constant.
      *
-     * @param array                                       $rawData
-     * @param string                                      $filePath
-     * @param int                                         $fileId
-     * @param int|null                                    $seId
-     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array            $rawData
+     * @param string           $filePath
+     * @param int              $fileId
+     * @param int|null         $seId
+     * @param FileTypeResolver $fileTypeResolver
      */
     protected function indexConstant(
         array $rawData,
         $filePath,
         $fileId,
         $seId = null,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        FileTypeResolver $fileTypeResolver
     ) {
         $documentation = $this->docblockParser->parse($rawData['docComment'], [
             DocblockParser::VAR_TYPE,
@@ -467,7 +469,7 @@ class FileIndexer
             $types = $this->getTypeDataForTypeSpecification(
                 $varDocumentation['type'],
                 $rawData['startLine'],
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         } elseif ($rawData['defaultValue']) {
             try {
@@ -478,7 +480,7 @@ class FileIndexer
                     0
                 );
 
-                $types = $this->getTypeDataForTypeList($typeList, $rawData['startLine'], $useStatementFetchingVisitor);
+                $types = $this->getTypeDataForTypeList($typeList, $rawData['startLine'], $fileTypeResolver);
             } catch (UnexpectedValueException $e) {
                 $types = [];
             }
@@ -505,12 +507,12 @@ class FileIndexer
     /**
      * Indexes the specified property.
      *
-     * @param array                                       $rawData
-     * @param string                                      $filePath
-     * @param int                                         $fileId
-     * @param int                                         $seId
-     * @param int                                         $amId
-     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array            $rawData
+     * @param string           $filePath
+     * @param int              $fileId
+     * @param int              $seId
+     * @param int              $amId
+     * @param FileTypeResolver $fileTypeResolver
      */
     protected function indexProperty(
         array $rawData,
@@ -518,7 +520,7 @@ class FileIndexer
         $fileId,
         $seId,
         $amId,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        FileTypeResolver $fileTypeResolver
     ) {
         $documentation = $this->docblockParser->parse($rawData['docComment'], [
             DocblockParser::VAR_TYPE,
@@ -544,7 +546,7 @@ class FileIndexer
             $types = $this->getTypeDataForTypeSpecification(
                 $varDocumentation['type'],
                 $rawData['startLine'],
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         } elseif (isset($rawData['returnType'])) {
             $types = [
@@ -562,7 +564,7 @@ class FileIndexer
                     0
                 );
 
-                $types = $this->getTypeDataForTypeList($typeList, $rawData['startLine'], $useStatementFetchingVisitor);
+                $types = $this->getTypeDataForTypeList($typeList, $rawData['startLine'], $fileTypeResolver);
             } catch (UnexpectedValueException $e) {
                 $types = [];
             }
@@ -588,18 +590,18 @@ class FileIndexer
     }
 
     /**
-     * @param array                                       $rawData
-     * @param int                                         $fileId
-     * @param int                                         $seId
-     * @param int                                         $amId
-     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array            $rawData
+     * @param int              $fileId
+     * @param int              $seId
+     * @param int              $amId
+     * @param FileTypeResolver $fileTypeResolver
      */
     protected function indexMagicProperty(
         array $rawData,
         $fileId,
         $seId,
         $amId,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        FileTypeResolver $fileTypeResolver
     ) {
         $types = [];
 
@@ -607,7 +609,7 @@ class FileIndexer
             $types = $this->getTypeDataForTypeSpecification(
                 $rawData['type'],
                 $rawData['startLine'],
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         }
 
@@ -633,12 +635,12 @@ class FileIndexer
     /**
      * Indexes the specified function.
      *
-     * @param array                                       $rawData
-     * @param int                                         $fileId
-     * @param int|null                                    $seId
-     * @param int|null                                    $amId
-     * @param bool                                        $isMagic
-     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array            $rawData
+     * @param int              $fileId
+     * @param int|null         $seId
+     * @param int|null         $amId
+     * @param bool             $isMagic
+     * @param FileTypeResolver $fileTypeResolver
      */
     protected function indexFunction(
         array $rawData,
@@ -646,7 +648,7 @@ class FileIndexer
         $seId = null,
         $amId = null,
         $isMagic = false,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        FileTypeResolver $fileTypeResolver
     ) {
         $documentation = $this->docblockParser->parse($rawData['docComment'], [
             DocblockParser::THROWS,
@@ -662,7 +664,7 @@ class FileIndexer
             $returnTypes = $this->getTypeDataForTypeSpecification(
                 $documentation['return']['type'],
                 $rawData['startLine'],
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         } elseif (isset($rawData['returnType'])) {
             $returnTypes = [
@@ -678,7 +680,7 @@ class FileIndexer
         $throws = [];
 
         foreach ($documentation['throws'] as $type => $description) {
-            $typeData = $this->getTypeDataForTypeSpecification($type, $rawData['startLine'], $useStatementFetchingVisitor);
+            $typeData = $this->getTypeDataForTypeSpecification($type, $rawData['startLine'], $fileTypeResolver);
             $typeData = array_shift($typeData);
 
             $throwsData = [
@@ -703,7 +705,7 @@ class FileIndexer
                 $types = $this->getTypeDataForTypeSpecification(
                     $parameterDoc['type'],
                     $rawData['startLine'],
-                    $useStatementFetchingVisitor
+                    $fileTypeResolver
                 );
             } elseif (isset($parameter['type'])) {
                 $types = [
@@ -766,12 +768,12 @@ class FileIndexer
     }
 
     /**
-     * @param array                                       $rawData
-     * @param int                                         $fileId
-     * @param int|null                                    $seId
-     * @param int|null                                    $amId
-     * @param bool                                        $isMagic
-     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
+     * @param array            $rawData
+     * @param int              $fileId
+     * @param int|null         $seId
+     * @param int|null         $amId
+     * @param bool             $isMagic
+     * @param FileTypeResolver $fileTypeResolver
      */
     protected function indexMagicMethod(
         array $rawData,
@@ -779,7 +781,7 @@ class FileIndexer
         $seId = null,
         $amId = null,
         $isMagic = false,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
+        FileTypeResolver $fileTypeResolver
     ) {
         $returnTypes = [];
 
@@ -787,7 +789,7 @@ class FileIndexer
             $returnTypes = $this->getTypeDataForTypeSpecification(
                 $rawData['type'],
                 $rawData['startLine'],
-                $useStatementFetchingVisitor
+                $fileTypeResolver
             );
         }
 
@@ -800,7 +802,7 @@ class FileIndexer
                 $types = $this->getTypeDataForTypeSpecification(
                     $parameter['type'],
                     $rawData['startLine'],
-                    $useStatementFetchingVisitor
+                    $fileTypeResolver
                 );
             }
 
@@ -824,7 +826,7 @@ class FileIndexer
                 $types = $this->getTypeDataForTypeSpecification(
                     $parameter['type'],
                     $rawData['startLine'],
-                    $useStatementFetchingVisitor
+                    $fileTypeResolver
                 );
             }
 
@@ -892,41 +894,6 @@ class FileIndexer
         }
 
         throw new UnexpectedValueException('Unknown access modifier returned!');
-    }
-
-    /**
-     * Resolves and determines the FQCN of the specified type.
-     *
-     * @param string                                      $type
-     * @param int                                         $line
-     * @param AssociativeUseStatementFetchingVisitor|null $useStatementFetchingVisitor
-     *
-     * @return string|null
-     */
-    protected function getFqcnForLocalType(
-        $type,
-        $line,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor = null
-    ) {
-        $imports = [];
-        $namespaces = [];
-
-        if ($useStatementFetchingVisitor) {
-            if (!$line) {
-                throw new UnexpectedValueException('The passed line number must not be null!');
-            }
-
-            $namespaces = $useStatementFetchingVisitor->getNamespaces();
-
-            foreach ($useStatementFetchingVisitor->getNamespaces() as $namespace) {
-                $imports = array_merge($imports, $namespace['useStatements']);
-            }
-        }
-
-        $typeResolver = new TypeResolver($this->typeAnalyzer);
-        $fileTypeResolver = new FileTypeResolver($typeResolver, $namespaces, $imports);
-
-        return $fileTypeResolver->resolve($type, $line);
     }
 
     /**
