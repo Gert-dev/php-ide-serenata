@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\Test\UserInterface\Command;
 
+use ReflectionClass;
+
 use PhpIntegrator\UserInterface\Command\DeduceTypesCommand;
 
 use PhpIntegrator\Test\IndexedTest;
@@ -24,7 +26,13 @@ class DeduceTypesCommandTest extends IndexedTest
 
         $command = new DeduceTypesCommand($this->getParser(), null, $indexDatabase);
 
-        return $command->deduceTypes($path, file_get_contents($path), $expressionParts, $markerOffset);
+        $reflectionClass = new ReflectionClass(DeduceTypesCommand::class);
+        $reflectionMethod = $reflectionClass->getMethod('getTypeDeducer');
+        $reflectionMethod->setAccessible(true);
+
+        $typeDeducer = $reflectionMethod->invoke($command);
+
+        return $typeDeducer->deduceTypes($path, file_get_contents($path), $expressionParts, $markerOffset);
     }
 
     protected function getMarkerOffset($path, $marker)

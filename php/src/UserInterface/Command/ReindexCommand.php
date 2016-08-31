@@ -9,6 +9,10 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Indexing;
 
+use PhpIntegrator\Analysis\Typing\TypeDeducer;
+use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
+
 use PhpIntegrator\Indexing\Scanner;
 use PhpIntegrator\Indexing\FileIndexer;
 use PhpIntegrator\Indexing\BuiltinIndexer;
@@ -16,6 +20,7 @@ use PhpIntegrator\Indexing\ProjectIndexer;
 use PhpIntegrator\Indexing\StorageInterface;
 use PhpIntegrator\Indexing\CallbackStorageProxy;
 
+use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
@@ -51,14 +56,49 @@ class ReindexCommand extends AbstractCommand
     protected $fileModifiedMap;
 
     /**
+     * @var ClassListCommand
+     */
+    protected $classListCommand;
+
+    /**
+     * @var ClassInfoCommand
+     */
+    protected $classInfoCommand;
+
+    /**
+     * @var ResolveTypeCommand
+     */
+    protected $resolveTypeCommand;
+
+    /**
+     * @var GlobalFunctionsCommand
+     */
+    protected $globalFunctionsCommand;
+
+    /**
+     * @var PartialParser
+     */
+    protected $partialParser;
+
+    /**
+     * @var TypeResolver
+     */
+    protected $typeResolver;
+
+    /**
+     * @var FileTypeResolverFactory
+     */
+    protected $fileTypeResolverFactory;
+
+    /**
      * @var DocblockParser
      */
     protected $docblockParser;
 
     /**
-     * @var DeduceTypesCommand
+     * @var TypeDeducer
      */
-    protected $deduceTypesCommand;
+    protected $typeDeducer;
 
     /**
      * @var StorageInterface
@@ -195,7 +235,7 @@ class ReindexCommand extends AbstractCommand
                 $this->getStorageForIndexers(),
                 $this->getTypeAnalyzer(),
                 $this->getDocblockParser(),
-                $this->getDeduceTypesCommand(),
+                $this->getTypeDeducer(),
                 $this->getParser()
             );
         }
@@ -258,15 +298,98 @@ class ReindexCommand extends AbstractCommand
     }
 
     /**
-     * @return DeduceTypesCommand
+     * Retrieves an instance of TypeDeducer. The object will only be created once if needed.
+     *
+     * @return TypeDeducer
      */
-    protected function getDeduceTypesCommand()
+    protected function getTypeDeducer()
     {
-        if (!$this->deduceTypesCommand) {
-            $this->deduceTypesCommand = new DeduceTypesCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
+        if (!$this->typeDeducer instanceof TypeDeducer) {
+            $this->typeDeducer = new TypeDeducer(
+                $this->getParser(),
+                $this->getClassListCommand(),
+                $this->getClassInfoCommand(),
+                $this->getDocblockParser(),
+                $this->getPartialParser(),
+                $this->getTypeAnalyzer(),
+                $this->getTypeResolver(),
+                $this->getFileTypeResolverFactory(),
+                $this->getIndexDatabase(),
+                $this->getClasslikeInfoBuilder(),
+                $this->getFunctionConverter()
+            );
         }
 
-        return $this->deduceTypesCommand;
+        return $this->typeDeducer;
+    }
+
+    /**
+     * @return ClassListCommand
+     */
+    protected function getClassListCommand()
+    {
+        if (!$this->classListCommand) {
+            $this->classListCommand = new ClassListCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
+        }
+
+        return $this->classListCommand;
+    }
+
+    /**
+     * @return ClassInfoCommand
+     */
+    protected function getClassInfoCommand()
+    {
+        if (!$this->classInfoCommand) {
+            $this->classInfoCommand = new ClassInfoCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
+        }
+
+        return $this->classInfoCommand;
+    }
+
+    /**
+     * Retrieves an instance of PartialParser. The object will only be created once if needed.
+     *
+     * @return PartialParser
+     */
+    protected function getPartialParser()
+    {
+        if (!$this->partialParser instanceof PartialParser) {
+            $this->partialParser = new PartialParser();
+        }
+
+        return $this->partialParser;
+    }
+
+    /**
+     * Retrieves an instance of FileTypeResolverFactory. The object will only be created once if needed.
+     *
+     * @return FileTypeResolverFactory
+     */
+    protected function getFileTypeResolverFactory()
+    {
+        if (!$this->fileTypeResolverFactory instanceof FileTypeResolverFactory) {
+            $this->fileTypeResolverFactory = new FileTypeResolverFactory(
+                $this->getTypeResolver(),
+                $this->getIndexDatabase()
+            );
+        }
+
+        return $this->fileTypeResolverFactory;
+    }
+
+    /**
+     * Retrieves an instance of TypeResolver. The object will only be created once if needed.
+     *
+     * @return TypeResolver
+     */
+    protected function getTypeResolver()
+    {
+        if (!$this->typeResolver instanceof TypeResolver) {
+            $this->typeResolver = new TypeResolver($this->getTypeAnalyzer());
+        }
+
+        return $this->typeResolver;
     }
 
     /**

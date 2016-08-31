@@ -9,6 +9,11 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Linting;
 
+use PhpIntegrator\Analysis\Typing\TypeDeducer;
+use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
+
+use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpParser\Error;
@@ -26,11 +31,6 @@ class SemanticLintCommand extends AbstractCommand
     protected $classInfoCommand;
 
     /**
-     * @var DeduceTypesCommand
-     */
-    protected $deduceTypesCommand;
-
-    /**
      * @var GlobalFunctionsCommand
      */
     protected $globalFunctions;
@@ -44,6 +44,36 @@ class SemanticLintCommand extends AbstractCommand
      * @var ResolveTypeCommand
      */
     protected $resolveTypeCommand;
+
+    /**
+     * @var ClassListCommand
+     */
+    protected $classListCommand;
+
+    /**
+     * @var GlobalFunctionsCommand
+     */
+    protected $globalFunctionsCommand;
+
+    /**
+     * @var PartialParser
+     */
+    protected $partialParser;
+
+    /**
+     * @var TypeResolver
+     */
+    protected $typeResolver;
+
+    /**
+     * @var FileTypeResolverFactory
+     */
+    protected $fileTypeResolverFactory;
+
+    /**
+     * @var TypeDeducer
+     */
+    protected $typeDeducer;
 
     /**
      * @var DocblockParser
@@ -165,7 +195,7 @@ class SemanticLintCommand extends AbstractCommand
 
             if ($retrieveUnknownMembers) {
                 $unknownMemberAnalyzer = new Linting\UnknownMemberAnalyzer(
-                    $this->getDeduceTypesCommand(),
+                    $this->getTypeDeducer(),
                     $this->getClassInfoCommand(),
                     $this->getResolveTypeCommand(),
                     $this->getTypeAnalyzer(),
@@ -294,18 +324,6 @@ class SemanticLintCommand extends AbstractCommand
     }
 
     /**
-     * @return DeduceTypesCommand
-     */
-    protected function getDeduceTypesCommand()
-    {
-        if (!$this->deduceTypesCommand) {
-            $this->deduceTypesCommand = new DeduceTypesCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->deduceTypesCommand;
-    }
-
-    /**
      * @return ResolveTypeCommand
      */
     protected function getResolveTypeCommand()
@@ -339,6 +357,89 @@ class SemanticLintCommand extends AbstractCommand
         }
 
         return $this->globalConstants;
+    }
+
+    /**
+     * Retrieves an instance of TypeDeducer. The object will only be created once if needed.
+     *
+     * @return TypeDeducer
+     */
+    protected function getTypeDeducer()
+    {
+        if (!$this->typeDeducer instanceof TypeDeducer) {
+            $this->typeDeducer = new TypeDeducer(
+                $this->getParser(),
+                $this->getClassListCommand(),
+                $this->getClassInfoCommand(),
+                $this->getDocblockParser(),
+                $this->getPartialParser(),
+                $this->getTypeAnalyzer(),
+                $this->getTypeResolver(),
+                $this->getFileTypeResolverFactory(),
+                $this->getIndexDatabase(),
+                $this->getClasslikeInfoBuilder(),
+                $this->getFunctionConverter()
+            );
+        }
+
+        return $this->typeDeducer;
+    }
+
+    /**
+     * @return ClassListCommand
+     */
+    protected function getClassListCommand()
+    {
+        if (!$this->classListCommand) {
+            $this->classListCommand = new ClassListCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
+        }
+
+        return $this->classListCommand;
+    }
+
+    /**
+     * Retrieves an instance of PartialParser. The object will only be created once if needed.
+     *
+     * @return PartialParser
+     */
+    protected function getPartialParser()
+    {
+        if (!$this->partialParser instanceof PartialParser) {
+            $this->partialParser = new PartialParser();
+        }
+
+        return $this->partialParser;
+    }
+
+    /**
+     * Retrieves an instance of FileTypeResolverFactory. The object will only be created once if needed.
+     *
+     * @return FileTypeResolverFactory
+     */
+    protected function getFileTypeResolverFactory()
+    {
+        if (!$this->fileTypeResolverFactory instanceof FileTypeResolverFactory) {
+            $this->fileTypeResolverFactory = new FileTypeResolverFactory(
+                $this->getTypeResolver(),
+                $this->getIndexDatabase()
+            );
+        }
+
+        return $this->fileTypeResolverFactory;
+    }
+
+    /**
+     * Retrieves an instance of TypeResolver. The object will only be created once if needed.
+     *
+     * @return TypeResolver
+     */
+    protected function getTypeResolver()
+    {
+        if (!$this->typeResolver instanceof TypeResolver) {
+            $this->typeResolver = new TypeResolver($this->getTypeAnalyzer());
+        }
+
+        return $this->typeResolver;
     }
 
     /**

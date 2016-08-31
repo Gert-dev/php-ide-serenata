@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use UnexpectedValueException;
 
+use PhpIntegrator\Analysis\Typing\TypeDeducer;
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\FileTypeResolver;
@@ -54,7 +55,7 @@ class FileIndexer
     /**
      * @var DeduceTypesCommand
      */
-    protected $deduceTypesCommand;
+    protected $typeDeducer;
 
     /**
      * @var Parser
@@ -72,23 +73,23 @@ class FileIndexer
     protected $structureTypeMap;
 
     /**
-     * @param StorageInterface   $storage
-     * @param TypeAnalyzer       $typeAnalyzer
-     * @param DocblockParser     $docblockParser
-     * @param DeduceTypesCommand $deduceTypesCommand
-     * @param Parser             $parser
+     * @param StorageInterface $storage
+     * @param TypeAnalyzer     $typeAnalyzer
+     * @param DocblockParser   $docblockParser
+     * @param TypeDeducer      $typeDeducer
+     * @param Parser           $parser
      */
     public function __construct(
         StorageInterface $storage,
         TypeAnalyzer $typeAnalyzer,
         DocblockParser $docblockParser,
-        DeduceTypesCommand $deduceTypesCommand,
+        TypeDeducer $typeDeducer,
         Parser $parser
     ) {
         $this->storage = $storage;
         $this->typeAnalyzer = $typeAnalyzer;
         $this->docblockParser = $docblockParser;
-        $this->deduceTypesCommand = $deduceTypesCommand;
+        $this->typeDeducer = $typeDeducer;
         $this->parser = $parser;
     }
 
@@ -473,7 +474,7 @@ class FileIndexer
             );
         } elseif ($rawData['defaultValue']) {
             try {
-                $typeList = $this->deduceTypesCommand->deduceTypes(
+                $typeList = $this->typeDeducer->deduceTypes(
                     $filePath,
                     $rawData['defaultValue'],
                     [$rawData['defaultValue']],
@@ -557,7 +558,7 @@ class FileIndexer
             ];
         } elseif ($rawData['defaultValue']) {
             try {
-                $typeList = $this->deduceTypesCommand->deduceTypes(
+                $typeList = $this->typeDeducer->deduceTypes(
                     $filePath,
                     $rawData['defaultValue'],
                     [$rawData['defaultValue']],

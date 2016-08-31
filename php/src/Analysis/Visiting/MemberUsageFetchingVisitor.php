@@ -4,8 +4,9 @@ namespace PhpIntegrator\Analysis\Visiting;
 
 use UnexpectedValueException;
 
+use PhpIntegrator\Analysis\Typing\TypeDeducer;
+
 use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
-use PhpIntegrator\UserInterface\Command\DeduceTypesCommand;
 use PhpIntegrator\UserInterface\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
@@ -59,9 +60,9 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     protected $code;
 
     /**
-     * @var DeduceTypesCommand
+     * @var TypeDeducer
      */
-    protected $deduceTypesCommand;
+    protected $typeDeducer;
 
     /**
      * @var ResolveTypeCommand
@@ -79,7 +80,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     protected $classInfoCommand;
 
     /**
-     * @param DeduceTypesCommand $deduceTypesCommand
+     * @param TypeDeducer        $typeDeducer
      * @param ClassInfoCommand   $classInfoCommand
      * @param ResolveTypeCommand $resolveTypeCommand
      * @param TypeAnalyzer       $typeAnalyzer
@@ -87,14 +88,14 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
      * @param string             $code
      */
     public function __construct(
-        DeduceTypesCommand $deduceTypesCommand,
+        TypeDeducer $typeDeducer,
         ClassInfoCommand $classInfoCommand,
         ResolveTypeCommand $resolveTypeCommand,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
     ) {
-        $this->deduceTypesCommand = $deduceTypesCommand;
+        $this->typeDeducer = $typeDeducer;
         $this->classInfoCommand = $classInfoCommand;
         $this->typeAnalyzer = $typeAnalyzer;
         $this->resolveTypeCommand = $resolveTypeCommand;
@@ -132,7 +133,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
             $nodeToDeduceTypeFrom = $node->class;
         }
 
-        $objectTypes = $this->deduceTypesCommand->deduceTypesFromNode(
+        $objectTypes = $this->typeDeducer->deduceTypesFromNode(
             $this->file,
             $this->code,
             $nodeToDeduceTypeFrom,
