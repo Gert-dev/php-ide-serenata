@@ -178,10 +178,11 @@ class SemanticLintCommand extends AbstractCommand
             $unknownClassAnalyzer = null;
 
             if ($retrieveUnknownClasses) {
+                $fileTypeResolver = $this->getFileTypeResolverFactory()->create($file);
+
                 $unknownClassAnalyzer = new Linting\UnknownClassAnalyzer(
-                    $file,
                     $this->getIndexDatabase(),
-                    $this->getResolveTypeCommand(),
+                    $fileTypeResolver,
                     $this->getTypeAnalyzer(),
                     $this->getDocblockParser()
                 );

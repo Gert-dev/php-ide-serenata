@@ -3,11 +3,10 @@
 namespace PhpIntegrator\Analysis\Linting;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+use PhpIntegrator\Analysis\Typing\FileTypeResolver;
 
 use PhpIntegrator\Analysis\Visiting\ClassUsageFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\DocblockClassUsageFetchingVisitor;
-
-use PhpIntegrator\UserInterface\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Indexing\IndexDatabase;
 
@@ -29,11 +28,6 @@ class UnknownClassAnalyzer implements AnalyzerInterface
     protected $docblockClassUsageFetchingVisitor;
 
     /**
-     * @var string
-     */
-    protected $file;
-
-    /**
      * @var IndexDatabase
      */
     protected $indexDatabase;
@@ -44,29 +38,26 @@ class UnknownClassAnalyzer implements AnalyzerInterface
     protected $typeAnalyzer;
 
     /**
-     * @var ResolveTypeCommand
+     * @var FileTypeResolver
      */
-    protected $resolveTypeCommand;
+    protected $fileTypeResolver;
 
     /**
      * Constructor.
      *
-     * @param string             $file
-     * @param IndexDatabase      $indexDatabase
-     * @param ResolveTypeCommand $resolveTypeCommand
-     * @param TypeAnalyzer       $typeAnalyzer
-     * @param DocblockParser     $docblockParser
+     * @param IndexDatabase    $indexDatabase
+     * @param FileTypeResolver $fileTypeResolver
+     * @param TypeAnalyzer     $typeAnalyzer
+     * @param DocblockParser   $docblockParser
      */
     public function __construct(
-        $file,
         IndexDatabase $indexDatabase,
-        ResolveTypeCommand $resolveTypeCommand,
+        FileTypeResolver $fileTypeResolver,
         TypeAnalyzer $typeAnalyzer,
         DocblockParser $docblockParser
     ) {
-        $this->file = $file;
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->resolveTypeCommand = $resolveTypeCommand;
+        $this->fileTypeResolver = $fileTypeResolver;
         $this->indexDatabase = $indexDatabase;
 
         $this->classUsageFetchingVisitor = new ClassUsageFetchingVisitor($typeAnalyzer);
@@ -108,9 +99,8 @@ class UnknownClassAnalyzer implements AnalyzerInterface
             if ($classUsage['isFullyQualified']) {
                 $fqcn = $classUsage['name'];
             } else {
-                $fqcn = $this->resolveTypeCommand->resolveType(
+                $fqcn = $this->fileTypeResolver->resolve(
                     $classUsage['name'],
-                    $this->file,
                     $classUsage['line']
                 );
             }
