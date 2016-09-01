@@ -9,6 +9,8 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Linting;
 use PhpIntegrator\Analysis\ClasslikeExistanceChecker;
+use PhpIntegrator\Analysis\GlobalConstantExistanceChecker;
+use PhpIntegrator\Analysis\GlobalFunctionExistanceChecker;
 
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
 use PhpIntegrator\Analysis\Typing\TypeResolver;
@@ -32,24 +34,9 @@ class SemanticLintCommand extends AbstractCommand
     protected $classInfoCommand;
 
     /**
-     * @var GlobalFunctionsCommand
-     */
-    protected $globalFunctions;
-
-    /**
-     * @var GlobalConstantsCommand
-     */
-    protected $globalConstants;
-
-    /**
      * @var ClassListCommand
      */
     protected $classListCommand;
-
-    /**
-     * @var GlobalFunctionsCommand
-     */
-    protected $globalFunctionsCommand;
 
     /**
      * @var PartialParser
@@ -60,6 +47,16 @@ class SemanticLintCommand extends AbstractCommand
      * @var ClasslikeExistanceChecker
      */
     protected $classlikeExistanceChecker;
+
+    /**
+     * @var GlobalFunctionExistanceChecker
+     */
+    protected $globalFunctionExistanceChecker;
+
+    /**
+     * @var GlobalConstantExistanceChecker
+     */
+    protected $globalConstantExistanceChecker;
 
     /**
      * @var TypeResolver
@@ -213,7 +210,7 @@ class SemanticLintCommand extends AbstractCommand
 
             if ($retrieveUnknownGlobalFunctions) {
                 $unknownGlobalFunctionAnalyzer = new Linting\UnknownGlobalFunctionAnalyzer(
-                    $this->getGlobalFunctionsCommand()
+                    $this->getGlobalFunctionExistanceChecker()
                 );
 
                 foreach ($unknownGlobalFunctionAnalyzer->getVisitors() as $visitor) {
@@ -225,7 +222,7 @@ class SemanticLintCommand extends AbstractCommand
 
             if ($retrieveUnknownGlobalFunctions) {
                 $unknownGlobalConstantAnalyzer = new Linting\UnknownGlobalConstantAnalyzer(
-                    $this->getGlobalConstantsCommand()
+                    $this->getGlobalConstantExistanceChecker()
                 );
 
                 foreach ($unknownGlobalConstantAnalyzer->getVisitors() as $visitor) {
@@ -323,30 +320,6 @@ class SemanticLintCommand extends AbstractCommand
     }
 
     /**
-     * @return GlobalFunctionsCommand
-     */
-    protected function getGlobalFunctionsCommand()
-    {
-        if (!$this->globalFunctions) {
-            $this->globalFunctions = new GlobalFunctionsCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->globalFunctions;
-    }
-
-    /**
-     * @return GlobalConstantsCommand
-     */
-    protected function getGlobalConstantsCommand()
-    {
-        if (!$this->globalConstants) {
-            $this->globalConstants = new GlobalConstantsCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->globalConstants;
-    }
-
-    /**
      * Retrieves an instance of TypeDeducer. The object will only be created once if needed.
      *
      * @return TypeDeducer
@@ -426,6 +399,34 @@ class SemanticLintCommand extends AbstractCommand
         }
 
         return $this->classlikeExistanceChecker;
+    }
+
+    /**
+     * Retrieves an instance of GlobalFunctionExistanceChecker. The object will only be created once if needed.
+     *
+     * @return GlobalFunctionExistanceChecker
+     */
+    protected function getGlobalFunctionExistanceChecker()
+    {
+        if (!$this->globalFunctionExistanceChecker instanceof GlobalFunctionExistanceChecker) {
+            $this->globalFunctionExistanceChecker = new GlobalFunctionExistanceChecker($this->getIndexDatabase());
+        }
+
+        return $this->globalFunctionExistanceChecker;
+    }
+
+    /**
+     * Retrieves an instance of GlobalConstantExistanceChecker. The object will only be created once if needed.
+     *
+     * @return GlobalConstantExistanceChecker
+     */
+    protected function getGlobalConstantExistanceChecker()
+    {
+        if (!$this->globalConstantExistanceChecker instanceof GlobalConstantExistanceChecker) {
+            $this->globalConstantExistanceChecker = new GlobalConstantExistanceChecker($this->getIndexDatabase());
+        }
+
+        return $this->globalConstantExistanceChecker;
     }
 
     /**

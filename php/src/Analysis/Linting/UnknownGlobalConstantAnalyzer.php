@@ -2,9 +2,9 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
-use PhpIntegrator\Analysis\Visiting\GlobalConstantUsageFetchingVisitor;
+use PhpIntegrator\Analysis\GlobalConstantExistanceCheckerInterface;
 
-use PhpIntegrator\UserInterface\Command\GlobalConstantsCommand;
+use PhpIntegrator\Analysis\Visiting\GlobalConstantUsageFetchingVisitor;
 
 /**
  * Looks for unknown global constant names.
@@ -12,9 +12,9 @@ use PhpIntegrator\UserInterface\Command\GlobalConstantsCommand;
 class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
 {
     /**
-     * @var GlobalConstantsCommand
+     * @var GlobalConstantExistanceCheckerInterface
      */
-    protected $globalConstantsCommand;
+    protected $globalConstantExistanceChecker;
 
     /**
      * @var GlobalConstantUsageFetchingVisitor
@@ -22,11 +22,11 @@ class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
     protected $globalConstantUsageFetchingVisitor;
 
     /**
-     * @param GlobalConstantsCommand $globalConstantsCommand
+     * @param GlobalConstantExistanceCheckerInterface $globalConstantExistanceChecker
      */
-    public function __construct(GlobalConstantsCommand $globalConstantsCommand)
+    public function __construct(GlobalConstantExistanceCheckerInterface $globalConstantExistanceChecker)
     {
-        $this->globalConstantsCommand = $globalConstantsCommand;
+        $this->globalConstantExistanceChecker = $globalConstantExistanceChecker;
 
         $this->globalConstantUsageFetchingVisitor = new GlobalConstantUsageFetchingVisitor();
     }
@@ -46,15 +46,13 @@ class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
      */
     public function getOutput()
     {
-        $globalConstants = $this->globalConstantsCommand->getGlobalConstants();
-
-        $detectedConstants = $this->globalConstantUsageFetchingVisitor->getGlobalConstantList();
+        $globalConstants = $this->globalConstantUsageFetchingVisitor->getGlobalConstantList();
 
         $unknownGlobalConstants = [];
 
-        foreach ($detectedConstants as $detectedConstant) {
-            if (!isset($globalConstants[$detectedConstant['name']])) {
-                $unknownGlobalConstants[] = $detectedConstant;
+        foreach ($globalConstants as $globalConstant) {
+            if (!$this->globalConstantExistanceChecker->doesGlobalConstantExist($globalConstant['name'])) {
+                $unknownGlobalConstants[] = $globalConstant;
             }
         }
 

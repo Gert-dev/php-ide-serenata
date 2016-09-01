@@ -2,11 +2,9 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
+use PhpIntegrator\Analysis\GlobalFunctionExistanceCheckerInterface;
+
 use PhpIntegrator\Analysis\Visiting\GlobalFunctionUsageFetchingVisitor;
-
-use PhpIntegrator\UserInterface\Command\GlobalFunctionsCommand;
-
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Looks for unknown global function names (i.e. used during calls).
@@ -19,16 +17,16 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
     protected $globalFunctionUsageFetchingVisitor;
 
     /**
-     * @var GlobalFunctionsCommand
+     * @var GlobalFunctionExistanceCheckerInterface
      */
-    protected $globalFunctionsCommand;
+    protected $globalFunctionExistanceChecker;
 
     /**
-     * @param GlobalFunctionsCommand $globalFunctions
+     * @param GlobalFunctionExistanceCheckerInterface $globalFunctionExistanceChecker
      */
-    public function __construct(GlobalFunctionsCommand $globalFunctionsCommand)
+    public function __construct(GlobalFunctionExistanceCheckerInterface $globalFunctionExistanceChecker)
     {
-        $this->globalFunctionsCommand = $globalFunctionsCommand;
+        $this->globalFunctionExistanceChecker = $globalFunctionExistanceChecker;
 
         $this->globalFunctionUsageFetchingVisitor = new GlobalFunctionUsageFetchingVisitor();
     }
@@ -48,15 +46,13 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
      */
     public function getOutput()
     {
-        $globalFunctions = $this->globalFunctionsCommand->getGlobalFunctions();
-
-        $detectedFunctions = $this->globalFunctionUsageFetchingVisitor->getGlobalFunctionCallList();
+        $globalFunctions = $this->globalFunctionUsageFetchingVisitor->getGlobalFunctionCallList();
 
         $unknownGlobalFunctions = [];
 
-        foreach ($detectedFunctions as $detectedFunction) {
-            if (!isset($globalFunctions[$detectedFunction['name']])) {
-                $unknownGlobalFunctions[] = $detectedFunction;
+        foreach ($globalFunctions as $globalFunction) {
+            if (!$this->globalFunctionExistanceChecker->doesGlobalFunctionExist($globalFunction['name'])) {
+                $unknownGlobalFunctions[] = $globalFunction;
             }
         }
 
