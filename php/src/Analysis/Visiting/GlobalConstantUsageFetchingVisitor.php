@@ -15,7 +15,7 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
     /**
      * @var array
      */
-    protected $globalConstantCallList = [];
+    protected $globalConstantList = [];
 
     /**
      * @inheritDoc
@@ -27,7 +27,7 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
         }
 
         if (!$this->isConstantExcluded($node->name->toString())) {
-            $this->globalConstantCallList[] = [
+            $this->globalConstantList[] = [
                 'name'  => NodeHelpers::fetchClassName($node->name),
                 'start' => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
                 'end'   => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
@@ -48,8 +48,8 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
     /**
      * @return array
      */
-    public function getGlobalConstantCallList()
+    public function getGlobalConstantList()
     {
-        return $this->globalConstantCallList;
+        return $this->globalConstantList;
     }
 }

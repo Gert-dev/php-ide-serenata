@@ -48,7 +48,7 @@ class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
     {
         $globalConstants = $this->globalConstantsCommand->getGlobalConstants();
 
-        $detectedConstants = $this->globalConstantUsageFetchingVisitor->getGlobalConstantCallList();
+        $detectedConstants = $this->globalConstantUsageFetchingVisitor->getGlobalConstantList();
 
         $unknownGlobalConstants = [];
 
