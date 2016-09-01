@@ -99,10 +99,7 @@ class UnknownClassAnalyzer implements AnalyzerInterface
             if ($classUsage['isFullyQualified']) {
                 $fqcn = $classUsage['name'];
             } else {
-                $fqcn = $this->fileTypeResolver->resolve(
-                    $classUsage['name'],
-                    $classUsage['line']
-                );
+                $fqcn = $this->fileTypeResolver->resolve($classUsage['name'], $classUsage['line']);
             }
 
             $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn);
