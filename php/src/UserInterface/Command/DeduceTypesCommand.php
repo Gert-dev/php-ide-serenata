@@ -29,11 +29,6 @@ class DeduceTypesCommand extends AbstractCommand
     protected $classListCommand;
 
     /**
-     * @var ClassInfoCommand
-     */
-    protected $classInfoCommand;
-
-    /**
      * @var ResolveTypeCommand
      */
     protected $resolveTypeCommand;
@@ -142,7 +137,6 @@ class DeduceTypesCommand extends AbstractCommand
             $this->typeDeducer = new TypeDeducer(
                 $this->getParser(),
                 $this->getClassListCommand(),
-                $this->getClassInfoCommand(),
                 $this->getDocblockParser(),
                 $this->getPartialParser(),
                 $this->getTypeAnalyzer(),
@@ -167,18 +161,6 @@ class DeduceTypesCommand extends AbstractCommand
         }
 
         return $this->classListCommand;
-    }
-
-    /**
-     * @return ClassInfoCommand
-     */
-    protected function getClassInfoCommand()
-    {
-        if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfoCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->classInfoCommand;
     }
 
     /**

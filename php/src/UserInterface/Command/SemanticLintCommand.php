@@ -351,7 +351,6 @@ class SemanticLintCommand extends AbstractCommand
             $this->typeDeducer = new TypeDeducer(
                 $this->getParser(),
                 $this->getClassListCommand(),
-                $this->getClassInfoCommand(),
                 $this->getDocblockParser(),
                 $this->getPartialParser(),
                 $this->getTypeAnalyzer(),

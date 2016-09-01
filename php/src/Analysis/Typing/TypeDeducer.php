@@ -48,11 +48,6 @@ class TypeDeducer
     protected $classListCommand;
 
     /**
-     * @var ClassInfoCommand
-     */
-    protected $classInfoCommand;
-
-    /**
      * @var DocblockParser
      */
     protected $docblockParser;
@@ -114,7 +109,6 @@ class TypeDeducer
     /**
      * @param Parser                  $parser
      * @param ClassListCommand        $classListCommand
-     * @param ClassInfoCommand        $classInfoCommand
      * @param DocblockParser          $docblockParser
      * @param PartialParser           $partialParser
      * @param TypeAnalyzer            $typeAnalyzer
@@ -126,7 +120,6 @@ class TypeDeducer
     public function __construct(
         Parser $parser,
         ClassListCommand $classListCommand,
-        ClassInfoCommand $classInfoCommand,
         DocblockParser $docblockParser,
         PartialParser $partialParser,
         TypeAnalyzer $typeAnalyzer,
@@ -138,7 +131,6 @@ class TypeDeducer
     ) {
         $this->parser = $parser;
         $this->classListCommand = $classListCommand;
-        $this->classInfoCommand = $classInfoCommand;
         $this->docblockParser = $docblockParser;
         $this->partialParser = $partialParser;
         $this->typeAnalyzer = $typeAnalyzer;
@@ -207,7 +199,7 @@ class TypeDeducer
             $currentClassName = $this->getCurrentClassAt($file, $code, $offset);
 
             if ($currentClassName) {
-                $classInfo = $this->classInfoCommand->getClassInfo($currentClassName);
+                $classInfo = $this->classlikeInfoBuilder->getClasslikeInfo($currentClassName);
 
                 if ($classInfo && !empty($classInfo['parents'])) {
                     $type = $classInfo['parents'][0];
