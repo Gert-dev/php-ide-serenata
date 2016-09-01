@@ -6,13 +6,16 @@ use PhpIntegrator\Analysis\Visiting\GlobalConstantUsageFetchingVisitor;
 
 use PhpIntegrator\UserInterface\Command\GlobalConstantsCommand;
 
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
 /**
  * Looks for unknown global constant names.
  */
 class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
 {
+    /**
+     * @var GlobalConstantsCommand
+     */
+    protected $globalConstantsCommand;
+
     /**
      * @var GlobalConstantUsageFetchingVisitor
      */
@@ -20,14 +23,12 @@ class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
 
     /**
      * @param GlobalConstantsCommand $globalConstantsCommand
-     * @param TypeAnalyzer           $typeAnalyzer
      */
-    public function __construct(GlobalConstantsCommand $globalConstantsCommand, TypeAnalyzer $typeAnalyzer)
+    public function __construct(GlobalConstantsCommand $globalConstantsCommand)
     {
-        $this->globalConstantUsageFetchingVisitor = new GlobalConstantUsageFetchingVisitor(
-            $globalConstantsCommand,
-            $typeAnalyzer
-        );
+        $this->globalConstantsCommand = $globalConstantsCommand;
+
+        $this->globalConstantUsageFetchingVisitor = new GlobalConstantUsageFetchingVisitor();
     }
 
     /**
@@ -45,6 +46,18 @@ class UnknownGlobalConstantAnalyzer implements AnalyzerInterface
      */
     public function getOutput()
     {
-        return $this->globalConstantUsageFetchingVisitor->getGlobalConstantCallList();
+        $globalConstants = $this->globalConstantsCommand->getGlobalConstants();
+
+        $detectedConstants = $this->globalConstantUsageFetchingVisitor->getGlobalConstantCallList();
+
+        $unknownGlobalConstants = [];
+
+        foreach ($detectedConstants as $detectedConstant) {
+            if (!isset($globalConstants[$detectedConstant['name']])) {
+                $unknownGlobalConstants[] = $detectedConstant;
+            }
+        }
+
+        return $unknownGlobalConstants;
     }
 }

@@ -2,10 +2,6 @@
 
 namespace PhpIntegrator\Analysis\Visiting;
 
-use PhpIntegrator\UserInterface\Command\GlobalConstantsCommand;
-
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
 use PhpIntegrator\Utility\NodeHelpers;
 
 use PhpParser\Node;
@@ -22,26 +18,6 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
     protected $globalConstantCallList = [];
 
     /**
-     * @var GlobalConstantsCommand
-     */
-    protected $globalConstantsCommand;
-
-    /**
-     * @var TypeAnalyzer
-     */
-    protected $typeAnalyzer;
-
-    /**
-     * @param GlobalConstantsCommand $globalConstantsCommand
-     * @param TypeAnalyzer           $typeAnalyzer
-     */
-    public function __construct(GlobalConstantsCommand $globalConstantsCommand, TypeAnalyzer $typeAnalyzer)
-    {
-        $this->globalConstantsCommand = $globalConstantsCommand;
-        $this->typeAnalyzer = $typeAnalyzer;
-    }
-
-    /**
      * @inheritDoc
      */
     public function enterNode(Node $node)
@@ -50,11 +26,7 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $fqcn = $this->typeAnalyzer->getNormalizedFqcn($node->name->toString());
-
-        $globalConstants = $this->globalConstantsCommand->getGlobalConstants();
-
-        if (!isset($globalConstants[$fqcn]) && !$this->isConstantExcluded($node->name->toString())) {
+        if (!$this->isConstantExcluded($node->name->toString())) {
             $this->globalConstantCallList[] = [
                 'name'  => NodeHelpers::fetchClassName($node->name),
                 'start' => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
