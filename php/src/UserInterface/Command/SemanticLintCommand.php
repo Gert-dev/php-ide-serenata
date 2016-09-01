@@ -212,8 +212,7 @@ class SemanticLintCommand extends AbstractCommand
 
             if ($retrieveUnknownGlobalFunctions) {
                 $unknownGlobalFunctionAnalyzer = new Linting\UnknownGlobalFunctionAnalyzer(
-                    $this->getGlobalFunctionsCommand(),
-                    $this->getTypeAnalyzer()
+                    $this->getGlobalFunctionsCommand()
                 );
 
                 foreach ($unknownGlobalFunctionAnalyzer->getVisitors() as $visitor) {

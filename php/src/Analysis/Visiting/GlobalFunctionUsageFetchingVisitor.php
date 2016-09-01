@@ -22,26 +22,6 @@ class GlobalFunctionUsageFetchingVisitor extends NodeVisitorAbstract
     protected $globalFunctionCallList = [];
 
     /**
-     * @var GlobalFunctionsCommand
-     */
-    protected $globalFunctionsCommand;
-
-    /**
-     * @var TypeAnalyzer
-     */
-    protected $typeAnalyzer;
-
-    /**
-     * @param GlobalFunctionsCommand $globalFunctionsCommand
-     * @param TypeAnalyzer           $typeAnalyzer
-     */
-    public function __construct(GlobalFunctionsCommand $globalFunctionsCommand, TypeAnalyzer $typeAnalyzer)
-    {
-        $this->globalFunctionsCommand = $globalFunctionsCommand;
-        $this->typeAnalyzer = $typeAnalyzer;
-    }
-
-    /**
      * @inheritDoc
      */
     public function enterNode(Node $node)
@@ -50,17 +30,11 @@ class GlobalFunctionUsageFetchingVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $fqcn = $this->typeAnalyzer->getNormalizedFqcn($node->name->toString());
-
-        $globalFunctions = $this->globalFunctionsCommand->getGlobalFunctions();
-
-        if (!isset($globalFunctions[$fqcn])) {
-            $this->globalFunctionCallList[] = [
-                'name'  => NodeHelpers::fetchClassName($node->name),
-                'start' => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
-                'end'   => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
-            ];
-        }
+        $this->globalFunctionCallList[] = [
+            'name'  => NodeHelpers::fetchClassName($node->name),
+            'start' => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
+            'end'   => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
+        ];
     }
 
     /**

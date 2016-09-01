@@ -19,15 +19,18 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
     protected $globalFunctionUsageFetchingVisitor;
 
     /**
-     * @param GlobalFunctions $globalFunctions
-     * @param TypeAnalyzer    $typeAnalyzer
+     * @var GlobalFunctionsCommand
      */
-    public function __construct(GlobalFunctionsCommand $globalFunctionsCommand, TypeAnalyzer $typeAnalyzer)
+    protected $globalFunctionsCommand;
+
+    /**
+     * @param GlobalFunctionsCommand $globalFunctions
+     */
+    public function __construct(GlobalFunctionsCommand $globalFunctionsCommand)
     {
-        $this->globalFunctionUsageFetchingVisitor = new GlobalFunctionUsageFetchingVisitor(
-            $globalFunctionsCommand,
-            $typeAnalyzer
-        );
+        $this->globalFunctionsCommand = $globalFunctionsCommand;
+
+        $this->globalFunctionUsageFetchingVisitor = new GlobalFunctionUsageFetchingVisitor();
     }
 
     /**
@@ -45,6 +48,18 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
      */
     public function getOutput()
     {
-        return $this->globalFunctionUsageFetchingVisitor->getGlobalFunctionCallList();
+        $globalFunctions = $this->globalFunctionsCommand->getGlobalFunctions();
+
+        $detectedFunctions = $this->globalFunctionUsageFetchingVisitor->getGlobalFunctionCallList();
+
+        $unknownGlobalFunctions = [];
+
+        foreach ($detectedFunctions as $detectedFunction) {
+            if (!isset($globalFunctions[$detectedFunction['name']])) {
+                $unknownGlobalFunctions[] = $detectedFunction;
+            }
+        }
+
+        return $unknownGlobalFunctions;
     }
 }
