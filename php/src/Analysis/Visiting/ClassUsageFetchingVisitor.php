@@ -36,8 +36,10 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
     /**
      * Constructor.
      */
-    public function __construct()
+    public function __construct(TypeAnalyzer $typeAnalyzer)
     {
+        $this->typeAnalyzer = $typeAnalyzer;
+
         $this->lastNamespace = null;
     }
 
@@ -85,20 +87,8 @@ class ClassUsageFetchingVisitor extends NodeVisitorAbstract
      */
      protected function isValidType($type)
      {
-         return $this->getTypeAnalyzer()->isClassType($type);
+         return $this->typeAnalyzer->isClassType($type);
      }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
-    }
 
     /**
      * Retrieves the class usage list.

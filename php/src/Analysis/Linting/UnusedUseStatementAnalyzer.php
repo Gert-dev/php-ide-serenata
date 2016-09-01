@@ -38,7 +38,7 @@ class UnusedUseStatementAnalyzer implements AnalyzerInterface
      */
     public function __construct(TypeAnalyzer $typeAnalyzer, DocblockParser $docblockParser)
     {
-        $this->classUsageFetchingVisitor = new ClassUsageFetchingVisitor();
+        $this->classUsageFetchingVisitor = new ClassUsageFetchingVisitor($typeAnalyzer);
         $this->useStatementFetchingVisitor = new UseStatementFetchingVisitor();
         $this->docblockClassUsageFetchingVisitor = new DocblockClassUsageFetchingVisitor($typeAnalyzer, $docblockParser);
     }
