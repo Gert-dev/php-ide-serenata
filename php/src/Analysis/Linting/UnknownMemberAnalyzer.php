@@ -2,13 +2,12 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
+
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpIntegrator\Analysis\Visiting\MemberUsageFetchingVisitor;
-
-use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
-
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 /**
  * Looks for unknown member names.
@@ -21,22 +20,22 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
     protected $methodUsageFetchingVisitor;
 
     /**
-     * @param TypeDeducer        $typeDeducer
-     * @param ClassInfoCommand   $classInfoCommand
-     * @param TypeAnalyzer       $typeAnalyzer
-     * @param string             $file
-     * @param string             $code
+     * @param TypeDeducer          $typeDeducer
+     * @param ClasslikeInfoBuilder $classlikeInfoBuilder
+     * @param TypeAnalyzer         $typeAnalyzer
+     * @param string               $file
+     * @param string               $code
      */
     public function __construct(
         TypeDeducer $typeDeducer,
-        ClassInfoCommand $classInfoCommand,
+        ClasslikeInfoBuilder $classlikeInfoBuilder,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
     ) {
         $this->methodUsageFetchingVisitor = new MemberUsageFetchingVisitor(
             $typeDeducer,
-            $classInfoCommand,
+            $classlikeInfoBuilder,
             $typeAnalyzer,
             $file,
             $code

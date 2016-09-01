@@ -192,7 +192,7 @@ class SemanticLintCommand extends AbstractCommand
             if ($retrieveUnknownMembers) {
                 $unknownMemberAnalyzer = new Linting\UnknownMemberAnalyzer(
                     $this->getTypeDeducer(),
-                    $this->getClassInfoCommand(),
+                    $this->getClasslikeInfoBuilder(),
                     $this->getTypeAnalyzer(),
                     $file,
                     $code

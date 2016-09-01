@@ -4,10 +4,9 @@ namespace PhpIntegrator\Analysis\Visiting;
 
 use UnexpectedValueException;
 
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
+
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
-
-use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
-
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpParser\Node;
@@ -69,26 +68,26 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     protected $typeAnalyzer;
 
     /**
-     * @var ClassInfoCommand
+     * @var ClasslikeInfoBuilder
      */
-    protected $classInfoCommand;
+    protected $classlikeInfoBuilder;
 
     /**
-     * @param TypeDeducer        $typeDeducer
-     * @param ClassInfoCommand   $classInfoCommand
-     * @param TypeAnalyzer       $typeAnalyzer
-     * @param string             $file
-     * @param string             $code
+     * @param TypeDeducer          $typeDeducer
+     * @param ClasslikeInfoBuilder $classlikeInfoBuilder
+     * @param TypeAnalyzer         $typeAnalyzer
+     * @param string               $file
+     * @param string               $code
      */
     public function __construct(
         TypeDeducer $typeDeducer,
-        ClassInfoCommand $classInfoCommand,
+        ClasslikeInfoBuilder $classlikeInfoBuilder,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
     ) {
         $this->typeDeducer = $typeDeducer;
-        $this->classInfoCommand = $classInfoCommand;
+        $this->classlikeInfoBuilder = $classlikeInfoBuilder;
         $this->typeAnalyzer = $typeAnalyzer;
         $this->file = $file;
         $this->code = $code;
@@ -155,7 +154,7 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
                 $classInfo = null;
 
                 try {
-                    $classInfo = $this->classInfoCommand->getClassInfo($objectType);
+                    $classInfo = $this->classlikeInfoBuilder->getClasslikeInfo($objectType);
                 } catch (UnexpectedValueException $e) {
                     // Ignore exception, no class information means we return an error anyhow.
                 }
