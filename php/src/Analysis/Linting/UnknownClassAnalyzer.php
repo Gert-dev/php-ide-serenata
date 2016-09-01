@@ -2,13 +2,13 @@
 
 namespace PhpIntegrator\Analysis\Linting;
 
+use PhpIntegrator\Analysis\ClasslikeExistanceCheckerInterface;
+
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Analysis\Typing\FileTypeResolver;
 
 use PhpIntegrator\Analysis\Visiting\ClassUsageFetchingVisitor;
 use PhpIntegrator\Analysis\Visiting\DocblockClassUsageFetchingVisitor;
-
-use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Parsing\DocblockParser;
 
@@ -28,9 +28,9 @@ class UnknownClassAnalyzer implements AnalyzerInterface
     protected $docblockClassUsageFetchingVisitor;
 
     /**
-     * @var IndexDatabase
+     * @var ClasslikeExistanceCheckerInterface
      */
-    protected $indexDatabase;
+    protected $classlikeExistanceChecker;
 
     /**
      * @var TypeAnalyzer
@@ -45,20 +45,20 @@ class UnknownClassAnalyzer implements AnalyzerInterface
     /**
      * Constructor.
      *
-     * @param IndexDatabase    $indexDatabase
+     * @param ClasslikeExistanceCheckerInterface $classlikeExistanceChecker
      * @param FileTypeResolver $fileTypeResolver
      * @param TypeAnalyzer     $typeAnalyzer
      * @param DocblockParser   $docblockParser
      */
     public function __construct(
-        IndexDatabase $indexDatabase,
+        ClasslikeExistanceCheckerInterface $classlikeExistanceChecker,
         FileTypeResolver $fileTypeResolver,
         TypeAnalyzer $typeAnalyzer,
         DocblockParser $docblockParser
     ) {
         $this->typeAnalyzer = $typeAnalyzer;
         $this->fileTypeResolver = $fileTypeResolver;
-        $this->indexDatabase = $indexDatabase;
+        $this->classlikeExistanceChecker = $classlikeExistanceChecker;
 
         $this->classUsageFetchingVisitor = new ClassUsageFetchingVisitor($typeAnalyzer);
         $this->docblockClassUsageFetchingVisitor = new DocblockClassUsageFetchingVisitor($typeAnalyzer, $docblockParser);
@@ -80,13 +80,6 @@ class UnknownClassAnalyzer implements AnalyzerInterface
      */
     public function getOutput()
     {
-        // Generate a class map for fast lookups.
-        $classMap = [];
-
-        foreach ($this->indexDatabase->getAllStructuresRawInfo(null) as $element) {
-            $classMap[$element['fqcn']] = true;
-        }
-
         // Cross-reference the found class names against the class map.
         $unknownClasses = [];
 
@@ -104,7 +97,7 @@ class UnknownClassAnalyzer implements AnalyzerInterface
 
             $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn);
 
-            if (!isset($classMap[$fqcn])) {
+            if (!$this->classlikeExistanceChecker->doesClassExist($fqcn)) {
                 unset($classUsage['line'], $classUsage['firstPart'], $classUsage['isFullyQualified']);
 
                 $unknownClasses[] = $classUsage;

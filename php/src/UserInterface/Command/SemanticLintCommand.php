@@ -8,6 +8,7 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Linting;
+use PhpIntegrator\Analysis\ClasslikeExistanceChecker;
 
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
 use PhpIntegrator\Analysis\Typing\TypeResolver;
@@ -54,6 +55,11 @@ class SemanticLintCommand extends AbstractCommand
      * @var PartialParser
      */
     protected $partialParser;
+
+    /**
+     * @var ClasslikeExistanceChecker
+     */
+    protected $classlikeExistanceChecker;
 
     /**
      * @var TypeResolver
@@ -176,7 +182,7 @@ class SemanticLintCommand extends AbstractCommand
                 $fileTypeResolver = $this->getFileTypeResolverFactory()->create($file);
 
                 $unknownClassAnalyzer = new Linting\UnknownClassAnalyzer(
-                    $this->getIndexDatabase(),
+                    $this->getClasslikeExistanceChecker(),
                     $fileTypeResolver,
                     $this->getTypeAnalyzer(),
                     $this->getDocblockParser()
@@ -406,6 +412,20 @@ class SemanticLintCommand extends AbstractCommand
         }
 
         return $this->fileTypeResolverFactory;
+    }
+
+    /**
+     * Retrieves an instance of ClasslikeExistanceChecker. The object will only be created once if needed.
+     *
+     * @return ClasslikeExistanceChecker
+     */
+    protected function getClasslikeExistanceChecker()
+    {
+        if (!$this->classlikeExistanceChecker instanceof ClasslikeExistanceChecker) {
+            $this->classlikeExistanceChecker = new ClasslikeExistanceChecker($this->getIndexDatabase());
+        }
+
+        return $this->classlikeExistanceChecker;
     }
 
     /**
