@@ -15,6 +15,11 @@ class ClasslikeExistanceChecker implements ClasslikeExistanceCheckerInterface
     protected $indexDatabase;
 
     /**
+     * @var array
+     */
+    protected $classlikeFqcnMap;
+
+    /**
      * @param IndexDatabase $indexDatabase
      */
     public function __construct(IndexDatabase $indexDatabase)
@@ -31,11 +36,6 @@ class ClasslikeExistanceChecker implements ClasslikeExistanceCheckerInterface
 
         return isset($classlikeFqcnMap[$fqcn]);
     }
-
-    /**
-     * @var array
-     */
-    protected $classlikeFqcnMap;
 
     /**
      * @return array
