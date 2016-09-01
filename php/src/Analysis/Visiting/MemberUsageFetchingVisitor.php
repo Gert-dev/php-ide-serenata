@@ -7,7 +7,6 @@ use UnexpectedValueException;
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
 
 use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
-use PhpIntegrator\UserInterface\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -65,11 +64,6 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     protected $typeDeducer;
 
     /**
-     * @var ResolveTypeCommand
-     */
-    protected $resolveTypeCommand;
-
-    /**
      * @var TypeAnalyzer
      */
     protected $typeAnalyzer;
@@ -82,7 +76,6 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     /**
      * @param TypeDeducer        $typeDeducer
      * @param ClassInfoCommand   $classInfoCommand
-     * @param ResolveTypeCommand $resolveTypeCommand
      * @param TypeAnalyzer       $typeAnalyzer
      * @param string             $file
      * @param string             $code
@@ -90,7 +83,6 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
     public function __construct(
         TypeDeducer $typeDeducer,
         ClassInfoCommand $classInfoCommand,
-        ResolveTypeCommand $resolveTypeCommand,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
@@ -98,7 +90,6 @@ class MemberUsageFetchingVisitor extends NodeVisitorAbstract
         $this->typeDeducer = $typeDeducer;
         $this->classInfoCommand = $classInfoCommand;
         $this->typeAnalyzer = $typeAnalyzer;
-        $this->resolveTypeCommand = $resolveTypeCommand;
         $this->file = $file;
         $this->code = $code;
     }

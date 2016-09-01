@@ -41,11 +41,6 @@ class SemanticLintCommand extends AbstractCommand
     protected $globalConstants;
 
     /**
-     * @var ResolveTypeCommand
-     */
-    protected $resolveTypeCommand;
-
-    /**
      * @var ClassListCommand
      */
     protected $classListCommand;
@@ -198,7 +193,6 @@ class SemanticLintCommand extends AbstractCommand
                 $unknownMemberAnalyzer = new Linting\UnknownMemberAnalyzer(
                     $this->getTypeDeducer(),
                     $this->getClassInfoCommand(),
-                    $this->getResolveTypeCommand(),
                     $this->getTypeAnalyzer(),
                     $file,
                     $code
@@ -320,18 +314,6 @@ class SemanticLintCommand extends AbstractCommand
         }
 
         return $this->classInfoCommand;
-    }
-
-    /**
-     * @return ResolveTypeCommand
-     */
-    protected function getResolveTypeCommand()
-    {
-        if (!$this->resolveTypeCommand) {
-            $this->resolveTypeCommand = new ResolveTypeCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->resolveTypeCommand;
     }
 
     /**

@@ -7,7 +7,6 @@ use PhpIntegrator\Analysis\Typing\TypeDeducer;
 use PhpIntegrator\Analysis\Visiting\MemberUsageFetchingVisitor;
 
 use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
-use PhpIntegrator\UserInterface\Command\ResolveTypeCommand;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
@@ -24,7 +23,6 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
     /**
      * @param TypeDeducer        $typeDeducer
      * @param ClassInfoCommand   $classInfoCommand
-     * @param ResolveTypeCommand $resolveTypeCommand
      * @param TypeAnalyzer       $typeAnalyzer
      * @param string             $file
      * @param string             $code
@@ -32,7 +30,6 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
     public function __construct(
         TypeDeducer $typeDeducer,
         ClassInfoCommand $classInfoCommand,
-        ResolveTypeCommand $resolveTypeCommand,
         TypeAnalyzer $typeAnalyzer,
         $file,
         $code
@@ -40,7 +37,6 @@ class UnknownMemberAnalyzer implements AnalyzerInterface
         $this->methodUsageFetchingVisitor = new MemberUsageFetchingVisitor(
             $typeDeducer,
             $classInfoCommand,
-            $resolveTypeCommand,
             $typeAnalyzer,
             $file,
             $code
