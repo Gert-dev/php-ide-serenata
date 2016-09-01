@@ -239,7 +239,7 @@ class ClasslikeInfoBuilder
      *
      * @return ArrayObject
      */
-    public function fetchFlatClasslikeInfo(
+    protected function fetchFlatClasslikeInfo(
         array $element,
         array $parents,
         array $children,
