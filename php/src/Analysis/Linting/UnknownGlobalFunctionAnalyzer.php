@@ -48,8 +48,6 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
     {
         $globalFunctions = $this->globalFunctionUsageFetchingVisitor->getGlobalFunctionCallList();
 
-        // die(var_dump(__FILE__ . ':' . __LINE__, $globalFunctions));
-
         $unknownGlobalFunctions = [];
 
         foreach ($globalFunctions as $globalFunction) {
