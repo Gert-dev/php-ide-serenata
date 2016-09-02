@@ -201,18 +201,6 @@ class SemanticLintCommand extends AbstractCommand
                 }
             }
 
-            $unknownGlobalConstantAnalyzer = null;
-
-            if ($retrieveUnknownGlobalFunctions) {
-                $unknownGlobalConstantAnalyzer = new Linting\UnknownGlobalConstantAnalyzer(
-                    $this->getGlobalConstantExistanceChecker()
-                );
-
-                foreach ($unknownGlobalConstantAnalyzer->getVisitors() as $visitor) {
-                    $traverser->addVisitor($visitor);
-                }
-            }
-
             $unusedUseStatementAnalyzer = null;
 
             if ($retrieveUnusedUseStatements) {
@@ -228,17 +216,11 @@ class SemanticLintCommand extends AbstractCommand
 
             $traverser->traverse($nodes);
 
-
-
-
-
-
-
-
             $docblockCorrectnessAnalyzer = null;
+            $unknownGlobalConstantAnalyzer = null;
             $unknownGlobalFunctionAnalyzer = null;
 
-            if ($retrieveUnknownGlobalFunctions || $analyzeDocblockCorrectness) {
+            if ($unknownGlobalConstantAnalyzer || $retrieveUnknownGlobalFunctions || $analyzeDocblockCorrectness) {
                 $fileId = $this->getIndexDatabase()->getFileId($file);
 
                 if (!$fileId) {
@@ -247,6 +229,16 @@ class SemanticLintCommand extends AbstractCommand
 
                 // These analyzers needs to traverse the nodes separately as it modifies them.
                 $traverser = new NodeTraverser(false);
+
+                if ($retrieveUnknownGlobalFunctions) {
+                    $unknownGlobalConstantAnalyzer = new Linting\UnknownGlobalConstantAnalyzer(
+                        $this->getGlobalConstantExistanceChecker()
+                    );
+
+                    foreach ($unknownGlobalConstantAnalyzer->getVisitors() as $visitor) {
+                        $traverser->addVisitor($visitor);
+                    }
+                }
 
                 if ($retrieveUnknownGlobalFunctions) {
                     $unknownGlobalFunctionAnalyzer = new Linting\UnknownGlobalFunctionAnalyzer(

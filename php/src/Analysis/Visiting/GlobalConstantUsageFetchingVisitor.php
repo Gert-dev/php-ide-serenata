@@ -5,12 +5,13 @@ namespace PhpIntegrator\Analysis\Visiting;
 use PhpIntegrator\Utility\NodeHelpers;
 
 use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
+
+use PhpParser\NodeVisitor\NameResolver;
 
 /**
  * Node visitor that fetches usages of (global) constants.
  */
-class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
+class GlobalConstantUsageFetchingVisitor extends NameResolver
 {
     /**
      * @var array
@@ -22,15 +23,19 @@ class GlobalConstantUsageFetchingVisitor extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
+        parent::enterNode($node);
+
         if (!$node instanceof Node\Expr\ConstFetch) {
             return;
         }
 
         if (!$this->isConstantExcluded($node->name->toString())) {
             $this->globalConstantList[] = [
-                'name'  => NodeHelpers::fetchClassName($node->name),
-                'start' => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
-                'end'   => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
+                'name'          => NodeHelpers::fetchClassName($node->name),
+                'namespace'     => NodeHelpers::fetchClassName($this->namespace),
+                'isUnqualified' => $node->name->isUnqualified(),
+                'start'         => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
+                'end'           => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
             ];
         }
     }

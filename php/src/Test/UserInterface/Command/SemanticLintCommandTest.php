@@ -253,21 +253,21 @@ class SemanticLintCommandTest extends IndexedTest
 
         $this->assertEquals([
             [
-                'name'  => 'FOO',
-                'start' => 40,
-                'end'   => 43
+                'name'  => 'MISSING',
+                'start' => 98,
+                'end'   => 105
             ],
 
             [
-                'name'  => 'BAR',
-                'start' => 45,
-                'end'   => 48
+                'name'  => '\MISSING',
+                'start' => 111,
+                'end'   => 119
             ],
 
             [
-                'name'  => '\A\FOO',
-                'start' => 50,
-                'end'   => 56
+                'name'  => '\A\MISSING',
+                'start' => 125,
+                'end'   => 135
             ]
         ], $output['errors']['unknownGlobalConstants']);
     }

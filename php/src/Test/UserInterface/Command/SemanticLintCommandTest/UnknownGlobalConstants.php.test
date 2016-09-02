@@ -1,10 +1,21 @@
 <?php
 
-namespace A;
+namespace {
+    const BAR = 1;
+}
 
-const BAR = null;
+namespace A {
+    const FOO = 2;
+    const BAR = 2;
 
-FOO;
-BAR;
-\A\FOO;
-\A\BAR;
+    MISSING;
+    \MISSING;
+    \A\MISSING;
+
+    FOO;
+    \A\FOO;
+
+    BAR;
+    \BAR;
+    \A\BAR;
+}
