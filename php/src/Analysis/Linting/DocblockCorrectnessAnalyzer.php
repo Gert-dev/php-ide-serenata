@@ -49,16 +49,25 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     protected $classCache = [];
 
     /**
-     * Constructor.
-     *
-     * @param string           $code
+     * @param string               $code
      * @param ClasslikeInfoBuilder $classlikeInfoBuilder
+     * @param DocblockParser       $docblockParser
+     * @param TypeAnalyzer         $typeAnalyzer
+     * @param DocblockAnalyzer     $docblockAnalyzer
      */
-    public function __construct($code, ClasslikeInfoBuilder $classlikeInfoBuilder)
-    {
+    public function __construct(
+        $code,
+        ClasslikeInfoBuilder $classlikeInfoBuilder,
+        DocblockParser $docblockParser,
+        TypeAnalyzer $typeAnalyzer,
+        DocblockAnalyzer $docblockAnalyzer
+    ) {
         $this->classlikeInfoBuilder = $classlikeInfoBuilder;
+        $this->docblockParser = $docblockParser;
+        $this->typeAnalyzer = $typeAnalyzer;
+        $this->docblockAnalyzer = $docblockAnalyzer;
 
-        $this->outlineIndexingVisitor = new OutlineFetchingVisitor($this->getTypeAnalyzer(), $code);
+        $this->outlineIndexingVisitor = new OutlineFetchingVisitor($typeAnalyzer, $code);
     }
 
     /**
@@ -405,41 +414,5 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         }
 
         return $classCache[$fqcn];
-    }
-
-    /**
-     * @return DocblockParser
-     */
-    protected function getDocblockParser()
-    {
-        if (!$this->docblockParser) {
-            $this->docblockParser = new DocblockParser();
-        }
-
-        return $this->docblockParser;
-    }
-
-    /**
-     * @return TypeAnalyzer
-     */
-    protected function getTypeAnalyzer()
-    {
-        if (!$this->typeAnalyzer) {
-            $this->typeAnalyzer = new TypeAnalyzer();
-        }
-
-        return $this->typeAnalyzer;
-    }
-
-    /**
-     * @return DocblockAnalyzer
-     */
-    protected function getDocblockAnalyzer()
-    {
-        if (!$this->docblockAnalyzer) {
-            $this->docblockAnalyzer = new DocblockAnalyzer();
-        }
-
-        return $this->docblockAnalyzer;
     }
 }
