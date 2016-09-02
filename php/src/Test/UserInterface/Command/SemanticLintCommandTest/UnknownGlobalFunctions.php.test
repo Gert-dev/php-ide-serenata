@@ -1,13 +1,31 @@
 <?php
 
-namespace A;
+namespace {
+    function bar()
+    {
 
-function bar()
-{
+    }
 
+    function rootFunc()
+    {
+
+    }
 }
 
-foo();
-bar();
-\A\foo();
-\A\bar();
+namespace A {
+    function bar()
+    {
+        
+    }
+
+    foo();
+    \foo();
+    \A\foo();
+
+    rootFunc();
+    \rootFunc();
+
+    bar();
+    \bar();
+    \A\bar();
+}

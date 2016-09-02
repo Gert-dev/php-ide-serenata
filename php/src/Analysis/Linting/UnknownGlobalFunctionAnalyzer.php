@@ -48,12 +48,30 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
     {
         $globalFunctions = $this->globalFunctionUsageFetchingVisitor->getGlobalFunctionCallList();
 
+        // die(var_dump(__FILE__ . ':' . __LINE__, $globalFunctions));
+
         $unknownGlobalFunctions = [];
 
         foreach ($globalFunctions as $globalFunction) {
-            if (!$this->globalFunctionExistanceChecker->doesGlobalFunctionExist($globalFunction['name'])) {
-                $unknownGlobalFunctions[] = $globalFunction;
+            if ($this->globalFunctionExistanceChecker->doesGlobalFunctionExist($globalFunction['name'])) {
+                continue;
+            } elseif ($globalFunction['isUnqualified']) {
+                $fqcnForCurrentNamespace = $globalFunction['namespace'] . '\\' . $globalFunction['name'];
+
+                if ($this->globalFunctionExistanceChecker->doesGlobalFunctionExist($fqcnForCurrentNamespace)) {
+                    continue;
+                }
+
+                $fqcnForRootNamespace = '\\' . $globalFunction['name'];
+
+                if ($this->globalFunctionExistanceChecker->doesGlobalFunctionExist($fqcnForRootNamespace)) {
+                    continue;
+                }
             }
+
+            unset($globalFunction['namespace'], $globalFunction['isUnqualified']);
+
+            $unknownGlobalFunctions[] = $globalFunction;
         }
 
         return $unknownGlobalFunctions;

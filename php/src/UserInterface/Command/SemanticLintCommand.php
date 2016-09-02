@@ -201,18 +201,6 @@ class SemanticLintCommand extends AbstractCommand
                 }
             }
 
-            $unknownGlobalFunctionAnalyzer = null;
-
-            if ($retrieveUnknownGlobalFunctions) {
-                $unknownGlobalFunctionAnalyzer = new Linting\UnknownGlobalFunctionAnalyzer(
-                    $this->getGlobalFunctionExistanceChecker()
-                );
-
-                foreach ($unknownGlobalFunctionAnalyzer->getVisitors() as $visitor) {
-                    $traverser->addVisitor($visitor);
-                }
-            }
-
             $unknownGlobalConstantAnalyzer = null;
 
             if ($retrieveUnknownGlobalFunctions) {
@@ -240,28 +228,48 @@ class SemanticLintCommand extends AbstractCommand
 
             $traverser->traverse($nodes);
 
-            $docblockCorrectnessAnalyzer = null;
 
-            if ($analyzeDocblockCorrectness) {
+
+
+
+
+
+
+            $docblockCorrectnessAnalyzer = null;
+            $unknownGlobalFunctionAnalyzer = null;
+
+            if ($retrieveUnknownGlobalFunctions || $analyzeDocblockCorrectness) {
                 $fileId = $this->getIndexDatabase()->getFileId($file);
 
                 if (!$fileId) {
                     throw new UnexpectedValueException('The specified file is not present in the index!');
                 }
 
-                // This analyzer needs to traverse the nodes separately as it modifies them.
+                // These analyzers needs to traverse the nodes separately as it modifies them.
                 $traverser = new NodeTraverser(false);
 
-                $docblockCorrectnessAnalyzer = new Linting\DocblockCorrectnessAnalyzer(
-                    $code,
-                    $this->getClasslikeInfoBuilder(),
-                    $this->getDocblockParser(),
-                    $this->getTypeAnalyzer(),
-                    $this->getDocblockAnalyzer()
-                );
+                if ($retrieveUnknownGlobalFunctions) {
+                    $unknownGlobalFunctionAnalyzer = new Linting\UnknownGlobalFunctionAnalyzer(
+                        $this->getGlobalFunctionExistanceChecker()
+                    );
 
-                foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
-                    $traverser->addVisitor($visitor);
+                    foreach ($unknownGlobalFunctionAnalyzer->getVisitors() as $visitor) {
+                        $traverser->addVisitor($visitor);
+                    }
+                }
+
+                if ($analyzeDocblockCorrectness) {
+                    $docblockCorrectnessAnalyzer = new Linting\DocblockCorrectnessAnalyzer(
+                        $code,
+                        $this->getClasslikeInfoBuilder(),
+                        $this->getDocblockParser(),
+                        $this->getTypeAnalyzer(),
+                        $this->getDocblockAnalyzer()
+                    );
+
+                    foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
+                        $traverser->addVisitor($visitor);
+                    }
                 }
 
                 try {
@@ -270,6 +278,7 @@ class SemanticLintCommand extends AbstractCommand
                     // The NameResolver can throw exceptions on things such as duplicate use statements. Seeing as that is
                     // a PHP error, just fetch any output at all.
                     $docblockCorrectnessAnalyzer = null;
+                    $unknownGlobalFunctionAnalyzer = null;
                 }
             }
 

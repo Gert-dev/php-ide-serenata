@@ -5,6 +5,9 @@
   * Everything should feel a bit more responsive.
   * Semantic linting should be significantly faster, especially for large files.
 
+### Bugs fixed
+* Semantic linting was incorrectly processing unqualified global function names.
+
 ### Changes for developers
 * Previously a fix was applied to make FQCN's actually contain a leading slash to clearly indicate that they were fully qualified. This still didn't happen everywhere, which has been corrected now.
 * A new service method, `getCurrentProjectSettings`, allows retrieving the settings (specific to this package) of a project. This includes things such as the PHP version, paths and excluded folders.

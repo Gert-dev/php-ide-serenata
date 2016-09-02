@@ -229,20 +229,20 @@ class SemanticLintCommandTest extends IndexedTest
         $this->assertEquals([
             [
                 'name'  => 'foo',
-                'start' => 42,
-                'end'   => 47
+                'start' => 151,
+                'end'   => 156
             ],
 
             [
-                'name'  => 'bar',
-                'start' => 49,
-                'end'   => 54
+                'name'  => '\foo',
+                'start' => 162,
+                'end'   => 168
             ],
 
             [
                 'name'  => '\A\foo',
-                'start' => 56,
-                'end'   => 64
+                'start' => 174,
+                'end'   => 182
             ]
         ], $output['errors']['unknownGlobalFunctions']);
     }
