@@ -219,12 +219,6 @@ class SemanticLintCommand extends AbstractCommand
             $docblockCorrectnessAnalyzer = null;
 
             if ($analyzeDocblockCorrectness) {
-                $fileId = $this->getIndexDatabase()->getFileId($file);
-
-                if (!$fileId) {
-                    throw new UnexpectedValueException('The specified file is not present in the index!');
-                }
-
                 // These analyzers needs to traverse the nodes separately as it modifies them.
                 $traverser = new NodeTraverser(false);
 
