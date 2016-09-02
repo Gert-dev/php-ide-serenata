@@ -12,8 +12,6 @@ use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
 
 use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
 
-use PhpIntegrator\Indexing\IndexDatabase;
-
 use PhpIntegrator\Parsing\DocblockParser;
 
 /**
@@ -25,11 +23,6 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      * @var OutlineFetchingVisitor
      */
     protected $outlineIndexingVisitor;
-
-    /**
-     * @var IndexDatabase
-     */
-    protected $indexDatabase;
 
     /**
      * @var DocblockParser
@@ -60,12 +53,10 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      * Constructor.
      *
      * @param string           $code
-     * @param IndexDatabase    $indexDatabase
      * @param ClassInfoCommand $classInfoCommand
      */
-    public function __construct($code, IndexDatabase $indexDatabase, ClassInfoCommand $classInfoCommand)
+    public function __construct($code, ClassInfoCommand $classInfoCommand)
     {
-        $this->indexDatabase = $indexDatabase;
         $this->classInfoCommand = $classInfoCommand;
 
         $this->outlineIndexingVisitor = new OutlineFetchingVisitor($this->getTypeAnalyzer(), $code);

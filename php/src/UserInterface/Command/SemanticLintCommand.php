@@ -259,7 +259,6 @@ class SemanticLintCommand extends AbstractCommand
 
                 $docblockCorrectnessAnalyzer = new Linting\DocblockCorrectnessAnalyzer(
                     $code,
-                    $this->getIndexDatabase(),
                     $this->getClassInfoCommand()
                 );
 
