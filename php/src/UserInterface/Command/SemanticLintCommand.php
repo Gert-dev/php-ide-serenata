@@ -29,11 +29,6 @@ use PhpParser\NodeTraverser;
 class SemanticLintCommand extends AbstractCommand
 {
     /**
-     * @var ClassInfoCommand
-     */
-    protected $classInfoCommand;
-
-    /**
      * @var ClassListCommand
      */
     protected $classListCommand;
@@ -259,7 +254,7 @@ class SemanticLintCommand extends AbstractCommand
 
                 $docblockCorrectnessAnalyzer = new Linting\DocblockCorrectnessAnalyzer(
                     $code,
-                    $this->getClassInfoCommand()
+                    $this->getClasslikeInfoBuilder()
                 );
 
                 foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
@@ -304,18 +299,6 @@ class SemanticLintCommand extends AbstractCommand
         }
 
         return $output;
-    }
-
-    /**
-     * @return ClassInfoCommand
-     */
-    protected function getClassInfoCommand()
-    {
-        if (!$this->classInfoCommand) {
-            $this->classInfoCommand = new ClassInfoCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->classInfoCommand;
     }
 
     /**

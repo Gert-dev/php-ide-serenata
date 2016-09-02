@@ -5,12 +5,11 @@ namespace PhpIntegrator\Analysis\Linting;
 use UnexpectedValueException;
 
 use PhpIntegrator\Analysis\DocblockAnalyzer;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
-
-use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
 
 use PhpIntegrator\Parsing\DocblockParser;
 
@@ -40,9 +39,9 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     protected $docblockAnalyzer;
 
     /**
-     * @var ClassInfoCommand
+     * @var ClasslikeInfoBuilder
      */
-    protected $classInfoCommand;
+    protected $classlikeInfoBuilder;
 
     /**
      * @var array
@@ -53,11 +52,11 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
      * Constructor.
      *
      * @param string           $code
-     * @param ClassInfoCommand $classInfoCommand
+     * @param ClasslikeInfoBuilder $classlikeInfoBuilder
      */
-    public function __construct($code, ClassInfoCommand $classInfoCommand)
+    public function __construct($code, ClasslikeInfoBuilder $classlikeInfoBuilder)
     {
-        $this->classInfoCommand = $classInfoCommand;
+        $this->classlikeInfoBuilder = $classlikeInfoBuilder;
 
         $this->outlineIndexingVisitor = new OutlineFetchingVisitor($this->getTypeAnalyzer(), $code);
     }
@@ -399,7 +398,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
     {
         if (!isset($classCache[$fqcn])) {
             try {
-                $classCache[$fqcn] = $this->classInfoCommand->getClassInfo($fqcn);
+                $classCache[$fqcn] = $this->classlikeInfoBuilder->getClasslikeInfo($fqcn);
             } catch (UnexpectedValueException $e) {
                 $classCache[$fqcn] = null;
             }
