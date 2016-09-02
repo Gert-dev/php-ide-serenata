@@ -22,8 +22,6 @@ use PhpIntegrator\Parsing\DocblockParser;
 use PhpParser\Error;
 use PhpParser\NodeTraverser;
 
-use PhpParser\NodeVisitor\NameResolver;
-
 /**
  * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the
  * indexer).
