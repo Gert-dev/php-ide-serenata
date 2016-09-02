@@ -153,7 +153,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         ];
 
         if ($structure['docComment']) {
-            $result = $this->getDocblockParser()->parse($structure['docComment'], [
+            $result = $this->docblockParser->parse($structure['docComment'], [
                 DocblockParser::CATEGORY,
                 DocblockParser::SUBPACKAGE,
                 DocblockParser::LINK
@@ -250,7 +250,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         ];
 
         if ($property['docComment']) {
-            $result = $this->getDocblockParser()->parse($property['docComment'], [DocblockParser::VAR_TYPE], $property['name']);
+            $result = $this->docblockParser->parse($property['docComment'], [DocblockParser::VAR_TYPE], $property['name']);
 
             if (!isset($result['var']['$' . $property['name']]['type'])) {
                 $docblockIssues['varTagMissing'][] = [
@@ -293,7 +293,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
         ];
 
         if ($constant['docComment']) {
-            $result = $this->getDocblockParser()->parse($constant['docComment'], [DocblockParser::VAR_TYPE], $constant['name']);
+            $result = $this->docblockParser->parse($constant['docComment'], [DocblockParser::VAR_TYPE], $constant['name']);
 
             if (!isset($result['var']['$' . $constant['name']]['type'])) {
                 $docblockIssues['varTagMissing'][] = [
@@ -340,13 +340,13 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             return $docblockIssues;
         }
 
-        $result = $this->getDocblockParser()->parse(
+        $result = $this->docblockParser->parse(
             $function['docComment'],
             [DocblockParser::DESCRIPTION, DocblockParser::PARAM_TYPE],
             $function['name']
         );
 
-        if ($this->getDocblockAnalyzer()->isFullInheritDocSyntax($result['descriptions']['short'])) {
+        if ($this->docblockAnalyzer->isFullInheritDocSyntax($result['descriptions']['short'])) {
             return $docblockIssues;
         }
 
@@ -371,7 +371,7 @@ class DocblockCorrectnessAnalyzer implements AnalyzerInterface
             } elseif ($parameter['type']) {
                 $docblockType = $docblockParameters[$dollarName]['type'];
 
-                if (!$this->getTypeAnalyzer()->isTypeConformantWithDocblockType($parameter['type'], $docblockType)) {
+                if (!$this->typeAnalyzer->isTypeConformantWithDocblockType($parameter['type'], $docblockType)) {
                     $docblockIssues['parameterTypeMismatch'][] = [
                         'name'      => $function['name'],
                         'parameter' => $dollarName,
