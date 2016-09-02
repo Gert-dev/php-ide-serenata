@@ -6,8 +6,6 @@ use PhpIntegrator\UserInterface\Command\SemanticLintCommand;
 
 use PhpIntegrator\Test\IndexedTest;
 
-use PhpIntegrator\Indexing\IndexDatabase;
-
 class SemanticLintCommandTest extends IndexedTest
 {
     protected function lintFile($file, $indexingMayFail = false)
