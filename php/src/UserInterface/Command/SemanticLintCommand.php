@@ -22,6 +22,8 @@ use PhpIntegrator\Parsing\DocblockParser;
 use PhpParser\Error;
 use PhpParser\NodeTraverser;
 
+use PhpParser\NodeVisitor\NameResolver;
+
 /**
  * Command that lints a file's semantics (i.e. it does not deal with syntax errors, as this is already handled by the
  * indexer).
@@ -217,16 +219,46 @@ class SemanticLintCommand extends AbstractCommand
             $traverser->traverse($nodes);
 
             $docblockCorrectnessAnalyzer = null;
-            $unknownGlobalConstantAnalyzer = null;
-            $unknownGlobalFunctionAnalyzer = null;
 
-            if ($unknownGlobalConstantAnalyzer || $retrieveUnknownGlobalFunctions || $analyzeDocblockCorrectness) {
+            if ($analyzeDocblockCorrectness) {
                 $fileId = $this->getIndexDatabase()->getFileId($file);
 
                 if (!$fileId) {
                     throw new UnexpectedValueException('The specified file is not present in the index!');
                 }
 
+                // These analyzers needs to traverse the nodes separately as it modifies them.
+                $traverser = new NodeTraverser(false);
+
+                $docblockCorrectnessAnalyzer = new Linting\DocblockCorrectnessAnalyzer(
+                    $code,
+                    $this->getClasslikeInfoBuilder(),
+                    $this->getDocblockParser(),
+                    $this->getTypeAnalyzer(),
+                    $this->getDocblockAnalyzer()
+                );
+
+                foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
+                    $traverser->addVisitor($visitor);
+                }
+
+                try {
+                    $traverser->traverse($nodes);
+                } catch (Error $e) {
+                    // The NameResolver can throw exceptions on things such as duplicate use statements. Seeing as that is
+                    // a PHP error, just fetch any output at all.
+                    $docblockCorrectnessAnalyzer = null;
+                }
+
+                // The NameResolver modifies nodes as it goes along. We can't use NodeTraverser's clone functionality
+                // as that only (shallowly) clones the nodes themselves, but not their names.
+                $nodes = $parser->parse($code);
+            }
+
+            $unknownGlobalConstantAnalyzer = null;
+            $unknownGlobalFunctionAnalyzer = null;
+
+            if ($unknownGlobalConstantAnalyzer || $retrieveUnknownGlobalFunctions) {
                 // These analyzers needs to traverse the nodes separately as it modifies them.
                 $traverser = new NodeTraverser(false);
 
@@ -250,26 +282,12 @@ class SemanticLintCommand extends AbstractCommand
                     }
                 }
 
-                if ($analyzeDocblockCorrectness) {
-                    $docblockCorrectnessAnalyzer = new Linting\DocblockCorrectnessAnalyzer(
-                        $code,
-                        $this->getClasslikeInfoBuilder(),
-                        $this->getDocblockParser(),
-                        $this->getTypeAnalyzer(),
-                        $this->getDocblockAnalyzer()
-                    );
-
-                    foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
-                        $traverser->addVisitor($visitor);
-                    }
-                }
-
                 try {
                     $traverser->traverse($nodes);
                 } catch (Error $e) {
                     // The NameResolver can throw exceptions on things such as duplicate use statements. Seeing as that is
                     // a PHP error, just fetch any output at all.
-                    $docblockCorrectnessAnalyzer = null;
+                    $unknownGlobalConstantAnalyzer = null;
                     $unknownGlobalFunctionAnalyzer = null;
                 }
             }

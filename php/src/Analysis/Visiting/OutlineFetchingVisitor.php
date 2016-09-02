@@ -277,13 +277,15 @@ class OutlineFetchingVisitor extends NameResolver
      */
     protected function parseFunctionNode(Node\Stmt\Function_ $node)
     {
+        $data = $this->extractFunctionLikeNodeData($node);
+
         parent::enterNode($node);
 
         $fqcn = $this->typeNormalizer->getNormalizedFqcn(
             isset($node->namespacedName) ? $node->namespacedName->toString() : $node->name
         );
 
-        $this->globalFunctions[$fqcn] = $this->extractFunctionLikeNodeData($node) + [
+        $this->globalFunctions[$fqcn] = $data + [
             'fqcn' => $fqcn
         ];
     }
