@@ -57,7 +57,7 @@ class UnknownGlobalFunctionAnalyzer implements AnalyzerInterface
                 // Unqualified global function calls, such as "array_walk", could refer to "array_walk" in the current
                 // namespace (e.g. "\A\array_walk") or, if not present in the current namespace, the root namespace
                 // (e.g. "\array_walk").
-                $fqcnForCurrentNamespace = $globalFunction['namespace'] . '\\' . $globalFunction['name'];
+                $fqcnForCurrentNamespace = '\\' . $globalFunction['namespace'] . '\\' . $globalFunction['name'];
 
                 if ($this->globalFunctionExistanceChecker->doesGlobalFunctionExist($fqcnForCurrentNamespace)) {
                     continue;
