@@ -2,7 +2,7 @@
 
 namespace PhpIntegrator\Analysis\Typing;
 
-use LogicException;
+use UnexpectedValueException;
 
 /**
  * Factory that creates instances of {@see FileTypeResolver}.
@@ -34,7 +34,7 @@ class FileTypeResolverFactory
     /**
      * @param string $filePath
      *
-     * @throws LogicException if no namespaces exist for a file.
+     * @throws UnexpectedValueException if no namespaces exist for a file.
      *
      * @return TypeResolver
      */
@@ -43,7 +43,7 @@ class FileTypeResolverFactory
         $namespaces = $this->namespaceImportProviderInterface->getNamespacesForFile($filePath);
 
         if (empty($namespaces)) {
-            throw new LogicException(
+            throw new UnexpectedValueException(
                 'No namespace found, but there should always exist at least one namespace row in the database!'
             );
         }
