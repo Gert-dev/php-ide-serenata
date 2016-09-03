@@ -21,6 +21,8 @@ use PhpIntegrator\UserInterface\Application;
  */
 abstract class IndexedTest extends \PHPUnit_Framework_TestCase
 {
+    static $builtinIndexDatabase;
+
     /**
      * @return \PhpParser\Parser
      */
@@ -86,11 +88,14 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
      */
     protected function getDatabaseForBuiltinTesting()
     {
-        $indexDatabase = $this->getDatabase();
+        // Indexing builtin items is a fairy large performance hit to run every test, so keep the property static.
+        if (!self::$builtinIndexDatabase) {
+            self::$builtinIndexDatabase = $this->getDatabase();
 
-        $builtiinIndexer = new BuiltinIndexer($indexDatabase, new TypeAnalyzer());
-        $builtiinIndexer->index();
+            $builtiinIndexer = new BuiltinIndexer(self::$builtinIndexDatabase, new TypeAnalyzer());
+            $builtiinIndexer->index();
+        }
 
-        return $indexDatabase;
+        return self::$builtinIndexDatabase;
     }
 }
