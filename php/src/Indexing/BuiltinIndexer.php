@@ -732,7 +732,7 @@ class BuiltinIndexer
 
         $shortName = $element->getShortName();
 
-        return isset($correctionMap[$shortName]) ? $correctionMap[$shortName] : $shortName;
+        return isset($correctionMap[$shortName]) ? $correctionMap[$shortName] : $element->getName();
     }
 
     /**

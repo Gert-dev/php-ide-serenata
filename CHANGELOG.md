@@ -1,3 +1,7 @@
+## 1.2.3
+### Bugs fixed
+* Fix built-in classes with FQCN's with more than one part, such as from the MongoDB extension, not properly being indexed.
+
 ## 1.2.2
 ### Bugs fixed
 * Fixed an error related to `JSON_PRESERVE_ZERO_FRACTION`, which needs PHP >= 5.6.
