@@ -17,6 +17,9 @@ use PhpIntegrator\UserInterface\Application;
  */
 abstract class IndexedTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @return \PhpParser\Parser
+     */
     protected function getParser()
     {
         $app = new Application();
@@ -29,6 +32,11 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
         return $refMethod->invoke($app);
     }
 
+    /**
+     * @param bool $indexBuiltinItems
+     *
+     * @return IndexDatabase
+     */
     protected function getDatabase($indexBuiltinItems = false)
     {
         $indexDatabase = new IndexDatabase(':memory:', 1);
@@ -45,6 +53,12 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
         return $indexDatabase;
     }
 
+    /**
+     * @param string|null $testPath
+     * @param bool        $mayFail
+     *
+     * @return IndexDatabase
+     */
     protected function getDatabaseForTestFile($testPath = null, $mayFail = false)
     {
         $indexDatabase = $this->getDatabase(false);
