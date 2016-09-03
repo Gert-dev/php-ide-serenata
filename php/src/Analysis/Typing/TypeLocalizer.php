@@ -61,14 +61,14 @@ class TypeLocalizer
                 // the class \A\B becomes B rather than A\B (the latter which would happen if there were a use
                 // statement "use A;").
                 $imports[] = [
-                    'fqcn'  => $namespaceFqcn . '\\' . $typeWithoutNamespacePrefixParts[0],
+                    'name'  => $namespaceFqcn . '\\' . $typeWithoutNamespacePrefixParts[0],
                     'alias' => $typeWithoutNamespacePrefixParts[0]
                 ];
             }
         }
 
         foreach ($imports as $import) {
-            $importFqcn = $this->typeAnalyzer->getNormalizedFqcn($import['fqcn']);
+            $importFqcn = $this->typeAnalyzer->getNormalizedFqcn($import['name']);
 
             if (mb_strpos($typeFqcn, $importFqcn) === 0) {
                 $localizedType = $import['alias'] . mb_substr($typeFqcn, mb_strlen($importFqcn));

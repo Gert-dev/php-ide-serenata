@@ -42,12 +42,12 @@ class TypeResolverTest extends \PHPUnit_Framework_TestCase
         $namespace = 'A';
         $imports = [
             [
-                'fqcn' => 'B\C',
+                'name'  => 'B\C',
                 'alias' => 'Alias'
             ],
 
             [
-                'fqcn' => 'B\C\D',
+                'name'  => 'B\C\D',
                 'alias' => 'D'
             ]
         ];

@@ -12,7 +12,7 @@ use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\FileTypeResolver;
 
 use PhpIntegrator\Analysis\Visiting\OutlineFetchingVisitor;
-use PhpIntegrator\Analysis\Visiting\AssociativeUseStatementFetchingVisitor;
+use PhpIntegrator\Analysis\Visiting\UseStatementFetchingVisitor;
 
 use PhpIntegrator\Parsing\DocblockParser;
 
@@ -111,7 +111,7 @@ class FileIndexer
             }
 
             $outlineIndexingVisitor = new OutlineFetchingVisitor($this->typeAnalyzer, $code);
-            $useStatementFetchingVisitor = new AssociativeUseStatementFetchingVisitor();
+            $useStatementFetchingVisitor = new UseStatementFetchingVisitor();
 
             $traverser = new NodeTraverser(false);
             $traverser->addVisitor($outlineIndexingVisitor);
@@ -148,16 +148,16 @@ class FileIndexer
      * the file. For structural elements, this also includes (direct) members, information about the parent class,
      * used traits, etc.
      *
-     * @param string                                 $filePath
-     * @param int                                    $fileId
-     * @param OutlineFetchingVisitor                 $outlineIndexingVisitor
-     * @param AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
+     * @param string                      $filePath
+     * @param int                         $fileId
+     * @param OutlineFetchingVisitor      $outlineIndexingVisitor
+     * @param UseStatementFetchingVisitor $useStatementFetchingVisitor
      */
     protected function indexVisitorResults(
         $filePath,
         $fileId,
         OutlineFetchingVisitor $outlineIndexingVisitor,
-        AssociativeUseStatementFetchingVisitor $useStatementFetchingVisitor
+        UseStatementFetchingVisitor $useStatementFetchingVisitor
     ) {
         $imports = [];
         $namespaces = $useStatementFetchingVisitor->getNamespaces();
@@ -176,7 +176,7 @@ class FileIndexer
                 $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
                     'line'               => $useStatement['line'],
                     'alias'              => $useStatement['alias'] ?: null,
-                    'fqcn'               => $useStatement['fqcn'],
+                    'fqcn'               => $useStatement['name'],
                     'files_namespace_id' => $namespaceId
                 ]);
             }

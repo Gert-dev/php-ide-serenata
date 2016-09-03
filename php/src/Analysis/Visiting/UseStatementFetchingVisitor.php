@@ -41,7 +41,7 @@ class UseStatementFetchingVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Namespace_) {
-            $namespace = (string) $node->name;
+            $namespace = $node->name ? (string) $node->name : '';
 
             $this->namespaces[$namespace] = [
                 'name'          => $namespace,
@@ -66,6 +66,7 @@ class UseStatementFetchingVisitor extends NodeVisitorAbstract
                 $this->namespaces[$this->lastNamespace]['useStatements'][(string) $use->alias] = [
                     'name'  => $prefix . ((string) $use->name),
                     'alias' => $use->alias,
+                    'line'  => $node->getLine(),
                     'start' => $use->getAttribute('startFilePos') ? $use->getAttribute('startFilePos')   : null,
                     'end'   => $use->getAttribute('endFilePos')   ? $use->getAttribute('endFilePos') + 1 : null
                 ];

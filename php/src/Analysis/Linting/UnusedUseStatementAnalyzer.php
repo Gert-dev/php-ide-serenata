@@ -85,6 +85,8 @@ class UnusedUseStatementAnalyzer implements AnalyzerInterface
 
             foreach ($useStatementMap as $alias => $data) {
                 if (!array_key_exists('used', $data) || !$data['used']) {
+                    unset($data['line']);
+                    
                     $unusedUseStatements[] = $data;
                 }
             }

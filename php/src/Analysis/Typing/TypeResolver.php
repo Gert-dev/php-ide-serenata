@@ -26,15 +26,15 @@ class TypeResolver
      * Resolves and determines the FQCN of the specified type.
      *
      * @param string      $type
-     * @param string|null $namespaceFqcn
+     * @param string|null $namespaceName
      * @param array {
-     *     @var string|null $fqcn
+     *     @var string|null $name
      *     @var string      $alias
      * } $imports
      *
      * @return string|null
      */
-    public function resolve($type, $namespaceFqcn, array $imports)
+    public function resolve($type, $namespaceName, array $imports)
     {
         if (empty($type)) {
             return null;
@@ -49,7 +49,7 @@ class TypeResolver
             if ($import['alias'] === $typeParts[0]) {
                 array_shift($typeParts);
 
-                $fullName = $import['fqcn'];
+                $fullName = $import['name'];
 
                 if (!empty($typeParts)) {
                     /*
@@ -70,7 +70,7 @@ class TypeResolver
 
         if (!$fullName) {
             // Still here? There must be no explicit use statement, default to the current namespace.
-            $fullName = $namespaceFqcn ? ($namespaceFqcn . '\\') : '';
+            $fullName = $namespaceName ? ($namespaceName . '\\') : '';
             $fullName .= $type;
         }
 

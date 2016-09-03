@@ -29,12 +29,12 @@ class FileTypeResolver
     /**
      * @param TypeResolver $typeResolver
      * @param array {
-     *     @var string   $fqcn
+     *     @var string   $name
      *     @var int      $startLine
      *     @var int|null $endLine
      * } $namespaces
      * @param array {
-     *     @var string $fqcn
+     *     @var string $name
      *     @var string $alias
      *     @var int    $line
      * } $imports
