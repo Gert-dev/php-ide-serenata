@@ -35,8 +35,6 @@ class GlobalFunctionsCommandTest extends IndexedTest
 
         $output = $command->getGlobalFunctions();
 
-        // die(var_dump(__FILE__ . ':' . __LINE__, $output['']));
-
         $this->assertArraySubset([
             'name'             => 'urlencode',
             'fqcn'             => '\urlencode',
