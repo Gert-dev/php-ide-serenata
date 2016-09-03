@@ -1520,7 +1520,7 @@ class ClassInfoCommandTest extends IndexedTest
             'shortName'        => 'IteratorAggregate',
             'filename'         => null,
             'type'             => 'interface',
-            'isAbstract'       => true,
+            'isAbstract'       => false,
             'isFinal'          => false,
             'isBuiltin'        => true,
             'isDeprecated'     => false,

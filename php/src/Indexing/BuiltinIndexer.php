@@ -551,7 +551,7 @@ class BuiltinIndexer
             'long_description'  => null,
             'is_builtin'        => 1,
             'is_final'          => $element->isFinal() ? 1 : 0,
-            'is_abstract'       => $element->isAbstract() ? 1 : 0,
+            'is_abstract'       => $element->isAbstract() && !$element->isInterface() ? 1 : 0,
             'is_annotation'     => 0,
             'is_deprecated'     => 0,
             'has_docblock'      => 0

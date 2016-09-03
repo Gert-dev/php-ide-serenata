@@ -13,6 +13,7 @@
 ### Changes for developers
 * Previously a fix was applied to make FQCN's actually contain a leading slash to clearly indicate that they were fully qualified. This still didn't happen everywhere, which has been corrected now.
 * A new service method, `getCurrentProjectSettings`, allows retrieving the settings (specific to this package) of a project. This includes things such as the PHP version, paths and excluded folders.
+* Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.
 * For method implementations, `implementation.declaringClass` previously pointed to the interface. This has now been changed to point to the class originally implementing the interface, which is consistent with `override.declaringClass`. Note that `implementation.declaringStructure` will still point to the interface.
 
 ## 1.2.2
