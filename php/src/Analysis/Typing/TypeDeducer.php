@@ -21,7 +21,6 @@ use PhpIntegrator\Indexing\IndexDatabase;
 use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
 
-use PhpIntegrator\UserInterface\Command\ClassInfoCommand;
 use PhpIntegrator\UserInterface\Command\ClassListCommand;
 
 use PhpIntegrator\Utility\NodeHelpers;
