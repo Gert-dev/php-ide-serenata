@@ -307,6 +307,8 @@ class TypeDeducer
      */
     protected function walkTypeQueryingVisitorTo($code, $offset)
     {
+        $nodes = null;
+
         try {
             $nodes = $this->parser->parse($code);
         } catch (Error $e) {
