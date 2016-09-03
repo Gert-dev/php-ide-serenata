@@ -154,20 +154,20 @@ class ProjectIndexer
     {
         $this->indexBuiltinItemsIfNecessary();
 
-        $this->logMessage('Pruning removed files...');
-        $this->pruneRemovedFiles();
-
         $this->logMessage('Scanning for files that need (re)indexing...');
         $files = $this->scanForFilesToIndex($items, $extensionsToIndex);
         $files = $this->getFilteredFilesToIndex($files, $excludedPaths);
+
+        $this->storage->beginTransaction();
+
+        $this->logMessage('Pruning removed files...');
+        $this->pruneRemovedFiles();
 
         $this->logMessage('Indexing outline...');
 
         $totalItems = count($files);
 
         $this->sendProgress(0, $totalItems);
-
-        $this->storage->beginTransaction();
 
         foreach ($files as $i => $filePath) {
             echo $this->logMessage('  - Indexing ' . $filePath);
