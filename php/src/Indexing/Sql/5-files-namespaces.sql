@@ -16,7 +16,7 @@ CREATE TABLE files_namespaces_imports(
 
     line                       integer unsigned,
     alias                      varchar(255) NOT NULL,
-    fqcn                       varchar(255) NOT NULL,
+    name                       varchar(255) NOT NULL,
     files_namespace_id         integer,
 
     FOREIGN KEY(files_namespace_id) REFERENCES files_namespaces(id)

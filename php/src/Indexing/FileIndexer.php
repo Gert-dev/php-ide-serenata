@@ -176,7 +176,7 @@ class FileIndexer
                 $this->storage->insert(IndexStorageItemEnum::FILES_NAMESPACES_IMPORTS, [
                     'line'               => $useStatement['line'],
                     'alias'              => $useStatement['alias'] ?: null,
-                    'fqcn'               => $useStatement['name'],
+                    'name'               => $useStatement['name'],
                     'files_namespace_id' => $namespaceId
                 ]);
             }
