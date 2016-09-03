@@ -152,13 +152,13 @@ class ProjectIndexer
      */
     public function index(array $items, array $extensionsToIndex, array $excludedPaths = [], $sourceOverrideMap = [])
     {
-        $this->indexBuiltinItemsIfNecessary();
-
         $this->logMessage('Scanning for files that need (re)indexing...');
         $files = $this->scanForFilesToIndex($items, $extensionsToIndex);
         $files = $this->getFilteredFilesToIndex($files, $excludedPaths);
 
         $this->storage->beginTransaction();
+
+        $this->indexBuiltinItemsIfNecessary();
 
         $this->logMessage('Pruning removed files...');
         $this->pruneRemovedFiles();
