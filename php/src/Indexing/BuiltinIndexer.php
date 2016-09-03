@@ -738,7 +738,7 @@ class BuiltinIndexer
 
         $shortName = $element->getShortName();
 
-        $correctedName = isset($correctionMap[$shortName]) ? $correctionMap[$shortName] : $shortName;
+        $correctedName = isset($correctionMap[$shortName]) ? $correctionMap[$shortName] : $element->getName();
 
         return $this->typeAnalyzer->getNormalizedFqcn($correctedName);
     }

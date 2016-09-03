@@ -16,6 +16,10 @@
 * Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.
 * For method implementations, `implementation.declaringClass` previously pointed to the interface. This has now been changed to point to the class originally implementing the interface, which is consistent with `override.declaringClass`. Note that `implementation.declaringStructure` will still point to the interface.
 
+## 1.2.3
+### Bugs fixed
+* Fix built-in classes with FQCN's with more than one part, such as from the MongoDB extension, not properly being indexed.
+
 ## 1.2.2
 ### Bugs fixed
 * Fixed an error related to `JSON_PRESERVE_ZERO_FRACTION`, which needs PHP >= 5.6.
