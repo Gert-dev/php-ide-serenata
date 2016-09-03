@@ -4,6 +4,10 @@ namespace PhpIntegrator\Test;
 
 use ReflectionClass;
 
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+
+use PhpIntegrator\Indexing\BuiltinIndexer;
+
 use PhpIntegrator\UserInterface\Command;
 
 use PhpIntegrator\Indexing\IndexDatabase;
@@ -37,20 +41,9 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
      *
      * @return IndexDatabase
      */
-    protected function getDatabase($indexBuiltinItems = false)
+    protected function getDatabase()
     {
-        $indexDatabase = new IndexDatabase(':memory:', 1);
-
-        if (!$indexBuiltinItems) {
-            // Indexing these on every test majorly slows down testing. Instead, we simply don't rely on PHP's built-in
-            // structural elements during testing.
-            $indexDatabase->insert(IndexStorageItemEnum::SETTINGS, [
-                'name'  => 'has_indexed_builtin',
-                'value' => 1
-            ]);
-        }
-
-        return $indexDatabase;
+        return new IndexDatabase(':memory:', 1);
     }
 
     /**
@@ -61,7 +54,14 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
      */
     protected function getDatabaseForTestFile($testPath = null, $mayFail = false)
     {
-        $indexDatabase = $this->getDatabase(false);
+        $indexDatabase = $this->getDatabase();
+
+        // Indexing these on every test majorly slows down testing. Instead, we simply don't rely on PHP's built-in
+        // structural elements during testing.
+        $indexDatabase->insert(IndexStorageItemEnum::SETTINGS, [
+            'name'  => 'has_indexed_builtin',
+            'value' => 1
+        ]);
 
         $reindexCommand = new Command\ReindexCommand($this->getParser(), null, $indexDatabase);
 
@@ -77,6 +77,19 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
                 $this->assertTrue($success);
             }
         }
+
+        return $indexDatabase;
+    }
+
+    /**
+     * @return IndexDatabase
+     */
+    protected function getDatabaseForBuiltinTesting()
+    {
+        $indexDatabase = $this->getDatabase();
+
+        $builtiinIndexer = new BuiltinIndexer($indexDatabase, new TypeAnalyzer());
+        $builtiinIndexer->index();
 
         return $indexDatabase;
     }

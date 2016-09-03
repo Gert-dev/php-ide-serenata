@@ -19,6 +19,15 @@ class ClassInfoCommandTest extends IndexedTest
         return $command->getClassInfo($fqcn);
     }
 
+    protected function getBuiltinClassInfo($fqcn)
+    {
+        $indexDatabase = $this->getDatabaseForBuiltinTesting();
+
+        $command = new ClassInfoCommand($this->getParser(), null, $indexDatabase);
+
+        return $command->getClassInfo($fqcn);
+    }
+
     protected function getPathFor($file)
     {
         return __DIR__ . '/ClassInfoCommandTest/' . $file;
@@ -1498,6 +1507,92 @@ class ClassInfoCommandTest extends IndexedTest
         $output = $this->getClassInfo($fileName, 'TestClass');
 
         $this->assertEquals('\TestClass', $output['name']);
+    }
+
+    public function testCorrectlyAnalyzesBuiltinItems()
+    {
+        $output = $this->getBuiltinClassInfo('\IteratorAggregate');
+
+        $this->assertArraySubset([
+            'name'             => '\IteratorAggregate',
+            'startLine'        => 0,
+            'endLine'          => 0,
+            'shortName'        => 'IteratorAggregate',
+            'filename'         => null,
+            'type'             => 'interface',
+            'isAbstract'       => true,
+            'isFinal'          => false,
+            'isBuiltin'        => true,
+            'isDeprecated'     => false,
+            'isAnnotation'     => false,
+            'hasDocblock'      => false,
+            'hasDocumentation' => false,
+            'shortDescription' => null,
+            'longDescription'  => null,
+
+            'parents'            => ['\Traversable'],
+            'interfaces'         => [],
+            'traits'             => [],
+            'directParents'      => ['\Traversable'],
+            'directInterfaces'   => [],
+            'directTraits'       => [],
+            'directChildren'     => [],
+            'directImplementors' => ['\ArrayObject'],
+            'directTraitUsers'   => [],
+            'constants'          => [],
+            'properties'         => []
+        ], $output);
+
+        $this->assertArraySubset([
+            'name'               => 'getIterator',
+            'fqcn'               => null,
+            'isBuiltin'          => true,
+            'startLine'          => 0,
+            'endLine'            => 0,
+            'filename'           => null,
+            'parameters'         => [],
+            'throws'             => [],
+            'isDeprecated'       => false,
+            'hasDocblock'        => false,
+            'hasDocumentation'   => false,
+            'returnTypeHint'     => null,
+
+            'returnTypes'        => [
+                [
+                    'fqcn'         => '\Traversable',
+                    'resolvedType' => '\Traversable',
+                    'type'         => 'Traversable'
+                ]
+            ],
+
+            'isMagic'            => false,
+            'isPublic'           => true,
+            'isProtected'        => false,
+            'isPrivate'          => false,
+            'isStatic'           => false,
+            'isAbstract'         => true,
+            'isFinal'            => false,
+            'override'           => null,
+            'implementation'     => null,
+
+            'declaringClass' => [
+                'name'      => '\IteratorAggregate',
+                'filename'  => null,
+                'startLine' => 0,
+                'endLine'   => 0,
+                'type'      => 'interface'
+            ],
+
+            'declaringStructure' => [
+                'name'            => '\IteratorAggregate',
+                'filename'        => null,
+                'startLine'       => 0,
+                'endLine'         => 0,
+                'type'            => 'interface',
+                'startLineMember' => 0,
+                'endLineMember'   => 0
+            ]
+        ], $output['methods']['getIterator']);
     }
 
     /**
