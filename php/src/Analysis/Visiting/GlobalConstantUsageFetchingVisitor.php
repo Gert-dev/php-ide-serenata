@@ -32,7 +32,7 @@ class GlobalConstantUsageFetchingVisitor extends NameResolver
         if (!$this->isConstantExcluded($node->name->toString())) {
             $this->globalConstantList[] = [
                 'name'          => NodeHelpers::fetchClassName($node->name),
-                'namespace'     => NodeHelpers::fetchClassName($this->namespace),
+                'namespace'     => $this->namespace ? NodeHelpers::fetchClassName($this->namespace) : null,
                 'isUnqualified' => $node->name->isUnqualified(),
                 'start'         => $node->getAttribute('startFilePos') ? $node->getAttribute('startFilePos')   : null,
                 'end'           => $node->getAttribute('endFilePos')   ? $node->getAttribute('endFilePos') + 1 : null
