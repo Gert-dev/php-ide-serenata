@@ -26,4 +26,57 @@ class GlobalFunctionsCommandTest extends IndexedTest
         $this->assertEquals($output['\A\secondFunction']['fqcn'], '\A\secondFunction');
         $this->assertThat($output, $this->logicalNot($this->arrayHasKey('shouldNotShowUp')));
     }
+
+    public function testBuiltinGlobalFunctions()
+    {
+        $indexDatabase = $this->getDatabaseForBuiltinTesting();
+
+        $command = new GlobalFunctionsCommand($this->getParser(), null, $indexDatabase);
+
+        $output = $command->getGlobalFunctions();
+
+        // die(var_dump(__FILE__ . ':' . __LINE__, $output['']));
+
+        $this->assertArraySubset([
+            'name'             => 'urlencode',
+            'fqcn'             => '\urlencode',
+            'startLine'        => 0,
+            'endLine'          => 0,
+            'filename'         => null,
+            'isBuiltin'        => true,
+            'isDeprecated'     => false,
+            'hasDocblock'      => false,
+            'hasDocumentation' => false,
+
+            'throws'           => [],
+            'returnTypeHint'   => null
+        ], $output['\urlencode']);
+
+        $this->assertArraySubset([
+            [
+                'name'         => 'str',
+                'typeHint'     => null,
+                'types'        => [
+                    [
+                        'type'         => 'string',
+                        'fqcn'         => '\string',
+                        'resolvedType' => '\string'
+                    ]
+                ],
+                'defaultValue' => null,
+                'isNullable'   => false,
+                'isReference'  => false,
+                'isVariadic'   => false,
+                'isOptional'   => false,
+            ]
+        ], $output['\urlencode']['parameters']);
+
+        $this->assertEquals([
+            [
+                'fqcn'         => '\string',
+                'resolvedType' => '\string',
+                'type'         => 'string'
+            ]
+        ], $output['\urlencode']['returnTypes']);
+    }
 }
