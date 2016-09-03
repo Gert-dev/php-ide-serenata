@@ -315,6 +315,8 @@ class TypeDeducer
             throw new UnexpectedValueException('Parsing the file failed!');
         }
 
+        // In php-parser 2.x, this happens when you enter $this-> before an if-statement, because of a syntax error that
+        // it can not recover from.
         if ($nodes === null) {
             throw new UnexpectedValueException('Parsing the file failed!');
         }
