@@ -116,6 +116,7 @@ class TypeDeducer
      * @param FileTypeResolverFactory $fileTypeResolverFactory
      * @param IndexDatabase           $indexDatabase
      * @param ClasslikeInfoBuilder    $classlikeInfoBuilder
+     * @param FunctionConverter       $functionConverter
      */
     public function __construct(
         Parser $parser,
