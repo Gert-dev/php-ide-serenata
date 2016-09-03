@@ -36,4 +36,38 @@ class GlobalConstantsCommandTest extends IndexedTest
 
         $this->assertThat($output, $this->logicalNot($this->arrayHasKey('SHOULD_NOT_SHOW_UP')));
     }
+
+    public function testBuiltinGlobalConstants()
+    {
+        $indexDatabase = $this->getDatabaseForBuiltinTesting();
+
+        $command = new GlobalConstantsCommand($this->getParser(), null, $indexDatabase);
+
+        $output = $command->getGlobalConstants();
+
+        $this->assertArraySubset([
+            'name'             => 'PHP_EOL',
+            'fqcn'             => '\PHP_EOL',
+            'startLine'        => 0,
+            'endLine'          => 0,
+            'filename'         => null,
+            'isBuiltin'        => true,
+            'isDeprecated'     => false,
+            'hasDocblock'      => false,
+            'hasDocumentation' => false,
+
+            'defaultValue'     => '"\n"',
+            'isPublic'         => true,
+            'isProtected'      => false,
+            'isPrivate'        => false,
+            'isStatic'         => true,
+            'shortDescription' => null,
+            'longDescription'  => null,
+            'typeDescription'  => null
+        ], $output['\PHP_EOL']);
+
+        $this->assertEquals([
+
+        ], $output['\PHP_EOL']['types']);
+    }
 }
