@@ -434,7 +434,10 @@ class BuiltinIndexer
      */
     protected function getNormalizedDocumentation($documentation)
     {
-        return str_replace('\\n', "\n", $documentation);
+        $documentation = str_replace('\\n', "\n", $documentation);
+        $documentation = str_replace('\_', "_", $documentation);
+
+        return $documentation;
     }
 
     /**

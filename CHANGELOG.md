@@ -6,6 +6,7 @@
   * Semantic linting should be significantly faster, especially for large files.
 
 ### Bugs fixed
+* Documentation for built-in functions was escaping underscores with a slash.
 * Semantic linting was incorrectly processing unqualified global function names.
 * Semantic linting was incorrectly processing unqualified global constant names.
 
