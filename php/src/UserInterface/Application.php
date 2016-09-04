@@ -114,8 +114,11 @@ class Application
             ]);
 
         $container
+            ->register('phpParserFactory', ParserFactory::class);
+
+        $container
             ->register('parser.phpParser', Parser::class)
-            ->setFactory([ParserFactory::class, 'create'])
+            ->setFactory([new Reference('phpParserFactory'), 'create'])
             ->setArguments([ParserFactory::PREFER_PHP7, new Reference('lexer'), [
                 'throwOnError' => false
             ]]);

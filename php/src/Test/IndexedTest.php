@@ -31,11 +31,13 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
         $app = new Application();
 
         $refClass = new ReflectionClass(Application::class);
-        $refMethod = $refClass->getMethod('getParser');
+        $refMethod = $refClass->getMethod('getContainer');
 
         $refMethod->setAccessible(true);
 
-        return $refMethod->invoke($app);
+        $container = $refMethod->invoke($app);
+
+        return $container->get('parser');
     }
 
     /**
