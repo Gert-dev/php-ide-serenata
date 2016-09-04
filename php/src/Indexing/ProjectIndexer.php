@@ -2,13 +2,7 @@
 
 namespace PhpIntegrator\Indexing;
 
-use SplFileInfo;
-use ArrayIterator;
-use AppendIterator;
-use FilesystemIterator;
 use UnexpectedValueException;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;
 
@@ -159,8 +153,26 @@ class ProjectIndexer
     public function index(array $items, array $extensionsToIndex, array $excludedPaths = [], $sourceOverrideMap = [])
     {
         $this->logMessage('Scanning for files that need (re)indexing...');
-        $files = $this->scanForFilesToIndex($items, $extensionsToIndex);
-        $files = $this->getFilteredFilesToIndex($files, $excludedPaths);
+
+        $fileModifiedMap = $this->fileModifiedMap;
+
+        // The modification time doesn't matter for files we have direct source code for, as this source code always
+        // needs to be indexed (e.g it may simply not have been saved to disk yet).
+        foreach ($sourceOverrideMap as $filePath => $source) {
+            unset($fileModifiedMap[$filePath]);
+        }
+
+        $iterator = new Iterating\MultiRecursivePathIterator($items);
+        $iterator = new Iterating\ExtensionFilterIterator($iterator, $extensionsToIndex);
+        $iterator = new Iterating\ExclusionFilterIterator($iterator, $excludedPaths);
+        $iterator = new Iterating\ModificationTimeFilterIterator($iterator, $fileModifiedMap);
+
+        $files = [];
+
+        /** @var \SplFileInfo $fileInfo */
+        foreach ($iterator as $fileInfo) {
+            $files[] = $fileInfo->getPathname();
+        }
 
         $this->storage->beginTransaction();
 
@@ -200,87 +212,6 @@ class ProjectIndexer
         }
 
         $this->storage->commitTransaction();
-    }
-
-    /**
-     * @param string[] $paths
-     * @param string[] $extensionsToIndex
-     *
-     * @return string[]
-     */
-    protected function scanForFilesToIndex(array $paths, array $extensionsToIndex)
-    {
-        $fileInfoIterators = [];
-
-        foreach ($paths as $path) {
-            $fileInfo = new SplFileInfo($path);
-
-            if ($fileInfo->isDir()) {
-                $directoryIterator = new RecursiveDirectoryIterator(
-                    $fileInfo->getPathname(),
-                    FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
-                );
-
-                $iterator = new RecursiveIteratorIterator(
-                    $directoryIterator,
-                    RecursiveIteratorIterator::LEAVES_ONLY,
-                    RecursiveIteratorIterator::CATCH_GET_CHILD
-                );
-
-                $iterator = new ModificationTimeFilterIterator($iterator, $this->fileModifiedMap);
-
-                $fileInfoIterators[] = $iterator;
-            } elseif ($fileInfo->isFile()) {
-                $fileInfoIterators[] = new ArrayIterator([$fileInfo]);
-            } else {
-                throw new IndexingFailedException('The specified file or directory "' . $fileInfo->getPathname() . '" does not exist!');
-            }
-        }
-
-        $iterator = new AppendIterator();
-
-        foreach ($fileInfoIterators as $fileInfoIterator) {
-            $iterator->append($fileInfoIterator);
-        }
-
-        $iterator = new ExtensionFilterIterator($iterator, $extensionsToIndex);
-
-        $files = [];
-
-        /** @var \SplFileInfo $fileInfo */
-        foreach ($iterator as $fileInfo) {
-            $files[] = $fileInfo->getPathname();
-        }
-
-        return $files;
-    }
-
-    /**
-     * @param string[] $files
-     * @param string[] $excludedDirectories
-     *
-     * @return string[]
-     */
-    protected function getFilteredFilesToIndex(array $files, array $excludedDirectories)
-    {
-        $filteredItems = [];
-
-        foreach ($files as $file) {
-            $skipFile = false;
-
-            foreach ($excludedDirectories as $excludedDirectory) {
-                if (mb_strpos($file, $excludedDirectory) === 0) {
-                    $skipFile = true;
-                    break;
-                }
-            }
-
-            if (!$skipFile) {
-                $filteredItems[] = $file;
-            }
-        }
-
-        return $filteredItems;
     }
 
     /**

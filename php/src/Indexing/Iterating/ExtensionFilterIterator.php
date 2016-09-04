@@ -1,12 +1,12 @@
 <?php
 
-namespace PhpIntegrator\Indexing;
+namespace PhpIntegrator\Indexing\Iterating;
 
 use Iterator;
 use FilterIterator;
 
 /**
- * Filters out {@see \DirectoryIterator} values that don't match any of the specified extensions.
+ * Filters out {@see \SplFileInfo} values that don't match any of the specified extensions.
  */
 class ExtensionFilterIterator extends FilterIterator
 {
@@ -31,7 +31,7 @@ class ExtensionFilterIterator extends FilterIterator
      */
     public function accept()
     {
-        /** @var \DirectoryIterator $value */
+        /** @var \SplFileInfo $value */
         $value = $this->current();
 
         return in_array($value->getExtension(), $this->allowedExtensions, true);

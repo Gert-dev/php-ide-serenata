@@ -1,12 +1,12 @@
 <?php
 
-namespace PhpIntegrator\Indexing;
+namespace PhpIntegrator\Indexing\Iterating;
 
 use Iterator;
 use FilterIterator;
 
 /**
- * Filters out {@see \DirectoryIterator} values that haven't been modified since a preconfigured time.
+ * Filters out {@see \SplFileInfo} values that haven't been modified since a preconfigured time.
  */
 class ModificationTimeFilterIterator extends FilterIterator
 {
@@ -31,7 +31,7 @@ class ModificationTimeFilterIterator extends FilterIterator
      */
     public function accept()
     {
-        /** @var \DirectoryIterator $value */
+        /** @var \SplFileInfo $value */
         $value = $this->current();
 
         $filename = $value->getPathname();
