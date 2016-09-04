@@ -104,7 +104,14 @@ module.exports =
                     'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'
                 }
 
+                failureHandler = () =>
+                    atom.notifications.addError('Error!', {
+                        'detail' : 'The project could not be properly initialized!'
+                    })
+
                 @projectManager.load(project)
+
+                @indexCurrentProject().catch(failureHandler)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
             @indexCurrentProject()
