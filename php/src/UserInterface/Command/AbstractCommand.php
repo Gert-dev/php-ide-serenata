@@ -35,33 +35,6 @@ use PhpParser\Parser;
 abstract class AbstractCommand implements CommandInterface
 {
     /**
-     * @var IndexDatabase
-     */
-    protected $indexDatabase;
-
-    /**
-     * @var Parser|null
-     */
-    protected $parser;
-
-    /**
-     * @var Cache|null
-     */
-    protected $cache;
-
-    /**
-     * @param Parser|null        $parser
-     * @param Cache|null         $cache
-     * @param IndexDatabase|null $indexDatabase
-     */
-    public function __construct(Parser $parser = null)
-    {
-        $this->parser = $parser;
-        $this->cache = $cache;
-        $this->indexDatabase = $indexDatabase;
-    }
-
-    /**
      * @inheritDoc
      */
     public function execute(array $processedArguments)
@@ -125,27 +98,5 @@ abstract class AbstractCommand implements CommandInterface
         }
 
         return $output;
-    }
-
-    /**
-     * @param string $code
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return \PhpParser\Node[]
-     */
-    protected function parse($code)
-    {
-        try {
-            $nodes = $this->parser->parse($code);
-        } catch (\PhpParser\Error $e) {
-            throw new UnexpectedValueException('Parsing the file failed!');
-        }
-
-        if ($nodes === null) {
-            throw new UnexpectedValueException('Parsing the file failed!');
-        }
-
-        return $nodes;
     }
 }
