@@ -152,8 +152,6 @@ class ProjectIndexer
      */
     public function index(array $items, array $extensionsToIndex, array $excludedPaths = [], $sourceOverrideMap = [])
     {
-        $this->logMessage('Scanning for files that need (re)indexing...');
-
         $fileModifiedMap = $this->fileModifiedMap;
 
         // The modification time doesn't matter for files we have direct source code for, as this source code always
@@ -169,12 +167,13 @@ class ProjectIndexer
 
         $this->storage->beginTransaction();
 
+        $this->logMessage('Indexing built-in structural elements...');
         $this->indexBuiltinItemsIfNecessary();
 
         $this->logMessage('Pruning removed files...');
         $this->pruneRemovedFiles();
 
-        $this->logMessage('Indexing outline...');
+        $this->logMessage('Scanning and indexing files that need (re)indexing...');
 
         $totalItems = iterator_count($iterator);
 
