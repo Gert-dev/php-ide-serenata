@@ -166,7 +166,7 @@ class ProjectIndexer
         $iterator = new Iterating\ModificationTimeFilterIterator($iterator, $fileModifiedMap);
 
         $this->storage->beginTransaction();
-        
+
         $this->logMessage('Scanning and indexing files that need (re)indexing...');
 
         $totalItems = iterator_count($iterator);
@@ -189,14 +189,16 @@ class ProjectIndexer
                 try {
                     $code = $this->sourceCodeStreamReader->getSourceCodeFromFile($filePath);
                 } catch (UnexpectedValueException $e) {
-                    continue; // Skip files that we can't read.
+                    $code = null; // Skip files that we can't read.
                 }
             }
 
-            try {
-                $this->fileIndexer->index($filePath, $code);
-            } catch (IndexingFailedException $e) {
-                $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
+            if ($code !== null) {
+                try {
+                    $this->fileIndexer->index($filePath, $code);
+                } catch (IndexingFailedException $e) {
+                    $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
+                }
             }
 
             $this->sendProgress(++$i, $totalItems);
