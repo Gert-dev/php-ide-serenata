@@ -45,11 +45,6 @@ class ReindexCommand extends AbstractCommand
     protected $builtinIndexer;
 
     /**
-     * @var Scanner
-     */
-    protected $scanner;
-
-    /**
      * @var array
      */
     protected $fileModifiedMap;
