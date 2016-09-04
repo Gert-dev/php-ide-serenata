@@ -49,14 +49,12 @@ class Scanner
             RecursiveIteratorIterator::CATCH_GET_CHILD
         );
 
+        $iterator = new ExtensionFilterIterator($iterator, $allowedExtensions);
+
         $files = [];
 
         /** @var \DirectoryIterator $fileInfo */
         foreach ($iterator as $filename => $fileInfo) {
-            if (!in_array($fileInfo->getExtension(), $allowedExtensions, true)) {
-                continue;
-            }
-
             if (!$isIncremental
              || !isset($this->fileModifiedMap[$filename])
              || $fileInfo->getMTime() > $this->fileModifiedMap[$filename]->getTimestamp()
