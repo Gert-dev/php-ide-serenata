@@ -150,7 +150,7 @@ module.exports =
     ###
     registerStatusBarListeners: () ->
         @service.onDidStartIndexing () =>
-            @timerName = @packageName + " - Project indexing"
+            @timerName = @packageName + " - Indexing"
 
             console.time(@timerName);
 
