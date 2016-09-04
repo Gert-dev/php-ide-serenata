@@ -13,7 +13,6 @@ use PhpIntegrator\Analysis\Typing\TypeDeducer;
 use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 
-use PhpIntegrator\Indexing\Scanner;
 use PhpIntegrator\Indexing\FileIndexer;
 use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\ProjectIndexer;
@@ -212,8 +211,8 @@ class ReindexCommand extends AbstractCommand
                 $this->getStorageForIndexers(),
                 $this->getBuiltinIndexer(),
                 $this->getFileIndexer(),
-                $this->getScanner(),
-                $this->getSourceCodeStreamReader()
+                $this->getSourceCodeStreamReader(),
+                $this->getFileModifiedMap()
             );
         }
 
@@ -266,18 +265,6 @@ class ReindexCommand extends AbstractCommand
         }
 
         return $this->storageForIndexers;
-    }
-
-    /**
-     * @return Scanner
-     */
-    protected function getScanner()
-    {
-        if (!$this->scanner) {
-            $this->scanner = new Scanner($this->getFileModifiedMap());
-        }
-
-        return $this->scanner;
     }
 
     /**

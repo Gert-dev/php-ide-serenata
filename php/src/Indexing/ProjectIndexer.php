@@ -2,7 +2,10 @@
 
 namespace PhpIntegrator\Indexing;
 
+use FilesystemIterator;
 use UnexpectedValueException;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;
 
@@ -27,14 +30,14 @@ class ProjectIndexer
     protected $fileIndexer;
 
     /**
-     * @var Scanner
-     */
-    protected $scanner;
-
-    /**
      * @var SourceCodeStreamReader
      */
     protected $sourceCodeStreamReader;
+
+    /**
+     * @var array
+     */
+    protected $fileModifiedMap;
 
     /**
      * @var resource|null
@@ -47,24 +50,24 @@ class ProjectIndexer
     protected $progressStream;
 
     /**
-     * @param StorageInterface $storage
-     * @param BuiltinIndexer   $builtinIndexer
-     * @param FileIndexer      $fileIndexer
-     * @param Scanner          $scanner
+     * @param StorageInterface       $storage
+     * @param BuiltinIndexer         $builtinIndexer
+     * @param FileIndexer            $fileIndexer
      * @param SourceCodeStreamReader $sourceCodeStreamReader
+     * @param array                  $fileModifiedMap
      */
     public function __construct(
         StorageInterface $storage,
         BuiltinIndexer $builtinIndexer,
         FileIndexer $fileIndexer,
-        Scanner $scanner,
-        SourceCodeStreamReader $sourceCodeStreamReader
+        SourceCodeStreamReader $sourceCodeStreamReader,
+        array $fileModifiedMap
     ) {
         $this->storage = $storage;
         $this->builtinIndexer = $builtinIndexer;
         $this->fileIndexer = $fileIndexer;
-        $this->scanner = $scanner;
         $this->sourceCodeStreamReader = $sourceCodeStreamReader;
+        $this->fileModifiedMap = $fileModifiedMap;
     }
 
     /**
@@ -208,9 +211,24 @@ class ProjectIndexer
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
-                $filesInDirectory = $this->scanner->scan($path, $extensionsToIndex);
+                $directoryIterator = new RecursiveDirectoryIterator(
+                    $path,
+                    FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
+                );
 
-                $files = array_merge($files, $filesInDirectory);
+                $iterator = new RecursiveIteratorIterator(
+                    $directoryIterator,
+                    RecursiveIteratorIterator::LEAVES_ONLY,
+                    RecursiveIteratorIterator::CATCH_GET_CHILD
+                );
+
+                $iterator = new ExtensionFilterIterator($iterator, $extensionsToIndex);
+                $iterator = new ModificationTimeFilterIterator($iterator, $this->fileModifiedMap);
+
+                /** @var \SplFileInfo $fileInfo */
+                foreach ($iterator as $fileInfo) {
+                    $files[] = $fileInfo->getPathname();
+                }
             } elseif (is_file($path)) {
                 $files[] = $path;
             } else {
