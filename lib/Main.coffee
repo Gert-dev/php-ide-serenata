@@ -133,10 +133,23 @@ module.exports =
             @projectManager.attemptCurrentProjectIndex()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
-            successHandler = () =>
-                return if not @projectManager.hasActiveProject()
+            return if not @projectManager.hasActiveProject()
 
-                @projectManager.attemptCurrentProjectIndex()
+            successHandler = () =>
+                initializeSuccessfulHandler = () =>
+                    return @projectManager.attemptCurrentProjectIndex()
+
+                initializeFailedHandler = (reason) =>
+                    console.error(reason)
+
+                    atom.notifications.addError('Error!', {
+                        'detail' : 'The project could not be properly reinitialized!'
+                    })
+
+                return @projectManager.initializeCurrentProject().then(
+                    initializeSuccessfulHandler,
+                    initializeFailedHandler
+                )
 
             failureHandler = () =>
                 # Do nothing.
