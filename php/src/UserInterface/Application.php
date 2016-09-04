@@ -54,20 +54,21 @@ class Application
         array_unshift($arguments, $programName);
 
         $commands = [
+            '--initialize'          => 'Initialize',
+            '--reindex'             => 'Reindex',
+            '--vacuum'              => 'Vacuum',
+            '--truncate'            => 'Truncate',
+
             '--class-list'          => 'ClassList',
             '--class-info'          => 'ClassInfo',
             '--functions'           => 'GlobalFunctions',
             '--constants'           => 'GlobalConstants',
-            '--reindex'             => 'Reindex',
             '--resolve-type'        => 'ResolveType',
             '--localize-type'       => 'LocalizeType',
             '--semantic-lint'       => 'SemanticLint',
             '--available-variables' => 'AvailableVariables',
             '--deduce-types'        => 'DeduceTypes',
-            '--invocation-info'     => 'InvocationInfo',
-            '--truncate'            => 'Truncate',
-            '--initialize'          => 'Initialize',
-            '--vacuum'              => 'Vacuum'
+            '--invocation-info'     => 'InvocationInfo'
         ];
 
         if (isset($commands[$command])) {
