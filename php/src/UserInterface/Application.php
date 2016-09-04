@@ -461,7 +461,7 @@ class Application
         $cachePath = sys_get_temp_dir() .
             '/php-integrator-base/' .
             $this->projectName . '/' .
-            Command\AbstractCommand::DATABASE_VERSION .
+            self::DATABASE_VERSION .
             '/';
 
         if (!file_exists($cachePath)) {
