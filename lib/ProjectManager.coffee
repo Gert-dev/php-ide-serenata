@@ -229,12 +229,15 @@ class ProjectManager
      * @return {Promise}
     ###
     performIndex: (project) ->
-        return @indexingMediator.reindex(
-            @getProjectPaths(project),
-            null,
-            @getAbsoluteExcludedPaths(project),
-            @getFileExtensionsToIndex(project)
-        )
+        successHandler = () =>
+            return @indexingMediator.reindex(
+                @getProjectPaths(project),
+                null,
+                @getAbsoluteExcludedPaths(project),
+                @getFileExtensionsToIndex(project)
+            )
+
+        return @indexingMediator.vacuum().then(successHandler)
 
     ###*
      * Performs a project index, but only if one is not currently already happening.
