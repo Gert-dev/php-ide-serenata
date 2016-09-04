@@ -74,7 +74,9 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
                 [$testPath],
                 false,
                 false,
-                false
+                false,
+                [],
+                ['test']
             );
 
             if (!$mayFail) {
