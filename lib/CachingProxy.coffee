@@ -143,6 +143,8 @@ class CachingProxy extends Proxy
     ###
     truncate: () ->
         return super().then (output) =>
+            @clearCache()
+
             return output
 
     ###*
