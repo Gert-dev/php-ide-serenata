@@ -167,13 +167,6 @@ class ProjectIndexer
         $iterator = new Iterating\ExclusionFilterIterator($iterator, $excludedPaths);
         $iterator = new Iterating\ModificationTimeFilterIterator($iterator, $fileModifiedMap);
 
-        $files = [];
-
-        /** @var \SplFileInfo $fileInfo */
-        foreach ($iterator as $fileInfo) {
-            $files[] = $fileInfo->getPathname();
-        }
-
         $this->storage->beginTransaction();
 
         $this->indexBuiltinItemsIfNecessary();
@@ -183,11 +176,16 @@ class ProjectIndexer
 
         $this->logMessage('Indexing outline...');
 
-        $totalItems = count($files);
+        $totalItems = iterator_count($iterator);
 
         $this->sendProgress(0, $totalItems);
 
-        foreach ($files as $i => $filePath) {
+        $i = 0;
+
+        /** @var \SplFileInfo $fileInfo */
+        foreach ($iterator as $fileInfo) {
+            $filePath = $fileInfo->getPathname();
+
             echo $this->logMessage('  - Indexing ' . $filePath);
 
             $code = null;
@@ -208,7 +206,7 @@ class ProjectIndexer
                 $this->logMessage('    - ERROR: Indexing failed due to parsing errors!');
             }
 
-            $this->sendProgress($i+1, $totalItems);
+            $this->sendProgress(++$i, $totalItems);
         }
 
         $this->storage->commitTransaction();
