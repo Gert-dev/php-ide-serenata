@@ -21,6 +21,8 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Analysis\Conversion;
+use PhpIntegrator\Parsing\CachingParserProxy;
+
 use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;
