@@ -23,6 +23,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 abstract class IndexedTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var IndexDatabase
+     */
     static $builtinIndexDatabase;
 
     /**
