@@ -141,8 +141,9 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    truncate: (file, source, offset) ->
-        return @wrapCachedRequestToParent("truncate", 'truncate', arguments)
+    truncate: () ->
+        return super().then (output) =>
+            return output
 
     ###*
      * @inherited
