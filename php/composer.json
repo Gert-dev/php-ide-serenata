@@ -11,7 +11,8 @@
         "ext-pdo_sqlite": "*",
         "nikic/php-parser": "~2.1.0",
         "doctrine/dbal": "~2.5",
-        "corneltek/getoptionkit": "~2.3.0"
+        "corneltek/getoptionkit": "~2.3.0",
+        "symfony/dependency-injection": "~3.1.0"
     },
 
     "require-dev": {
