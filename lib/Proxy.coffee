@@ -438,6 +438,32 @@ class Proxy
         return @performRequest(parameters, null, null)
 
     ###*
+     * Initializes a project.
+     *
+     * @return {Promise}
+    ###
+    initialize: () ->
+        parameters = [
+            '--initialize',
+            '--database=' + @getIndexDatabasePath()
+        ]
+
+        return @performRequest(parameters, null, null)
+
+    ###*
+     * Vacuums a project, cleaning up the index database (e.g. pruning files that no longer exist).
+     *
+     * @return {Promise}
+    ###
+    vacuum: () ->
+        parameters = [
+            '--vacuum',
+            '--database=' + @getIndexDatabasePath()
+        ]
+
+        return @performRequest(parameters, null, null)
+
+    ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
      * @param {String|Array}  path                   The full path to the file  or folder to refresh. Alternatively,

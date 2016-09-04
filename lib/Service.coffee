@@ -211,18 +211,17 @@ class Service
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
      *
-     * @param {String|Array}  path                   The full path to the file  or folder to refresh. Alternatively,
+     * @param {String|Array}  path                  The full path to the file  or folder to refresh. Alternatively,
      *                                              this can be a list of items to index at the same time.
-     * @param {String|null}   source                 The source code of the file to index. May be null if a directory is
+     * @param {String|null}   source                The source code of the file to index. May be null if a directory is
      *                                              passed instead.
-     * @param {Callback|null} progressStreamCallback A method to invoke each time progress streaming data is received.
-     * @param {Array}         excludedPaths          A list of paths to exclude from indexing.
-     * @param {Array}         fileExtensionsToIndex  A list of file extensions (without leading dot) to index.
+     * @param {Array}         excludedPaths         A list of paths to exclude from indexing.
+     * @param {Array}         fileExtensionsToIndex A list of file extensions (without leading dot) to index.
      *
      * @return {Promise}
     ###
-    reindex: (path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex) ->
-        return @indexingMediator.reindex(path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex)
+    reindex: (path, source, excludedPaths, fileExtensionsToIndex) ->
+        return @indexingMediator.reindex(path, source, excludedPaths, fileExtensionsToIndex)
 
     ###*
      * Truncates the database.
@@ -231,6 +230,43 @@ class Service
     ###
     truncate: () ->
         return @indexingMediator.truncate()
+
+    ###*
+     * Initializes a project.
+     *
+     * @return {Promise}
+    ###
+    initialize: () ->
+        return @indexingMediator.initialize()
+
+    ###*
+     * Vacuums a project, cleaning up the index database (e.g. pruning files that no longer exist).
+     *
+     * @return {Promise}
+    ###
+    vacuum: () ->
+        return @indexingMediator.vacuum()
+
+    ###*
+     * Attaches a callback to indexing started event. The returned disposable can be used to detach your event handler.
+     *
+     * @param {Callback} callback A callback that takes one parameter which contains a 'path' property.
+     *
+     * @return {Disposable}
+    ###
+    onDidStartIndexing: (callback) ->
+        return @indexingMediator.onDidStartIndexing(callback)
+
+    ###*
+     * Attaches a callback to indexing progress event. The returned disposable can be used to detach your event handler.
+     *
+     * @param {Callback} callback A callback that takes one parameter which contains a 'path' and a 'percentage'
+     *                            property.
+     *
+     * @return {Disposable}
+    ###
+    onDidIndexingProgress: (callback) ->
+        return @indexingMediator.onDidIndexingProgress(callback)
 
     ###*
      * Attaches a callback to indexing finished event. The returned disposable can be used to detach your event handler.

@@ -150,6 +150,24 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    initialize: () ->
+        return super().then (output) =>
+            @clearCache()
+
+            return output
+
+    ###*
+     * @inherited
+    ###
+    vacuum: () ->
+        return super().then (output) =>
+            @clearCache()
+
+            return output
+
+    ###*
+     * @inherited
+    ###
     reindex: (path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex) ->
         return super(path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex).then (output) =>
             @clearCache()

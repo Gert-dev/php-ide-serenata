@@ -9,9 +9,17 @@
 * Documentation for built-in functions was escaping underscores with a slash.
 * Semantic linting was incorrectly processing unqualified global function names.
 * Semantic linting was incorrectly processing unqualified global constant names.
+* The status bar was not showing progress when a project index happened through a repository status change.
 * Editing a file that did not meet the allowed extensions specified in the project settings still caused it to be added to the index.
 
 ### Changes for developers
+* The `reindex` call no longer automatically indexes built-in structural elements, nor will it automatically prune removed files from the database.
+  * A new call, `vacuum`, can be used to vacuum a project and prune removed files from its index.
+  * A new call, `initialize`, can be used to initialize a project and index built-in structural elements.
+* The `reindex` call no longer takes a `progressStreamCallback`, this was necessary because it was holding back refactoring and it really did not belong there.
+  * It also wasn't really useful in its current form, as the only the one doing the indexing could register a callback.
+  * As a better alternative, you can now register a callback with `onDidIndexingProgress` to listen to the progress, even if you did not spawn the reindex yourself.
+* A new call, `onDidStartIndexing`, has been added that allows you to listen to an indexing action starting.
 * Previously a fix was applied to make FQCN's actually contain a leading slash to clearly indicate that they were fully qualified. This still didn't happen everywhere, which has been corrected now.
 * A new service method, `getCurrentProjectSettings`, allows retrieving the settings (specific to this package) of a project. This includes things such as the PHP version, paths and excluded folders.
 * Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.

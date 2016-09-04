@@ -41,6 +41,11 @@ module.exports =
     disposables: null
 
     ###*
+     * @var {String|null}
+    ###
+    timerName: null
+
+    ###*
      * The service instance from the project-manager package.
      *
      * @var {Object|null}
@@ -104,21 +109,29 @@ module.exports =
                     'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'
                 }
 
-                failureHandler = () =>
+                successHandler = () =>
+                    return @projectManager.attemptCurrentProjectIndex()
+
+                failureHandler = (reason) =>
+                    console.error(reason)
+
                     atom.notifications.addError('Error!', {
                         'detail' : 'The project could not be properly initialized!'
                     })
 
                 @projectManager.load(project)
-
-                @indexCurrentProject().catch(failureHandler)
+                @projectManager.initializeCurrentProject().then(successHandler, failureHandler)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
-            @indexCurrentProject()
+            return if not @projectManager.hasActiveProject()
+
+            @projectManager.attemptCurrentProjectIndex()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
             successHandler = () =>
-                @indexCurrentProject()
+                return if not @projectManager.hasActiveProject()
+
+                @projectManager.attemptCurrentProjectIndex()
 
             failureHandler = () =>
                 # Do nothing.
@@ -133,45 +146,37 @@ module.exports =
             }
 
     ###*
-     * Indexes the current project.
+     * Registers status bar listeners.
     ###
-    indexCurrentProject: () ->
-        return if not @projectManager.hasActiveProject()
+    registerStatusBarListeners: () ->
+        @service.onDidStartIndexing () =>
+            @timerName = @packageName + " - Project indexing"
 
-        progressStreamCallback = (progress) =>
-            progress = parseFloat(progress)
+            console.time(@timerName);
 
-            if not isNaN(progress)
-                if @statusBarManager
-                    @statusBarManager.setProgress(progress)
-                    @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
+            if @statusBarManager?
+                @statusBarManager.setLabel("Indexing...")
+                @statusBarManager.setProgress(null)
+                @statusBarManager.show()
 
-        promise = @projectManager.attemptCurrentProjectIndex(progressStreamCallback)
-
-        return if not promise?
-
-        timerName = @packageName + " - Project indexing"
-
-        console.time(timerName);
-
-        if @statusBarManager
-            @statusBarManager.setLabel("Indexing...")
-            @statusBarManager.setProgress(null)
-            @statusBarManager.show()
-
-        successHandler = () =>
-            if @statusBarManager
+        @service.onDidFinishIndexing () =>
+            if @statusBarManager?
                 @statusBarManager.setLabel("Indexing completed!")
                 @statusBarManager.hide()
 
-            console.timeEnd(timerName);
+            console.timeEnd(@timerName);
 
-        failureHandler = () =>
-            if @statusBarManager
+        @service.onDidFailIndexing () =>
+            if @statusBarManager?
                 @statusBarManager.showMessage("Indexing failed!", "highlight-error")
                 @statusBarManager.hide()
 
-        promise.then(successHandler, failureHandler)
+            console.timeEnd(@timerName);
+
+        @service.onDidIndexingProgress (data) =>
+            if @statusBarManager?
+                @statusBarManager.setProgress(data.percentage)
+                @statusBarManager.setLabel("Indexing... (" + data.percentage.toFixed(2) + " %)")
 
     ###*
      * Attaches items to the status bar.
@@ -226,6 +231,7 @@ module.exports =
         @service = new Service(@proxy, @projectManager, indexingMediator)
 
         @registerCommands()
+        @registerStatusBarListeners()
 
         @disposables.add atom.workspace.observeTextEditors (editor) =>
             # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
@@ -288,7 +294,9 @@ module.exports =
         service.projects.getCurrent (project) =>
             @projectManager.load(project)
 
-            @indexCurrentProject()
+            return if not @projectManager.hasActiveProject()
+
+            @projectManager.attemptCurrentProjectIndex()
 
     ###*
      * Retrieves the service exposed by this package.

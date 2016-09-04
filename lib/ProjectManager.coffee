@@ -105,8 +105,6 @@ class ProjectManager
 
     ###*
      * @param {Object} project
-     *
-     * @return {Promise|null}
     ###
     load: (project) ->
         @activeProject = null
@@ -226,16 +224,14 @@ class ProjectManager
     ###*
      * Indexes the project asynchronously.
      *
-     * @param {Object}        project
-     * @param {Callback|null} progressStreamCallback
+     * @param {Object} project
      *
      * @return {Promise}
     ###
-    performIndex: (project, progressStreamCallback = null) ->
+    performIndex: (project) ->
         return @indexingMediator.reindex(
             @getProjectPaths(project),
             null,
-            progressStreamCallback,
             @getAbsoluteExcludedPaths(project),
             @getFileExtensionsToIndex(project)
         )
@@ -244,11 +240,10 @@ class ProjectManager
      * Performs a project index, but only if one is not currently already happening.
      *
      * @param {Object} project
-     * @param {Callback|null} progressStreamCallback
      *
      * @return {Promise|null}
     ###
-    attemptIndex: (project, progressStreamCallback = null) ->
+    attemptIndex: (project) ->
         return null if @isProjectIndexing()
 
         @isProjectIndexingFlag = true
@@ -259,17 +254,15 @@ class ProjectManager
         successHandler = handler
         failureHandler = handler
 
-        return @performIndex(project, progressStreamCallback).then(successHandler, failureHandler)
+        return @performIndex(project).then(successHandler, failureHandler)
 
     ###*
      * Indexes the current project, but only if one is not currently already happening.
      *
-     * @param {Callback|null} progressStreamCallback
-     *
      * @return {Promise}
     ###
-    attemptCurrentProjectIndex: (progressStreamCallback = null) ->
-        return @attemptIndex(@getActiveProject(), progressStreamCallback)
+    attemptCurrentProjectIndex: () ->
+        return @attemptIndex(@getActiveProject())
 
     ###*
      * Truncates the project, removing the existing indexing database.
@@ -278,6 +271,22 @@ class ProjectManager
     ###
     truncateCurrentProject: () ->
         return @indexingMediator.truncate()
+
+    ###*
+     * Initializes the project.
+     *
+     * @return {Promise|null}
+    ###
+    initializeCurrentProject: () ->
+        return @indexingMediator.initialize()
+
+    ###*
+     * Vacuums the project.
+     *
+     * @return {Promise|null}
+    ###
+    vacuumCurrentProject: () ->
+        return @indexingMediator.vacuum()
 
     ###*
      * Indexes a file asynchronously.

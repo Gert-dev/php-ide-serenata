@@ -32,14 +32,17 @@ class IndexingMediator
      *                                              this can be a list of items to index at the same time.
      * @param {String|null}   source                 The source code of the file to index. May be null if a directory is
      *                                              passed instead.
-     * @param {Callback|null} progressStreamCallback A method to invoke each time progress streaming data is received.
      * @param {Array}         excludedPaths          A list of paths to exclude from indexing.
      * @param {Array}         fileExtensionsToIndex  A list of file extensions (without leading dot) to index.
      *
      * @return {Promise}
     ###
-    reindex: (path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex) ->
+    reindex: (path, source, excludedPaths, fileExtensionsToIndex) ->
         return new Promise (resolve, reject) =>
+            @indexingEventEmitter.emit('php-integrator-base:indexing-started', {
+                path : path
+            })
+
             successHandler = (output) =>
                 @indexingEventEmitter.emit('php-integrator-base:indexing-finished', {
                     output : output
@@ -56,6 +59,15 @@ class IndexingMediator
 
                 reject(error)
 
+            progressStreamCallback = (progress) =>
+                progress = parseFloat(progress)
+
+                if not isNaN(progress)
+                    @indexingEventEmitter.emit('php-integrator-base:indexing-progress', {
+                        path       : path
+                        percentage : progress
+                    })
+
             return @proxy.reindex(
                 path,
                 source,
@@ -71,6 +83,42 @@ class IndexingMediator
     ###
     truncate: () ->
         return @proxy.truncate()
+
+    ###*
+     * Initializes the project.
+     *
+     * @return {Promise}
+    ###
+    initialize: () ->
+        return @proxy.initialize()
+
+    ###*
+     * Vacuums the project.
+     *
+     * @return {Promise}
+    ###
+    vacuum: () ->
+        return @proxy.vacuum()
+
+    ###*
+     * Attaches a callback to indexing started event. The returned disposable can be used to detach your event handler.
+     *
+     * @param {Callback} callback A callback that takes one parameter which contains a 'path' property.
+     *
+     * @return {Disposable}
+    ###
+    onDidStartIndexing: (callback) ->
+        @indexingEventEmitter.on('php-integrator-base:indexing-started', callback)
+
+    ###*
+     * Attaches a callback to indexing progress event. The returned disposable can be used to detach your event handler.
+     *
+     * @param {Callback} callback A callback that takes one parameter which contains a 'path' and a 'percentage' property.
+     *
+     * @return {Disposable}
+    ###
+    onDidIndexingProgress: (callback) ->
+        @indexingEventEmitter.on('php-integrator-base:indexing-progress', callback)
 
     ###*
      * Attaches a callback to indexing finished event. The returned disposable can be used to detach your event handler.

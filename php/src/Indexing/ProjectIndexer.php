@@ -166,13 +166,7 @@ class ProjectIndexer
         $iterator = new Iterating\ModificationTimeFilterIterator($iterator, $fileModifiedMap);
 
         $this->storage->beginTransaction();
-
-        $this->logMessage('Indexing built-in structural elements...');
-        $this->indexBuiltinItemsIfNecessary();
-
-        $this->logMessage('Pruning removed files...');
-        $this->pruneRemovedFiles();
-
+        
         $this->logMessage('Scanning and indexing files that need (re)indexing...');
 
         $totalItems = iterator_count($iterator);
@@ -214,7 +208,7 @@ class ProjectIndexer
     /**
      * Indexes builtin PHP structural elemens when necessary.
      */
-    protected function indexBuiltinItemsIfNecessary()
+    public function indexBuiltinItemsIfNecessary()
     {
         $hasIndexedBuiltin = $this->storage->getSetting('has_indexed_builtin');
 
@@ -237,7 +231,7 @@ class ProjectIndexer
     /**
      * Prunes removed files from the index.
      */
-    protected function pruneRemovedFiles()
+    public function pruneRemovedFiles()
     {
         foreach ($this->fileModifiedMap as $fileName => $indexedTime) {
             if (!file_exists($fileName)) {

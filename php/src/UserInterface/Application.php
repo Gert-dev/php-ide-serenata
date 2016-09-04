@@ -65,7 +65,9 @@ class Application
             '--available-variables' => 'AvailableVariables',
             '--deduce-types'        => 'DeduceTypes',
             '--invocation-info'     => 'InvocationInfo',
-            '--truncate'            => 'Truncate'
+            '--truncate'            => 'Truncate',
+            '--initialize'          => 'Initialize',
+            '--vacuum'              => 'Vacuum'
         ];
 
         if (isset($commands[$command])) {
