@@ -301,7 +301,6 @@ class ProjectManager
         return @indexingMediator.reindex(
             fileName,
             source,
-            null,
             @getAbsoluteExcludedPaths(project),
             @getFileExtensionsToIndex(project)
         )
