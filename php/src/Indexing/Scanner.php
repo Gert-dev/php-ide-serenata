@@ -48,18 +48,8 @@ class Scanner
         );
 
         $iterator = new ExtensionFilterIterator($iterator, $allowedExtensions);
+        $iterator = new ModificationTimeFilterIterator($iterator, $this->fileModifiedMap);
 
-        $files = [];
-
-        /** @var \DirectoryIterator $fileInfo */
-        foreach ($iterator as $filename => $fileInfo) {
-            if (!isset($this->fileModifiedMap[$filename])
-             || $fileInfo->getMTime() > $this->fileModifiedMap[$filename]->getTimestamp()
-            ) {
-                $files[] = $filename;
-            }
-        }
-
-        return $files;
+        return iterator_to_array($iterator);
     }
 }
