@@ -46,6 +46,11 @@ module.exports =
     timerName: null
 
     ###*
+     * @var {String|null}
+    ###
+    progressBarTimeout: null
+
+    ###*
      * The service instance from the project-manager package.
      *
      * @var {Object|null}
@@ -150,16 +155,27 @@ module.exports =
     ###
     registerStatusBarListeners: () ->
         @service.onDidStartIndexing () =>
-            @timerName = @packageName + " - Indexing"
+            # Indexing could be anything: the entire project or just a file. If indexing anything takes too long, show
+            # the progress bar to indicate we're doing something.
+            @progressBarTimeout = setTimeout ( =>
+                @progressBarTimeout = null
 
-            console.time(@timerName);
+                @timerName = @packageName + " - Indexing"
 
-            if @statusBarManager?
-                @statusBarManager.setLabel("Indexing...")
-                @statusBarManager.setProgress(null)
-                @statusBarManager.show()
+                console.time(@timerName);
+
+                if @statusBarManager?
+                    @statusBarManager.setLabel("Indexing...")
+                    @statusBarManager.setProgress(null)
+                    @statusBarManager.show()
+            ), 1000
 
         @service.onDidFinishIndexing () =>
+            if @progressBarTimeout
+                clearTimeout(@progressBarTimeout)
+                @progressBarTimeout = null
+                return
+
             if @statusBarManager?
                 @statusBarManager.setLabel("Indexing completed!")
                 @statusBarManager.hide()
@@ -167,6 +183,11 @@ module.exports =
             console.timeEnd(@timerName);
 
         @service.onDidFailIndexing () =>
+            if @progressBarTimeout
+                clearTimeout(@progressBarTimeout)
+                @progressBarTimeout = null
+                return
+
             if @statusBarManager?
                 @statusBarManager.showMessage("Indexing failed!", "highlight-error")
                 @statusBarManager.hide()
