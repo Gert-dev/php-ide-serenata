@@ -37,7 +37,7 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
 
         $container = $refMethod->invoke($app);
 
-        return $container->get('parser');
+        return $container->get('parser.phpParser');
     }
 
     /**
