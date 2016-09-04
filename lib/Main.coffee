@@ -71,7 +71,7 @@ module.exports =
 
             return false
 
-        if testServices and not @projectManager.projectManagerService?
+        if testServices and not @projectManagerService?
             errorMessage =
                 "There is no project manager service available. Install the atom-project-manager package for project
                 support to work in its full extent."
@@ -87,9 +87,9 @@ module.exports =
     ###
     registerCommands: () ->
         atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
-            return if not @projectManager.projectManagerService?
+            return if not @projectManagerService?
 
-            @projectManager.projectManagerService.projects.getCurrent (project) =>
+            @projectManagerService.projects.getCurrent (project) =>
                 try
                     @projectManager.setUpProject(project)
 
