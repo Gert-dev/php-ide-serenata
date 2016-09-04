@@ -18,6 +18,7 @@ class ComposerStaticInit6d911d2c0317086b52990384597ba6c1
         'S' => 
         array (
             'Symfony\\Component\\Yaml\\' => 23,
+            'Symfony\\Component\\ExpressionLanguage\\' => 37,
             'Symfony\\Component\\DependencyInjection\\' => 38,
         ),
         'P' => 
@@ -52,6 +53,10 @@ class ComposerStaticInit6d911d2c0317086b52990384597ba6c1
         'Symfony\\Component\\Yaml\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
+        ),
+        'Symfony\\Component\\ExpressionLanguage\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/expression-language',
         ),
         'Symfony\\Component\\DependencyInjection\\' => 
         array (
