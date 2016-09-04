@@ -2,6 +2,9 @@
 
 namespace PhpIntegrator\Indexing;
 
+use SplFileInfo;
+use ArrayIterator;
+use AppendIterator;
 use FilesystemIterator;
 use UnexpectedValueException;
 use RecursiveIteratorIterator;
@@ -207,12 +210,14 @@ class ProjectIndexer
      */
     protected function scanForFilesToIndex(array $paths, array $extensionsToIndex)
     {
-        $files = [];
+        $fileInfoIterators = [];
 
         foreach ($paths as $path) {
-            if (is_dir($path)) {
+            $fileInfo = new SplFileInfo($path);
+
+            if ($fileInfo->isDir()) {
                 $directoryIterator = new RecursiveDirectoryIterator(
-                    $path,
+                    $fileInfo->getPathname(),
                     FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::SKIP_DOTS
                 );
 
@@ -225,15 +230,25 @@ class ProjectIndexer
                 $iterator = new ExtensionFilterIterator($iterator, $extensionsToIndex);
                 $iterator = new ModificationTimeFilterIterator($iterator, $this->fileModifiedMap);
 
-                /** @var \SplFileInfo $fileInfo */
-                foreach ($iterator as $fileInfo) {
-                    $files[] = $fileInfo->getPathname();
-                }
-            } elseif (is_file($path)) {
-                $files[] = $path;
+                $fileInfoIterators[] = $iterator;
+            } elseif ($fileInfo->isFile()) {
+                $fileInfoIterators[] = new ArrayIterator([$fileInfo]);
             } else {
-                throw new IndexingFailedException('The specified file or directory "' . $path . '" does not exist!');
+                throw new IndexingFailedException('The specified file or directory "' . $fileInfo->getPathname() . '" does not exist!');
             }
+        }
+
+        $iterator = new AppendIterator();
+
+        foreach ($fileInfoIterators as $fileInfoIterator) {
+            $iterator->append($fileInfoIterator);
+        }
+
+        $files = [];
+
+        /** @var \SplFileInfo $fileInfo */
+        foreach ($iterator as $fileInfo) {
+            $files[] = $fileInfo->getPathname();
         }
 
         return $files;
