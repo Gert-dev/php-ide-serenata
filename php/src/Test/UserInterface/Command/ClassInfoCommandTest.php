@@ -14,7 +14,10 @@ class ClassInfoCommandTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path);
 
-        $command = new ClassInfoCommand($this->getParser(), null, $indexDatabase);
+        $command = new ClassInfoCommand(
+            $this->getApplicationContainer()->get('typeAnalyzer'),
+            $this->getApplicationContainer()->get('classlikeInfoBuilder')
+        );
 
         return $command->getClassInfo($fqcn);
     }
@@ -23,7 +26,10 @@ class ClassInfoCommandTest extends IndexedTest
     {
         $indexDatabase = $this->getDatabaseForBuiltinTesting();
 
-        $command = new ClassInfoCommand($this->getParser(), null, $indexDatabase);
+        $command = new ClassInfoCommand(
+            $this->getApplicationContainer()->get('typeAnalyzer'),
+            $this->getApplicationContainer()->get('classlikeInfoBuilder')
+        );
 
         return $command->getClassInfo($fqcn);
     }

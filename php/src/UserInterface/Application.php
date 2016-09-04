@@ -22,8 +22,20 @@ use PhpIntegrator\Analysis\Relations\TraitUsageResolver;
 use PhpIntegrator\Analysis\Relations\InheritanceResolver;
 use PhpIntegrator\Analysis\Relations\InterfaceImplementationResolver;
 
+use PhpIntegrator\Analysis\Typing\TypeDeducer;
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\TypeLocalizer;
+use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
+use PhpIntegrator\Analysis\Typing\FileTypeLocalizerFactory;
 
+use PhpIntegrator\Indexing\FileIndexer;
+use PhpIntegrator\Indexing\BuiltinIndexer;
+use PhpIntegrator\Indexing\ProjectIndexer;
+use PhpIntegrator\Indexing\CallbackStorageProxy;
+
+use PhpIntegrator\Parsing\PartialParser;
+use PhpIntegrator\Parsing\DocblockParser;
 use PhpIntegrator\Parsing\CachingParserProxy;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;
@@ -34,6 +46,8 @@ use PhpParser\ParserFactory;
 
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Main application class.
@@ -190,8 +204,10 @@ class Application
             ]]);
 
         $container
-            ->register('parser', CachingParserProxy::class)
+            ->register('parser.cachingParserProxy', CachingParserProxy::class)
             ->addArgument(new Reference('parser.phpParser'));
+
+        $container->setAlias('parser', 'parser.cachingParserProxy');
 
         $container
             ->register('cache', FilesystemCache::class)
@@ -202,6 +218,10 @@ class Application
 
         $container
             ->register('typeAnalyzer', TypeAnalyzer::class);
+
+        $container
+            ->register('typeResolver', TypeResolver::class)
+            ->setArguments([new Reference('typeAnalyzer')]);
 
         $container
             ->register('typeLocalizer', TypeLocalizer::class)
@@ -279,9 +299,8 @@ class Application
 
         $container
             ->register('storageForIndexers', CallbackStorageProxy::class)
-            ->setArguments([new Reference('indexDatabase'), function ($fqcn) {
-                // TODO: This doesn't work.
-                $provider = $this->getClasslikeInfoBuilderProvider();
+            ->setArguments([new Reference('indexDatabase'), function ($fqcn) use ($container) {
+                $provider = $container->get('classlikeInfoBuilderProviderCachingProxy');
 
                 if ($provider instanceof ClasslikeInfoBuilderProviderCachingProxy) {
                     $provider->clearCacheFor($fqcn);
@@ -343,7 +362,7 @@ class Application
                 new Reference('builtinIndexer'),
                 new Reference('fileIndexer'),
                 new Reference('sourceCodeStreamReader'),
-                new Reference('fileModifiedMap')
+                new Expression("service('indexDatabase').getFileModifiedMap()")
             ]);
 
         // Commands.
@@ -375,7 +394,7 @@ class Application
                 new Reference('inheritanceResolver'),
                 new Reference('interfaceImplementationResolver'),
                 new Reference('traitUsageResolver'),
-                new Reference('classlikeInfoBuilderProvider'),
+                new Reference('classlikeInfoBuilderProviderCachingProxy'),
                 new Reference('typeAnalyzer'),
                 new Reference('indexDatabase')
             ]);

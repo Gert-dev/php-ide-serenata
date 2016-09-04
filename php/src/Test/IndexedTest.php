@@ -29,6 +29,16 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
     static $builtinIndexDatabase;
 
     /**
+     * @param bool $indexBuiltinItems
+     *
+     * @return IndexDatabase
+     */
+    protected function getDatabase()
+    {
+        return new IndexDatabase(':memory:', 1);
+    }
+
+    /**
      * @return ContainerBuilder
      */
     protected function getApplicationContainer()
@@ -40,7 +50,13 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
 
         $refMethod->setAccessible(true);
 
-        return $refMethod->invoke($app);
+        $container = $refMethod->invoke($app);
+
+        // Replace some container items for testing purposes.
+        $container->set('indexDatabase', $this->getDatabase());
+        $container->setAlias('parser', 'parser.phpParser');
+
+        return $container;
     }
 
     /**
@@ -49,16 +65,6 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
     protected function getParser()
     {
         return $this->getApplicationContainer()->get('parser.phpParser');
-    }
-
-    /**
-     * @param bool $indexBuiltinItems
-     *
-     * @return IndexDatabase
-     */
-    protected function getDatabase()
-    {
-        return new IndexDatabase(':memory:', 1);
     }
 
     /**
@@ -78,7 +84,10 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
             'value' => 1
         ]);
 
-        $reindexCommand = new Command\ReindexCommand($this->getParser(), null, $indexDatabase);
+        $reindexCommand = new Command\ReindexCommand(
+            $indexDatabase,
+            $this->getApplicationContainer()->get('projectIndexer')
+        );
 
         if ($testPath) {
             $success = $reindexCommand->reindex(

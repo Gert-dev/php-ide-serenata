@@ -4,16 +4,29 @@ namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
 
-use GetOptionKit\OptionCollection;
-
-use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilderWhiteHolingProxyProvider;
-
 use Doctrine\Common\Cache\Cache;
 
 use GetOptionKit\OptionCollection;
 
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilderProviderInterface;
+
+use PhpIntegrator\Analysis\Conversion\MethodConverter;
+use PhpIntegrator\Analysis\Conversion\FunctionConverter;
+use PhpIntegrator\Analysis\Conversion\PropertyConverter;
+use PhpIntegrator\Analysis\Conversion\ConstantConverter;
+use PhpIntegrator\Analysis\Conversion\ClasslikeConverter;
+use PhpIntegrator\Analysis\Conversion\ClasslikeConstantConverter;
+
+use PhpIntegrator\Analysis\Relations\TraitUsageResolver;
+use PhpIntegrator\Analysis\Relations\InheritanceResolver;
+use PhpIntegrator\Analysis\Relations\InterfaceImplementationResolver;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+
 use PhpIntegrator\Indexing\IndexDatabase;
+
+use PhpIntegrator\UserInterface\ClasslikeInfoBuilderWhiteHolingProxyProvider;
 
 use PhpParser\Parser;
 
@@ -68,7 +81,7 @@ class ClassListCommand extends AbstractCommand
     protected $traitUsageResolver;
 
     /**
-     * @var ClasslikeInfoBuilderProvider
+     * @var ClasslikeInfoBuilderProviderInterface
      */
     protected $classlikeInfoBuilderProvider;
 
@@ -96,7 +109,7 @@ class ClassListCommand extends AbstractCommand
         InheritanceResolver $inheritanceResolver,
         InterfaceImplementationResolver $interfaceImplementationResolver,
         TraitUsageResolver $traitUsageResolver,
-        ClasslikeInfoBuilderProvider $classlikeInfoBuilderProvider,
+        ClasslikeInfoBuilderProviderInterface $classlikeInfoBuilderProvider,
         TypeAnalyzer $typeAnalyzer,
         IndexDatabase $indexDatabase
     ) {

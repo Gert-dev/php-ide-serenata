@@ -14,8 +14,9 @@ use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 
 use PhpIntegrator\Indexing\FileIndexer;
-use PhpIntegrator\Indexing\BuiltinIndexer;
+use PhpIntegrator\Indexing\IndexDatabase;
 use PhpIntegrator\Indexing\ProjectIndexer;
+use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\StorageInterface;
 use PhpIntegrator\Indexing\CallbackStorageProxy;
 
@@ -40,7 +41,7 @@ class ReindexCommand extends AbstractCommand
     protected $projectIndexer;
 
 
-    public function __construct(IndexDatabase $indexDatabase, phprojectIndexer $projectIndexer)
+    public function __construct(IndexDatabase $indexDatabase, ProjectIndexer $projectIndexer)
     {
         $this->indexDatabase = $indexDatabase;
         $this->projectIndexer = $projectIndexer;
