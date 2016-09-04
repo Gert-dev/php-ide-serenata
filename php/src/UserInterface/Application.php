@@ -13,25 +13,18 @@ use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 /**
  * Main application class.
  */
 class Application
 {
     /**
-     * @var FilesystemCache
+     * @var string
      */
-    protected $filesystemCache;
-
-    /**
-     * @var CachingParserProxy
-     */
-    protected $cachingParserProxy;
-
-    /**
-     * @var Parser
-     */
-    protected $parser;
+    protected $projectName;
 
     /**
      * Handles the application process.
@@ -43,11 +36,13 @@ class Application
     public function handle(array $arguments)
     {
         if (count($arguments) < 3) {
-            throw new UnexpectedValueException('Not enough argument supplied. Usage: . <project> <command> [<addtional parameters>]');
+            throw new UnexpectedValueException(
+                'Not enough argument supplied. Usage: . <project> <command> [<addtional parameters>]'
+            );
         }
 
         $programName = array_shift($arguments);
-        $projectName = array_shift($arguments);
+        $this->projectName = array_shift($arguments);
         $command = array_shift($arguments);
 
         // This seems to be needed for GetOptionKit.
@@ -76,8 +71,8 @@ class Application
 
             /** @var \PhpIntegrator\UserInterface\Command\CommandInterface $command */
             $command = new $className(
-                $this->getCachingParserProxy(),
-                $this->getFilesystemCache($projectName)
+                $this->getContainer()->get('parser'),
+                $this->getContainer()->get('cache')
             );
 
             if (interface_exists('Throwable')) {
@@ -103,62 +98,59 @@ class Application
     }
 
     /**
-     * Retrieves an instance of FilesystemCache. The object will only be created once if needed.
-     *
-     * @param string $project
-     *
-     * @return FilesystemCache
+     * @return ContainerBuilder
      */
-    protected function getFilesystemCache($project)
+    protected function getContainer()
     {
-        if (!$this->filesystemCache instanceof FilesystemCache) {
-            $cachePath = sys_get_temp_dir() .
-                '/php-integrator-base/' .
-                $project . '/' .
-                Command\AbstractCommand::DATABASE_VERSION .
-                '/';
+        $container = new ContainerBuilder();
 
-            if (!file_exists($cachePath)) {
-                mkdir($cachePath, 0777, true);
-            }
+        $container
+            ->register('application', Application::class)
+            ->setSynthetic(true);
 
-            $this->filesystemCache = new FilesystemCache($cachePath);
-        }
+        $container->set('application', $this);
 
-        return $this->filesystemCache;
-    }
-
-    /**
-     * @return CachingParserProxy
-     */
-    protected function getCachingParserProxy()
-    {
-        if (!$this->cachingParserProxy instanceof CachingParserProxy) {
-            $this->cachingParserProxy = new CachingParserProxy($this->getParser());
-        }
-
-        return $this->cachingParserProxy;
-    }
-
-    /**
-     * @return Parser
-     */
-    protected function getParser()
-    {
-        if (!$this->parser) {
-            $lexer = new Lexer([
+        $container
+            ->register('lexer', Lexer::class)
+            ->addArgument([
                 'usedAttributes' => [
                     'comments', 'startLine', 'endLine', 'startFilePos', 'endFilePos'
                 ]
             ]);
 
-            $parserFactory = new ParserFactory();
-
-            $this->parser = $parserFactory->create(ParserFactory::PREFER_PHP7, $lexer, [
+        $container
+            ->register('parser.phpParser', Parser::class)
+            ->setFactory([ParserFactory::class, 'create'])
+            ->setArguments([ParserFactory::PREFER_PHP7, new Reference('lexer'), [
                 'throwOnError' => false
-            ]);
+            ]]);
+
+        $container
+            ->register('parser', CachingParserProxy::class)
+            ->addArgument(new Reference('parser.phpParser'));
+
+        $container
+            ->register('cache', FilesystemCache::class)
+            ->setArguments([$this->getCacheDirectory()]);
+
+        return $container;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCacheDirectory()
+    {
+        $cachePath = sys_get_temp_dir() .
+            '/php-integrator-base/' .
+            $this->projectName . '/' .
+            Command\AbstractCommand::DATABASE_VERSION .
+            '/';
+
+        if (!file_exists($cachePath)) {
+            mkdir($cachePath, 0777, true);
         }
 
-        return $this->parser;
+        return $cachePath;
     }
 }
