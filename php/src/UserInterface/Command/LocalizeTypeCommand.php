@@ -39,7 +39,7 @@ class LocalizeTypeCommand extends AbstractCommand
     /**
      * @inheritDoc
      */
-    protected function attachOptions(OptionCollection $optionCollection)
+    public function attachOptions(OptionCollection $optionCollection)
     {
         $optionCollection->add('line:', 'The line on which the type can be found, line 1 being the first line.')->isa('number');
         $optionCollection->add('type:', 'The name of the type to resolve.')->isa('string');

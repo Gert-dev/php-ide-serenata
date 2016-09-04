@@ -50,7 +50,7 @@ class ReindexCommand extends AbstractCommand
     /**
      * @inheritDoc
      */
-    protected function attachOptions(OptionCollection $optionCollection)
+    public function attachOptions(OptionCollection $optionCollection)
     {
         $optionCollection->add('source+', 'The file or directory to index. Can be passed multiple times to process multiple items at once.')->isa('string');
         $optionCollection->add('exclude+', 'An absolute path to exclude. Can be passed multiple times.')->isa('string');

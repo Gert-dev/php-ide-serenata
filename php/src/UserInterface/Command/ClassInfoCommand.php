@@ -43,7 +43,7 @@ class ClassInfoCommand extends AbstractCommand
     /**
      * @inheritDoc
      */
-    protected function attachOptions(OptionCollection $optionCollection)
+    public function attachOptions(OptionCollection $optionCollection)
     {
         $optionCollection->add('name:', 'The name of the class, trait or interface to fetch information about.')->isa('string');
     }

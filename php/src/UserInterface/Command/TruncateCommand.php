@@ -35,7 +35,7 @@ class TruncateCommand extends AbstractCommand
     /**
      * @inheritDoc
      */
-    protected function attachOptions(OptionCollection $optionCollection)
+    public function attachOptions(OptionCollection $optionCollection)
     {
 
     }

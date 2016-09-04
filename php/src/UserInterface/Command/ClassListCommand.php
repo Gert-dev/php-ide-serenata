@@ -114,7 +114,7 @@ class ClassListCommand extends AbstractCommand
     /**
      * @inheritDoc
      */
-    protected function attachOptions(OptionCollection $optionCollection)
+    public function attachOptions(OptionCollection $optionCollection)
     {
         $optionCollection->add('file?', 'The file to filter the results by.')->isa('string');
     }
