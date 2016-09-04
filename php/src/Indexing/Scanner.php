@@ -31,12 +31,10 @@ class Scanner
      *
      * @param string   $directory
      * @param string[] $allowedExtensions
-     * @param bool     $isIncremental Whether to only return files modified since their last index (otherwise: all
-     *                              files are returned).
      *
      * @return string[]
      */
-    public function scan($directory, array $allowedExtensions = ['php'], $isIncremental = true)
+    public function scan($directory, array $allowedExtensions = ['php'])
     {
         $dirIterator = new RecursiveDirectoryIterator(
             $directory,
@@ -55,8 +53,7 @@ class Scanner
 
         /** @var \DirectoryIterator $fileInfo */
         foreach ($iterator as $filename => $fileInfo) {
-            if (!$isIncremental
-             || !isset($this->fileModifiedMap[$filename])
+            if (!isset($this->fileModifiedMap[$filename])
              || $fileInfo->getMTime() > $this->fileModifiedMap[$filename]->getTimestamp()
             ) {
                 $files[] = $filename;
