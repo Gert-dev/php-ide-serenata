@@ -77,6 +77,11 @@ class ClassListCommand extends AbstractCommand
      */
     protected $typeAnalyzer;
 
+    /**
+     * @var IndexDatabase
+     */
+    protected $indexDatabase;
+
 
 
 
@@ -93,11 +98,8 @@ class ClassListCommand extends AbstractCommand
         TraitUsageResolver $traitUsageResolver,
         ClasslikeInfoBuilderProvider $classlikeInfoBuilderProvider,
         TypeAnalyzer $typeAnalyzer,
-        Cache $cache = null,
-        IndexDatabase $indexDatabase = null
+        IndexDatabase $indexDatabase
     ) {
-        parent::__construct(null, $cache, $indexDatabase);
-
         $this->constantConverter = $constantConverter;
         $this->classlikeConstantConverter = $classlikeConstantConverter;
         $this->propertyConverter = $propertyConverter;
@@ -109,6 +111,7 @@ class ClassListCommand extends AbstractCommand
         $this->traitUsageResolver = $traitUsageResolver;
         $this->classlikeInfoBuilderProvider = $classlikeInfoBuilderProvider;
         $this->typeAnalyzer = $typeAnalyzer;
+        $this->indexDatabase = $indexDatabase;
     }
 
     /**

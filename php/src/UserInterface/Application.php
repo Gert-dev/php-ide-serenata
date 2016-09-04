@@ -377,36 +377,20 @@ class Application
                 new Reference('traitUsageResolver'),
                 new Reference('classlikeInfoBuilderProvider'),
                 new Reference('typeAnalyzer'),
-                new Reference('cache'),
                 new Reference('indexDatabase')
             ]);
 
         $container
             ->register('classInfoCommand', Command\ClassInfoCommand::class)
-            ->setArguments([
-                new Reference('typeAnalyzer'),
-                new Reference('classlikeInfoBuilder'),
-                new Reference('parser'),
-                new Reference('cache')]
-            );
+            ->setArguments([new Reference('typeAnalyzer'), new Reference('classlikeInfoBuilder')]);
 
         $container
             ->register('globalFunctionsCommand', Command\GlobalFunctionsCommand::class)
-            ->setArguments([
-                new Reference('functionConverter'),
-                new Reference('parser'),
-                new Reference('cache'),
-                new Reference('indexDatabase')
-            ]);
+            ->setArguments([new Reference('functionConverter'), new Reference('indexDatabase')]);
 
         $container
             ->register('globalConstantsCommand', Command\GlobalConstantsCommand::class)
-            ->setArguments([
-                new Reference('constantConverter'),
-                new Reference('parser'),
-                new Reference('cache'),
-                new Reference('indexDatabase')
-            ]);
+            ->setArguments([new Reference('constantConverter'), new Reference('indexDatabase')]);
 
         $container
             ->register('resolveTypeCommand', Command\ResolveTypeCommand::class)
@@ -434,16 +418,14 @@ class Application
 
         $container
             ->register('availableVariablesCommand', Command\AvailableVariablesCommand::class)
-            ->setArguments([new Reference('variableScanner'), new Reference('parser'), new Reference('cache')]);
+            ->setArguments([new Reference('variableScanner'), new Reference('parser')]);
 
         $container
             ->register('deduceTypesCommand', Command\DeduceTypesCommand::class)
             ->setArguments([
                     new Reference('typeDeducer'),
                     new Reference('partialParser'),
-                    new Reference('sourceCodeStreamReader'),
-                    new Reference('cache'),
-                    new Reference('indexDatabase')
+                    new Reference('sourceCodeStreamReader')
                 ]);
 
         $container

@@ -22,28 +22,21 @@ use PhpParser\Parser;
  */
 class AvailableVariablesCommand extends AbstractCommand
 {
+    use ParserAwareTrait;
+
     /**
      * @var VariableScanner
      */
     protected $variableScanner;
 
     /**
-     * @param VariableScanner    $variableScanner
-     * @param Parser|null        $parser
-     * @param Cache|null         $cache
-     * @param IndexDatabase|null $indexDatabase
-     *
-     * @return self
+     * @param VariableScanner $variableScanner
+     * @param Parser          $parser
      */
-    public function __construct(
-        VariableScanner $variableScanner,
-        Parser $parser = null,
-        Cache $cache = null,
-        IndexDatabase $indexDatabase = null
-    ) {
-        parent::__construct($parser, $cache, $indexDatabase);
-
+    public function __construct(VariableScanner $variableScanner, Parser $parser)
+    {
         $this->variableScanner = $variableScanner;
+        $this->parser = $parser;
     }
 
     /**
@@ -97,6 +90,6 @@ class AvailableVariablesCommand extends AbstractCommand
      {
          $nodes = $this->parse($code);
 
-         return $this->getVariableScanner()->getAvailableVariables($nodes, $offset);
+         return $this->variableScanner->getAvailableVariables($nodes, $offset);
      }
 }

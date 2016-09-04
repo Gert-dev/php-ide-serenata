@@ -16,18 +16,16 @@ class GlobalConstantsCommand extends AbstractCommand
      */
     protected $constantConverter;
 
+    /**
+     * @var IndexDatabase
+     */
+    protected $indexDatabase;
 
 
-
-    public function __construct(
-        ConstantConverter $constantConverter,
-        Parser $parser = null,
-        Cache $cache = null,
-        IndexDatabase $indexDatabase = null
-    ) {
-        parent::__construct($parser, $cache, $indexDatabase);
-
+    public function __construct(ConstantConverter $constantConverter, IndexDatabase $indexDatabase)
+    {
         $this->constantConverter = $constantConverter;
+        $this->indexDatabase = $indexDatabase;
     }
 
     /**

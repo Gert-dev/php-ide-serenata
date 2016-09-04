@@ -25,17 +25,9 @@ class ClassInfoCommand extends AbstractCommand
     /**
      * @param TypeAnalyzer         $typeAnalyzer
      * @param ClasslikeInfoBuilder $classlikeInfoBuilder
-     * @param Cache|null           $cache
-     * @param IndexDatabase|null   $indexDatabase
      */
-    public function __construct(
-        TypeAnalyzer $typeAnalyzer,
-        ClasslikeInfoBuilder $classlikeInfoBuilder,
-        Cache $cache = null,
-        IndexDatabase $indexDatabase = null
-    ) {
-        parent::__construct($parser, $cache, $indexDatabase);
-
+    public function __construct(TypeAnalyzer $typeAnalyzer, ClasslikeInfoBuilder $classlikeInfoBuilder)
+    {
         $this->typeAnalyzer = $typeAnalyzer;
         $this->classlikeInfoBuilder = $classlikeInfoBuilder;
     }

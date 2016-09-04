@@ -14,21 +14,17 @@ class GlobalFunctionsCommand extends AbstractCommand
      */
     protected $functionConverter;
 
+    /**
+     * @var IndexDatabase
+     */
+    protected $indexDatabase;
 
 
-
-    public function __construct(
-        FunctionConverter $functionConverter,
-        Parser $parser = null,
-        Cache $cache = null,
-        IndexDatabase $indexDatabase = null
-    ) {
-        parent::__construct($parser, $cache, $indexDatabase);
-
+    public function __construct(FunctionConverter $functionConverter, IndexDatabase $indexDatabase)
+    {
         $this->functionConverter = $functionConverter;
+        $this->indexDatabase = $indexDatabase;
     }
-
-
 
     /**
      * @inheritDoc

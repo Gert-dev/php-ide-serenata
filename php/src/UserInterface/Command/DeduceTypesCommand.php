@@ -43,12 +43,8 @@ class DeduceTypesCommand extends AbstractCommand
     public function __construct(
         TypeDeducer $typeDeducer,
         PartialParser $partialParser,
-        SourceCodeStreamReader $sourceCodeStreamReader,
-        Cache $cache = null,
-        IndexDatabase $indexDatabase = null
+        SourceCodeStreamReader $sourceCodeStreamReader
     ) {
-        parent::__construct($parser, $cache, $indexDatabase);
-
         $this->typeDeducer = $typeDeducer;
         $this->partialParser = $partialParser;
         $this->sourceCodeStreamReader = $sourceCodeStreamReader;
