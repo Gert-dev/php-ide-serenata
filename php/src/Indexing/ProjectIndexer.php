@@ -179,7 +179,7 @@ class ProjectIndexer
         foreach ($iterator as $fileInfo) {
             $filePath = $fileInfo->getPathname();
 
-            echo $this->logMessage('  - Indexing ' . $filePath);
+            $this->logMessage('  - Indexing ' . $filePath);
 
             $code = null;
 
