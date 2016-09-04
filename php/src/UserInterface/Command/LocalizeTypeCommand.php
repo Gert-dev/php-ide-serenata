@@ -16,14 +16,25 @@ use PhpIntegrator\Analysis\Typing\FileTypeLocalizerFactory;
 class LocalizeTypeCommand extends AbstractCommand
 {
     /**
-     * @var TypeLocalizer
+     * @var IndexDatabase
      */
-    protected $typeLocalizer;
+    protected $indexDatabase;
 
     /**
      * @var FileTypeLocalizerFactory
      */
     protected $fileTypeLocalizerFactory;
+
+
+
+    public function __construct(IndexDatabase $indexDatabase, FileTypeLocalizerFactory $fileTypeLocalizerFactory)
+    {
+        $this->indexDatabase = $indexDatabase;
+        $this->fileTypeLocalizerFactory = $fileTypeLocalizerFactory;
+    }
+
+
+
 
     /**
      * @inheritDoc
@@ -62,43 +73,12 @@ class LocalizeTypeCommand extends AbstractCommand
      */
     public function localizeType($type, $file, $line)
     {
-        $fileId = $this->getIndexDatabase()->getFileId($file);
+        $fileId = $this->indexDatabase->getFileId($file);
 
         if (!$fileId) {
             throw new UnexpectedValueException('The specified file is not present in the index!');
         }
 
-        return $this->getFileTypeLocalizerFactory()->create($file)->resolve($type, $line);
-    }
-
-    /**
-     * Retrieves an instance of FileTypeLocalizerFactory. The object will only be created once if needed.
-     *
-     * @return FileTypeLocalizerFactory
-     */
-    protected function getFileTypeLocalizerFactory()
-    {
-        if (!$this->fileTypeLocalizerFactory instanceof FileTypeLocalizerFactory) {
-            $this->fileTypeLocalizerFactory = new FileTypeLocalizerFactory(
-                $this->getTypeLocalizer(),
-                $this->getIndexDatabase()
-            );
-        }
-
-        return $this->fileTypeLocalizerFactory;
-    }
-
-    /**
-     * Retrieves an instance of TypeLocalizer. The object will only be created once if needed.
-     *
-     * @return TypeLocalizer
-     */
-    protected function getTypeLocalizer()
-    {
-        if (!$this->typeLocalizer instanceof TypeLocalizer) {
-            $this->typeLocalizer = new TypeLocalizer($this->getTypeAnalyzer());
-        }
-
-        return $this->typeLocalizer;
+        return $this->fileTypeLocalizerFactory->create($file)->resolve($type, $line);
     }
 }

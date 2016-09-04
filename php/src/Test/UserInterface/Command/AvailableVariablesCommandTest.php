@@ -14,7 +14,11 @@ class AvailableVariablesCommandTest extends IndexedTest
 
         $indexDatabase = $this->getDatabaseForTestFile($path, $mayFail);
 
-        $command = new AvailableVariablesCommand($this->getParser(), null, $indexDatabase);
+        $command = new AvailableVariablesCommand(
+            $this->getApplicationContainer()->get('variableScanner'),
+            $this->getParser(),
+            $indexDatabase
+        );
 
         return $command;
     }

@@ -10,6 +10,27 @@ use ArrayAccess;
 class GlobalFunctionsCommand extends AbstractCommand
 {
     /**
+     * @var FunctionConverter
+     */
+    protected $functionConverter;
+
+
+
+
+    public function __construct(
+        FunctionConverter $functionConverter,
+        Parser $parser = null,
+        Cache $cache = null,
+        IndexDatabase $indexDatabase = null
+    ) {
+        parent::__construct($parser, $cache, $indexDatabase);
+
+        $this->functionConverter = $functionConverter;
+    }
+
+
+
+    /**
      * @inheritDoc
      */
      protected function process(ArrayAccess $arguments)
@@ -26,8 +47,8 @@ class GlobalFunctionsCommand extends AbstractCommand
      {
          $result = [];
 
-         foreach ($this->getIndexDatabase()->getGlobalFunctions() as $function) {
-             $result[$function['fqcn']] = $this->getFunctionConverter()->convert($function);
+         foreach ($this->indexDatabase->getGlobalFunctions() as $function) {
+             $result[$function['fqcn']] = $this->functionConverter->convert($function);
          }
 
          return $result;

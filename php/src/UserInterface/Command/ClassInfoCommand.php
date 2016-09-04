@@ -5,13 +5,41 @@ namespace PhpIntegrator\UserInterface\Command;
 use ArrayAccess;
 use UnexpectedValueException;
 
+use Doctrine\Common\Cache\Cache;
+
 use GetOptionKit\OptionCollection;
+
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+
+use PhpIntegrator\Indexing\IndexDatabase;
+
+use PhpParser\Parser;
 
 /**
  * Command that shows information about a class, interface or trait.
  */
 class ClassInfoCommand extends AbstractCommand
 {
+    /**
+     * @param TypeAnalyzer         $typeAnalyzer
+     * @param ClasslikeInfoBuilder $classlikeInfoBuilder
+     * @param Cache|null           $cache
+     * @param IndexDatabase|null   $indexDatabase
+     */
+    public function __construct(
+        TypeAnalyzer $typeAnalyzer,
+        ClasslikeInfoBuilder $classlikeInfoBuilder,
+        Cache $cache = null,
+        IndexDatabase $indexDatabase = null
+    ) {
+        parent::__construct($parser, $cache, $indexDatabase);
+
+        $this->typeAnalyzer = $typeAnalyzer;
+        $this->classlikeInfoBuilder = $classlikeInfoBuilder;
+    }
+
     /**
      * @inheritDoc
      */
@@ -43,8 +71,8 @@ class ClassInfoCommand extends AbstractCommand
      */
     public function getClassInfo($fqcn)
     {
-        $fqcn = $this->getTypeAnalyzer()->getNormalizedFqcn($fqcn);
+        $fqcn = $this->typeAnalyzer->getNormalizedFqcn($fqcn);
 
-        return $this->getClasslikeInfoBuilder()->getClasslikeInfo($fqcn);
+        return $this->classlikeInfoBuilder->getClasslikeInfo($fqcn);
     }
 }

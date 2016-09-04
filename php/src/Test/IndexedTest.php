@@ -15,6 +15,8 @@ use PhpIntegrator\Indexing\IndexStorageItemEnum;
 
 use PhpIntegrator\UserInterface\Application;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 /**
  * Abstract base class for tests that need to test functionality that requires an indexing database to be set up with
  * the contents of a file or folder already indexed.
@@ -24,9 +26,9 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
     static $builtinIndexDatabase;
 
     /**
-     * @return \PhpParser\Parser
+     * @return ContainerBuilder
      */
-    protected function getParser()
+    protected function getApplicationContainer()
     {
         $app = new Application();
 
@@ -35,9 +37,15 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
 
         $refMethod->setAccessible(true);
 
-        $container = $refMethod->invoke($app);
+        return $refMethod->invoke($app);
+    }
 
-        return $container->get('parser.phpParser');
+    /**
+     * @return \PhpParser\Parser
+     */
+    protected function getParser()
+    {
+        return $this->getApplicationContainer()->get('parser.phpParser');
     }
 
     /**

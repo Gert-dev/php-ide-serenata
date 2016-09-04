@@ -16,14 +16,20 @@ use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 class ResolveTypeCommand extends AbstractCommand
 {
     /**
-     * @var TypeResolver
+     * @var IndexDatabase
      */
-    protected $typeResolver;
+    protected $indexDatabase;
 
     /**
      * @var FileTypeResolverFactory
      */
     protected $fileTypeResolverFactory;
+
+    public function __construct(IndexDatabase $indexDatabase, FileTypeResolverFactory $fileTypeResolverFactory)
+    {
+        $this->indexDatabase = $indexDatabase;
+        $this->fileTypeResolverFactory = $fileTypeResolverFactory;
+    }
 
     /**
      * @inheritDoc
@@ -66,43 +72,12 @@ class ResolveTypeCommand extends AbstractCommand
      */
     public function resolveType($type, $file, $line)
     {
-        $fileId = $this->getIndexDatabase()->getFileId($file);
+        $fileId = $this->indexDatabase->getFileId($file);
 
         if (!$fileId) {
             throw new UnexpectedValueException('The specified file is not present in the index!');
         }
 
-        return $this->getFileTypeResolverFactory()->create($file)->resolve($type, $line);
-    }
-
-    /**
-     * Retrieves an instance of FileTypeResolverFactory. The object will only be created once if needed.
-     *
-     * @return FileTypeResolverFactory
-     */
-    protected function getFileTypeResolverFactory()
-    {
-        if (!$this->fileTypeResolverFactory instanceof FileTypeResolverFactory) {
-            $this->fileTypeResolverFactory = new FileTypeResolverFactory(
-                $this->getTypeResolver(),
-                $this->getIndexDatabase()
-            );
-        }
-
-        return $this->fileTypeResolverFactory;
-    }
-
-    /**
-     * Retrieves an instance of TypeResolver. The object will only be created once if needed.
-     *
-     * @return TypeResolver
-     */
-    protected function getTypeResolver()
-    {
-        if (!$this->typeResolver instanceof TypeResolver) {
-            $this->typeResolver = new TypeResolver($this->getTypeAnalyzer());
-        }
-
-        return $this->typeResolver;
+        return $this->fileTypeResolverFactory->create($file)->resolve($type, $line);
     }
 }

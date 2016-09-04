@@ -7,7 +7,26 @@ use UnexpectedValueException;
 
 use Doctrine\Common\Cache\FilesystemCache;
 
+use PhpIntegrator\Analysis\VariableScanner;
+use PhpIntegrator\Analysis\DocblockAnalyzer;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
+
+use PhpIntegrator\Analysis\Conversion\MethodConverter;
+use PhpIntegrator\Analysis\Conversion\FunctionConverter;
+use PhpIntegrator\Analysis\Conversion\PropertyConverter;
+use PhpIntegrator\Analysis\Conversion\ConstantConverter;
+use PhpIntegrator\Analysis\Conversion\ClasslikeConverter;
+use PhpIntegrator\Analysis\Conversion\ClasslikeConstantConverter;
+
+use PhpIntegrator\Analysis\Relations\TraitUsageResolver;
+use PhpIntegrator\Analysis\Relations\InheritanceResolver;
+use PhpIntegrator\Analysis\Relations\InterfaceImplementationResolver;
+
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
+
 use PhpIntegrator\Parsing\CachingParserProxy;
+
+use PhpIntegrator\Utility\SourceCodeStreamReader;
 
 use PhpParser\Lexer;
 use PhpParser\Parser;
@@ -22,9 +41,22 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class Application
 {
     /**
+     * The version of the database we're currently at. When there are large changes to the layout of the database, this
+     * number is bumped and all databases with older versions will be dumped and replaced with a new index database.
+     *
+     * @var int
+     */
+    const DATABASE_VERSION = 27;
+
+    /**
      * @var string
      */
     protected $projectName;
+
+    /**
+     * @var string
+     */
+    protected $databaseFile;
 
     /**
      * Handles the application process.
@@ -66,21 +98,55 @@ class Application
             '--invocation-info'     => 'invocationInfoCommand'
         ];
 
+
+
+        // TODO: Update access modifier of attachOptions for each command.
+        // TODO: Rewrite code above to use this.
+
+        $optionCollection = new OptionCollection();
+        $optionCollection->add('database:', 'The index database to use.' )->isa('string');
+
+
         if (isset($commandServiceMap[$command])) {
             /** @var \PhpIntegrator\UserInterface\Command\CommandInterface $command */
             $command = $this->getContainer()->get($commandServiceMap[$command]);
 
+            $command->attachOptions($optionCollection);
+
+            $parser = new OptionParser($optionCollection);
+
+            $processedArguments = null;
+
+            try {
+                $processedArguments = $parser->parse($arguments);
+            } catch(\Exception $e) {
+                return $this->outputJson(false, $e->getMessage());
+            }
+
+            if (!isset($processedArguments['database'])) {
+                return $this->outputJson(false, 'No database path passed!');
+            }
+
+            $this->databaseFile = $processedArguments['database']->value;
+
+            // TODO: Move to service locator.
+
+            // Ensure we differentiate caches between databases.
+            if ($this->cache) {
+                $this->cache->setCachePrefix($this->cache->getCachePrefix() . md5($this->databaseFile));
+            }
+
             if (interface_exists('Throwable')) {
                 // PHP >= 7.
                 try {
-                    return $command->execute($arguments);
+                    return $command->execute($processedArguments);
                 } catch (\Throwable $e) {
                     return $e->getFile() . ':' . $e->getLine() . ' - ' . $e->getMessage();
                 }
             } else {
                 // PHP < 7
                 try {
-                    return $command->execute($arguments);
+                    return $command->execute($processedArguments);
                 } catch (Exception $e) {
                     return $e->getFile() . ':' . $e->getLine() . ' - ' . $e->getMessage();
                 }
@@ -132,12 +198,162 @@ class Application
             ->setArguments([$this->getCacheDirectory()]);
 
         $container
+            ->register('variableScanner', VariableScanner::class);
+
+        $container
+            ->register('typeAnalyzer', TypeAnalyzer::class);
+
+        $container
+            ->register('typeLocalizer', TypeLocalizer::class)
+            ->setArguments([new Reference('typeAnalyzer')]);
+
+        $container
+            ->register('partialParser', PartialParser::class);
+
+        $container
+            ->register('sourceCodeStreamReader', SourceCodeStreamReader::class);
+
+        $container
+            ->register('docblockParser', DocblockParser::class);
+
+        $container
+            ->register('docblockAnalyzer', DocblockAnalyzer::class);
+
+        $container
+            ->register('constantConverter', ConstantConverter::class);
+
+        $container
+            ->register('classlikeConstantConverter', ClasslikeConstantConverter::class);
+
+        $container
+            ->register('propertyConverter', PropertyConverter::class);
+
+        $container
+            ->register('classlikeConverter', ClasslikeConverter::class);
+
+        $container
+            ->register('functionConverter', FunctionConverter::class);
+
+        $container
+            ->register('methodConverter', MethodConverter::class);
+
+        $container
+            ->register('fileTypeResolverFactory', FileTypeResolverFactory::class)
+            ->setArguments([new Reference('typeResolver'), new Reference('indexDatabase')]);
+
+        $container
+            ->register('fileTypeLocalizerFactory', FileTypeLocalizerFactory::class)
+            ->setArguments([new Reference('typeLocalizer'), new Reference('indexDatabase')]);
+
+        $container
+            ->register('inheritanceResolver', InheritanceResolver::class)
+            ->setArguments([new Reference('docblockAnalyzer'), new Reference('typeAnalyzer')]);
+
+        $container
+            ->register('interfaceImplementationResolver', InterfaceImplementationResolver::class)
+            ->setArguments([new Reference('docblockAnalyzer'), new Reference('typeAnalyzer')]);
+
+        $container
+            ->register('traitUsageResolver', TraitUsageResolver::class)
+            ->setArguments([new Reference('docblockAnalyzer'), new Reference('typeAnalyzer')]);
+
+        $container
+            ->register('indexDatabase', IndexDatabase::class)
+            ->setArguments([$this->databaseFile, self::DATABASE_VERSION]);
+
+        $container
+            ->register('classlikeInfoBuilderProviderCachingProxy', ClasslikeInfoBuilderProviderCachingProxy::class)
+            ->setArguments([new Reference('indexDatabase'), new Reference('cache')]);
+
+        $container
+            ->register('classlikeExistanceChecker', ClasslikeExistanceChecker::class)
+            ->setArguments([new Reference('indexDatabase')]);
+
+        $container
+            ->register('globalFunctionExistanceChecker', GlobalFunctionExistanceChecker::class)
+            ->setArguments([new Reference('indexDatabase')]);
+
+        $container
+            ->register('globalConstantExistanceChecker', GlobalConstantExistanceChecker::class)
+            ->setArguments([new Reference('indexDatabase')]);
+
+        $container
+            ->register('storageForIndexers', CallbackStorageProxy::class)
+            ->setArguments([new Reference('indexDatabase'), function ($fqcn) {
+                // TODO: This doesn't work.
+                $provider = $this->getClasslikeInfoBuilderProvider();
+
+                if ($provider instanceof ClasslikeInfoBuilderProviderCachingProxy) {
+                    $provider->clearCacheFor($fqcn);
+                }
+            }]);
+
+        $container
+            ->register('classlikeInfoBuilder', ClasslikeInfoBuilder::class)
+            ->setArguments([
+                new Reference('constantConverter'),
+                new Reference('classlikeConstantConverter'),
+                new Reference('propertyConverter'),
+                new Reference('functionConverter'),
+                new Reference('methodConverter'),
+                new Reference('classlikeConverter'),
+                new Reference('inheritanceResolver'),
+                new Reference('interfaceImplementationResolver'),
+                new Reference('traitUsageResolver'),
+                new Reference('classlikeInfoBuilderProviderCachingProxy'),
+                new Reference('typeAnalyzer')
+            ]);
+
+        $container
+            ->register('typeDeducer', TypeDeducer::class)
+            ->setArguments([
+                new Reference('parser'),
+                new Reference('classListCommand'),
+                new Reference('docblockParser'),
+                new Reference('partialParser'),
+                new Reference('typeAnalyzer'),
+                new Reference('typeResolver'),
+                new Reference('fileTypeResolverFactory'),
+                new Reference('indexDatabase'),
+                new Reference('classlikeInfoBuilder'),
+                new Reference('functionConverter')
+            ]);
+
+        $container
+            ->register('builtinIndexer', BuiltinIndexer::class)
+            ->setArguments([
+                new Reference('indexDatabase'),
+                new Reference('typeAnalyzer')
+            ]);
+
+        $container
+            ->register('fileIndexer', FileIndexer::class)
+            ->setArguments([
+                new Reference('storageForIndexers'),
+                new Reference('typeAnalyzer'),
+                new Reference('docblockParser'),
+                new Reference('typeDeducer'),
+                new Reference('parser')
+            ]);
+
+        $container
+            ->register('projectIndexer', ProjectIndexer::class)
+            ->setArguments([
+                new Reference('storageForIndexers'),
+                new Reference('builtinIndexer'),
+                new Reference('fileIndexer'),
+                new Reference('sourceCodeStreamReader'),
+                new Reference('fileModifiedMap')
+            ]);
+
+        // Commands.
+        $container
             ->register('initializeCommand', Command\InitializeCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([new Reference('projectIndexer')]);
 
         $container
             ->register('reindexCommand', Command\ReindexCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([new Reference('indexDatabase'), new Reference('projectIndexer')]);
 
         $container
             ->register('vacuumCommand', Command\VacuumCommand::class)
@@ -145,47 +361,94 @@ class Application
 
         $container
             ->register('truncateCommand', Command\TruncateCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([$this->databaseFile, new Reference('cache')]);
 
         $container
             ->register('classListCommand', Command\ClassListCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([
+                new Reference('constantConverter'),
+                new Reference('classlikeConstantConverter'),
+                new Reference('propertyConverter'),
+                new Reference('functionConverter'),
+                new Reference('methodConverter'),
+                new Reference('classlikeConverter'),
+                new Reference('inheritanceResolver'),
+                new Reference('interfaceImplementationResolver'),
+                new Reference('traitUsageResolver'),
+                new Reference('classlikeInfoBuilderProvider'),
+                new Reference('typeAnalyzer'),
+                new Reference('cache'),
+                new Reference('indexDatabase')
+            ]);
 
         $container
             ->register('classInfoCommand', Command\ClassInfoCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([
+                new Reference('typeAnalyzer'),
+                new Reference('classlikeInfoBuilder'),
+                new Reference('parser'),
+                new Reference('cache')]
+            );
 
         $container
             ->register('globalFunctionsCommand', Command\GlobalFunctionsCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([
+                new Reference('functionConverter'),
+                new Reference('parser'),
+                new Reference('cache'),
+                new Reference('indexDatabase')
+            ]);
 
         $container
             ->register('globalConstantsCommand', Command\GlobalConstantsCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([
+                new Reference('constantConverter'),
+                new Reference('parser'),
+                new Reference('cache'),
+                new Reference('indexDatabase')
+            ]);
 
         $container
             ->register('resolveTypeCommand', Command\ResolveTypeCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([new Reference('indexDatabase'), new Reference('fileTypeResolverFactory')]);
 
         $container
             ->register('localizeTypeCommand', Command\LocalizeTypeCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([new Reference('indexDatabase'), new Reference('fileTypeLocalizerFactory')]);
 
         $container
             ->register('semanticLintCommand', Command\SemanticLintCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([
+                new Reference('sourceCodeStreamReader'),
+                new Reference('parser'),
+                new Reference('fileTypeResolverFactory'),
+                new Reference('typeDeducer'),
+                new Reference('classlikeInfoBuilder'),
+                new Reference('docblockParser'),
+                new Reference('typeAnalyzer'),
+                new Reference('docblockAnalyzer'),
+                new Reference('classlikeExistanceChecker'),
+                new Reference('globalConstantExistanceChecker'),
+                new Reference('globalFunctionExistanceChecker')
+            ]);
 
         $container
             ->register('availableVariablesCommand', Command\AvailableVariablesCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([new Reference('variableScanner'), new Reference('parser'), new Reference('cache')]);
 
         $container
             ->register('deduceTypesCommand', Command\DeduceTypesCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([
+                    new Reference('typeDeducer'),
+                    new Reference('partialParser'),
+                    new Reference('sourceCodeStreamReader'),
+                    new Reference('cache'),
+                    new Reference('indexDatabase')
+                ]);
 
         $container
             ->register('invocationInfoCommand', Command\InvocationInfoCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([new Reference('partialParser'), new Reference('sourceCodeStreamReader')]);
 
         return $container;
     }

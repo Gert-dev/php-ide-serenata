@@ -22,6 +22,19 @@ class InvocationInfoCommand extends AbstractCommand
     protected $partialParser;
 
     /**
+     * @var SourceCodeStreamReader
+     */
+    protected $sourceCodeStreamReader;
+
+
+
+    public function __construct(PartialParser $partialParser, SourceCodeStreamReader $sourceCodeStreamReader)
+    {
+        $this->partialParser = $partialParser;
+        $this->sourceCodeStreamReader = $sourceCodeStreamReader;
+    }
+
+    /**
      * @inheritDoc
      */
     protected function attachOptions(OptionCollection $optionCollection)
@@ -44,9 +57,9 @@ class InvocationInfoCommand extends AbstractCommand
         $code = null;
 
         if (isset($arguments['stdin']) && $arguments['stdin']->value) {
-            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
+            $code = $this->sourceCodeStreamReader->getSourceCodeFromStdin();
         } elseif (isset($arguments['file']) && $arguments['file']->value) {
-            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']->value);
+            $code = $this->sourceCodeStreamReader->getSourceCodeFromFile($arguments['file']->value);
         } else {
             throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
         }
@@ -80,20 +93,6 @@ class InvocationInfoCommand extends AbstractCommand
      */
     public function getInvocationInfo($code)
     {
-        return $this->getPartialParser()->getInvocationInfoAt($code);
-    }
-
-    /**
-     * Retrieves an instance of PartialParser. The object will only be created once if needed.
-     *
-     * @return PartialParser
-     */
-    protected function getPartialParser()
-    {
-        if (!$this->partialParser instanceof PartialParser) {
-            $this->partialParser = new PartialParser();
-        }
-
-        return $this->partialParser;
+        return $this->partialParser->getInvocationInfoAt($code);
     }
 }

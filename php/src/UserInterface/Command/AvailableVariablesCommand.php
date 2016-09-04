@@ -5,11 +5,17 @@ namespace PhpIntegrator\UserInterface\Command;
 use ArrayAccess;
 use UnexpectedValueException;
 
+use Doctrine\Common\Cache\Cache;
+
 use GetOptionKit\OptionCollection;
+
+use PhpIntegrator\Analysis\VariableScanner;
+
+use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Utility\SourceCodeHelpers;
 
-use PhpIntegrator\Analysis\VariableScanner;
+use PhpParser\Parser;
 
 /**
  * Command that shows information about the scopes at a specific position in a file.
@@ -20,6 +26,25 @@ class AvailableVariablesCommand extends AbstractCommand
      * @var VariableScanner
      */
     protected $variableScanner;
+
+    /**
+     * @param VariableScanner    $variableScanner
+     * @param Parser|null        $parser
+     * @param Cache|null         $cache
+     * @param IndexDatabase|null $indexDatabase
+     *
+     * @return self
+     */
+    public function __construct(
+        VariableScanner $variableScanner,
+        Parser $parser = null,
+        Cache $cache = null,
+        IndexDatabase $indexDatabase = null
+    ) {
+        parent::__construct($parser, $cache, $indexDatabase);
+
+        $this->variableScanner = $variableScanner;
+    }
 
     /**
      * @inheritDoc
@@ -73,19 +98,5 @@ class AvailableVariablesCommand extends AbstractCommand
          $nodes = $this->parse($code);
 
          return $this->getVariableScanner()->getAvailableVariables($nodes, $offset);
-     }
-
-     /**
-      * Retrieves an instance of VariableScanner. The object will only be created once if needed.
-      *
-      * @return VariableScanner
-      */
-     protected function getVariableScanner()
-     {
-         if (!$this->variableScanner instanceof VariableScanner) {
-             $this->variableScanner = new VariableScanner();
-         }
-
-         return $this->variableScanner;
      }
 }

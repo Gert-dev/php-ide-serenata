@@ -29,34 +29,14 @@ use PhpParser\NodeTraverser;
 class SemanticLintCommand extends AbstractCommand
 {
     /**
-     * @var ClassListCommand
+     * @var SourceCodeStreamReader
      */
-    protected $classListCommand;
+    protected $sourceCodeStreamReader;
 
     /**
-     * @var PartialParser
+     * @var Parser
      */
-    protected $partialParser;
-
-    /**
-     * @var ClasslikeExistanceChecker
-     */
-    protected $classlikeExistanceChecker;
-
-    /**
-     * @var GlobalFunctionExistanceChecker
-     */
-    protected $globalFunctionExistanceChecker;
-
-    /**
-     * @var GlobalConstantExistanceChecker
-     */
-    protected $globalConstantExistanceChecker;
-
-    /**
-     * @var TypeResolver
-     */
-    protected $typeResolver;
+    protected $parser;
 
     /**
      * @var FileTypeResolverFactory
@@ -69,9 +49,70 @@ class SemanticLintCommand extends AbstractCommand
     protected $typeDeducer;
 
     /**
+     * @var ClasslikeInfoBuilder
+     */
+    protected $classlikeInfoBuilder;
+
+    /**
      * @var DocblockParser
      */
     protected $docblockParser;
+
+    /**
+     * @var TypeAnalyzer
+     */
+    protected $typeAnalyzer;
+
+    /**
+     * @var DocblockAnalyzer
+     */
+    protected $docblockAnalyzer;
+
+    /**
+     * @var ClasslikeExistanceChecker
+     */
+    protected $classlikeExistanceChecker;
+
+    /**
+     * @var GlobalConstantExistanceChecker
+     */
+    protected $globalConstantExistanceChecker;
+
+    /**
+     * @var GlobalFunctionExistanceChecker
+     */
+    protected $globalFunctionExistanceChecker;
+
+
+
+
+    public function __construct(
+        SourceCodeStreamReader $sourceCodeStreamReader,
+        Parser $parser,
+        FileTypeResolverFactory $fileTypeResolverFactory,
+        TypeDeducer $typeDeducer,
+        ClasslikeInfoBuilder $classlikeInfoBuilder,
+        DocblockParser $docblockParser,
+        TypeAnalyzer $typeAnalyzer,
+        DocblockAnalyzer $docblockAnalyzer,
+        ClasslikeExistanceChecker $classlikeExistanceChecker,
+        GlobalConstantExistanceChecker $globalConstantExistanceChecker,
+        GlobalFunctionExistanceChecker $globalFunctionExistanceChecker
+    ) {
+        $this->sourceCodeStreamReader = $sourceCodeStreamReader;
+        $this->parser = $parser;
+        $this->fileTypeResolverFactory = $fileTypeResolverFactory;
+        $this->typeDeducer = $typeDeducer;
+        $this->classlikeInfoBuilder = $classlikeInfoBuilder;
+        $this->docblockParser = $docblockParser;
+        $this->typeAnalyzer = $typeAnalyzer;
+        $this->docblockAnalyzer = $docblockAnalyzer;
+        $this->classlikeExistanceChecker = $classlikeExistanceChecker;
+        $this->globalConstantExistanceChecker = $globalConstantExistanceChecker;
+        $this->globalFunctionExistanceChecker = $globalFunctionExistanceChecker;
+    }
+
+
 
     /**
      * @inheritDoc
@@ -100,9 +141,9 @@ class SemanticLintCommand extends AbstractCommand
         $code = null;
 
         if (isset($arguments['stdin']) && $arguments['stdin']->value) {
-            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
+            $code = $this->sourceCodeStreamReader->getSourceCodeFromStdin();
         } else {
-            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']->value);
+            $code = $this->sourceCodeStreamReader->getSourceCodeFromFile($arguments['file']->value);
         }
 
         $output = $this->semanticLint(
@@ -143,7 +184,7 @@ class SemanticLintCommand extends AbstractCommand
     ) {
         // Parse the file to fetch the information we need.
         $nodes = [];
-        $parser = $this->getParser();
+        $parser = $this->parser;
 
         $nodes = $parser->parse($code);
 
@@ -171,13 +212,13 @@ class SemanticLintCommand extends AbstractCommand
             $unknownClassAnalyzer = null;
 
             if ($retrieveUnknownClasses) {
-                $fileTypeResolver = $this->getFileTypeResolverFactory()->create($file);
+                $fileTypeResolver = $this->fileTypeResolverFactory->create($file);
 
                 $unknownClassAnalyzer = new Linting\UnknownClassAnalyzer(
-                    $this->getClasslikeExistanceChecker(),
+                    $this->classlikeExistanceChecker,
                     $fileTypeResolver,
-                    $this->getTypeAnalyzer(),
-                    $this->getDocblockParser()
+                    $this->typeAnalyzer,
+                    $this->docblockParser
                 );
 
                 foreach ($unknownClassAnalyzer->getVisitors() as $visitor) {
@@ -189,9 +230,9 @@ class SemanticLintCommand extends AbstractCommand
 
             if ($retrieveUnknownMembers) {
                 $unknownMemberAnalyzer = new Linting\UnknownMemberAnalyzer(
-                    $this->getTypeDeducer(),
-                    $this->getClasslikeInfoBuilder(),
-                    $this->getTypeAnalyzer(),
+                    $this->typeDeducer,
+                    $this->classlikeInfoBuilder,
+                    $this->typeAnalyzer,
                     $file,
                     $code
                 );
@@ -205,8 +246,8 @@ class SemanticLintCommand extends AbstractCommand
 
             if ($retrieveUnusedUseStatements) {
                 $unusedUseStatementAnalyzer = new Linting\UnusedUseStatementAnalyzer(
-                    $this->getTypeAnalyzer(),
-                    $this->getDocblockParser()
+                    $this->typeAnalyzer,
+                    $this->docblockParser
                 );
 
                 foreach ($unusedUseStatementAnalyzer->getVisitors() as $visitor) {
@@ -224,10 +265,10 @@ class SemanticLintCommand extends AbstractCommand
 
                 $docblockCorrectnessAnalyzer = new Linting\DocblockCorrectnessAnalyzer(
                     $code,
-                    $this->getClasslikeInfoBuilder(),
-                    $this->getDocblockParser(),
-                    $this->getTypeAnalyzer(),
-                    $this->getDocblockAnalyzer()
+                    $this->classlikeInfoBuilder,
+                    $this->docblockParser,
+                    $this->typeAnalyzer,
+                    $this->docblockAnalyzer
                 );
 
                 foreach ($docblockCorrectnessAnalyzer->getVisitors() as $visitor) {
@@ -256,7 +297,7 @@ class SemanticLintCommand extends AbstractCommand
 
                 if ($retrieveUnknownGlobalFunctions) {
                     $unknownGlobalConstantAnalyzer = new Linting\UnknownGlobalConstantAnalyzer(
-                        $this->getGlobalConstantExistanceChecker()
+                        $this->globalConstantExistanceChecker
                     );
 
                     foreach ($unknownGlobalConstantAnalyzer->getVisitors() as $visitor) {
@@ -266,7 +307,7 @@ class SemanticLintCommand extends AbstractCommand
 
                 if ($retrieveUnknownGlobalFunctions) {
                     $unknownGlobalFunctionAnalyzer = new Linting\UnknownGlobalFunctionAnalyzer(
-                        $this->getGlobalFunctionExistanceChecker()
+                        $this->globalFunctionExistanceChecker
                     );
 
                     foreach ($unknownGlobalFunctionAnalyzer->getVisitors() as $visitor) {
@@ -313,141 +354,5 @@ class SemanticLintCommand extends AbstractCommand
         }
 
         return $output;
-    }
-
-    /**
-     * Retrieves an instance of TypeDeducer. The object will only be created once if needed.
-     *
-     * @return TypeDeducer
-     */
-    protected function getTypeDeducer()
-    {
-        if (!$this->typeDeducer instanceof TypeDeducer) {
-            $this->typeDeducer = new TypeDeducer(
-                $this->getParser(),
-                $this->getClassListCommand(),
-                $this->getDocblockParser(),
-                $this->getPartialParser(),
-                $this->getTypeAnalyzer(),
-                $this->getTypeResolver(),
-                $this->getFileTypeResolverFactory(),
-                $this->getIndexDatabase(),
-                $this->getClasslikeInfoBuilder(),
-                $this->getFunctionConverter()
-            );
-        }
-
-        return $this->typeDeducer;
-    }
-
-    /**
-     * @return ClassListCommand
-     */
-    protected function getClassListCommand()
-    {
-        if (!$this->classListCommand) {
-            $this->classListCommand = new ClassListCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->classListCommand;
-    }
-
-    /**
-     * Retrieves an instance of PartialParser. The object will only be created once if needed.
-     *
-     * @return PartialParser
-     */
-    protected function getPartialParser()
-    {
-        if (!$this->partialParser instanceof PartialParser) {
-            $this->partialParser = new PartialParser();
-        }
-
-        return $this->partialParser;
-    }
-
-    /**
-     * Retrieves an instance of FileTypeResolverFactory. The object will only be created once if needed.
-     *
-     * @return FileTypeResolverFactory
-     */
-    protected function getFileTypeResolverFactory()
-    {
-        if (!$this->fileTypeResolverFactory instanceof FileTypeResolverFactory) {
-            $this->fileTypeResolverFactory = new FileTypeResolverFactory(
-                $this->getTypeResolver(),
-                $this->getIndexDatabase()
-            );
-        }
-
-        return $this->fileTypeResolverFactory;
-    }
-
-    /**
-     * Retrieves an instance of ClasslikeExistanceChecker. The object will only be created once if needed.
-     *
-     * @return ClasslikeExistanceChecker
-     */
-    protected function getClasslikeExistanceChecker()
-    {
-        if (!$this->classlikeExistanceChecker instanceof ClasslikeExistanceChecker) {
-            $this->classlikeExistanceChecker = new ClasslikeExistanceChecker($this->getIndexDatabase());
-        }
-
-        return $this->classlikeExistanceChecker;
-    }
-
-    /**
-     * Retrieves an instance of GlobalFunctionExistanceChecker. The object will only be created once if needed.
-     *
-     * @return GlobalFunctionExistanceChecker
-     */
-    protected function getGlobalFunctionExistanceChecker()
-    {
-        if (!$this->globalFunctionExistanceChecker instanceof GlobalFunctionExistanceChecker) {
-            $this->globalFunctionExistanceChecker = new GlobalFunctionExistanceChecker($this->getIndexDatabase());
-        }
-
-        return $this->globalFunctionExistanceChecker;
-    }
-
-    /**
-     * Retrieves an instance of GlobalConstantExistanceChecker. The object will only be created once if needed.
-     *
-     * @return GlobalConstantExistanceChecker
-     */
-    protected function getGlobalConstantExistanceChecker()
-    {
-        if (!$this->globalConstantExistanceChecker instanceof GlobalConstantExistanceChecker) {
-            $this->globalConstantExistanceChecker = new GlobalConstantExistanceChecker($this->getIndexDatabase());
-        }
-
-        return $this->globalConstantExistanceChecker;
-    }
-
-    /**
-     * Retrieves an instance of TypeResolver. The object will only be created once if needed.
-     *
-     * @return TypeResolver
-     */
-    protected function getTypeResolver()
-    {
-        if (!$this->typeResolver instanceof TypeResolver) {
-            $this->typeResolver = new TypeResolver($this->getTypeAnalyzer());
-        }
-
-        return $this->typeResolver;
-    }
-
-    /**
-     * @return DocblockParser
-     */
-    protected function getDocblockParser()
-    {
-        if (!$this->docblockParser) {
-            $this->docblockParser = new DocblockParser();
-        }
-
-        return $this->docblockParser;
     }
 }

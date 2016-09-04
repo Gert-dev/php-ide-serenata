@@ -24,24 +24,9 @@ use PhpIntegrator\Utility\SourceCodeHelpers;
 class DeduceTypesCommand extends AbstractCommand
 {
     /**
-     * @var ClassListCommand
+     * @var TypeDeducer
      */
-    protected $classListCommand;
-
-    /**
-     * @var ResolveTypeCommand
-     */
-    protected $resolveTypeCommand;
-
-    /**
-     * @var GlobalFunctionsCommand
-     */
-    protected $globalFunctionsCommand;
-
-    /**
-     * @var DocblockParser
-     */
-    protected $docblockParser;
+    protected $typeDeducer;
 
     /**
      * @var PartialParser
@@ -49,24 +34,26 @@ class DeduceTypesCommand extends AbstractCommand
     protected $partialParser;
 
     /**
-     * @var TypeResolver
+     * @var SourceCodeStreamReader
      */
-    protected $typeResolver;
+    protected $sourceCodeStreamReader;
 
-    /**
-     * @var FileTypeResolverFactory
-     */
-    protected $fileTypeResolverFactory;
 
-    /**
-     * @var TypeQueryingVisitor
-     */
-    protected $typeQueryingVisitor;
 
-    /**
-     * @var TypeDeducer
-     */
-    protected $typeDeducer;
+    public function __construct(
+        TypeDeducer $typeDeducer,
+        PartialParser $partialParser,
+        SourceCodeStreamReader $sourceCodeStreamReader,
+        Cache $cache = null,
+        IndexDatabase $indexDatabase = null
+    ) {
+        parent::__construct($parser, $cache, $indexDatabase);
+
+        $this->typeDeducer = $typeDeducer;
+        $this->partialParser = $partialParser;
+        $this->sourceCodeStreamReader = $sourceCodeStreamReader;
+    }
+
 
     /**
      * @inheritDoc
@@ -93,9 +80,9 @@ class DeduceTypesCommand extends AbstractCommand
         }
 
         if (isset($arguments['stdin']) && $arguments['stdin']->value) {
-            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
+            $code = $this->sourceCodeStreamReader->getSourceCodeFromStdin();
         } else {
-            $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']->value);
+            $code = $this->sourceCodeStreamReader->getSourceCodeFromFile($arguments['file']->value);
         }
 
         $offset = $arguments['offset']->value;
@@ -109,14 +96,14 @@ class DeduceTypesCommand extends AbstractCommand
         if (isset($arguments['part'])) {
             $parts = $arguments['part']->value;
         } else {
-            $parts = $this->getPartialParser()->retrieveSanitizedCallStackAt(substr($code, 0, $offset));
+            $parts = $this->partialParser->retrieveSanitizedCallStackAt(substr($code, 0, $offset));
 
             if (!empty($parts) && isset($arguments['ignore-last-element']) && $arguments['ignore-last-element']) {
                 array_pop($parts);
             }
         }
 
-        $result = $this->getTypeDeducer()->deduceTypes(
+        $result = $this->typeDeducer->deduceTypes(
            isset($arguments['file']) ? $arguments['file']->value : null,
            $code,
            $parts,
@@ -124,101 +111,5 @@ class DeduceTypesCommand extends AbstractCommand
         );
 
         return $this->outputJson(true, $result);
-    }
-
-    /**
-     * Retrieves an instance of TypeDeducer. The object will only be created once if needed.
-     *
-     * @return TypeDeducer
-     */
-    protected function getTypeDeducer()
-    {
-        if (!$this->typeDeducer instanceof TypeDeducer) {
-            $this->typeDeducer = new TypeDeducer(
-                $this->getParser(),
-                $this->getClassListCommand(),
-                $this->getDocblockParser(),
-                $this->getPartialParser(),
-                $this->getTypeAnalyzer(),
-                $this->getTypeResolver(),
-                $this->getFileTypeResolverFactory(),
-                $this->getIndexDatabase(),
-                $this->getClasslikeInfoBuilder(),
-                $this->getFunctionConverter()
-            );
-        }
-
-        return $this->typeDeducer;
-    }
-
-    /**
-     * @return ClassListCommand
-     */
-    protected function getClassListCommand()
-    {
-        if (!$this->classListCommand) {
-            $this->classListCommand = new ClassListCommand($this->getParser(), $this->cache, $this->getIndexDatabase());
-        }
-
-        return $this->classListCommand;
-    }
-
-    /**
-     * Retrieves an instance of DocblockParser. The object will only be created once if needed.
-     *
-     * @return DocblockParser
-     */
-    protected function getDocblockParser()
-    {
-        if (!$this->docblockParser instanceof DocblockParser) {
-            $this->docblockParser = new DocblockParser();
-        }
-
-        return $this->docblockParser;
-    }
-
-    /**
-     * Retrieves an instance of PartialParser. The object will only be created once if needed.
-     *
-     * @return PartialParser
-     */
-    protected function getPartialParser()
-    {
-        if (!$this->partialParser instanceof PartialParser) {
-            $this->partialParser = new PartialParser();
-        }
-
-        return $this->partialParser;
-    }
-
-    /**
-     * Retrieves an instance of FileTypeResolverFactory. The object will only be created once if needed.
-     *
-     * @return FileTypeResolverFactory
-     */
-    protected function getFileTypeResolverFactory()
-    {
-        if (!$this->fileTypeResolverFactory instanceof FileTypeResolverFactory) {
-            $this->fileTypeResolverFactory = new FileTypeResolverFactory(
-                $this->getTypeResolver(),
-                $this->getIndexDatabase()
-            );
-        }
-
-        return $this->fileTypeResolverFactory;
-    }
-
-    /**
-     * Retrieves an instance of TypeResolver. The object will only be created once if needed.
-     *
-     * @return TypeResolver
-     */
-    protected function getTypeResolver()
-    {
-        if (!$this->typeResolver instanceof TypeResolver) {
-            $this->typeResolver = new TypeResolver($this->getTypeAnalyzer());
-        }
-
-        return $this->typeResolver;
     }
 }
