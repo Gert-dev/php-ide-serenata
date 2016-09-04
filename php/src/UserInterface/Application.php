@@ -48,32 +48,27 @@ class Application
         // This seems to be needed for GetOptionKit.
         array_unshift($arguments, $programName);
 
-        $commands = [
-            '--initialize'          => 'Initialize',
-            '--reindex'             => 'Reindex',
-            '--vacuum'              => 'Vacuum',
-            '--truncate'            => 'Truncate',
+        $commandServiceMap = [
+            '--initialize'          => 'initializeCommand',
+            '--reindex'             => 'reindexCommand',
+            '--vacuum'              => 'vacuumCommand',
+            '--truncate'            => 'truncateCommand',
 
-            '--class-list'          => 'ClassList',
-            '--class-info'          => 'ClassInfo',
-            '--functions'           => 'GlobalFunctions',
-            '--constants'           => 'GlobalConstants',
-            '--resolve-type'        => 'ResolveType',
-            '--localize-type'       => 'LocalizeType',
-            '--semantic-lint'       => 'SemanticLint',
-            '--available-variables' => 'AvailableVariables',
-            '--deduce-types'        => 'DeduceTypes',
-            '--invocation-info'     => 'InvocationInfo'
+            '--class-list'          => 'classListCommand',
+            '--class-info'          => 'classInfoCommand',
+            '--functions'           => 'globalFunctionsCommand',
+            '--constants'           => 'globalConstantsCommand',
+            '--resolve-type'        => 'resolveTypeCommand',
+            '--localize-type'       => 'localizeTypeCommand',
+            '--semantic-lint'       => 'semanticLintCommand',
+            '--available-variables' => 'availableVariablesCommand',
+            '--deduce-types'        => 'deduceTypesCommand',
+            '--invocation-info'     => 'invocationInfoCommand'
         ];
 
-        if (isset($commands[$command])) {
-            $className = "\\PhpIntegrator\\UserInterface\\Command\\{$commands[$command]}Command";
-
+        if (isset($commandServiceMap[$command])) {
             /** @var \PhpIntegrator\UserInterface\Command\CommandInterface $command */
-            $command = new $className(
-                $this->getContainer()->get('parser'),
-                $this->getContainer()->get('cache')
-            );
+            $command = $this->getContainer()->get($commandServiceMap[$command]);
 
             if (interface_exists('Throwable')) {
                 // PHP >= 7.
@@ -92,7 +87,7 @@ class Application
             }
         }
 
-        $supportedCommands = implode(', ', array_keys($commands));
+        $supportedCommands = implode(', ', array_keys($commandServiceMap));
 
         echo "Unknown command {$command}, supported commands: {$supportedCommands}";
     }
@@ -132,6 +127,62 @@ class Application
         $container
             ->register('cache', FilesystemCache::class)
             ->setArguments([$this->getCacheDirectory()]);
+
+        $container
+            ->register('initializeCommand', Command\InitializeCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('reindexCommand', Command\ReindexCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('vacuumCommand', Command\VacuumCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('truncateCommand', Command\TruncateCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('classListCommand', Command\ClassListCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('classInfoCommand', Command\ClassInfoCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('globalFunctionsCommand', Command\GlobalFunctionsCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('globalConstantsCommand', Command\GlobalConstantsCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('resolveTypeCommand', Command\ResolveTypeCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('localizeTypeCommand', Command\LocalizeTypeCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('semanticLintCommand', Command\SemanticLintCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('availableVariablesCommand', Command\AvailableVariablesCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('deduceTypesCommand', Command\DeduceTypesCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
+
+        $container
+            ->register('invocationInfoCommand', Command\InvocationInfoCommand::class)
+            ->setArguments([new Reference('parser'), new Reference('cache')]);
 
         return $container;
     }
