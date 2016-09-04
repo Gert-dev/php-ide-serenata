@@ -9,6 +9,7 @@
 * Documentation for built-in functions was escaping underscores with a slash.
 * Semantic linting was incorrectly processing unqualified global function names.
 * Semantic linting was incorrectly processing unqualified global constant names.
+* Editing a file that did not meet the allowed extensions specified in the project settings still caused it to be added to the index.
 
 ### Changes for developers
 * Previously a fix was applied to make FQCN's actually contain a leading slash to clearly indicate that they were fully qualified. This still didn't happen everywhere, which has been corrected now.

@@ -227,7 +227,6 @@ class ProjectIndexer
                     RecursiveIteratorIterator::CATCH_GET_CHILD
                 );
 
-                $iterator = new ExtensionFilterIterator($iterator, $extensionsToIndex);
                 $iterator = new ModificationTimeFilterIterator($iterator, $this->fileModifiedMap);
 
                 $fileInfoIterators[] = $iterator;
@@ -243,6 +242,8 @@ class ProjectIndexer
         foreach ($fileInfoIterators as $fileInfoIterator) {
             $iterator->append($fileInfoIterator);
         }
+
+        $iterator = new ExtensionFilterIterator($iterator, $extensionsToIndex);
 
         $files = [];
 
