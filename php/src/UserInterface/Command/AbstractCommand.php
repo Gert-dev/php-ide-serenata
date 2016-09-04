@@ -45,7 +45,7 @@ abstract class AbstractCommand implements CommandInterface
     protected $parser;
 
     /**
-     * @var CacheIdPrefixDecorator|null
+     * @var Cache|null
      */
     protected $cache;
 
@@ -57,7 +57,7 @@ abstract class AbstractCommand implements CommandInterface
     public function __construct(Parser $parser = null)
     {
         $this->parser = $parser;
-        $this->cache = $cache ? (new CacheIdPrefixDecorator($cache, $this->getCachePrefix())) : null;
+        $this->cache = $cache;
         $this->indexDatabase = $indexDatabase;
     }
 
@@ -95,14 +95,6 @@ abstract class AbstractCommand implements CommandInterface
      * @return string Output to pass back.
      */
     abstract protected function process(ArrayAccess $arguments);
-
-    /**
-     * @return string
-     */
-    protected function getCachePrefix()
-    {
-        return '';
-    }
 
     /**
      * Outputs JSON.
