@@ -12,7 +12,7 @@ use PhpParser\Parser;
 trait ParserAwareTrait
 {
     /**
-     * @var ParserAwareTrait
+     * @var Parser
      */
     protected $parser;
 
