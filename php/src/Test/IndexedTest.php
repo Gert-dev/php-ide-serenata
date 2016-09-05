@@ -4,14 +4,7 @@ namespace PhpIntegrator\Test;
 
 use ReflectionClass;
 
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
-use PhpIntegrator\Indexing\BuiltinIndexer;
-
-use PhpIntegrator\UserInterface\Command;
-
 use PhpIntegrator\Indexing\IndexDatabase;
-use PhpIntegrator\Indexing\IndexStorageItemEnum;
 
 use PhpIntegrator\UserInterface\Application;
 
