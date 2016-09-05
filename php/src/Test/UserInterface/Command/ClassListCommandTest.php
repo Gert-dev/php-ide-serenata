@@ -26,7 +26,7 @@ class ClassListCommandTest extends IndexedTest
             $container->get('inheritanceResolver'),
             $container->get('interfaceImplementationResolver'),
             $container->get('traitUsageResolver'),
-            $container->get('classlikeInfoBuilderProviderCachingProxy'),
+            $container->get('classlikeInfoBuilderProvider'),
             $container->get('typeAnalyzer'),
             $container->get('indexDatabase')
         );

@@ -285,6 +285,9 @@ class Application
             ->setArguments([new Reference('indexDatabase'), new Reference('cache')]);
 
         $container
+            ->setAlias('classlikeInfoBuilderProvider', 'classlikeInfoBuilderProviderCachingProxy');
+
+        $container
             ->register('classlikeExistanceChecker', ClasslikeExistanceChecker::class)
             ->setArguments([new Reference('indexDatabase')]);
 
@@ -299,7 +302,7 @@ class Application
         $container
             ->register('storageForIndexers', CallbackStorageProxy::class)
             ->setArguments([new Reference('indexDatabase'), function ($fqcn) use ($container) {
-                $provider = $container->get('classlikeInfoBuilderProviderCachingProxy');
+                $provider = $container->get('classlikeInfoBuilderProvider');
 
                 if ($provider instanceof ClasslikeInfoBuilderProviderCachingProxy) {
                     $provider->clearCacheFor($fqcn);
@@ -318,7 +321,7 @@ class Application
                 new Reference('inheritanceResolver'),
                 new Reference('interfaceImplementationResolver'),
                 new Reference('traitUsageResolver'),
-                new Reference('classlikeInfoBuilderProviderCachingProxy'),
+                new Reference('classlikeInfoBuilderProvider'),
                 new Reference('typeAnalyzer')
             ]);
 
@@ -397,7 +400,7 @@ class Application
                 new Reference('inheritanceResolver'),
                 new Reference('interfaceImplementationResolver'),
                 new Reference('traitUsageResolver'),
-                new Reference('classlikeInfoBuilderProviderCachingProxy'),
+                new Reference('classlikeInfoBuilderProvider'),
                 new Reference('typeAnalyzer'),
                 new Reference('indexDatabase')
             ]);
