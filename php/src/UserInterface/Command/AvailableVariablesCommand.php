@@ -10,6 +10,7 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\Analysis\VariableScanner;
 
 use PhpIntegrator\Utility\SourceCodeHelpers;
+use PhpIntegrator\Utility\SourceCodeStreamReader;
 
 use PhpParser\Parser;
 
@@ -26,13 +27,23 @@ class AvailableVariablesCommand extends AbstractCommand
     protected $variableScanner;
 
     /**
-     * @param VariableScanner $variableScanner
-     * @param Parser          $parser
+     * @var SourceCodeStreamReader
      */
-    public function __construct(VariableScanner $variableScanner, Parser $parser)
-    {
+    protected $sourceCodeStreamReader;
+
+    /**
+     * @param VariableScanner        $variableScanner
+     * @param Parser                 $parser
+     * @param SourceCodeStreamReader $sourceCodeStreamReader
+     */
+    public function __construct(
+        VariableScanner $variableScanner,
+        Parser $parser,
+        SourceCodeStreamReader $sourceCodeStreamReader
+    ) {
         $this->variableScanner = $variableScanner;
         $this->parser = $parser;
+        $this->sourceCodeStreamReader = $sourceCodeStreamReader;
     }
 
     /**
@@ -58,9 +69,9 @@ class AvailableVariablesCommand extends AbstractCommand
          $code = null;
 
          if (isset($arguments['stdin']) && $arguments['stdin']->value) {
-             $code = $this->getSourceCodeStreamReader()->getSourceCodeFromStdin();
+             $code = $this->sourceCodeStreamReader->getSourceCodeFromStdin();
          } elseif (isset($arguments['file']) && $arguments['file']->value) {
-             $code = $this->getSourceCodeStreamReader()->getSourceCodeFromFile($arguments['file']->value);
+             $code = $this->sourceCodeStreamReader->getSourceCodeFromFile($arguments['file']->value);
          } else {
              throw new UnexpectedValueException('Either a --file file must be supplied or --stdin must be passed!');
          }

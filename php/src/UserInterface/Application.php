@@ -443,7 +443,11 @@ class Application
 
         $container
             ->register('availableVariablesCommand', Command\AvailableVariablesCommand::class)
-            ->setArguments([new Reference('variableScanner'), new Reference('parser')]);
+            ->setArguments([
+                new Reference('variableScanner'),
+                new Reference('parser'),
+                new Reference('sourceCodeStreamReader')
+            ]);
 
         $container
             ->register('deduceTypesCommand', Command\DeduceTypesCommand::class)
