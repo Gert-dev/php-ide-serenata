@@ -22,8 +22,6 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
     static $testContainerBuiltinStructuralElements;
 
     /**
-     * @param bool $indexBuiltinItems
-     *
      * @return IndexDatabase
      */
     protected function getDatabase()
@@ -77,7 +75,7 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ContainerBuilder $container
+     *
      */
     protected function createTestContainerForBuiltinStructuralElements()
     {
