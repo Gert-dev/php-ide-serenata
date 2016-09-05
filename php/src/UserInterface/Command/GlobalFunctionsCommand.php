@@ -4,6 +4,10 @@ namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
 
+use PhpIntegrator\Analysis\Conversion\FunctionConverter;
+
+use PhpIntegrator\Indexing\IndexDatabase;
+
 /**
  * Command that shows a list of global functions.
  */

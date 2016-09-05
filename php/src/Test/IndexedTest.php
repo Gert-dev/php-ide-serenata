@@ -41,7 +41,7 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
     /**
      * @return ContainerBuilder
      */
-    protected function getApplicationContainer()
+    protected function createTestContainer()
     {
         $app = new Application();
 
@@ -56,70 +56,52 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
         $container->set('indexDatabase', $this->getDatabase());
         $container->setAlias('parser', 'parser.phpParser');
 
+        $container
+            ->set('cache', new \Doctrine\Common\Cache\VoidCache());
+
         return $container;
     }
 
     /**
-     * @return \PhpParser\Parser
+     * @param ContainerBuilder $container
+     * @param string           $testPath
+     * @param bool             $mayFail
      */
-    protected function getParser()
+    protected function indexTestFile(ContainerBuilder $container, $testPath, $mayFail = false)
     {
-        return $this->getApplicationContainer()->get('parser.phpParser');
-    }
-
-    /**
-     * @param string|null $testPath
-     * @param bool        $mayFail
-     *
-     * @return IndexDatabase
-     */
-    protected function getDatabaseForTestFile($testPath = null, $mayFail = false)
-    {
-        $indexDatabase = $this->getDatabase();
-
-        // Indexing these on every test majorly slows down testing. Instead, we simply don't rely on PHP's built-in
-        // structural elements during testing.
-        $indexDatabase->insert(IndexStorageItemEnum::SETTINGS, [
-            'name'  => 'has_indexed_builtin',
-            'value' => 1
-        ]);
-
         $reindexCommand = new Command\ReindexCommand(
-            $indexDatabase,
-            $this->getApplicationContainer()->get('projectIndexer')
+            $container->get('indexDatabase'),
+            $container->get('projectIndexer')
         );
 
-        if ($testPath) {
-            $success = $reindexCommand->reindex(
-                [$testPath],
-                false,
-                false,
-                false,
-                [],
-                ['test']
-            );
+        $success = $reindexCommand->reindex(
+            [$testPath],
+            false,
+            false,
+            false,
+            [],
+            ['test']
+        );
 
-            if (!$mayFail) {
-                $this->assertTrue($success);
-            }
+        if (!$mayFail) {
+            $this->assertTrue($success);
         }
-
-        return $indexDatabase;
     }
 
     /**
-     * @return IndexDatabase
+     * @param ContainerBuilder $container
      */
-    protected function getDatabaseForBuiltinTesting()
+    protected function indexBuiltinStructuralElements(ContainerBuilder $container)
     {
+        // TODO: Caching?
+
         // Indexing builtin items is a fairy large performance hit to run every test, so keep the property static.
-        if (!self::$builtinIndexDatabase) {
-            self::$builtinIndexDatabase = $this->getDatabase();
+        // if (!self::$builtinIndexDatabase) {
+        //     self::$builtinIndexDatabase = $this->getDatabase();
 
-            $builtiinIndexer = new BuiltinIndexer(self::$builtinIndexDatabase, new TypeAnalyzer());
-            $builtiinIndexer->index();
-        }
-
-        return self::$builtinIndexDatabase;
+            $container->get('builtinIndexer')->index();
+        // }
+        //
+        // return self::$builtinIndexDatabase;
     }
 }

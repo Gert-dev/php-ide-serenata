@@ -18,6 +18,8 @@ use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\Utility\SourceCodeHelpers;
 
+use PhpIntegrator\Utility\SourceCodeStreamReader;
+
 /**
  * Allows deducing the types of an expression (e.g. a call chain, a simple string, ...).
  */
@@ -99,7 +101,7 @@ class DeduceTypesCommand extends AbstractCommand
             }
         }
 
-        $result = $this->typeDeducer->deduceTypes(
+        $result = $this->deduceTypes(
            isset($arguments['file']) ? $arguments['file']->value : null,
            $code,
            $parts,
@@ -107,5 +109,18 @@ class DeduceTypesCommand extends AbstractCommand
         );
 
         return $this->outputJson(true, $result);
+    }
+
+    /**
+     * @param string   $file
+     * @param string   $code
+     * @param string[] $parts
+     * @param int      $offset
+     *
+     * @return string[]
+     */
+    protected function deduceTypes($file, $code, array $parts, $offset)
+    {
+        return $this->typeDeducer->deduceTypes($file, $code, $parts, $offset);
     }
 }

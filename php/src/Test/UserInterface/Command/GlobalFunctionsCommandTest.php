@@ -12,9 +12,14 @@ class GlobalFunctionsCommandTest extends IndexedTest
     {
         $path = __DIR__ . '/GlobalFunctionsCommandTest/' . 'GlobalFunctions.php.test';
 
-        $indexDatabase = $this->getDatabaseForTestFile($path);
+        $container = $this->createTestContainer();
 
-        $command = new GlobalFunctionsCommand($this->getParser(), null, $indexDatabase);
+        $this->indexTestFile($container, $path);
+
+        $command = new GlobalFunctionsCommand(
+            $container->get('functionConverter'),
+            $container->get('indexDatabase')
+        );
 
         $output = $command->getGlobalFunctions();
 
@@ -29,9 +34,14 @@ class GlobalFunctionsCommandTest extends IndexedTest
 
     public function testBuiltinGlobalFunctions()
     {
-        $indexDatabase = $this->getDatabaseForBuiltinTesting();
+        $container = $this->createTestContainer();
 
-        $command = new GlobalFunctionsCommand($this->getParser(), null, $indexDatabase);
+        $this->indexBuiltinStructuralElements($container);
+
+        $command = new GlobalFunctionsCommand(
+            $container->get('functionConverter'),
+            $container->get('indexDatabase')
+        );
 
         $output = $command->getGlobalFunctions();
 

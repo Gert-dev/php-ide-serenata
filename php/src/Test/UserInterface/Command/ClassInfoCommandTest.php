@@ -12,11 +12,13 @@ class ClassInfoCommandTest extends IndexedTest
     {
         $path = $this->getPathFor($file);
 
-        $indexDatabase = $this->getDatabaseForTestFile($path);
+        $container = $this->createTestContainer();
+
+        $this->indexTestFile($container, $path);
 
         $command = new ClassInfoCommand(
-            $this->getApplicationContainer()->get('typeAnalyzer'),
-            $this->getApplicationContainer()->get('classlikeInfoBuilder')
+            $container->get('typeAnalyzer'),
+            $container->get('classlikeInfoBuilder')
         );
 
         return $command->getClassInfo($fqcn);
@@ -24,11 +26,13 @@ class ClassInfoCommandTest extends IndexedTest
 
     protected function getBuiltinClassInfo($fqcn)
     {
-        $indexDatabase = $this->getDatabaseForBuiltinTesting();
+        $container = $this->createTestContainer();
+
+        $indexDatabase = $this->indexBuiltinStructuralElements($container);
 
         $command = new ClassInfoCommand(
-            $this->getApplicationContainer()->get('typeAnalyzer'),
-            $this->getApplicationContainer()->get('classlikeInfoBuilder')
+            $container->get('typeAnalyzer'),
+            $container->get('classlikeInfoBuilder')
         );
 
         return $command->getClassInfo($fqcn);

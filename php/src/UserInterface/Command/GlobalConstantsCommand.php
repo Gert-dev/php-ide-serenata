@@ -6,6 +6,10 @@ use ArrayAccess;
 
 use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
 
+use PhpIntegrator\Analysis\Conversion\ConstantConverter;
+
+use PhpIntegrator\Indexing\IndexDatabase;
+
 /**
  * Command that shows a list of global constants.
  */

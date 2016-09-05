@@ -12,12 +12,14 @@ class AvailableVariablesCommandTest extends IndexedTest
     {
         $path = $this->getTestFilePath($file);
 
-        $indexDatabase = $this->getDatabaseForTestFile($path, $mayFail);
+        $container = $this->createTestContainer();
+
+        $this->indexTestFile($container, $path, $mayFail);
 
         $command = new AvailableVariablesCommand(
-            $this->getApplicationContainer()->get('variableScanner'),
-            $this->getParser(),
-            $indexDatabase
+            $container->get('variableScanner'),
+            $container->get('parser'),
+            $container->get('indexDatabase')
         );
 
         return $command;

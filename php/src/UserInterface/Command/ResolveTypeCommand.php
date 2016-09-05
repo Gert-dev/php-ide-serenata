@@ -10,6 +10,8 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 
+use PhpIntegrator\Indexing\IndexDatabase;
+
 /**
  * Command that resolves local types in a file.
  */

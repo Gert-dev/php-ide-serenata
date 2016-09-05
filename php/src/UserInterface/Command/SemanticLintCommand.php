@@ -8,18 +8,24 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Linting;
+use PhpIntegrator\Analysis\DocblockAnalyzer;
+use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
 use PhpIntegrator\Analysis\ClasslikeExistanceChecker;
-use PhpIntegrator\Analysis\GlobalConstantExistanceChecker;
 use PhpIntegrator\Analysis\GlobalFunctionExistanceChecker;
+use PhpIntegrator\Analysis\GlobalConstantExistanceChecker;
 
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 
 use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
 
+use PhpIntegrator\Utility\SourceCodeStreamReader;
+
 use PhpParser\Error;
+use PhpParser\Parser;
 use PhpParser\NodeTraverser;
 
 /**

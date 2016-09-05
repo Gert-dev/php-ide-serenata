@@ -12,9 +12,23 @@ class SemanticLintCommandTest extends IndexedTest
     {
         $path = __DIR__ . '/SemanticLintCommandTest/' . $file;
 
-        $indexDatabase = $this->getDatabaseForTestFile($path, $indexingMayFail);
+        $container = $this->createTestContainer();
 
-        $command = new SemanticLintCommand($this->getParser(), null, $indexDatabase);
+        $this->indexTestFile($container, $path, $indexingMayFail);
+
+        $command = new SemanticLintCommand(
+            $container->get('sourceCodeStreamReader'),
+            $container->get('parser'),
+            $container->get('fileTypeResolverFactory'),
+            $container->get('typeDeducer'),
+            $container->get('classlikeInfoBuilder'),
+            $container->get('docblockParser'),
+            $container->get('typeAnalyzer'),
+            $container->get('docblockAnalyzer'),
+            $container->get('classlikeExistanceChecker'),
+            $container->get('globalConstantExistanceChecker'),
+            $container->get('globalFunctionExistanceChecker')
+        );
 
         return $command->semanticLint($path, file_get_contents($path));
     }

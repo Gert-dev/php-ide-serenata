@@ -14,9 +14,14 @@ class ResolveTypeCommandTest extends IndexedTest
     {
         $path = __DIR__ . '/ResolveTypeCommandTest/' . 'ResolveType.php.test';
 
-        $indexDatabase = $this->getDatabaseForTestFile($path);
+        $container = $this->createTestContainer();
 
-        $command = new ResolveTypeCommand($this->getParser(), null, $indexDatabase);
+        $this->indexTestFile($container, $path);
+
+        $command = new ResolveTypeCommand(
+            $container->get('indexDatabase'),
+            $container->get('fileTypeResolverFactory')
+        );
 
         $this->assertEquals('\C', $command->resolveType('C', $path, 1));
         $this->assertEquals('\A\C', $command->resolveType('C', $path, 5));
@@ -33,7 +38,12 @@ class ResolveTypeCommandTest extends IndexedTest
      */
     public function testThrowsExceptionOnUnknownFile()
     {
-        $command = new ResolveTypeCommand($this->getParser(), null, new IndexDatabase(':memory:', 1));
+        $container = $this->createTestContainer();
+
+        $command = new ResolveTypeCommand(
+            $container->get('indexDatabase'),
+            $container->get('fileTypeResolverFactory')
+        );
 
         $command->resolveType('\C', 'MissingFile.php', 1);
     }

@@ -10,6 +10,8 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\Analysis\Typing\TypeLocalizer;
 use PhpIntegrator\Analysis\Typing\FileTypeLocalizerFactory;
 
+use PhpIntegrator\Indexing\IndexDatabase;
+
 /**
  * Command that makes a FQCN relative to local use statements in a file.
  */

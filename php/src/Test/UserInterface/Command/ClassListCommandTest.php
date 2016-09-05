@@ -12,9 +12,24 @@ class ClassListCommandTest extends IndexedTest
     {
         $path = __DIR__ . '/ClassListCommandTest/' . 'ClassList.php.test';
 
-        $indexDatabase = $this->getDatabaseForTestFile($path);
+        $container = $this->createTestContainer();
 
-        $command = new ClassListCommand($this->getParser(), null, $indexDatabase);
+        $this->indexTestFile($container, $path);
+
+        $command = new ClassListCommand(
+            $container->get('constantConverter'),
+            $container->get('classlikeConstantConverter'),
+            $container->get('propertyConverter'),
+            $container->get('functionConverter'),
+            $container->get('methodConverter'),
+            $container->get('classlikeConverter'),
+            $container->get('inheritanceResolver'),
+            $container->get('interfaceImplementationResolver'),
+            $container->get('traitUsageResolver'),
+            $container->get('classlikeInfoBuilderProviderCachingProxy'),
+            $container->get('typeAnalyzer'),
+            $container->get('indexDatabase')
+        );
 
         $output = $command->getClassList($path);
 

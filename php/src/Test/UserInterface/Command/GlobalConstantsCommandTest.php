@@ -12,9 +12,14 @@ class GlobalConstantsCommandTest extends IndexedTest
     {
         $path = __DIR__ . '/GlobalConstantsCommandTest/' . 'GlobalConstants.php.test';
 
-        $indexDatabase = $this->getDatabaseForTestFile($path);
+        $container = $this->createTestContainer();
 
-        $command = new GlobalConstantsCommand($this->getParser(), null, $indexDatabase);
+        $this->indexTestFile($container, $path);
+
+        $command = new GlobalConstantsCommand(
+            $container->get('constantConverter'),
+            $container->get('indexDatabase')
+        );
 
         $output = $command->getGlobalConstants();
 
@@ -39,9 +44,14 @@ class GlobalConstantsCommandTest extends IndexedTest
 
     public function testBuiltinGlobalConstants()
     {
-        $indexDatabase = $this->getDatabaseForBuiltinTesting();
+        $container = $this->createTestContainer();
 
-        $command = new GlobalConstantsCommand($this->getParser(), null, $indexDatabase);
+        $this->indexBuiltinStructuralElements($container);
+
+        $command = new GlobalConstantsCommand(
+            $container->get('constantConverter'),
+            $container->get('indexDatabase')
+        );
 
         $output = $command->getGlobalConstants();
 

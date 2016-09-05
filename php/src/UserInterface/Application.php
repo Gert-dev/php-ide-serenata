@@ -10,6 +10,9 @@ use Doctrine\Common\Cache\FilesystemCache;
 use PhpIntegrator\Analysis\VariableScanner;
 use PhpIntegrator\Analysis\DocblockAnalyzer;
 use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
+use PhpIntegrator\Analysis\ClasslikeExistanceChecker;
+use PhpIntegrator\Analysis\GlobalFunctionExistanceChecker;
+use PhpIntegrator\Analysis\GlobalConstantExistanceChecker;
 
 use PhpIntegrator\Analysis\Conversion\MethodConverter;
 use PhpIntegrator\Analysis\Conversion\FunctionConverter;

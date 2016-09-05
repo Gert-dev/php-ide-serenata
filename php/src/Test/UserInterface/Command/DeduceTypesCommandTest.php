@@ -22,17 +22,21 @@ class DeduceTypesCommandTest extends IndexedTest
 
         $markerOffset = $this->getMarkerOffset($path, '<MARKER>');
 
-        $indexDatabase = $this->getDatabaseForTestFile($path);
+        $container = $this->createTestContainer();
 
-        $command = new DeduceTypesCommand($this->getParser(), null, $indexDatabase);
+        $this->indexTestFile($container, $path);
+
+        $command = new DeduceTypesCommand(
+            $container->get('typeDeducer'),
+            $container->get('partialParser'),
+            $container->get('sourceCodeStreamReader')
+        );
 
         $reflectionClass = new ReflectionClass(DeduceTypesCommand::class);
-        $reflectionMethod = $reflectionClass->getMethod('getTypeDeducer');
+        $reflectionMethod = $reflectionClass->getMethod('deduceTypes');
         $reflectionMethod->setAccessible(true);
 
-        $typeDeducer = $reflectionMethod->invoke($command);
-
-        return $typeDeducer->deduceTypes($path, file_get_contents($path), $expressionParts, $markerOffset);
+        return $reflectionMethod->invoke($command, $path, file_get_contents($path), $expressionParts, $markerOffset);
     }
 
     protected function getMarkerOffset($path, $marker)
