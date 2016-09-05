@@ -50,7 +50,7 @@ class TypeQueryingVisitor extends NodeVisitorAbstract
      * Constructor.
      *
      * @param DocblockParser $docblockParser
-     * @param int       $position
+     * @param int            $position
      */
     public function __construct(DocblockParser $docblockParser, $position)
     {
