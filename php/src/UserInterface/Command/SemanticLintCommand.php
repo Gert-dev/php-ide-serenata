@@ -16,10 +16,8 @@ use PhpIntegrator\Analysis\GlobalConstantExistanceChecker;
 
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 
-use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;
@@ -89,9 +87,19 @@ class SemanticLintCommand extends AbstractCommand
      */
     protected $globalFunctionExistanceChecker;
 
-
-
-
+    /**
+     * @param SourceCodeStreamReader         $sourceCodeStreamReader
+     * @param Parser                         $parser
+     * @param FileTypeResolverFactory        $fileTypeResolverFactory
+     * @param TypeDeducer                    $typeDeducer
+     * @param ClasslikeInfoBuilder           $classlikeInfoBuilder
+     * @param DocblockParser                 $docblockParser
+     * @param TypeAnalyzer                   $typeAnalyzer
+     * @param DocblockAnalyzer               $docblockAnalyzer
+     * @param ClasslikeExistanceChecker      $classlikeExistanceChecker
+     * @param GlobalConstantExistanceChecker $globalConstantExistanceChecker
+     * @param GlobalFunctionExistanceChecker $globalFunctionExistanceChecker
+     */
     public function __construct(
         SourceCodeStreamReader $sourceCodeStreamReader,
         Parser $parser,
@@ -117,8 +125,6 @@ class SemanticLintCommand extends AbstractCommand
         $this->globalConstantExistanceChecker = $globalConstantExistanceChecker;
         $this->globalFunctionExistanceChecker = $globalFunctionExistanceChecker;
     }
-
-
 
     /**
      * @inheritDoc

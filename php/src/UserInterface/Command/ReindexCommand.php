@@ -9,21 +9,8 @@ use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Indexing;
 
-use PhpIntegrator\Analysis\Typing\TypeDeducer;
-use PhpIntegrator\Analysis\Typing\TypeResolver;
-use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
-
-use PhpIntegrator\Indexing\FileIndexer;
 use PhpIntegrator\Indexing\IndexDatabase;
-use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\ProjectIndexer;
-use PhpIntegrator\Indexing\StorageInterface;
-use PhpIntegrator\Indexing\CallbackStorageProxy;
-
-use PhpIntegrator\Parsing\PartialParser;
-use PhpIntegrator\Parsing\DocblockParser;
-
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
 
 use PhpIntegrator\Utility\SourceCodeStreamReader;
 
@@ -47,8 +34,11 @@ class ReindexCommand extends AbstractCommand
      */
     protected $sourceCodeStreamReader;
 
-
-
+    /**
+     * @param IndexDatabase          $indexDatabase
+     * @param ProjectIndexer         $projectIndexer
+     * @param SourceCodeStreamReader $sourceCodeStreamReader
+     */
     public function __construct(
         IndexDatabase $indexDatabase,
         ProjectIndexer $projectIndexer,
@@ -58,7 +48,6 @@ class ReindexCommand extends AbstractCommand
         $this->projectIndexer = $projectIndexer;
         $this->sourceCodeStreamReader = $sourceCodeStreamReader;
     }
-
 
     /**
      * @inheritDoc

@@ -4,17 +4,15 @@ namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
 
-use Doctrine\Common\Cache\Cache;
-
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
 use PhpIntegrator\Analysis\ClasslikeInfoBuilderProviderInterface;
 
 use PhpIntegrator\Analysis\Conversion\MethodConverter;
-use PhpIntegrator\Analysis\Conversion\FunctionConverter;
-use PhpIntegrator\Analysis\Conversion\PropertyConverter;
 use PhpIntegrator\Analysis\Conversion\ConstantConverter;
+use PhpIntegrator\Analysis\Conversion\PropertyConverter;
+use PhpIntegrator\Analysis\Conversion\FunctionConverter;
 use PhpIntegrator\Analysis\Conversion\ClasslikeConverter;
 use PhpIntegrator\Analysis\Conversion\ClasslikeConstantConverter;
 
@@ -27,8 +25,6 @@ use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\UserInterface\ClasslikeInfoBuilderWhiteHolingProxyProvider;
-
-use PhpParser\Parser;
 
 /**
  * Command that shows a list of available classes, interfaces and traits.
@@ -95,10 +91,20 @@ class ClassListCommand extends AbstractCommand
      */
     protected $indexDatabase;
 
-
-
-
-
+    /**
+     * @param ConstantConverter                     $constantConverter
+     * @param ClasslikeConstantConverter            $classlikeConstantConverter
+     * @param PropertyConverter                     $propertyConverter
+     * @param FunctionConverter                     $functionConverter
+     * @param MethodConverter                       $methodConverter
+     * @param ClasslikeConverter                    $classlikeConverter
+     * @param InheritanceResolver                   $inheritanceResolver
+     * @param InterfaceImplementationResolver       $interfaceImplementationResolver
+     * @param TraitUsageResolver                    $traitUsageResolver
+     * @param ClasslikeInfoBuilderProviderInterface $classlikeInfoBuilderProvider
+     * @param TypeAnalyzer                          $typeAnalyzer
+     * @param IndexDatabase                         $indexDatabase
+     */
     public function __construct(
         ConstantConverter $constantConverter,
         ClasslikeConstantConverter $classlikeConstantConverter,

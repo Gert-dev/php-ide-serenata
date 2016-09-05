@@ -8,16 +8,10 @@ use UnexpectedValueException;
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
-use PhpIntegrator\Analysis\Typing\TypeResolver;
-use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
-
-use PhpIntegrator\Analysis\Visiting\TypeQueryingVisitor;
 
 use PhpIntegrator\Parsing\PartialParser;
-use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\Utility\SourceCodeHelpers;
-
 use PhpIntegrator\Utility\SourceCodeStreamReader;
 
 /**
@@ -40,8 +34,11 @@ class DeduceTypesCommand extends AbstractCommand
      */
     protected $sourceCodeStreamReader;
 
-
-
+    /**
+     * @param TypeDeducer            $typeDeducer
+     * @param PartialParser          $partialParser
+     * @param SourceCodeStreamReader $sourceCodeStreamReader
+     */
     public function __construct(
         TypeDeducer $typeDeducer,
         PartialParser $partialParser,
@@ -51,7 +48,6 @@ class DeduceTypesCommand extends AbstractCommand
         $this->partialParser = $partialParser;
         $this->sourceCodeStreamReader = $sourceCodeStreamReader;
     }
-
 
     /**
      * @inheritDoc

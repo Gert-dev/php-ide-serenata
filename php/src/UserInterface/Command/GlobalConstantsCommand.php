@@ -4,8 +4,6 @@ namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
 
-use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
-
 use PhpIntegrator\Analysis\Conversion\ConstantConverter;
 
 use PhpIntegrator\Indexing\IndexDatabase;
@@ -25,7 +23,10 @@ class GlobalConstantsCommand extends AbstractCommand
      */
     protected $indexDatabase;
 
-
+    /**
+     * @param ConstantConverter $constantConverter
+     * @param IndexDatabase     $indexDatabase
+     */
     public function __construct(ConstantConverter $constantConverter, IndexDatabase $indexDatabase)
     {
         $this->constantConverter = $constantConverter;

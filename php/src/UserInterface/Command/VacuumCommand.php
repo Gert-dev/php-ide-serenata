@@ -4,20 +4,7 @@ namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
 
-use PhpIntegrator\Analysis\Typing\TypeDeducer;
-use PhpIntegrator\Analysis\Typing\TypeResolver;
-use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
-
-use PhpIntegrator\Indexing\FileIndexer;
-use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\ProjectIndexer;
-use PhpIntegrator\Indexing\StorageInterface;
-use PhpIntegrator\Indexing\CallbackStorageProxy;
-
-use PhpIntegrator\Parsing\PartialParser;
-use PhpIntegrator\Parsing\DocblockParser;
-
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
 
 /**
  * Command that vacuums a project.
@@ -31,7 +18,9 @@ class VacuumCommand extends AbstractCommand
      */
     protected $projectIndexer;
 
-
+    /**
+     * @param ProjectIndexer $projectIndexer
+     */
     public function __construct(ProjectIndexer $projectIndexer)
     {
         $this->projectIndexer = $projectIndexer;

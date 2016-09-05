@@ -6,28 +6,7 @@ use ArrayAccess;
 use RuntimeException;
 use UnexpectedValueException;
 
-use Doctrine\Common\Cache\Cache;
-
-use GetOptionKit\OptionParser;
 use GetOptionKit\OptionCollection;
-
-use PhpIntegrator\Analysis\Relations;
-use PhpIntegrator\Analysis\DocblockAnalyzer;
-use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
-use PhpIntegrator\Analysis\ClasslikeInfoBuilderProviderInterface;
-
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
-use PhpIntegrator\Indexing\IndexDatabase;
-
-use PhpIntegrator\Analysis\Conversion;
-use PhpIntegrator\Parsing\CachingParserProxy;
-
-use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
-
-use PhpIntegrator\Utility\SourceCodeStreamReader;
-
-use PhpParser\Parser;
 
 /**
  * Base class for commands.

@@ -5,17 +5,11 @@ namespace PhpIntegrator\UserInterface\Command;
 use ArrayAccess;
 use UnexpectedValueException;
 
-use Doctrine\Common\Cache\Cache;
-
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
 
 use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
-
-use PhpIntegrator\Indexing\IndexDatabase;
-
-use PhpParser\Parser;
 
 /**
  * Command that shows information about a class, interface or trait.

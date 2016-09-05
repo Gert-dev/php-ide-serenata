@@ -7,7 +7,6 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Analysis\Typing\TypeResolver;
 use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 
 use PhpIntegrator\Indexing\IndexDatabase;
@@ -27,6 +26,10 @@ class ResolveTypeCommand extends AbstractCommand
      */
     protected $fileTypeResolverFactory;
 
+    /**
+     * @param IndexDatabase           $indexDatabase
+     * @param FileTypeResolverFactory $fileTypeResolverFactory
+     */
     public function __construct(IndexDatabase $indexDatabase, FileTypeResolverFactory $fileTypeResolverFactory)
     {
         $this->indexDatabase = $indexDatabase;

@@ -23,7 +23,10 @@ class GlobalFunctionsCommand extends AbstractCommand
      */
     protected $indexDatabase;
 
-
+    /**
+     * @param FunctionConverter $functionConverter
+     * @param IndexDatabase     $indexDatabase
+     */
     public function __construct(FunctionConverter $functionConverter, IndexDatabase $indexDatabase)
     {
         $this->functionConverter = $functionConverter;

@@ -5,13 +5,9 @@ namespace PhpIntegrator\UserInterface\Command;
 use ArrayAccess;
 use UnexpectedValueException;
 
-use Doctrine\Common\Cache\Cache;
-
 use GetOptionKit\OptionCollection;
 
 use PhpIntegrator\Analysis\VariableScanner;
-
-use PhpIntegrator\Indexing\IndexDatabase;
 
 use PhpIntegrator\Utility\SourceCodeHelpers;
 

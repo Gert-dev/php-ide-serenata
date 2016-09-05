@@ -7,7 +7,6 @@ use UnexpectedValueException;
 
 use GetOptionKit\OptionCollection;
 
-use PhpIntegrator\Analysis\Typing\TypeLocalizer;
 use PhpIntegrator\Analysis\Typing\FileTypeLocalizerFactory;
 
 use PhpIntegrator\Indexing\IndexDatabase;
@@ -27,16 +26,15 @@ class LocalizeTypeCommand extends AbstractCommand
      */
     protected $fileTypeLocalizerFactory;
 
-
-
+    /**
+     * @param IndexDatabase            $indexDatabase
+     * @param FileTypeLocalizerFactory $fileTypeLocalizerFactory
+     */
     public function __construct(IndexDatabase $indexDatabase, FileTypeLocalizerFactory $fileTypeLocalizerFactory)
     {
         $this->indexDatabase = $indexDatabase;
         $this->fileTypeLocalizerFactory = $fileTypeLocalizerFactory;
     }
-
-
-
 
     /**
      * @inheritDoc

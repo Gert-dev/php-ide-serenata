@@ -4,7 +4,7 @@ namespace PhpIntegrator\UserInterface\Command;
 
 use ArrayAccess;
 
-use Doctrine\Common\Cache;
+use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
 
 use GetOptionKit\OptionCollection;
@@ -24,9 +24,11 @@ class TruncateCommand extends AbstractCommand
      */
     protected $cache;
 
-
-
-    public function __construct($databaseFile, $cache)
+    /**
+     * @param string $databaseFile
+     * @param Cache  $cache
+     */
+    public function __construct($databaseFile, Cache $cache)
     {
         $this->databaseFile = $databaseFile;
         $this->cache = $cache;

@@ -27,8 +27,10 @@ class InvocationInfoCommand extends AbstractCommand
      */
     protected $sourceCodeStreamReader;
 
-
-
+    /**
+     * @param PartialParser          $partialParser
+     * @param SourceCodeStreamReader $sourceCodeStreamReader
+     */
     public function __construct(PartialParser $partialParser, SourceCodeStreamReader $sourceCodeStreamReader)
     {
         $this->partialParser = $partialParser;
