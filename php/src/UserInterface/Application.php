@@ -149,11 +149,6 @@ class Application
                 return 'No database path passed!';
             }
 
-
-            // TODO: Database file needs to be fetched earlier.
-            $this->databaseFile = $processedArguments['database']->value;
-
-
             if (interface_exists('Throwable')) {
                 // PHP >= 7.
                 try {
