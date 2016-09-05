@@ -24,9 +24,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 abstract class IndexedTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var IndexDatabase
+     * @var ContainerBuilder
      */
-    static $builtinIndexDatabase;
+    static $testContainerBuiltinStructuralElements;
 
     /**
      * @param bool $indexBuiltinItems
@@ -91,17 +91,14 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
     /**
      * @param ContainerBuilder $container
      */
-    protected function indexBuiltinStructuralElements(ContainerBuilder $container)
+    protected function createTestContainerForBuiltinStructuralElements()
     {
-        // TODO: Caching?
-
         // Indexing builtin items is a fairy large performance hit to run every test, so keep the property static.
-        // if (!self::$builtinIndexDatabase) {
-        //     self::$builtinIndexDatabase = $this->getDatabase();
+        if (!self::$testContainerBuiltinStructuralElements) {
+            self::$testContainerBuiltinStructuralElements = $this->createTestContainer();
+            self::$testContainerBuiltinStructuralElements->get('builtinIndexer')->index();
+        }
 
-            $container->get('builtinIndexer')->index();
-        // }
-        //
-        // return self::$builtinIndexDatabase;
+        return self::$testContainerBuiltinStructuralElements;
     }
 }
