@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\UserInterface\Command;
 
+use UnexpectedValueException;
+
 use PhpParser\Parser;
 
 /**
