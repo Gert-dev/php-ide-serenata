@@ -34,9 +34,7 @@ class GlobalFunctionsCommandTest extends IndexedTest
 
     public function testBuiltinGlobalFunctions()
     {
-        $container = $this->createTestContainer();
-
-        $this->indexBuiltinStructuralElements($container);
+        $container = $this->createTestContainerForBuiltinStructuralElements();
 
         $command = new GlobalFunctionsCommand(
             $container->get('functionConverter'),

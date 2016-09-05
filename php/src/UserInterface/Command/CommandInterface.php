@@ -2,6 +2,8 @@
 
 namespace PhpIntegrator\UserInterface\Command;
 
+use ArrayAccess;
+
 /**
  * Interface for commands.
  */
@@ -10,9 +12,9 @@ interface CommandInterface
     /**
      * Executes the command.
      *
-     * @param array $processedArguments
+     * @param ArrayAccess $processedArguments
      *
      * @return string Output to return to the user.
      */
-    public function execute(array $processedArguments);
+    public function execute(ArrayAccess $processedArguments);
 }

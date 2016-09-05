@@ -26,9 +26,7 @@ class ClassInfoCommandTest extends IndexedTest
 
     protected function getBuiltinClassInfo($fqcn)
     {
-        $container = $this->createTestContainer();
-
-        $indexDatabase = $this->indexBuiltinStructuralElements($container);
+        $container = $this->createTestContainerForBuiltinStructuralElements();
 
         $command = new ClassInfoCommand(
             $container->get('typeAnalyzer'),

@@ -15,8 +15,8 @@ use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 
 use PhpIntegrator\Indexing\FileIndexer;
 use PhpIntegrator\Indexing\IndexDatabase;
-use PhpIntegrator\Indexing\ProjectIndexer;
 use PhpIntegrator\Indexing\BuiltinIndexer;
+use PhpIntegrator\Indexing\ProjectIndexer;
 use PhpIntegrator\Indexing\StorageInterface;
 use PhpIntegrator\Indexing\CallbackStorageProxy;
 
@@ -24,6 +24,8 @@ use PhpIntegrator\Parsing\PartialParser;
 use PhpIntegrator\Parsing\DocblockParser;
 
 use PhpIntegrator\UserInterface\ClasslikeInfoBuilderProviderCachingProxy;
+
+use PhpIntegrator\Utility\SourceCodeStreamReader;
 
 /**
  * Command that reindexes a file or folder.
@@ -40,11 +42,21 @@ class ReindexCommand extends AbstractCommand
      */
     protected $projectIndexer;
 
+    /**
+     * @var SourceCodeStreamReader
+     */
+    protected $sourceCodeStreamReader;
 
-    public function __construct(IndexDatabase $indexDatabase, ProjectIndexer $projectIndexer)
-    {
+
+
+    public function __construct(
+        IndexDatabase $indexDatabase,
+        ProjectIndexer $projectIndexer,
+        SourceCodeStreamReader $sourceCodeStreamReader
+    ) {
         $this->indexDatabase = $indexDatabase;
         $this->projectIndexer = $projectIndexer;
+        $this->sourceCodeStreamReader = $sourceCodeStreamReader;
     }
 
 

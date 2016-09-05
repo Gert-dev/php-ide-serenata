@@ -7,17 +7,20 @@ use UnexpectedValueException;
 
 use Doctrine\Common\Cache\FilesystemCache;
 
+use GetOptionKit\OptionParser;
+use GetOptionKit\OptionCollection;
+
 use PhpIntegrator\Analysis\VariableScanner;
 use PhpIntegrator\Analysis\DocblockAnalyzer;
 use PhpIntegrator\Analysis\ClasslikeInfoBuilder;
 use PhpIntegrator\Analysis\ClasslikeExistanceChecker;
-use PhpIntegrator\Analysis\GlobalFunctionExistanceChecker;
 use PhpIntegrator\Analysis\GlobalConstantExistanceChecker;
+use PhpIntegrator\Analysis\GlobalFunctionExistanceChecker;
 
 use PhpIntegrator\Analysis\Conversion\MethodConverter;
-use PhpIntegrator\Analysis\Conversion\FunctionConverter;
-use PhpIntegrator\Analysis\Conversion\PropertyConverter;
 use PhpIntegrator\Analysis\Conversion\ConstantConverter;
+use PhpIntegrator\Analysis\Conversion\PropertyConverter;
+use PhpIntegrator\Analysis\Conversion\FunctionConverter;
 use PhpIntegrator\Analysis\Conversion\ClasslikeConverter;
 use PhpIntegrator\Analysis\Conversion\ClasslikeConstantConverter;
 
@@ -26,15 +29,16 @@ use PhpIntegrator\Analysis\Relations\InheritanceResolver;
 use PhpIntegrator\Analysis\Relations\InterfaceImplementationResolver;
 
 use PhpIntegrator\Analysis\Typing\TypeDeducer;
-use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Analysis\Typing\TypeResolver;
+use PhpIntegrator\Analysis\Typing\TypeAnalyzer;
 use PhpIntegrator\Analysis\Typing\TypeLocalizer;
 use PhpIntegrator\Analysis\Typing\FileTypeResolverFactory;
 use PhpIntegrator\Analysis\Typing\FileTypeLocalizerFactory;
 
 use PhpIntegrator\Indexing\FileIndexer;
-use PhpIntegrator\Indexing\BuiltinIndexer;
+use PhpIntegrator\Indexing\IndexDatabase;
 use PhpIntegrator\Indexing\ProjectIndexer;
+use PhpIntegrator\Indexing\BuiltinIndexer;
 use PhpIntegrator\Indexing\CallbackStorageProxy;
 
 use PhpIntegrator\Parsing\PartialParser;
@@ -115,19 +119,20 @@ class Application
             '--invocation-info'     => 'invocationInfoCommand'
         ];
 
-
-
-        // TODO: Update access modifier of attachOptions for each command.
-        // TODO: Rewrite code above to use this.
-
         $optionCollection = new OptionCollection();
         $optionCollection->add('database:', 'The index database to use.' )->isa('string');
 
+        foreach ($arguments as $argument) {
+            if (mb_strpos($argument, '--database=') === 0) {
+                $this->databaseFile = mb_substr($argument, mb_strlen('--database='));
+            }
+        }
+
+        $container = $this->getContainer();
 
         if (isset($commandServiceMap[$command])) {
             /** @var \PhpIntegrator\UserInterface\Command\CommandInterface $command */
-            $command = $this->getContainer()->get($commandServiceMap[$command]);
-
+            $command = $container->get($commandServiceMap[$command]);
             $command->attachOptions($optionCollection);
 
             $parser = new OptionParser($optionCollection);
@@ -137,21 +142,17 @@ class Application
             try {
                 $processedArguments = $parser->parse($arguments);
             } catch(\Exception $e) {
-                return $this->outputJson(false, $e->getMessage());
+                return $e->getFile() . ':' . $e->getLine() . ' - ' . $e->getMessage();
             }
 
             if (!isset($processedArguments['database'])) {
-                return $this->outputJson(false, 'No database path passed!');
+                return 'No database path passed!';
             }
 
+
+            // TODO: Database file needs to be fetched earlier.
             $this->databaseFile = $processedArguments['database']->value;
 
-            // TODO: Move to service locator.
-
-            // Ensure we differentiate caches between databases.
-            if ($this->cache) {
-                $this->cache->setCachePrefix($this->cache->getCachePrefix() . md5($this->databaseFile));
-            }
 
             if (interface_exists('Throwable')) {
                 // PHP >= 7.
@@ -214,7 +215,7 @@ class Application
 
         $container
             ->register('cache', FilesystemCache::class)
-            ->setArguments([$this->getCacheDirectory()]);
+            ->setArguments([new Expression("service('application').getCacheDirectory()")]);
 
         $container
             ->register('variableScanner', VariableScanner::class);
@@ -282,7 +283,7 @@ class Application
 
         $container
             ->register('indexDatabase', IndexDatabase::class)
-            ->setArguments([$this->databaseFile, self::DATABASE_VERSION]);
+            ->setArguments([new Expression("service('application').getDatabaseFile()"), self::DATABASE_VERSION]);
 
         $container
             ->register('classlikeInfoBuilderProviderCachingProxy', ClasslikeInfoBuilderProviderCachingProxy::class)
@@ -375,15 +376,19 @@ class Application
 
         $container
             ->register('reindexCommand', Command\ReindexCommand::class)
-            ->setArguments([new Reference('indexDatabase'), new Reference('projectIndexer')]);
+            ->setArguments([
+                new Reference('indexDatabase'),
+                new Reference('projectIndexer'),
+                new Reference('sourceCodeStreamReader')
+            ]);
 
         $container
             ->register('vacuumCommand', Command\VacuumCommand::class)
-            ->setArguments([new Reference('parser'), new Reference('cache')]);
+            ->setArguments([new Reference('projectIndexer')]);
 
         $container
             ->register('truncateCommand', Command\TruncateCommand::class)
-            ->setArguments([$this->databaseFile, new Reference('cache')]);
+            ->setArguments([new Expression("service('application').getDatabaseFile()"), new Reference('cache')]);
 
         $container
             ->register('classListCommand', Command\ClassListCommand::class)
@@ -460,7 +465,7 @@ class Application
     /**
      * @return string
      */
-    protected function getCacheDirectory()
+    public function getCacheDirectory()
     {
         $cachePath = sys_get_temp_dir() .
             '/php-integrator-base/' .
@@ -473,5 +478,13 @@ class Application
         }
 
         return $cachePath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDatabaseFile()
+    {
+        return $this->databaseFile;
     }
 }

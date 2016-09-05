@@ -10,6 +10,7 @@ use GetOptionKit\OptionCollection;
 use PhpIntegrator\Parsing\PartialParser;
 
 use PhpIntegrator\Utility\SourceCodeHelpers;
+use PhpIntegrator\Utility\SourceCodeStreamReader;
 
 /**
  * Allows fetching invocation information of a method or function call.

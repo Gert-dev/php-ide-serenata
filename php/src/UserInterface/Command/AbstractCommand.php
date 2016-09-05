@@ -37,7 +37,7 @@ abstract class AbstractCommand implements CommandInterface
     /**
      * @inheritDoc
      */
-    public function execute(array $processedArguments)
+    public function execute(ArrayAccess $processedArguments)
     {
         try {
             return $this->process($processedArguments);

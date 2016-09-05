@@ -71,7 +71,8 @@ abstract class IndexedTest extends \PHPUnit_Framework_TestCase
     {
         $reindexCommand = new Command\ReindexCommand(
             $container->get('indexDatabase'),
-            $container->get('projectIndexer')
+            $container->get('projectIndexer'),
+            $container->get('sourceCodeStreamReader')
         );
 
         $success = $reindexCommand->reindex(

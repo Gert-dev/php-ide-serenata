@@ -26,12 +26,12 @@ class TruncateCommand extends AbstractCommand
 
 
 
-    public function __construct($databaseFile, Cache $cache)
+    public function __construct($databaseFile, $cache)
     {
         $this->databaseFile = $databaseFile;
         $this->cache = $cache;
     }
-    
+
     /**
      * @inheritDoc
      */
