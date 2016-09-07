@@ -209,6 +209,8 @@ class TypeDeducer
             }
         } elseif ($firstElement[0] === '[') {
             $types = ['array'];
+        } elseif ($firstElement === 'null') {
+            $types = ['null'];
         } elseif (preg_match('/^(0x)?\d+$/', $firstElement) === 1) {
             $types = ['int'];
         } elseif (preg_match('/^\d+.\d+$/', $firstElement) === 1) {

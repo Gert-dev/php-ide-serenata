@@ -225,6 +225,14 @@ class ClassInfoCommandTest extends IndexedTest
                 'resolvedType' => 'string'
             ]
         ], $output['properties']['testProperty']['types']);
+
+        $this->assertEquals([
+            [
+                'type'         => 'null',
+                'fqcn'         => 'null',
+                'resolvedType' => 'null'
+            ]
+        ], $output['properties']['testPropertyWithNull']['types']);
     }
 
     public function testConstantTypeDeductionFallsBackToUsingItsDefaultValue()
