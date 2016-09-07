@@ -187,25 +187,26 @@ module.exports =
             if @progressBarTimeout
                 clearTimeout(@progressBarTimeout)
                 @progressBarTimeout = null
-                return
+
+            else
+                console.timeEnd(@timerName)
 
             if @statusBarManager?
                 @statusBarManager.setLabel("Indexing completed!")
                 @statusBarManager.hide()
 
-            console.timeEnd(@timerName);
 
         @service.onDidFailIndexing () =>
             if @progressBarTimeout
                 clearTimeout(@progressBarTimeout)
                 @progressBarTimeout = null
-                return
+
+            else
+                console.timeEnd(@timerName)
 
             if @statusBarManager?
                 @statusBarManager.showMessage("Indexing failed!", "highlight-error")
                 @statusBarManager.hide()
-
-            console.timeEnd(@timerName);
 
         @service.onDidIndexingProgress (data) =>
             if @statusBarManager?
