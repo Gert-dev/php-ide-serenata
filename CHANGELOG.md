@@ -1,3 +1,19 @@
+## 1.2.4
+### Bugs fixed
+* Add workarounds for project-manager 3.0.0. Unfortunately, some functionalities are currently broken because of the backwards-incompatible upgrade. See also [this ticket](https://github.com/danielbrodin/atom-project-manager/issues/252) for more information.
+  * Setting up new projects is currently impossible via the package, you can however still manually set up projects by adding PHP settings to their root object via the `projects.cson` file:
+  ```
+    php:
+        enabled: true
+        php_integrator:
+            enabled: true
+            phpVersion: 5.6
+            excludedPaths: []
+            fileExtensions: [
+                "php"
+            ]
+  ```
+
 ## 1.2.3
 ### Bugs fixed
 * Fix built-in classes with FQCN's with more than one part, such as from the MongoDB extension, not properly being indexed.

@@ -113,8 +113,15 @@ module.exports =
         atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
             return if not @projectManagerService
 
-            @projectManagerService.projects.getCurrent (project) =>
-                projectPhpSettings = if project.props.php? then project.props.php else {}
+            atom.notifications.addError 'Error', {
+                'detail' : 'Setting up new projects is temporarily broken beyond repair as of project-manager 3.0. ' +
+                    'It is possible to set up projects manually via the projects file, however.'
+            }
+
+            return
+
+            @projectManagerService.getProject (project) =>
+                projectPhpSettings = if project.getProps().php? then project.getProps().php else {}
 
                 if projectPhpSettings.php_integrator?
                     atom.notifications.addError 'Already initialized', {
@@ -130,6 +137,8 @@ module.exports =
                 if not projectPhpSettings.php_integrator?
                     projectPhpSettings.php_integrator = @defaultProjectSettings.php_integrator
 
+                # FIXME: As of project-manager 3.0, this no longer seems to be working. There seems to be no workaround
+                # for it at the moment, either. See also https://github.com/danielbrodin/atom-project-manager/issues/252
                 project.set('php', projectPhpSettings)
 
                 atom.notifications.addSuccess 'Success', {
@@ -197,7 +206,7 @@ module.exports =
                     @statusBarManager.setLabel("Indexing... (" + progress.toFixed(2) + " %)")
 
         return @service.reindex(
-            project.props.paths,
+            project.getProps().paths,
             null,
             progressStreamCallback,
             @getAbsoluteExcludedPaths(project),
@@ -347,8 +356,8 @@ module.exports =
      * @return {Array}
     ###
     getAbsoluteExcludedPaths: (project) ->
-        projectPaths = project.props.paths
-        excludedPaths = project.props.php?.php_integrator?.excludedPaths
+        projectPaths = project.getProps().paths
+        excludedPaths = project.getProps().php?.php_integrator?.excludedPaths
 
         if not excludedPaths?
             excludedPaths = []
@@ -386,8 +395,8 @@ module.exports =
      * @return {Array}
     ###
     getFileExtensionsToIndex: (project) ->
-        projectPaths = project.props.paths
-        fileExtensions = project.props.php?.php_integrator?.fileExtensions
+        projectPaths = project.getProps().paths
+        fileExtensions = project.getProps().php?.php_integrator?.fileExtensions
 
         if not fileExtensions?
             fileExtensions = []
@@ -400,14 +409,14 @@ module.exports =
     loadProject: (project) ->
         @activeProject = null
 
-        return if project.props.php?.enabled != true
-        return if project.props.php?.php_integrator?.enabled != true
-        return if project.props.paths.length == 0
+        return if project.getProps().php?.enabled != true
+        return if project.getProps().php?.php_integrator?.enabled != true
+        return if project.getProps().paths.length == 0
 
         @activeProject = project
 
-        @proxy.setProjectName(project.props._id)
-        @proxy.setIndexDatabaseName(project.props._id)
+        @proxy.setProjectName(project.getProps().title)
+        @proxy.setIndexDatabaseName(project.getProps().title)
 
         @attemptProjectIndex(project)
 
@@ -424,7 +433,7 @@ module.exports =
 
         {Directory} = require 'atom'
 
-        for projectDirectory in project.props.paths
+        for projectDirectory in project.getProps().paths
             projectDirectoryObject = new Directory(projectDirectory)
 
             atom.project.repositoryForDirectory(projectDirectoryObject).then(successHandler, failureHandler)
@@ -522,7 +531,19 @@ module.exports =
     setProjectManagerService: (service) ->
         @projectManagerService = service
 
-        service.projects.getCurrent (project) =>
+        service.getProject (project) =>
+            if not project?
+                # Workaround for project-manager 3.0. See also
+                # https://github.com/danielbrodin/atom-project-manager/issues/252
+                setTimeout ( =>
+                    service.getProject (project) =>
+                        return if not project?
+
+                        @loadProject(project)
+                ), 2000
+
+                return
+
             @loadProject(project)
 
     ###*
