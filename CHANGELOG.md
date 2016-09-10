@@ -25,6 +25,10 @@
 * Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.
 * For method implementations, `implementation.declaringClass` previously pointed to the interface. This has now been changed to point to the class originally implementing the interface, which is consistent with `override.declaringClass`. Note that `implementation.declaringStructure` will still point to the interface.
 
+## 1.2.6
+### Bugs fixed
+* Rename the package and repository.
+
 ## 1.2.5
 ### Bugs fixed
 * Thanks to a quick response by [danielbrodin](https://github.com/danielbrodin), all functionality related to project management should now once again be working.
