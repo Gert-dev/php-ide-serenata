@@ -48,6 +48,11 @@ module.exports =
     ###*
      * The currently active project, if any.
     ###
+    loadedProject: null
+
+    ###*
+     * The currently active project, if any.
+    ###
     activeProject: null
 
     ###*
@@ -111,7 +116,7 @@ module.exports =
     ###
     registerCommands: () ->
         atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
-            return if not @projectManagerService
+            return if not @activeProject
 
             atom.notifications.addError 'Error', {
                 'detail' : 'Setting up new projects is temporarily broken beyond repair as of project-manager 3.0. ' +
@@ -120,44 +125,45 @@ module.exports =
 
             return
 
-            @projectManagerService.getProject (project) =>
-                projectPhpSettings = if project.getProps().php? then project.getProps().php else {}
+            project = @activeProject
 
-                if projectPhpSettings.php_integrator?
-                    atom.notifications.addError 'Already initialized', {
-                        'detail' : 'The currently active project was already initialized. To prevent existing ' +
-                            'settings from getting lost, the request has been aborted.'
-                    }
+            projectPhpSettings = if project.getProps().php? then project.getProps().php else {}
 
-                    return
-
-                if not projectPhpSettings.enabled
-                    projectPhpSettings.enabled = true
-
-                if not projectPhpSettings.php_integrator?
-                    projectPhpSettings.php_integrator = @defaultProjectSettings.php_integrator
-
-                # FIXME: As of project-manager 3.0, this no longer seems to be working. There seems to be no workaround
-                # for it at the moment, either. See also https://github.com/danielbrodin/atom-project-manager/issues/252
-                project.set('php', projectPhpSettings)
-
-                atom.notifications.addSuccess 'Success', {
-                    'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'
+            if projectPhpSettings.php_integrator?
+                atom.notifications.addError 'Already initialized', {
+                    'detail' : 'The currently active project was already initialized. To prevent existing ' +
+                        'settings from getting lost, the request has been aborted.'
                 }
 
-                @loadProject(project)
+                return
+
+            if not projectPhpSettings.enabled
+                projectPhpSettings.enabled = true
+
+            if not projectPhpSettings.php_integrator?
+                projectPhpSettings.php_integrator = @defaultProjectSettings.php_integrator
+
+            # FIXME: As of project-manager 3.0, this no longer seems to be working. There seems to be no workaround
+            # for it at the moment, either. See also https://github.com/danielbrodin/atom-project-manager/issues/252
+            project.set('php', projectPhpSettings)
+
+            atom.notifications.addSuccess 'Success', {
+                'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'
+            }
+
+            @loadProject(project)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
-            return if not @activeProject
+            return if not @loadedProject
 
-            project = @activeProject
+            project = @loadedProject
 
             return @attemptProjectIndex(project)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
-            return if not @activeProject
+            return if not @loadedProject
 
-            project = @activeProject
+            project = @loadedProject
 
             return @attemptForceProjectIndex(project)
 
@@ -407,13 +413,13 @@ module.exports =
      * @param {Object} project
     ###
     loadProject: (project) ->
-        @activeProject = null
+        @loadedProject = null
 
         return if project.getProps().php?.enabled != true
         return if project.getProps().php?.php_integrator?.enabled != true
         return if project.getProps().paths.length == 0
 
-        @activeProject = project
+        @loadedProject = project
 
         @proxy.setProjectName(project.getProps().title)
         @proxy.setIndexDatabaseName(project.getProps().title)
@@ -487,15 +493,15 @@ module.exports =
         path = editor.getPath()
 
         return if not path
-        return if not @activeProject
+        return if not @loadedProject
 
         {Directory} = require 'atom'
 
-        for projectDirectory in @activeProject.props.paths
+        for projectDirectory in @loadedProject.props.paths
             projectDirectoryObject = new Directory(projectDirectory)
 
             if projectDirectoryObject.contains(path)
-                @attemptFileIndex(@activeProject, path, editor.getBuffer().getText())
+                @attemptFileIndex(@loadedProject, path, editor.getBuffer().getText())
                 return
 
     ###*
@@ -532,17 +538,9 @@ module.exports =
         @projectManagerService = service
 
         service.getProject (project) =>
-            if not project?
-                # Workaround for project-manager 3.0. See also
-                # https://github.com/danielbrodin/atom-project-manager/issues/252
-                setTimeout ( =>
-                    service.getProject (project) =>
-                        return if not project?
+            @activeProject = project
 
-                        @loadProject(project)
-                ), 2000
-
-                return
+            return if not project?
 
             @loadProject(project)
 
