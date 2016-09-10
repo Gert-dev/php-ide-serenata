@@ -1,3 +1,7 @@
+## 1.2.6
+### Bugs fixed
+* Rename the package and repository.
+
 ## 1.2.5
 ### Bugs fixed
 * Thanks to a quick response by [danielbrodin](https://github.com/danielbrodin), all functionality related to project management should now once again be working.
