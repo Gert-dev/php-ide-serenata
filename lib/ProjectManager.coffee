@@ -84,10 +84,14 @@ class ProjectManager
      * Default settings will be stored inside the package, if they aren't already present. If they already exist, they
      * will not be overwritten.
      *
+     * Note that this method does not explicitly request persisting settings from the external project manager service.
+     *
      * @param {Object} project
+     *
+     * @return {Object} The new settings of the project (that could be persisted).
     ###
     setUpProject: (project) ->
-        projectPhpSettings = if project.props.php? then project.props.php else {}
+        projectPhpSettings = if project.getProps().php? then project.getProps().php else {}
 
         if projectPhpSettings.php_integrator?
             throw new Error('''
@@ -101,7 +105,10 @@ class ProjectManager
         if not projectPhpSettings.php_integrator?
             projectPhpSettings.php_integrator = @defaultProjectSettings.php_integrator
 
-        project.set('php', projectPhpSettings)
+        existingProps = project.getProps()
+        existingProps.php = projectPhpSettings
+
+        return existingProps
 
     ###*
      * @param {Object} project
@@ -109,7 +116,7 @@ class ProjectManager
     load: (project) ->
         @activeProject = null
 
-        return if project.props.php?.enabled != true
+        return if project.getProps().php?.enabled != true
 
         projectSettings = @getProjectSettings(project)
 
@@ -119,8 +126,8 @@ class ProjectManager
 
         @activeProject = project
 
-        @proxy.setProjectName(project.props._id)
-        @proxy.setIndexDatabaseName(project.props._id)
+        @proxy.setProjectName(project.getProps().title)
+        @proxy.setIndexDatabaseName(project.getProps().title)
 
         successHandler = (repository) =>
             return if not repository?
@@ -364,8 +371,8 @@ class ProjectManager
      * @return {Object|null}
     ###
     getProjectSettings: (project) ->
-        if project.props.php?.php_integrator?
-            return project.props.php.php_integrator
+        if project.getProps().php?.php_integrator?
+            return project.getProps().php.php_integrator
 
         return null
 
@@ -379,7 +386,7 @@ class ProjectManager
      * @return {Array}
     ###
     getProjectPaths: (project) ->
-        return project.props.paths
+        return project.getProps().paths
 
     ###*
      * Indicates if the specified file is part of the project.

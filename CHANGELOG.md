@@ -25,6 +25,27 @@
 * Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.
 * For method implementations, `implementation.declaringClass` previously pointed to the interface. This has now been changed to point to the class originally implementing the interface, which is consistent with `override.declaringClass`. Note that `implementation.declaringStructure` will still point to the interface.
 
+## 1.2.5
+### Bugs fixed
+* Thanks to a quick response by [danielbrodin](https://github.com/danielbrodin), all functionality related to project management should now once again be working.
+
+## 1.2.4
+### Bugs fixed
+* Add workarounds for project-manager 3.0.0. Unfortunately, some functionalities are currently broken because of the backwards-incompatible upgrade. See also [this ticket](https://github.com/danielbrodin/atom-project-manager/issues/252) for more information.
+  * Setting up new projects is currently impossible via the package, you can however still manually set up projects by adding PHP settings to their root object via the `projects.cson` file:
+  ```
+    php:
+        enabled: true
+        php_integrator:
+            enabled: true
+            phpVersion: 5.6
+            excludedPaths: []
+            fileExtensions: [
+                "php"
+            ]
+  ```
+>>>>>>> master
+
 ## 1.2.3
 ### Bugs fixed
 * Fix built-in classes with FQCN's with more than one part, such as from the MongoDB extension, not properly being indexed.

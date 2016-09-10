@@ -41,6 +41,11 @@ module.exports =
     disposables: null
 
     ###*
+     * The currently active project, if any.
+    ###
+    activeProject: null
+
+    ###*
      * @var {String|null}
     ###
     timerName: null
@@ -97,35 +102,43 @@ module.exports =
     ###
     registerCommands: () ->
         atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
-            return if not @projectManagerService?
+            return if not @activeProject?
 
-            @projectManagerService.projects.getCurrent (project) =>
-                try
-                    @projectManager.setUpProject(project)
+            project = @activeProject
 
-                catch error
-                    atom.notifications.addError('Error!', {
-                        'detail' : error.message
-                    })
+            newProperties = null
 
-                    return
+            try
+                newProperties = @projectManager.setUpProject(project)
 
-                atom.notifications.addSuccess 'Success', {
-                    'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'
-                }
+                if not newProperties?
+                    throw new Error('No properties returned, this should never happen!')
 
-                successHandler = () =>
-                    return @projectManager.attemptCurrentProjectIndex()
+            catch error
+                atom.notifications.addError('Error!', {
+                    'detail' : error.message
+                })
 
-                failureHandler = (reason) =>
-                    console.error(reason)
+                return
 
-                    atom.notifications.addError('Error!', {
-                        'detail' : 'The project could not be properly initialized!'
-                    })
+            @projectManagerService.saveProject(newProperties)
 
-                @projectManager.load(project)
-                @projectManager.initializeCurrentProject().then(successHandler, failureHandler)
+            atom.notifications.addSuccess 'Success', {
+                'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'
+            }
+
+            successHandler = () =>
+                return @projectManager.attemptCurrentProjectIndex()
+
+            failureHandler = (reason) =>
+                console.error(reason)
+
+                atom.notifications.addError('Error!', {
+                    'detail' : 'The project could not be properly initialized!'
+                })
+
+            @projectManager.load(project)
+            @projectManager.initializeCurrentProject().then(successHandler, failureHandler)
 
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
             return if not @projectManager.hasActiveProject()
@@ -326,7 +339,12 @@ module.exports =
     setProjectManagerService: (service) ->
         @projectManagerService = service
 
-        service.projects.getCurrent (project) =>
+        # NOTE: This method is actually called whenever the project changes as well.
+        service.getProject (project) =>
+            @activeProject = project
+
+            return if not project?
+
             @projectManager.load(project)
 
             return if not @projectManager.hasActiveProject()
