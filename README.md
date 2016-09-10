@@ -21,6 +21,6 @@ The following package also exists is currently looking for a new maintainer (see
 The source code was originally based on the php-autocomplete-plus code base, but has significantly diverged from it since then.
 
 ## What do I need to do to make it work?
-See also [the website](https://php-integrator.github.io/#what-do-i-need) as well as [the wiki](https://github.com/Gert-dev/php-integrator-base/wiki).
+See [the website](https://php-integrator.github.io/#what-do-i-need) as well as [the wiki](https://github.com/Gert-dev/php-integrator-base/wiki).
 
 ![GPLv3 Logo](http://gplv3.fsf.org/gplv3-127x51.png)
