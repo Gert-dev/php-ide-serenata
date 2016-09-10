@@ -116,14 +116,8 @@ module.exports =
     ###
     registerCommands: () ->
         atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
+            return if not @projectManagerService
             return if not @activeProject
-
-            atom.notifications.addError 'Error', {
-                'detail' : 'Setting up new projects is temporarily broken beyond repair as of project-manager 3.0. ' +
-                    'It is possible to set up projects manually via the projects file, however.'
-            }
-
-            return
 
             project = @activeProject
 
@@ -143,9 +137,10 @@ module.exports =
             if not projectPhpSettings.php_integrator?
                 projectPhpSettings.php_integrator = @defaultProjectSettings.php_integrator
 
-            # FIXME: As of project-manager 3.0, this no longer seems to be working. There seems to be no workaround
-            # for it at the moment, either. See also https://github.com/danielbrodin/atom-project-manager/issues/252
-            project.set('php', projectPhpSettings)
+
+            existingProps = @activeProject.getProps()
+            existingProps.php = projectPhpSettings
+            @projectManagerService.saveProject(existingProps)
 
             atom.notifications.addSuccess 'Success', {
                 'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'

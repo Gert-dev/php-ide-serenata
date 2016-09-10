@@ -1,3 +1,7 @@
+## 1.2.5
+### Bugs fixed
+* Thanks to a quick response by [danielbrodin](https://github.com/danielbrodin), all functionality related to project management should now once again be working.
+
 ## 1.2.4
 ### Bugs fixed
 * Add workarounds for project-manager 3.0.0. Unfortunately, some functionalities are currently broken because of the backwards-incompatible upgrade. See also [this ticket](https://github.com/danielbrodin/atom-project-manager/issues/252) for more information.

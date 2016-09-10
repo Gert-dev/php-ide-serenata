@@ -23,7 +23,7 @@
     },
     "project-manager": {
       "versions": {
-        "^2.3.0": "setProjectManagerService"
+        "^3.1.0": "setProjectManagerService"
       }
     }
   },
