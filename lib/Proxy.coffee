@@ -40,7 +40,7 @@ class Proxy
     prepareParameters: (args) ->
         parameters = [
             '-d memory_limit=-1',
-            __dirname + "/../php/src/Main.php"
+            atom.packages.resolvePackagePath("php-integrator-core") + "/src/Main.php"
         ]
 
         for a in args

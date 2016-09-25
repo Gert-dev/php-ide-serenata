@@ -36,6 +36,11 @@ module.exports =
     statusBarManager: null
 
     ###*
+     * @var {IndexingMediator}
+    ###
+    indexingMediator: null
+
+    ###*
      * A list of disposables to dispose when the package deactivates.
     ###
     disposables: null
@@ -72,7 +77,7 @@ module.exports =
     testConfig: (testServices = true) ->
         ConfigTester = require './ConfigTester'
 
-        configTester = new ConfigTester(@configuration)
+        configTester = new ConfigTester(@getConfiguration())
 
         result = configTester.test()
 
@@ -180,7 +185,9 @@ module.exports =
      * Registers status bar listeners.
     ###
     registerStatusBarListeners: () ->
-        @service.onDidStartIndexing () =>
+        service = @getService()
+
+        service.onDidStartIndexing () =>
             # Indexing could be anything: the entire project or just a file. If indexing anything takes too long, show
             # the progress bar to indicate we're doing something.
             @progressBarTimeout = setTimeout ( =>
@@ -196,7 +203,7 @@ module.exports =
                     @statusBarManager.show()
             ), 1000
 
-        @service.onDidFinishIndexing () =>
+        service.onDidFinishIndexing () =>
             if @progressBarTimeout
                 clearTimeout(@progressBarTimeout)
                 @progressBarTimeout = null
@@ -209,7 +216,7 @@ module.exports =
                 @statusBarManager.hide()
 
 
-        @service.onDidFailIndexing () =>
+        service.onDidFailIndexing () =>
             if @progressBarTimeout
                 clearTimeout(@progressBarTimeout)
                 @progressBarTimeout = null
@@ -221,7 +228,7 @@ module.exports =
                 @statusBarManager.showMessage("Indexing failed!", "highlight-error")
                 @statusBarManager.hide()
 
-        @service.onDidIndexingProgress (data) =>
+        service.onDidIndexingProgress (data) =>
             if @statusBarManager?
                 @statusBarManager.setProgress(data.percentage)
                 @statusBarManager.setLabel("Indexing... (" + data.percentage.toFixed(2) + " %)")
@@ -248,48 +255,56 @@ module.exports =
             @statusBarManager = null
 
     ###*
+     * Uninstalls the core package (which contains the PHP payload) if it is outdated. It can then be installed in an
+     * up-to-date version again.
+     *
+     * @return {Promise}
+    ###
+    uninstallCorePackageIfOutdated: () ->
+        fs = require 'fs'
+        path = require 'path'
+
+        corePackagePath = atom.packages.resolvePackagePath("php-integrator-core")
+
+        if corePackagePath?
+            coreVersion = JSON.parse(fs.readFileSync(path.join(corePackagePath, 'package.json')))?.version
+            baseVersion = JSON.parse(fs.readFileSync(path.join(atom.packages.resolvePackagePath(@packageName), 'package.json')))?.version
+
+            if coreVersion? and coreVersion < baseVersion
+                return new Promise (resolve, reject) =>
+                    rmdirRecursive = require('rimraf');
+
+                    rmdirRecursive corePackagePath, (error) =>
+                        resolve()
+
+        return new Promise (resolve, reject) ->
+            resolve()
+
+    ###*
      * Activates the package.
     ###
     activate: ->
-        Service               = require './Service'
-        AtomConfig            = require './AtomConfig'
-        CachingProxy          = require './CachingProxy'
-        ProjectManager        = require './ProjectManager'
-        IndexingMediator      = require './IndexingMediator'
+        @uninstallCorePackageIfOutdated().then () =>
+            require('atom-package-deps').install(@packageName).then () =>
+                # See also atom-autocomplete-php pull request #197 - Disabled for now because it does not allow the user to
+                # reactivate or try again.
+                # return unless @testConfig()
+                @testConfig(false)
 
-        {Emitter}             = require 'event-kit';
-        {CompositeDisposable} = require 'atom';
+                # @getService()
 
-        @disposables = new CompositeDisposable()
+                @registerCommands()
+                @registerStatusBarListeners()
 
-        @configuration = new AtomConfig(@packageName)
+                @getDisposables().add atom.workspace.observeTextEditors (editor) =>
+                    # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
+                    # because the contents are still loading.
+                    setTimeout ( =>
+                        return if not @disposables
 
-        # See also atom-autocomplete-php pull request #197 - Disabled for now because it does not allow the user to
-        # reactivate or try again.
-        # return unless @testConfig()
-        @testConfig(false)
-
-        @proxy = new CachingProxy(@configuration)
-
-        emitter = new Emitter()
-        indexingMediator = new IndexingMediator(@proxy, emitter)
-
-        @projectManager = new ProjectManager(@proxy, indexingMediator)
-
-        @service = new Service(@proxy, @projectManager, indexingMediator)
-
-        @registerCommands()
-        @registerStatusBarListeners()
-
-        @disposables.add atom.workspace.observeTextEditors (editor) =>
-            # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
-            # because the contents are still loading.
-            setTimeout ( =>
-                return if not @disposables
-
-                @disposables.add editor.onDidStopChanging () =>
-                    @onEditorDidStopChanging(editor)
-            ), 1500
+                        @disposables.add editor.onDidStopChanging () =>
+                            @onEditorDidStopChanging(editor)
+                    ), 1500
 
     ###*
      * Invoked when an editor stops changing.
@@ -303,8 +318,10 @@ module.exports =
 
         return if not fileName
 
-        if @projectManager.hasActiveProject() and @projectManager.isFilePartOfCurrentProject(fileName)
-            @projectManager.attemptCurrentProjectFileIndex(fileName, editor.getBuffer().getText())
+        projectManager = @getProjectManager()
+
+        if projectManager.hasActiveProject() and projectManager.isFilePartOfCurrentProject(fileName)
+            projectManager.attemptCurrentProjectFileIndex(fileName, editor.getBuffer().getText())
 
     ###*
      * Deactivates the package.
@@ -324,7 +341,7 @@ module.exports =
 
         # This method is usually invoked after the indexing has already started, hence we can't unconditionally hide it
         # here or it will never be made visible again.
-        if not @projectManager.isProjectIndexing()
+        if not @getProjectManager().isProjectIndexing()
             @statusBarManager.hide()
 
         {Disposable} = require 'atom'
@@ -345,14 +362,97 @@ module.exports =
 
             return if not project?
 
-            @projectManager.load(project)
+            projectManager = @getProjectManager()
+            projectManager.load(project)
 
-            return if not @projectManager.hasActiveProject()
+            return if not projectManager.hasActiveProject()
 
-            @projectManager.attemptCurrentProjectIndex()
+            projectManager.attemptCurrentProjectIndex()
 
     ###*
-     * Retrieves the service exposed by this package.
+     * Retrieves the base package service that can be used by other packages.
+     *
+     * @return {Service}
     ###
-    getService: ->
+    getServiceInstance: () ->
+        # Don't allow service calls to initialize the service prematurely.
+        return null if not @service?
+
+        return @getService()
+
+    ###*
+     * @return {Service}
+    ###
+    getService: () ->
+        if not @disposables?
+            Service = require './Service'
+
+            @service = new Service(@getCachingProxy(), @getProjectManager(), @getIndexingMediator())
+
         return @service
+
+    ###*
+     * @return {Disposables}
+    ###
+    getDisposables: () ->
+        if not @disposables?
+            {CompositeDisposable} = require 'atom';
+
+            @disposables = new CompositeDisposable()
+
+        return @disposables
+
+    ###*
+     * @return {Configuration}
+    ###
+    getConfiguration: () ->
+        if not @configuration?
+            AtomConfig = require './AtomConfig'
+
+            @configuration = new AtomConfig(@packageName)
+
+        return @configuration
+
+    ###*
+     * @return {CachingProxy}
+    ###
+    getCachingProxy: () ->
+        if not @proxy?
+            CachingProxy = require './CachingProxy'
+
+            @proxy = new CachingProxy(@getConfiguration())
+
+        return @proxy
+
+    ###*
+     * @return {Emitter}
+    ###
+    getEmitter: () ->
+        if not @emitter?
+            {Emitter} = require 'event-kit';
+
+            @emitter = new Emitter()
+
+        return @emitter
+
+    ###*
+     * @return {IndexingMediator}
+    ###
+    getIndexingMediator: () ->
+        if not @indexingMediator?
+            IndexingMediator = require './IndexingMediator'
+
+            @indexingMediator = new IndexingMediator(@getCachingProxy(), @getEmitter())
+
+        return @indexingMediator
+
+    ###*
+     * @return {ProjectManager}
+    ###
+    getProjectManager: () ->
+        if not @projectManager?
+            ProjectManager = require './ProjectManager'
+
+            @projectManager = new ProjectManager(@getCachingProxy(), @getIndexingMediator())
+
+        return @projectManager

@@ -1,7 +1,0 @@
-<?php
-
-$var = function () {
-
-};
-
-// <MARKER>
