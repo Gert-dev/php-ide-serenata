@@ -188,6 +188,9 @@ module.exports =
         service = @getService()
 
         service.onDidStartIndexing () =>
+            if @progressBarTimeout
+                clearTimeout(@progressBarTimeout)
+
             # Indexing could be anything: the entire project or just a file. If indexing anything takes too long, show
             # the progress bar to indicate we're doing something.
             @progressBarTimeout = setTimeout ( =>
