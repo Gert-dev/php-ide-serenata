@@ -132,18 +132,9 @@ module.exports =
                 'detail' : 'Your current project has been set up as PHP project. Indexing will now commence.'
             }
 
-            successHandler = () =>
-                return @projectManager.attemptCurrentProjectIndex()
-
-            failureHandler = (reason) =>
-                console.error(reason)
-
-                atom.notifications.addError('Error!', {
-                    'detail' : 'The project could not be properly initialized!'
-                })
-
             @projectManager.load(project)
-            @projectManager.initializeCurrentProject().then(successHandler, failureHandler)
+
+            @performInitialFullIndexForCurrentProject()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
             return if not @projectManager.hasActiveProject()
@@ -154,20 +145,7 @@ module.exports =
             return if not @projectManager.hasActiveProject()
 
             successHandler = () =>
-                initializeSuccessfulHandler = () =>
-                    return @projectManager.attemptCurrentProjectIndex()
-
-                initializeFailedHandler = (reason) =>
-                    console.error(reason)
-
-                    atom.notifications.addError('Error!', {
-                        'detail' : 'The project could not be properly reinitialized!'
-                    })
-
-                return @projectManager.initializeCurrentProject().then(
-                    initializeSuccessfulHandler,
-                    initializeFailedHandler
-                )
+                @performInitialFullIndexForCurrentProject()
 
             failureHandler = () =>
                 # Do nothing.
@@ -180,6 +158,24 @@ module.exports =
             atom.notifications.addSuccess 'Success', {
                 'detail' : 'Your PHP integrator configuration is working correctly!'
             }
+
+    ###*
+     * Performs the "initial" index for a new project by initializing it and then performing a project index.
+     *
+     * @return {Promise}
+    ###
+    performInitialFullIndexForCurrentProject: () ->
+        successHandler = () =>
+            return @projectManager.attemptCurrentProjectIndex()
+
+        failureHandler = (reason) =>
+            console.error(reason)
+
+            atom.notifications.addError('Error!', {
+                'detail' : 'The project could not be properly initialized!'
+            })
+
+        return @projectManager.initializeCurrentProject().then(successHandler, failureHandler)
 
     ###*
      * Registers status bar listeners.
