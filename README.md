@@ -1,4 +1,4 @@
-# atom-base
+# php-integrator/atom-base
 <p align="right">
 :coffee:
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ">Send me some coffee beans</a>
