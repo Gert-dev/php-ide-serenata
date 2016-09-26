@@ -1,18 +1,7 @@
+### Note
+Starting with version **1.3.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting chnages are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
+
 ## 1.3.0
-### Features and improvements
-* A great deal of refactoring has occurred, which paved the way for performance improvements in several areas, such as type deduction.
-  * Indexing should be slightly faster.
-  * Everything should feel a bit more responsive.
-  * Semantic linting should be significantly faster, especially for large files.
-
-### Bugs fixed
-* Documentation for built-in functions was escaping underscores with a slash.
-* Semantic linting was incorrectly processing unqualified global function names.
-* Semantic linting was incorrectly processing unqualified global constant names.
-* The status bar was not showing progress when a project index happened through a repository status change.
-* Editing a file that did not meet the allowed extensions specified in the project settings still caused it to be added to the index.
-
-### Changes for developers
 * The `reindex` call no longer automatically indexes built-in structural elements, nor will it automatically prune removed files from the database.
   * A new call, `vacuum`, can be used to vacuum a project and prune removed files from its index.
   * A new call, `initialize`, can be used to initialize a project and index built-in structural elements.
@@ -20,10 +9,8 @@
   * It also wasn't really useful in its current form, as the only the one doing the indexing could register a callback.
   * As a better alternative, you can now register a callback with `onDidIndexingProgress` to listen to the progress, even if you did not spawn the reindex yourself.
 * A new call, `onDidStartIndexing`, has been added that allows you to listen to an indexing action starting.
-* Previously a fix was applied to make FQCN's actually contain a leading slash to clearly indicate that they were fully qualified. This still didn't happen everywhere, which has been corrected now.
 * A new service method, `getCurrentProjectSettings`, allows retrieving the settings (specific to this package) of a project. This includes things such as the PHP version, paths and excluded folders.
 * Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.
-* For method implementations, `implementation.declaringClass` previously pointed to the interface. This has now been changed to point to the class originally implementing the interface, which is consistent with `override.declaringClass`. Note that `implementation.declaringStructure` will still point to the interface.
 * The PHP side is no longer part of the base package. Instead, it has been separated into the [php-integrator/core](https://github.com/php-integrator/core) repository so it can be more easily installed via Composer for use in other projects.
 ** This change should not impact users as they upgrade, as this package will be automatically installed and upgraded along with this one if necessary (a notification will be shown whenever that happens).
 
