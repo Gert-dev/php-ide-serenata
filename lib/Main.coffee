@@ -215,7 +215,6 @@ module.exports =
                 @statusBarManager.setLabel("Indexing completed!")
                 @statusBarManager.hide()
 
-
         service.onDidFailIndexing () =>
             if @progressBarTimeout
                 clearTimeout(@progressBarTimeout)
