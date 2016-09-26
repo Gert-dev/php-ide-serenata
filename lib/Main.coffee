@@ -375,9 +375,6 @@ module.exports =
      * @return {Service}
     ###
     getServiceInstance: () ->
-        # Don't allow service calls to initialize the service prematurely.
-        return null if not @service?
-
         return @getService()
 
     ###*

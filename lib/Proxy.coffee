@@ -40,13 +40,19 @@ class Proxy
     prepareParameters: (args) ->
         parameters = [
             '-d memory_limit=-1',
-            atom.packages.resolvePackagePath("php-integrator-core") + "/src/Main.php"
+            @getCorePackagePath() + "/src/Main.php"
         ]
 
         for a in args
             parameters.push(a)
 
         return parameters
+
+    ###*
+     * @return {String}
+    ###
+    getCorePackagePath: () ->
+        return atom.packages.resolvePackagePath("php-integrator-core")
 
     ###*
      * Performs an asynchronous request to the PHP side.
@@ -60,6 +66,13 @@ class Proxy
     ###
     performRequestAsync: (command, parameters, streamCallback = null, stdinData = null) ->
         return new Promise (resolve, reject) =>
+            if not @getCorePackagePath()?
+                reject('''
+                    The core package was not found, it is currently being installed. This only needs to happen once at
+                    initialization, but the service is not available yet in the meantime.
+                ''')
+                return
+
             proc = child_process.spawn(command, parameters)
 
             buffer = ''
