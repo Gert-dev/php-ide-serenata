@@ -4,7 +4,7 @@
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ">Send me some coffee beans</a>
 </p>
 
-PHP Integrator is an Atom package that analyzes PHP projects and exposes a service that other packages can use to provide additional functionality, such as autocompletion,
+This package provides Atom integration for [PHP Integrator](https://github.com/php-integrator/core) and exposes a service that other packages can use to provide additional functionality, such as autocompletion,
 code navigation and tooltips. The user can then select his desired combination of functionalities from these other packages:
   * **[php-integrator-autocomplete-plus](https://github.com/php-integrator/atom-autocompletion)** - Provides intelligent PHP autocompletion in combination with autocomplete-plus.
   * **[php-integrator-navigation](https://github.com/php-integrator/atom-navigation)** - Provides code navigation and go to functionality.
