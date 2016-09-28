@@ -382,7 +382,7 @@ module.exports =
         if not @disposables?
             Service = require './Service'
 
-            @service = new Service(@getCachingProxy(), @getProjectManager(), @getIndexingMediator())
+            @service = new Service(@getConfiguration(), @getCachingProxy(), @getProjectManager(), @getIndexingMediator())
 
         return @service
 

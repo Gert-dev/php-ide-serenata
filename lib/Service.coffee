@@ -8,7 +8,12 @@ module.exports =
 ##
 class Service
     ###*
-     * The proxy to use to contact the PHP side.
+     * @var {Object}
+    ###
+    config: null
+
+    ###*
+     * @var {Object}
     ###
     proxy: null
 
@@ -25,11 +30,12 @@ class Service
     ###*
      * Constructor.
      *
+     * @param {AtomConfig}   config
      * @param {CachingProxy} proxy
      * @param {Object}       projectManager
      * @param {Object}       indexingMediator
     ###
-    constructor: (@proxy, @projectManager, @indexingMediator) ->
+    constructor: (@config, @proxy, @projectManager, @indexingMediator) ->
 
     ###*
      * Retrieves the settings (that are specific to this package) for the currently active project. If there is no
@@ -446,3 +452,44 @@ class Service
         buffer = new Buffer(string)
 
         return buffer.slice(0, byteOffset).toString().length
+
+    ###*
+     * @param {String} fqcn
+     *
+     * @return {String}
+    ###
+    getDocumentationUrlForClass: (fqcn) ->
+        return @config.get('php_documentation_base_urls').classes + @getNormalizeFqcnDocumentationUrl(fqcn)
+
+    ###*
+     * @param {String} fqcn
+     *
+     * @return {String}
+    ###
+    getDocumentationUrlForFunction: (fqcn) ->
+        return @config.get('php_documentation_base_urls').functions + @getNormalizeFqcnDocumentationUrl(fqcn)
+
+    ###*
+     * @param {String} classlikeFqcn
+     * @param {String} name
+     *
+     * @return {String}
+    ###
+    getDocumentationUrlForClassMethod: (classlikeFqcn, name) ->
+        return @config.get('php_documentation_base_urls').root + @getNormalizeFqcnDocumentationUrl(classlikeFqcn) + '.' + @getNormalizeMethodDocumentationUrl(name)
+
+    ###*
+     * @param {String} name
+     *
+     * @return {String}
+    ###
+    getNormalizeFqcnDocumentationUrl: (name) ->
+        return name.replace(/\\/g, '-').substr(1).toLowerCase()
+
+    ###*
+     * @param {String} name
+     *
+     * @return {String}
+    ###
+    getNormalizeMethodDocumentationUrl: (name) ->
+        return name.replace(/^__/, '')

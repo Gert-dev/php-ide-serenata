@@ -23,12 +23,20 @@ class Config
         @listeners = {}
 
         @data =
-            phpCommand                     : null
-            packagePath                    : null
+            phpCommand  : null
+            packagePath : null
+
+            # See also http://www.phpdoc.org/docs/latest/index.html .
+            phpdoc_base_url : {
+                prefix: 'http://www.phpdoc.org/docs/latest/references/phpdoc/tags/'
+                suffix: '.html'
+            }
 
             # See also https://secure.php.net/urlhowto.php .
-            php_documentation_base_url     : {
-                functions: 'https://secure.php.net/function.'
+            php_documentation_base_urls : {
+                root      : 'https://secure.php.net/'
+                classes   : 'https://secure.php.net/class.'
+                functions : 'https://secure.php.net/function.'
             }
 
         @load()

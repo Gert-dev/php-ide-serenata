@@ -10,6 +10,10 @@ Starting with version **1.3.0**, this repository only contains the CoffeeScript 
   * As a better alternative, you can now register a callback with `onDidIndexingProgress` to listen to the progress, even if you did not spawn the reindex yourself.
 * A new call, `onDidStartIndexing`, has been added that allows you to listen to an indexing action starting.
 * A new service method, `getCurrentProjectSettings`, allows retrieving the settings (specific to this package) of a project. This includes things such as the PHP version, paths and excluded folders.
+* A couple of new service methods have been added to allow fetching documentation URL's for built-in structural elements. These were imported from php-integrator-navigation so they can be reused by other packages as well:
+  * `getDocumentationUrlForClass`
+  * `getDocumentationUrlForFunction`
+  * `getDocumentationUrlForClassMethod`
 * Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.
 * The PHP side is no longer part of the base package. Instead, it has been separated into the [php-integrator/core](https://github.com/php-integrator/core) repository so it can be more easily installed via Composer for use in other projects.
 ** This change should not impact users as they upgrade, as this package will be automatically installed and upgraded along with this one if necessary (a notification will be shown whenever that happens).
