@@ -142,7 +142,7 @@ class Proxy
 
         if not @projectName
             return new Promise (resolve, reject) ->
-                reject()
+                reject('Request aborted as there is no project active (yet)')
 
         return @performRequestAsync(php, parameters, streamCallback, stdinData)
 
