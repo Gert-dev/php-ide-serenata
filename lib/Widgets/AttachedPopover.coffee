@@ -53,6 +53,9 @@ class AttachedPopover extends Popover
         x = coordinates.left - (@$(@getElement()).width() / 2) + centerOffset
         y = coordinates.bottom
 
+        x = 0 if x < 0
+        y = 0 if y < 0
+
         super(x, y, fadeInTime)
 
     ###*
