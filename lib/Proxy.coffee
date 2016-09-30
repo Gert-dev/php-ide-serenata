@@ -179,6 +179,38 @@ class Proxy
         return @performRequest(parameters)
 
     ###*
+     * Retrieves a list of namespaces.
+     *
+     * @return {Promise}
+    ###
+    getNamespaceList: () ->
+        parameters = [
+            '--namespace-list',
+            '--database=' + @getIndexDatabasePath()
+        ]
+
+        return @performRequest(parameters)
+
+    ###*
+     * Retrieves a list of namespaces in the specified file.
+     *
+     * @param {String} file
+     *
+     * @return {Promise}
+    ###
+    getNamespaceListForFile: (file) ->
+        if not file
+            throw new Error('No file passed!')
+
+        parameters = [
+            '--namespace-list',
+            '--database=' + @getIndexDatabasePath(),
+            '--file=' + file
+        ]
+
+        return @performRequest(parameters)
+
+    ###*
      * Retrieves a list of available global constants.
      *
      * @return {Promise}

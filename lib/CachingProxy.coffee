@@ -62,6 +62,18 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    getNamespaceList: () ->
+        return @wrapCachedRequestToParent("getNamespaceList", 'getNamespaceList', arguments)
+
+    ###*
+     * @inherited
+    ###
+    getNamespaceListForFile: (file) ->
+        return @wrapCachedRequestToParent("getNamespaceListForFile-#{file}", 'getNamespaceListForFile', arguments)
+
+    ###*
+     * @inherited
+    ###
     getGlobalConstants: () ->
         return @wrapCachedRequestToParent("getGlobalConstants", 'getGlobalConstants', arguments)
 

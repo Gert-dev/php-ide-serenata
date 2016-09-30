@@ -73,6 +73,24 @@ class Service
         return @proxy.getClassListForFile(file)
 
     ###*
+     * Retrieves a list of namespaces.
+     *
+     * @return {Promise}
+    ###
+    getNamespaceList: () ->
+        return @proxy.getNamespaceList()
+
+    ###*
+     * Retrieves a list of namespaces in the specified file.
+     *
+     * @param {String} file
+     *
+     * @return {Promise}
+    ###
+    getNamespaceListForFile: (file) ->
+        return @proxy.getNamespaceListForFile(file)
+
+    ###*
      * Retrieves a list of available global constants.
      *
      * @return {Promise}
