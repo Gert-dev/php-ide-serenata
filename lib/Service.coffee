@@ -341,6 +341,34 @@ class Service
             return @getClassListForFile(path).then(successHandler, failureHandler)
 
     ###*
+     * Determines the current namespace on the specified buffer position.
+     *
+     * @param {TextEditor} editor         The editor that contains the class (needed to resolve relative class names).
+     * @param {Point}      bufferPosition
+     *
+     * @return {Promise}
+    ###
+    determineCurrentNamespaceName: (editor, bufferPosition) ->
+        return new Promise (resolve, reject) =>
+            path = editor.getPath()
+
+            if not path?
+                reject()
+                return
+
+            successHandler = (namespacesInFile) =>
+                for namespace in namespacesInFile
+                    if bufferPosition.row >= namespace.startLine and (bufferPosition.row <= namespace.endLine or not namespace.endLine?)
+                        resolve(namespace.name)
+
+                resolve(null)
+
+            failureHandler = () =>
+                reject()
+
+            return @getNamespaceListForFile(path).then(successHandler, failureHandler)
+
+    ###*
      * Convenience function that resolves types using {@see resolveType}, automatically determining the correct
      * parameters for the editor and buffer position.
      *
