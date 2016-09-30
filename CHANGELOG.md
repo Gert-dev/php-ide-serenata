@@ -9,9 +9,12 @@ Starting with version **1.3.0**, this repository only contains the CoffeeScript 
 * The `reindex` call no longer takes a `progressStreamCallback`, this was necessary because it was holding back refactoring and it really did not belong there.
   * It also wasn't really useful in its current form, as the only the one doing the indexing could register a callback.
   * As a better alternative, you can now register a callback with `onDidIndexingProgress` to listen to the progress, even if you did not spawn the reindex yourself.
-* The new calls `getNamespaceList` and `getNamespaceListForFile` now allow you to fetch a list of known namespaces, either in the project or for a specific file respectively.
 * A new call, `onDidStartIndexing`, has been added that allows you to listen to an indexing action starting.
 * A new service method, `getCurrentProjectSettings`, allows retrieving the settings (specific to this package) of a project. This includes things such as the PHP version, paths and excluded folders.
+* A couple of new service methods have been added to allow fetching namespace information:
+  * `getNamespaceList`
+  * `getNamespaceListForFile`
+  * `determineCurrentNamespaceName`
 * A couple of new service methods have been added to allow fetching documentation URL's for built-in structural elements. These were imported from php-integrator-navigation so they can be reused by other packages as well:
   * `getDocumentationUrlForClass`
   * `getDocumentationUrlForFunction`
