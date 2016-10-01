@@ -28,14 +28,28 @@ class Service
     indexingMediator: null
 
     ###*
+     * @var {Object}
+    ###
+    useStatementHelper: null
+
+    ###*
      * Constructor.
      *
      * @param {AtomConfig}   config
      * @param {CachingProxy} proxy
      * @param {Object}       projectManager
      * @param {Object}       indexingMediator
+     * @param {Object}       useStatementHelper
     ###
-    constructor: (@config, @proxy, @projectManager, @indexingMediator) ->
+    constructor: (@config, @proxy, @projectManager, @indexingMediator, @useStatementHelper) ->
+
+    ###*
+     * Retrieves the use statement helper, which contains utility methods for dealing with use statements.
+     *
+     * @return {Object}
+    ###
+    getUseStatementHelper: () ->
+        return @useStatementHelper
 
     ###*
      * Retrieves the settings (that are specific to this package) for the currently active project. If there is no

@@ -10,6 +10,15 @@ module.exports =
             default     : 'php'
             order       : 1
 
+        insertNewlinesForUseStatements:
+            title       : 'Insert newlines for use statements'
+            description : 'When enabled, additional newlines are inserted before or after an automatically added
+                           use statement when they can\'t be nicely added to an existing \'group\'. This results in
+                           more cleanly separated use statements but will create additional vertical whitespace.'
+            type        : 'boolean'
+            default     : false
+            order       : 2
+
     ###*
      * The name of the package.
     ###
@@ -159,6 +168,13 @@ module.exports =
                 'detail' : 'Your PHP integrator configuration is working correctly!'
             }
 
+        atom.commands.add 'atom-workspace', "php-integrator-base:sort-use-statements": =>
+            activeTextEditor = atom.workspace.getActiveTextEditor()
+
+            return if not activeTextEditor?
+
+            @getUseStatementHelper().sortUseStatements(activeTextEditor)
+
     ###*
      * Performs the "initial" index for a new project by initializing it and then performing a project index.
      *
@@ -176,6 +192,15 @@ module.exports =
             })
 
         return @projectManager.initializeCurrentProject().then(successHandler, failureHandler)
+
+    ###*
+     * Registers listeners for configuration changes.
+    ###
+    registerConfigListeners: () ->
+        config = @getConfiguration()
+
+        config.onDidChange 'insertNewlinesForUseStatements', (value) =>
+            @getUseStatementHelper().setAllowAdditionalNewlines(value)
 
     ###*
      * Registers status bar listeners.
@@ -292,6 +317,7 @@ module.exports =
                 # @getService()
 
                 @registerCommands()
+                @registerConfigListeners()
                 @registerStatusBarListeners()
 
                 @getDisposables().add atom.workspace.observeTextEditors (editor) =>
@@ -382,7 +408,13 @@ module.exports =
         if not @disposables?
             Service = require './Service'
 
-            @service = new Service(@getConfiguration(), @getCachingProxy(), @getProjectManager(), @getIndexingMediator())
+            @service = new Service(
+                @getConfiguration(),
+                @getCachingProxy(),
+                @getProjectManager(),
+                @getIndexingMediator(),
+                @getUseStatementHelper()
+            )
 
         return @service
 
@@ -429,6 +461,17 @@ module.exports =
             @emitter = new Emitter()
 
         return @emitter
+
+    ###*
+     * @return {UseStatementHelper}
+    ###
+    getUseStatementHelper: () ->
+        if not @useStatementHelper?
+            UseStatementHelper = require './UseStatementHelper';
+
+            @useStatementHelper = new UseStatementHelper(@getConfiguration().get('insertNewlinesForUseStatements'))
+
+        return @useStatementHelper
 
     ###*
      * @return {IndexingMediator}

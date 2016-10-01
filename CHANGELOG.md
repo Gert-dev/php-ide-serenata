@@ -11,6 +11,7 @@ Starting with version **1.3.0**, this repository only contains the CoffeeScript 
   * As a better alternative, you can now register a callback with `onDidIndexingProgress` to listen to the progress, even if you did not spawn the reindex yourself.
 * A new call, `onDidStartIndexing`, has been added that allows you to listen to an indexing action starting.
 * A new service method, `getCurrentProjectSettings`, allows retrieving the settings (specific to this package) of a project. This includes things such as the PHP version, paths and excluded folders.
+* A new service method `getUseStatementHelper`, can be used to retrieve an object that handles adding use statements and sorting them. This has been imported from the autocompletion package so it can be reused in other packages as well (and bugfixes are centralized).
 * A couple of new service methods have been added to allow fetching namespace information:
   * `getNamespaceList`
   * `getNamespaceListForFile`

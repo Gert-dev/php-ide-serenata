@@ -23,8 +23,9 @@ class Config
         @listeners = {}
 
         @data =
-            phpCommand  : null
-            packagePath : null
+            phpCommand                     : null
+            packagePath                    : null
+            insertNewlinesForUseStatements : false
 
             # See also http://www.phpdoc.org/docs/latest/index.html .
             phpdoc_base_url : {
