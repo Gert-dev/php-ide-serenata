@@ -334,9 +334,15 @@ module.exports =
                     # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens
                     # just because the contents are still loading.
                     setTimeout ( =>
-                        @getDisposables().add editor.onDidStopChanging () =>
-                            @onEditorDidStopChanging(editor)
+                        @registerTextEditorListeners(editor)
                     ), 1500
+
+    ###*
+     * @param {TextEditor} editor
+    ###
+    registerTextEditorListeners: (editor) ->
+        @getDisposables().add editor.onDidStopChanging () =>
+            @onEditorDidStopChanging(editor)
 
     ###*
      * Invoked when an editor stops changing.
