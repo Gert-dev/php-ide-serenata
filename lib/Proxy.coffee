@@ -381,7 +381,8 @@ class Proxy
     ###
     getAvailableVariables: (file, source, offset) ->
         if not file? and not source?
-            throw 'Either a path to a file or source code must be passed!'
+            return new Promise (resolve, reject) ->
+                reject('Either a path to a file or source code must be passed!')
 
         if file?
             parameter = '--file=' + file
