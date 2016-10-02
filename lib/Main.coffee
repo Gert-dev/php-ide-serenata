@@ -329,8 +329,6 @@ module.exports =
                 # return unless @testConfig()
                 @testConfig(false)
 
-                # @getService()
-
                 @registerCommands()
                 @registerConfigListeners()
                 @registerStatusBarListeners()
