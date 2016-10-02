@@ -25,6 +25,7 @@ class Config
         @data =
             phpCommand                     : null
             packagePath                    : null
+            additionalIndexingDelay        : 200
             insertNewlinesForUseStatements : false
 
             # See also http://www.phpdoc.org/docs/latest/index.html .

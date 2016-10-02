@@ -2,6 +2,8 @@
 Starting with version **1.3.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting chnages are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
 ## 1.3.0
+* It is now possible to specify an additional indexing delay via the settings screen.
+  * It's currently set to 200 ms by default. As Atom's default delay before invoking an event after an editor stopped changing is about 300 ms, this results in indexing happening after 500 ms by default. Increasing this will reduce the load of constant reindexing happening, but will also make results from autocompletion and linting less current.
 * Error messages will now be shown if setting up the current project fails because there is no active project or the project-manager service is not available.
 * Popovers will no longer go beyond the left or top part of the screen. They will move respectively right or down in that case.
 * The `reindex` call no longer automatically indexes built-in structural elements, nor will it automatically prune removed files from the database.
