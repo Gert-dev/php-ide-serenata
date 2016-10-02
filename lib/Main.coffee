@@ -331,8 +331,8 @@ module.exports =
                 @registerStatusBarListeners()
 
                 @getDisposables().add atom.workspace.observeTextEditors (editor) =>
-                    # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens just
-                    # because the contents are still loading.
+                    # Wait a while for the editor to stabilize so we don't reindex multiple times after an editor opens
+                    # just because the contents are still loading.
                     setTimeout ( =>
                         return if not @disposables
 
