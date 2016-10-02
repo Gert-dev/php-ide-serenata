@@ -2,6 +2,7 @@
 Starting with version **1.3.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting chnages are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
 ## 1.3.0
+* Error messages will now be shown if setting up the current project fails because there is no active project or the project-manager service is not available.
 * Popovers will no longer go beyond the left or top part of the screen. They will move respectively right or down in that case.
 * The `reindex` call no longer automatically indexes built-in structural elements, nor will it automatically prune removed files from the database.
   * A new call, `vacuum`, can be used to vacuum a project and prune removed files from its index.

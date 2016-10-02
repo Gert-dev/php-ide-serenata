@@ -116,7 +116,22 @@ module.exports =
     ###
     registerCommands: () ->
         atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
-            return if not @activeProject?
+            if not @projectManagerService?
+                errorMessage = '''
+                    The project manager service was not found. Did you perhaps forget to install the project-manager
+                    package or another package able to provide it?
+                '''
+
+                atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
+                return
+
+            if not @activeProject?
+                errorMessage = '''
+                    No project is currently active. Please set up and activate one before attempting to set it up.
+                '''
+
+                atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
+                return
 
             project = @activeProject
 
