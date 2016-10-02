@@ -324,9 +324,6 @@ module.exports =
     activate: ->
         @uninstallCorePackageIfOutdated().then () =>
             require('atom-package-deps').install(@packageName).then () =>
-                # See also atom-autocomplete-php pull request #197 - Disabled for now because it does not allow the user to
-                # reactivate or try again.
-                # return unless @testConfig()
                 @testConfig(false)
 
                 @registerCommands()
