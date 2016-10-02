@@ -330,12 +330,18 @@ module.exports =
                 @registerConfigListeners()
                 @registerStatusBarListeners()
 
-                @getDisposables().add atom.workspace.observeTextEditors (editor) =>
-                    # Let the editor stabilize so we don't reindex multiple times just because the contents are rapidly
-                    # changing during its loading process.
-                    setTimeout ( =>
-                        @registerTextEditorListeners(editor)
-                    ), 1500
+                @registerAtomListeners()
+
+    ###*
+     * Registers listeners for events from Atom's API.
+    ###
+    registerAtomListeners: () ->
+        @getDisposables().add atom.workspace.observeTextEditors (editor) =>
+            # Let the editor stabilize so we don't reindex multiple times just because the contents are rapidly
+            # changing during its loading process.
+            setTimeout ( =>
+                @registerTextEditorListeners(editor)
+            ), 1500
 
     ###*
      * @param {TextEditor} editor
