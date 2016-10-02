@@ -412,7 +412,7 @@ class Proxy
     ###
     deduceTypes: (parts, file, source, offset, ignoreLastElement) ->
         if not file?
-            throw 'A path to a file must be passed!'
+            throw new Error('A path to a file must be passed!')
 
         parameters = [
             '--deduce-types',
@@ -451,7 +451,7 @@ class Proxy
     ###
     getInvocationInfo: (file, source, offset) ->
         if not file? and not source?
-            throw 'Either a path to a file or source code must be passed!'
+            throw new Error('Either a path to a file or source code must be passed!')
 
         if file?
             parameter = '--file=' + file
