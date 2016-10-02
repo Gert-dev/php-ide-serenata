@@ -23,6 +23,7 @@ Starting with version **1.3.0**, this repository only contains the CoffeeScript 
 * Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.
 * The PHP side is no longer part of the base package. Instead, it has been separated into the [php-integrator/core](https://github.com/php-integrator/core) repository so it can be more easily installed via Composer for use in other projects.
 ** This change should not impact users as they upgrade, as this package will be automatically installed and upgraded along with this one if necessary (a notification will be shown whenever that happens).
+* Proxy methods will no longer throw exceptions if some parameters are missing or invalid. Instead, a promise rejection will occur.
 
 ## 1.2.6
 ### Bugs fixed

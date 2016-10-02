@@ -168,7 +168,8 @@ class Proxy
     ###
     getClassListForFile: (file) ->
         if not file
-            throw new Error('No file passed!')
+            return new Promise (resolve, reject) ->
+                reject('No file passed!')
 
         parameters = [
             '--class-list',
@@ -200,7 +201,8 @@ class Proxy
     ###
     getNamespaceListForFile: (file) ->
         if not file
-            throw new Error('No file passed!')
+            return new Promise (resolve, reject) ->
+                reject('No file passed!')
 
         parameters = [
             '--namespace-list',
@@ -245,7 +247,8 @@ class Proxy
     ###
     getClassInfo: (className) ->
         if not className
-            throw new Error('No class name passed!')
+            return new Promise (resolve, reject) ->
+                reject('No class name passed!')
 
         parameters = [
             '--class-info',
@@ -265,9 +268,17 @@ class Proxy
      * @return {Promise}
     ###
     resolveType: (file, line, type) ->
-        throw new Error('No file passed!') if not file
-        throw new Error('No line passed!') if not line
-        throw new Error('No type passed!') if not type
+        if not file
+            return new Promise (resolve, reject) ->
+                reject('No file passed!')
+
+        if not line
+            return new Promise (resolve, reject) ->
+                reject('No line passed!')
+
+        if not type
+            return new Promise (resolve, reject) ->
+                reject('No type passed!')
 
         parameters = [
             '--resolve-type',
@@ -290,9 +301,17 @@ class Proxy
      * @return {Promise}
     ###
     localizeType: (file, line, type) ->
-        throw new Error('No file passed!') if not file
-        throw new Error('No line passed!') if not line
-        throw new Error('No type passed!') if not type
+        if not file
+            return new Promise (resolve, reject) ->
+                reject('No file passed!')
+
+        if not line
+            return new Promise (resolve, reject) ->
+                reject('No line passed!')
+
+        if not type
+            return new Promise (resolve, reject) ->
+                reject('No type passed!')
 
         parameters = [
             '--localize-type',
@@ -316,7 +335,9 @@ class Proxy
      * @return {Promise}
     ###
     semanticLint: (file, source, options = {}) ->
-        throw new Error('No file passed!') if not file
+        if not file
+            return new Promise (resolve, reject) ->
+                reject('No file passed!')
 
         parameters = [
             '--semantic-lint',
@@ -412,7 +433,8 @@ class Proxy
     ###
     deduceTypes: (parts, file, source, offset, ignoreLastElement) ->
         if not file?
-            throw new Error('A path to a file must be passed!')
+            return new Promise (resolve, reject) ->
+                reject('A path to a file must be passed!')
 
         parameters = [
             '--deduce-types',
@@ -451,7 +473,8 @@ class Proxy
     ###
     getInvocationInfo: (file, source, offset) ->
         if not file? and not source?
-            throw new Error('Either a path to a file or source code must be passed!')
+            return new Promise (resolve, reject) ->
+                reject('Either a path to a file or source code must be passed!')
 
         if file?
             parameter = '--file=' + file
@@ -532,7 +555,8 @@ class Proxy
             pathsToIndex = path
 
         if path.length == 0
-            throw new Error('No filename passed!')
+            return new Promise (resolve, reject) ->
+                reject('No filename passed!')
 
         progressStreamCallbackWrapper = null
 
