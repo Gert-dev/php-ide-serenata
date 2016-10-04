@@ -544,7 +544,10 @@ class Service
      * @return {String}
     ###
     getNormalizedFqcnDocumentationUrl: (name) ->
-        return name.replace(/\\/g, '-').substr(1).toLowerCase()
+        if name.length > 0 and name[0] == '\\'
+            name = name.substr(1)
+
+        return name.replace(/\\/g, '-').toLowerCase()
 
     ###*
      * @param {String} name
