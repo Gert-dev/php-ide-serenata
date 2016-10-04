@@ -519,7 +519,7 @@ class Service
      * @return {String}
     ###
     getDocumentationUrlForClass: (fqcn) ->
-        return @config.get('php_documentation_base_urls').classes + @getNormalizeFqcnDocumentationUrl(fqcn)
+        return @config.get('php_documentation_base_urls').classes + @getNormalizedFqcnDocumentationUrl(fqcn)
 
     ###*
      * @param {String} fqcn
@@ -527,7 +527,7 @@ class Service
      * @return {String}
     ###
     getDocumentationUrlForFunction: (fqcn) ->
-        return @config.get('php_documentation_base_urls').functions + @getNormalizeFqcnDocumentationUrl(fqcn)
+        return @config.get('php_documentation_base_urls').functions + @getNormalizedFqcnDocumentationUrl(fqcn)
 
     ###*
      * @param {String} classlikeFqcn
@@ -536,14 +536,14 @@ class Service
      * @return {String}
     ###
     getDocumentationUrlForClassMethod: (classlikeFqcn, name) ->
-        return @config.get('php_documentation_base_urls').root + @getNormalizeFqcnDocumentationUrl(classlikeFqcn) + '.' + @getNormalizeMethodDocumentationUrl(name)
+        return @config.get('php_documentation_base_urls').root + @getNormalizedFqcnDocumentationUrl(classlikeFqcn) + '.' + @getNormalizeMethodDocumentationUrl(name)
 
     ###*
      * @param {String} name
      *
      * @return {String}
     ###
-    getNormalizeFqcnDocumentationUrl: (name) ->
+    getNormalizedFqcnDocumentationUrl: (name) ->
         return name.replace(/\\/g, '-').substr(1).toLowerCase()
 
     ###*
