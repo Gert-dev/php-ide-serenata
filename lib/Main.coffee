@@ -355,11 +355,7 @@ module.exports =
     ###
     registerAtomListeners: () ->
         @getDisposables().add atom.workspace.observeTextEditors (editor) =>
-            # Let the editor stabilize so we don't reindex multiple times just because the contents are rapidly
-            # changing during its loading process.
-            setTimeout ( =>
-                @registerTextEditorListeners(editor)
-            ), 1500
+            @registerTextEditorListeners(editor)
 
     ###*
      * @param {TextEditor} editor
