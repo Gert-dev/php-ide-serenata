@@ -32,26 +32,36 @@ module.exports =
 
     ###*
      * The name of the package.
+     *
+     * @var {String}
     ###
     packageName: 'php-integrator-base'
 
     ###*
      * The configuration object.
+     *
+     * @var {Object}
     ###
     configuration: null
 
     ###*
      * The proxy object.
+     *
+     * @var {Object}
     ###
     proxy: null
 
     ###*
      * The exposed service.
+     *
+     * @var {Object}
     ###
     service: null
 
     ###*
      * The status bar manager.
+     *
+     * @var {Object}
     ###
     statusBarManager: null
 
@@ -62,11 +72,15 @@ module.exports =
 
     ###*
      * A list of disposables to dispose when the package deactivates.
+     *
+     * @var {Object|null}
     ###
     disposables: null
 
     ###*
      * The currently active project, if any.
+     *
+     * @var {Object|null}
     ###
     activeProject: null
 
