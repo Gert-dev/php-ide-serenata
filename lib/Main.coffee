@@ -456,6 +456,7 @@ module.exports =
 
             return if not projectManager.hasActiveProject()
 
+            # NOTE: If the index is manually deleted and the project is started, built-in items will *not* be indexed.
             projectManager.attemptCurrentProjectIndex()
 
     ###*
