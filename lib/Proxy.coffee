@@ -83,7 +83,7 @@ class Proxy
 
             proc.on 'close', (code) =>
                 if errorBuffer or not buffer or buffer.length == 0
-                    @showUnexpectedOutputError(errorBuffer)
+                    @showUnexpectedOutputError(errorBuffer, parameters)
                     reject({rawOutput: buffer, message: "No output received from the PHP side!"})
                     return
 
@@ -91,7 +91,7 @@ class Proxy
                     response = JSON.parse(buffer)
 
                 catch error
-                    @showUnexpectedOutputError(buffer)
+                    @showUnexpectedOutputError(buffer, parameters)
 
                 if not response or not response.success
                     reject({rawOutput: buffer, message: 'An unsuccessful status code was returned by the PHP side!'})
@@ -113,13 +113,16 @@ class Proxy
 
     ###*
      * @param {String} rawOutput
+     * @param {Array}  parameters
     ###
-    showUnexpectedOutputError: (rawOutput) ->
+    showUnexpectedOutputError: (rawOutput, parameters) ->
         atom.notifications.addError('php-integrator - Oops, something went wrong!', {
             dismissable : true
             detail      :
                 "PHP sent back something unexpected. This is most likely an issue with your setup. If you're sure " +
-                "this is a bug, feel free to report it on the bug tracker.\n \n→ " + rawOutput
+                "this is a bug, feel free to report it on the bug tracker." +
+                "\n \nCommand\n  → " + parameters.join(' ') +
+                "\n \nOutput\n  → " + rawOutput
         })
 
     ###*
