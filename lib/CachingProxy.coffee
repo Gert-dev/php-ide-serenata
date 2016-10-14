@@ -92,14 +92,14 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    resolveType: (file, line, type) ->
-        return @wrapCachedRequestToParent("resolveType-#{file}-#{line}-#{type}", 'resolveType', arguments)
+    resolveType: (file, line, type, kind = 'classlike') ->
+        return @wrapCachedRequestToParent("resolveType-#{file}-#{line}-#{type}-#{kind}", 'resolveType', arguments)
 
     ###*
      * @inherited
     ###
-    localizeType: (file, line, type) ->
-        return @wrapCachedRequestToParent("localizeType-#{file}-#{line}-#{type}", 'localizeType', arguments)
+    localizeType: (file, line, type, kind = 'classlike') ->
+        return @wrapCachedRequestToParent("localizeType-#{file}-#{line}-#{type}-#{kind}", 'localizeType', arguments)
 
     ###*
      * @inherited

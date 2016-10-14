@@ -267,10 +267,11 @@ class Proxy
      * @param {String}  file
      * @param {Number}  line The line the type is located at. The first line is 1, not 0.
      * @param {String}  type
+     * @param {String}  kind The kind of element. Either 'classlike', 'constant' or 'function'.
      *
      * @return {Promise}
     ###
-    resolveType: (file, line, type) ->
+    resolveType: (file, line, type, kind = 'classlike') ->
         if not file
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
@@ -283,12 +284,17 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No type passed!')
 
+        if not kind
+            return new Promise (resolve, reject) ->
+                reject('No kind passed!')
+
         parameters = [
             '--resolve-type',
             '--database=' + @getIndexDatabasePath(),
             '--file=' + file,
             '--line=' + line,
-            '--type=' + type
+            '--type=' + type,
+            '--kind=' + kind
         ]
 
         return @performRequest(parameters)
@@ -300,10 +306,11 @@ class Proxy
      * @param {String}  file
      * @param {Number}  line The line the type is located at. The first line is 1, not 0.
      * @param {String}  type
+     * @param {String}  kind The kind of element. Either 'classlike', 'constant' or 'function'.
      *
      * @return {Promise}
     ###
-    localizeType: (file, line, type) ->
+    localizeType: (file, line, type, kind = 'classlike') ->
         if not file
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
@@ -316,12 +323,17 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No type passed!')
 
+        if not kind
+            return new Promise (resolve, reject) ->
+                reject('No kind passed!')
+
         parameters = [
             '--localize-type',
             '--database=' + @getIndexDatabasePath(),
             '--file=' + file,
             '--line=' + line,
-            '--type=' + type
+            '--type=' + type,
+            '--kind=' + kind
         ]
 
         return @performRequest(parameters)

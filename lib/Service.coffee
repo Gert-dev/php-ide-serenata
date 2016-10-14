@@ -136,11 +136,12 @@ class Service
      * @param {String}  file
      * @param {Number}  line The line the type is located at. The first line is 1, not 0.
      * @param {String}  type
+     * @param {String}  kind The kind of element. Either 'classlike', 'constant' or 'function'.
      *
      * @return {Promise}
     ###
-    resolveType: (file, line, type) ->
-        return @proxy.resolveType(file, line, type)
+    resolveType: (file, line, type, kind) ->
+        return @proxy.resolveType(file, line, type, kind)
 
     ###*
      * Localizes a type to the specified file, making it relative to local use statements, if possible. If not possible,
@@ -149,11 +150,12 @@ class Service
      * @param {String}  file
      * @param {Number}  line The line the type is located at. The first line is 1, not 0.
      * @param {String}  type
+     * @param {String}  kind The kind of element. Either 'classlike', 'constant' or 'function'.
      *
      * @return {Promise}
     ###
-    localizeType: (file, line, type) ->
-        return @proxy.localizeType(file, line, type)
+    localizeType: (file, line, type, kind) ->
+        return @proxy.localizeType(file, line, type, kind)
 
     ###*
      * Performs a semantic lint of the specified file.
