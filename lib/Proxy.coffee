@@ -1,4 +1,5 @@
 fs            = require 'fs'
+net           = require 'net'
 stream        = require 'stream'
 child_process = require 'child_process'
 
@@ -29,6 +30,7 @@ class Proxy
      * @param {Config} config
     ###
     constructor: (@config) ->
+        @requestQueue = {}
 
     ###*
      * Prepares parameters for execution.
@@ -39,8 +41,8 @@ class Proxy
     ###
     prepareParameters: (args) ->
         parameters = [
-            '-d memory_limit=-1',
-            @getCorePackagePath() + "/src/Main.php"
+            # '-d memory_limit=-1',
+            # @getCorePackagePath() + "/src/Main.php"
         ]
 
         for a in args
@@ -53,6 +55,147 @@ class Proxy
     ###
     getCorePackagePath: () ->
         return atom.packages.resolvePackagePath("php-integrator-core")
+
+
+
+
+
+
+
+
+    client: null
+    requestQueue: null
+    nextRequestId: 1
+
+
+    response: null
+
+
+    getSocketConnection: () ->
+        return new Promise (resolve, reject) =>
+            if not @client?
+                # TODO: Catch ECONNREFUSED if server hasn't started yet.
+
+                @client = net.createConnection {port: 9999}, () =>
+                    resolve(@client)
+
+                @client.setNoDelay(true)
+                @client.on('data', @processData.bind(this))
+                @client.on('close', @onConnectionClosed.bind(this))
+                @client.on('end', @onConnectionEnded.bind(this))
+
+            resolve(@client)
+
+
+    onDataReceived: (data) ->
+        @processData(data)
+
+    onConnectionClosed: (data) ->
+        # TODO: Argh, the connection dropped.
+        debugger
+
+    onConnectionEnded: (data) ->
+        # TODO
+        debugger
+
+
+
+
+    processData: (data) ->
+        dataBuffer = new Buffer(data)
+
+        @processDataBuffer(dataBuffer)
+
+
+
+    processDataBuffer: (dataBuffer) ->
+        console.log('Processing buffer')
+
+        if not @response
+            console.log('creating new response')
+            @response =
+                length: null
+                wasBoundaryFound: false
+                bytesRead: 0
+                content: new Buffer([])
+
+        if not @response.length?
+            console.log('expecting length')
+            end = dataBuffer.indexOf("\r\n")
+
+            if end == -1
+              throw new Error('Expected length header');
+
+            contentLengthHeader = dataBuffer.slice(0, end).toString()
+
+            parts = contentLengthHeader.split(':')
+
+            if parts.length != 2
+                throw new Error('Nope')
+
+
+            contentLength = parseInt(parts[1])
+
+            if not contentLength? or contentLength == 0
+                return
+
+            @response.length = contentLength
+            console.log('got length ' + contentLength)
+
+        else if not @response.wasBoundaryFound
+            console.log('expecting boundary')
+            end = dataBuffer.indexOf("\r\n")
+
+            if end == 0
+                console.log('got boundary')
+                @response.wasBoundaryFound = true
+
+            dataBuffer = dataBuffer.slice(end + "\r\n".length)
+
+        else
+            console.log('reading data')
+            bytesToRead = Math.min(dataBuffer.length, @response.length - @response.bytesRead)
+
+            @response.content = Buffer.concat([@response.content, dataBuffer.slice(0, bytesToRead)])
+            @response.bytesRead += bytesToRead
+
+            dataBuffer = dataBuffer.slice(bytesToRead)
+
+            if @response.bytesRead == @response.length
+                console.log('all bytes read for response, decoding')
+                dataString = @response.content.toString()
+
+
+                try
+                    responseData = JSON.parse(dataString)
+
+                catch error
+                    # FIXME: Can't know parameters cause we can't know the request ID until we were able to decode the response.
+                    @showUnexpectedOutputError(dataString, [])
+                    #@showUnexpectedOutputError(dataString, request.parameters)
+
+                request = @requestQueue[responseData.id]
+
+                delete @requestQueue[responseData.id]
+                console.log(request.parameters)
+                console.timeEnd(responseData.id)
+
+                if not responseData or responseData.error? or not responseData.result?.success
+                    console.log('unsuccessful response')
+                    request.promise.reject({rawOutput: dataString, message: 'An unsuccessful status code was returned by the PHP side!'})
+                    return
+
+                console.log('resolving promise with response')
+                request.promise.resolve(responseData.result.result)
+
+                @response = null
+
+        if dataBuffer.length > 0
+            console.log('more data to read...')
+            @processDataBuffer(dataBuffer)
+
+
+
 
     ###*
      * Performs an asynchronous request to the PHP side.
@@ -73,43 +216,58 @@ class Proxy
                 ''')
                 return
 
-            proc = child_process.spawn(command, parameters)
 
-            buffer = ''
-            errorBuffer = ''
 
-            proc.stdout.on 'data', (data) =>
-                buffer += data
+            @getSocketConnection().then (connection) =>
+                requestId = @nextRequestId++
 
-            proc.on 'close', (code) =>
-                if errorBuffer or not buffer or buffer.length == 0
-                    @showUnexpectedOutputError(errorBuffer, parameters)
-                    reject({rawOutput: buffer, message: "No output received from the PHP side!"})
-                    return
+                @requestQueue[requestId] = {
+                    id             : requestId
+                    streamCallback : streamCallback
+                    parameters     : parameters
 
-                try
-                    response = JSON.parse(buffer)
+                    promise: {
+                        resolve : resolve
+                        reject  : reject
+                    }
+                }
 
-                catch error
-                    @showUnexpectedOutputError(buffer, parameters)
 
-                if not response or not response.success
-                    reject({rawOutput: buffer, message: 'An unsuccessful status code was returned by the PHP side!'})
-                    return
+                console.log('Sending request ID ' + requestId)
 
-                resolve(response.result)
 
-            if streamCallback
-                proc.stderr.on 'data', (data) =>
-                    streamCallback(data)
+                # TODO: See if we can also used named pipes instead of TCP, the former should be faster. This should
+                # however also work on Windows transparantly. Does React support this?
+                # TODO: Spawn the server socket process ourselves. Check if it automatically closes if Atom closes.
 
-            else
-                proc.stderr.on 'data', (data) =>
-                    errorBuffer += data
+                # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
+                # side) responses for this.
 
-            if stdinData?
-                proc.stdin.write(stdinData, 'utf-8')
-                proc.stdin.end()
+                # if streamCallback
+                #     proc.stderr.on 'data', (data) =>
+                #         streamCallback(data)
+
+                # TODO: Refactor.
+
+
+                requestContent =
+                    jsonrpc : 2.0
+                    id      : requestId,
+                    method  : "application/invokeCommand",
+                    params: {
+                        parameters : parameters
+                        stdinData  : if stdinData? then stdinData else null
+                    }
+
+                content = JSON.stringify(requestContent)
+                contentLength = (new TextEncoder('utf-8').encode(content)).length
+
+                console.time(requestId)
+
+                connection.setNoDelay(true)
+                connection.write("Content-Length: " + contentLength + "\r\n")
+                connection.write("\r\n");
+                connection.write(content)
 
     ###*
      * @param {String} rawOutput
