@@ -140,7 +140,7 @@ class CachingProxy extends Proxy
             for part in parts
                 partsKey += part
 
-        return @wrapCachedRequestToParent("deduceTypes-#{partsKey}#{file}-#{sourceKey}-#{offset}-#{ignoreLastElement}", 'deduceTypes', arguments)
+        return @wrapCachedRequestToParent("deduceTypes-#{partsKey}-#{file}-#{sourceKey}-#{offset}-#{ignoreLastElement}", 'deduceTypes', arguments)
 
     ###*
      * @inherited
