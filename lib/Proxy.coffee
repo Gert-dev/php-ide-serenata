@@ -183,10 +183,10 @@ class Proxy
                 if not responseData or responseData.error? or not responseData.result?.success
                     console.log('unsuccessful response')
                     request.promise.reject({rawOutput: dataString, message: 'An unsuccessful status code was returned by the PHP side!'})
-                    return
 
-                console.log('resolving promise with response')
-                request.promise.resolve(responseData.result.result)
+                else
+                    console.log('resolving promise with response')
+                    request.promise.resolve(responseData.result.result)
 
                 @response = null
 
