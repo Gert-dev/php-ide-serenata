@@ -176,7 +176,6 @@ class Proxy
 
                 request = @requestQueue[responseData.id]
 
-                delete @requestQueue[responseData.id]
                 console.log(request.parameters)
                 console.timeEnd(responseData.id)
 
@@ -187,6 +186,8 @@ class Proxy
                 else
                     console.log('resolving promise with response')
                     request.promise.resolve(responseData.result.result)
+
+                delete @requestQueue[responseData.id]
 
                 @response = null
 
