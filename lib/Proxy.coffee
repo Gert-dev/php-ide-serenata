@@ -171,6 +171,7 @@ class Proxy
 
                 catch error
                     # FIXME: Can't know parameters cause we can't know the request ID until we were able to decode the response.
+                    # TODO: The server process may be showing errors, but we can catch those from the server's STDOUT/STDERR when we spawn it ourselves later.
                     @showUnexpectedOutputError(dataString, [])
                     #@showUnexpectedOutputError(dataString, request.parameters)
 
