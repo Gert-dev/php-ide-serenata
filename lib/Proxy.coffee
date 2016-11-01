@@ -217,58 +217,65 @@ class Proxy
                 ''')
                 return
 
+            requestId = @nextRequestId++
+
+            @requestQueue[requestId] = {
+                id             : requestId
+                streamCallback : streamCallback
+                parameters     : parameters
+
+                promise: {
+                    resolve : resolve
+                    reject  : reject
+                }
+            }
 
 
-            @getSocketConnection().then (connection) =>
-                requestId = @nextRequestId++
+            console.log('Sending request ID ' + requestId)
 
-                @requestQueue[requestId] = {
-                    id             : requestId
-                    streamCallback : streamCallback
-                    parameters     : parameters
 
-                    promise: {
-                        resolve : resolve
-                        reject  : reject
-                    }
+            # TODO: See if we can also used named pipes instead of TCP, the former should be faster. This should
+            # however also work on Windows transparantly. Does React support this?
+            # TODO: Spawn the server socket process ourselves. Check if it automatically closes if Atom closes.
+
+            # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
+            # side) responses for this.
+
+            # if streamCallback
+            #     proc.stderr.on 'data', (data) =>
+            #         streamCallback(data)
+
+            # TODO: Refactor.
+
+
+            requestContent =
+                jsonrpc : 2.0
+                id      : requestId,
+                method  : "application/invokeCommand",
+                params: {
+                    parameters : parameters
+                    stdinData  : if stdinData? then stdinData else null
                 }
 
+            content = JSON.stringify(requestContent)
 
-                console.log('Sending request ID ' + requestId)
+            @writeRawRequest(content)
 
+    ###*
+     * Writes a raw request to the connection.
+     *
+     * This may not happen immediately if the connection is not available yet. In that case, the request will be
+     * dispatched as soon as the connection becomes available.
+     *
+     * @param {String} content The content (body) of the request.
+    ###
+    writeRawRequest: (content) ->
+        @getSocketConnection().then (connection) =>
+            lengthInBytes = (new TextEncoder('utf-8').encode(content)).length
 
-                # TODO: See if we can also used named pipes instead of TCP, the former should be faster. This should
-                # however also work on Windows transparantly. Does React support this?
-                # TODO: Spawn the server socket process ourselves. Check if it automatically closes if Atom closes.
-
-                # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
-                # side) responses for this.
-
-                # if streamCallback
-                #     proc.stderr.on 'data', (data) =>
-                #         streamCallback(data)
-
-                # TODO: Refactor.
-
-
-                requestContent =
-                    jsonrpc : 2.0
-                    id      : requestId,
-                    method  : "application/invokeCommand",
-                    params: {
-                        parameters : parameters
-                        stdinData  : if stdinData? then stdinData else null
-                    }
-
-                content = JSON.stringify(requestContent)
-                contentLength = (new TextEncoder('utf-8').encode(content)).length
-
-                console.time(requestId)
-
-                connection.setNoDelay(true)
-                connection.write("Content-Length: " + contentLength + "\r\n")
-                connection.write("\r\n");
-                connection.write(content)
+            connection.write("Content-Length: " + lengthInBytes + "\r\n")
+            connection.write("\r\n");
+            connection.write(content)
 
     ###*
      * @param {String} rawOutput
