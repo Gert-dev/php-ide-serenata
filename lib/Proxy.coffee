@@ -176,9 +176,6 @@ class Proxy
 
                 request = @requestQueue[responseData.id]
 
-                console.log(request.parameters)
-                console.timeEnd(responseData.id)
-
                 if not responseData or responseData.error? or not responseData.result?.success
                     console.log('unsuccessful response')
                     request.promise.reject({rawOutput: dataString, message: 'An unsuccessful status code was returned by the PHP side!'})
@@ -222,7 +219,6 @@ class Proxy
             @requestQueue[requestId] = {
                 id             : requestId
                 streamCallback : streamCallback
-                parameters     : parameters
 
                 promise: {
                     resolve : resolve
