@@ -165,12 +165,11 @@ class Proxy
                 console.log('all bytes read for response, decoding')
                 dataString = @response.content.toString()
 
-
                 try
                     responseData = JSON.parse(dataString)
 
                 catch error
-                    @showUnexpectedOutputError(dataString)
+                    @showUnexpectedSocketResponseError(dataString)
 
                 request = @requestQueue[responseData.id]
 
@@ -284,17 +283,17 @@ class Proxy
      * @param {String}     rawOutput
      * @param {Array|null} parameters
     ###
-    showUnexpectedOutputError: (rawOutput, parameters = null) ->
+    showUnexpectedSocketResponseError: (rawOutput, parameters = null) ->
         detail =
-            "PHP sent back something unexpected. This is most likely an issue with your setup. If you're sure " +
-            "this is a bug, feel free to report it on the bug tracker."
+            "The socket server sent back something unexpected. This could be a bug, but it could also be a problem " +
+            "with your setup. If you're sure it is a bug, feel free to report it on the bug tracker."
 
         if parameters?
             detail += "\n \nCommand\n  → " + parameters.join(' ')
 
         detail += "\n \nOutput\n  → " + rawOutput
 
-        atom.notifications.addError('php-integrator - Oops, something went wrong!', {
+        atom.notifications.addError('PHP Integrator - Oops, something went wrong!', {
             dismissable : true
             detail      : detail
         })
