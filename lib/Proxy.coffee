@@ -248,7 +248,7 @@ class Proxy
             # TODO: Refactor.
 
 
-            requestContent =
+            JsonRpcRequest =
                 jsonrpc : 2.0
                 id      : requestId,
                 method  : "application/invokeCommand",
@@ -257,9 +257,17 @@ class Proxy
                     stdinData  : if stdinData? then stdinData else null
                 }
 
-            content = JSON.stringify(requestContent)
+            content = @getContentForJsonRpcRequest(JsonRpcRequest)
 
             @writeRawRequest(content)
+
+    ###*
+     * @param {Object} request
+     *
+     * @return {String}
+    ###
+    getContentForJsonRpcRequest: (request) ->
+        return JSON.stringify(requestContent)
 
     ###*
      * Writes a raw request to the connection.
