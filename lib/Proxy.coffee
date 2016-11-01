@@ -170,10 +170,7 @@ class Proxy
                     responseData = JSON.parse(dataString)
 
                 catch error
-                    # FIXME: Can't know parameters cause we can't know the request ID until we were able to decode the response.
-                    # TODO: The server process may be showing errors, but we can catch those from the server's STDOUT/STDERR when we spawn it ourselves later.
-                    @showUnexpectedOutputError(dataString, [])
-                    #@showUnexpectedOutputError(dataString, request.parameters)
+                    @showUnexpectedOutputError(dataString)
 
                 request = @requestQueue[responseData.id]
 
@@ -235,6 +232,7 @@ class Proxy
             # however also work on Windows transparantly. Does React support this?
             # TODO: Spawn the server socket process ourselves. Check if it automatically closes if Atom closes.
 
+            # TODO: The server process may be showing errors, but we can catch those from the server's STDOUT/STDERR when we spawn it ourselves later.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
             # side) responses for this.
 
@@ -283,17 +281,22 @@ class Proxy
             connection.write(content)
 
     ###*
-     * @param {String} rawOutput
-     * @param {Array}  parameters
+     * @param {String}     rawOutput
+     * @param {Array|null} parameters
     ###
-    showUnexpectedOutputError: (rawOutput, parameters) ->
+    showUnexpectedOutputError: (rawOutput, parameters = null) ->
+        detail =
+            "PHP sent back something unexpected. This is most likely an issue with your setup. If you're sure " +
+            "this is a bug, feel free to report it on the bug tracker."
+
+        if parameters?
+            detail += "\n \nCommand\n  → " + parameters.join(' ')
+
+        detail += "\n \nOutput\n  → " + rawOutput
+
         atom.notifications.addError('php-integrator - Oops, something went wrong!', {
             dismissable : true
-            detail      :
-                "PHP sent back something unexpected. This is most likely an issue with your setup. If you're sure " +
-                "this is a bug, feel free to report it on the bug tracker." +
-                "\n \nCommand\n  → " + parameters.join(' ') +
-                "\n \nOutput\n  → " + rawOutput
+            detail      : detail
         })
 
     ###*
