@@ -39,16 +39,29 @@ class Proxy
      *
      * @return {Array}
     ###
-    prepareParameters: (args) ->
-        parameters = [
-            # '-d memory_limit=-1',
-            # @getCorePackagePath() + "/src/Main.php"
-        ]
+    # prepareParameters: (args) ->
+    #     parameters = [
+    #         # '-d memory_limit=-1',
+    #         # @getCorePackagePath() + "/src/Main.php"
+    #     ]
+    #
+    #     for a in args
+    #         parameters.push(a)
+    #
+    #     return parameters
 
-        for a in args
-            parameters.push(a)
-
-        return parameters
+    # performRequest: (method, params, streamCallback = null, stdinData = null) ->
+    #     php = @config.get('phpCommand')
+    #
+    #     params.unshift(@projectName)
+    #
+    #     parameters = @prepareParameters(params)
+    #
+    #     if not @projectName
+    #         return new Promise (resolve, reject) ->
+    #             reject('Request aborted as there is no project active (yet)')
+    #
+    #     return @performRequestAsync(php, parameters, streamCallback, stdinData)
 
     ###*
      * @return {String}
@@ -163,25 +176,33 @@ class Proxy
 
             if @response.bytesRead == @response.length
                 console.log('all bytes read for response, decoding')
-                dataString = @response.content.toString()
+                jsonRpcResponseString = @response.content.toString()
 
                 try
-                    responseData = JSON.parse(dataString)
+                    jsonRpcResponse = JSON.parse(jsonRpcResponseString)
 
                 catch error
-                    @showUnexpectedSocketResponseError(dataString)
+                    @showUnexpectedSocketResponseError(jsonRpcResponseString)
 
-                request = @requestQueue[responseData.id]
+                request = @requestQueue[jsonRpcResponse.id]
 
-                if not responseData or responseData.error? or not responseData.result?.success
+                if not jsonRpcResponse or jsonRpcResponse.error?
                     console.log('unsuccessful response')
-                    request.promise.reject({rawOutput: dataString, message: 'An unsuccessful status code was returned by the PHP side!'})
+                    request.promise.reject({
+                        request  : request
+                        response : jsonRpcResponse
+                        error    : jsonRpcResponse.error
+                    })
+
+                    # Server error
+                    if jsonRpcResponse.error.code == -32000
+                        @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
 
                 else
                     console.log('resolving promise with response')
-                    request.promise.resolve(responseData.result.result)
+                    request.promise.resolve(jsonRpcResponse.result)
 
-                delete @requestQueue[responseData.id]
+                delete @requestQueue[jsonRpcResponse.id]
 
                 @response = null
 
@@ -195,27 +216,25 @@ class Proxy
     ###*
      * Performs an asynchronous request to the PHP side.
      *
-     * @param {String}   command        The command to execute.
-     * @param {Array}    parameters     The arguments to pass.
-     * @param {Callback} streamCallback A method to invoke each time streaming data is received.
-     * @param {String}   stdinData      The data to pass to STDIN.
+     * @param {Number}   id
+     * @param {String}   method
+     * @param {Object}   parameters
+     * @param {Callback} streamCallback
      *
      * @return {Promise}
     ###
-    performRequestAsync: (command, parameters, streamCallback = null, stdinData = null) ->
+    performJsonRpcRequest: (id, method, parameters, streamCallback = null) ->
         return new Promise (resolve, reject) =>
-            if not @getCorePackagePath()?
-                reject('''
-                    The core package was not found, it is currently being installed. This only needs to happen once at
-                    initialization, but the service is not available yet in the meantime.
-                ''')
-                return
+            JsonRpcRequest =
+                jsonrpc : 2.0
+                id      : id,
+                method  : method,
+                params  : parameters
 
-            requestId = @nextRequestId++
-
-            @requestQueue[requestId] = {
-                id             : requestId
+            @requestQueue[id] = {
+                id             : id
                 streamCallback : streamCallback
+                request        : JsonRpcRequest
 
                 promise: {
                     resolve : resolve
@@ -223,14 +242,17 @@ class Proxy
                 }
             }
 
+            console.log('Sending request ID ' + id)
 
-            console.log('Sending request ID ' + requestId)
 
 
+            # TODO: Nothing seems to be persisted anymore.
+            # TODO: At startup, the reindex command is sent and everything else is waiting for it to finish.
+
+            # TODO: Refactor.
             # TODO: See if we can also used named pipes instead of TCP, the former should be faster. This should
             # however also work on Windows transparantly. Does React support this?
             # TODO: Spawn the server socket process ourselves. Check if it automatically closes if Atom closes.
-
             # TODO: The server process may be showing errors, but we can catch those from the server's STDOUT/STDERR when we spawn it ourselves later.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
             # side) responses for this.
@@ -238,18 +260,6 @@ class Proxy
             # if streamCallback
             #     proc.stderr.on 'data', (data) =>
             #         streamCallback(data)
-
-            # TODO: Refactor.
-
-
-            JsonRpcRequest =
-                jsonrpc : 2.0
-                id      : requestId,
-                method  : "application/invokeCommand",
-                params: {
-                    parameters : parameters
-                    stdinData  : if stdinData? then stdinData else null
-                }
 
             content = @getContentForJsonRpcRequest(JsonRpcRequest)
 
@@ -261,7 +271,7 @@ class Proxy
      * @return {String}
     ###
     getContentForJsonRpcRequest: (request) ->
-        return JSON.stringify(requestContent)
+        return JSON.stringify(request)
 
     ###*
      * Writes a raw request to the connection.
@@ -299,28 +309,35 @@ class Proxy
         })
 
     ###*
-     * Performs a request to the PHP side.
-     *
-     * @param {Array}    args           The arguments to pass.
-     * @param {Callback} streamCallback A method to invoke each time streaming data is received.
-     * @param {String}   stdinData      The data to pass to STDIN.
-     *
-     * @todo Support stdinData for synchronous requests as well.
+     * @param {String}      method
+     * @param {Object}      parameters
+     * @param {Callback}    streamCallback A method to invoke each time streaming data is received.
+     * @param {String|null} stdinData      The data to pass to STDIN.
      *
      * @return {Promise}
     ###
-    performRequest: (args, streamCallback = null, stdinData = null) ->
-        php = @config.get('phpCommand')
+    performRequest: (method, parameters, streamCallback = null, stdinData = null) ->
+        if not @getCorePackagePath()?
+            return new Promise (resolve, reject) ->
+                reject('''
+                    The core package was not found, it is currently being installed. This only needs to happen once at
+                    initialization, but the service is not available yet in the meantime.
+                ''')
+                return
 
-        args.unshift(@projectName)
-
-        parameters = @prepareParameters(args)
-
-        if not @projectName
+        if not @projectName?
             return new Promise (resolve, reject) ->
                 reject('Request aborted as there is no project active (yet)')
 
-        return @performRequestAsync(php, parameters, streamCallback, stdinData)
+        parameters.projectName = @projectName
+
+        if stdinData?
+            parameters.stdin = true
+            parameters.stdinData = stdinData
+
+        requestId = @nextRequestId++
+
+        return @performJsonRpcRequest(requestId, method, parameters, streamCallback)
 
     ###*
      * Retrieves a list of available classes.
@@ -328,12 +345,11 @@ class Proxy
      * @return {Promise}
     ###
     getClassList: () ->
-        parameters = [
-            '--class-list',
-            '--database=' + @getIndexDatabasePath()
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('classList', parameters)
 
     ###*
      * Retrieves a list of available classes in the specified file.
@@ -347,13 +363,12 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
 
-        parameters = [
-            '--class-list',
-            '--database=' + @getIndexDatabasePath(),
-            '--file=' + file
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+            file     : file
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('classList', parameters)
 
     ###*
      * Retrieves a list of namespaces.
@@ -361,12 +376,11 @@ class Proxy
      * @return {Promise}
     ###
     getNamespaceList: () ->
-        parameters = [
-            '--namespace-list',
-            '--database=' + @getIndexDatabasePath()
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('namespaceList', parameters)
 
     ###*
      * Retrieves a list of namespaces in the specified file.
@@ -380,13 +394,12 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
 
-        parameters = [
-            '--namespace-list',
-            '--database=' + @getIndexDatabasePath(),
-            '--file=' + file
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+            file     : file
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('namespaceList', parameters)
 
     ###*
      * Retrieves a list of available global constants.
@@ -394,12 +407,11 @@ class Proxy
      * @return {Promise}
     ###
     getGlobalConstants: () ->
-        parameters = [
-            '--constants',
-            '--database=' + @getIndexDatabasePath()
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('globalConstants', parameters)
 
     ###*
      * Retrieves a list of available global functions.
@@ -407,12 +419,11 @@ class Proxy
      * @return {Promise}
     ###
     getGlobalFunctions: () ->
-        parameters = [
-            '--functions',
-            '--database=' + @getIndexDatabasePath()
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('globalFunctions', parameters)
 
     ###*
      * Retrieves a list of available members of the class (or interface, trait, ...) with the specified name.
@@ -426,13 +437,12 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No class name passed!')
 
-        parameters = [
-            '--class-info',
-            '--database=' + @getIndexDatabasePath(),
-            '--name=' + className
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+            name     : className
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('classInfo', parameters)
 
     ###*
      * Resolves a local type in the specified file, based on use statements and the namespace.
@@ -461,16 +471,15 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No kind passed!')
 
-        parameters = [
-            '--resolve-type',
-            '--database=' + @getIndexDatabasePath(),
-            '--file=' + file,
-            '--line=' + line,
-            '--type=' + type,
-            '--kind=' + kind
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+            file     : file
+            line     : line
+            type     : type
+            kind     : kind
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('resolveType', parameters)
 
     ###*
      * Localizes a type to the specified file, making it relative to local use statements, if possible. If not possible,
@@ -500,16 +509,15 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No kind passed!')
 
-        parameters = [
-            '--localize-type',
-            '--database=' + @getIndexDatabasePath(),
-            '--file=' + file,
-            '--line=' + line,
-            '--type=' + type,
-            '--kind=' + kind
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+            file     : file
+            line     : line
+            type     : type
+            kind     : kind
+        }
 
-        return @performRequest(parameters)
+        return @performRequest('localizeType', parameters)
 
     ###*
      * Performs a semantic lint of the specified file.
@@ -527,36 +535,16 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
 
-        parameters = [
-            '--semantic-lint',
-            '--database=' + @getIndexDatabasePath(),
-            '--file=' + file,
-            '--stdin'
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+            file     : file
+            stdin    : true
+        }
 
-        if options.noUnknownClasses == true
-            parameters.push('--no-unknown-classes')
+        for key, value of options
+            parameters[key] = value
 
-        if options.noUnknownMembers == true
-            parameters.push('--no-unknown-members')
-
-        if options.noUnknownGlobalFunctions == true
-            parameters.push('--no-unknown-global-functions')
-
-        if options.noUnknownGlobalConstants == true
-            parameters.push('--no-unknown-global-constants')
-
-        if options.noDocblockCorrectness == true
-            parameters.push('--no-docblock-correctness')
-
-        if options.noUnusedUseStatements == true
-            parameters.push('--no-unused-use-statements')
-
-        return @performRequest(
-            parameters,
-            null,
-            source
-        )
+        return @performRequest('semanticLint', parameters, null, source)
 
     ###*
      * Fetches all available variables at a specific location.
@@ -572,21 +560,16 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('Either a path to a file or source code must be passed!')
 
+        parameters = {
+            database   : @getIndexDatabasePath()
+            offset     : offset
+            charoffset : true
+        }
+
         if file?
-            parameter = '--file=' + file
+            parameters.file = file
 
-        if source?
-            parameter = '--stdin'
-
-        parameters = [
-            '--available-variables',
-            '--database=' + @getIndexDatabasePath(),
-            parameter,
-            '--offset=' + offset,
-            '--charoffset'
-        ]
-
-        return @performRequest(parameters, null, source)
+        return @performRequest('availableVariables', parameters, null, source)
 
     ###*
      * Fetches the types of the specified variable at the specified location.
@@ -625,31 +608,22 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('A path to a file must be passed!')
 
-        parameters = [
-            '--deduce-types',
-            '--database=' + @getIndexDatabasePath(),
-            '--offset=' + offset,
-            '--charoffset'
-        ]
+        parameters = {
+            database   : @getIndexDatabasePath()
+            offset     : offset
+            charoffset : true
+        }
 
         if file?
-            parameters.push('--file=' + file)
-
-        if source?
-            parameters.push('--stdin')
+            parameters.file = file
 
         if ignoreLastElement
-            parameters.push('--ignore-last-element')
+            parameters.ignoreLastElement = true
 
         if parts?
-            for part in parts
-                parameters.push('--part=' + part)
+            parameters.part = parts
 
-        return @performRequest(
-            parameters,
-            null,
-            source
-        )
+        return @performRequest('deduceTypes', parameters, null, source)
 
     ###*
      * Fetches invocation information of a method or function call.
@@ -665,21 +639,16 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('Either a path to a file or source code must be passed!')
 
+        parameters = {
+            database   : @getIndexDatabasePath()
+            offset     : offset
+            charoffset : true
+        }
+
         if file?
-            parameter = '--file=' + file
+            parameters.file = file
 
-        if source?
-            parameter = '--stdin'
-
-        parameters = [
-            '--invocation-info',
-            '--database=' + @getIndexDatabasePath(),
-            parameter,
-            '--offset=' + offset,
-            '--charoffset'
-        ]
-
-        return @performRequest(parameters, null, source)
+        return @performRequest('invocationInfo', parameters, null, source)
 
     ###*
      * Truncates the database.
@@ -687,12 +656,11 @@ class Proxy
      * @return {Promise}
     ###
     truncate: () ->
-        parameters = [
-            '--truncate',
-            '--database=' + @getIndexDatabasePath()
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
 
-        return @performRequest(parameters, null, null)
+        return @performRequest('truncate', parameters, null, null)
 
     ###*
      * Initializes a project.
@@ -700,12 +668,11 @@ class Proxy
      * @return {Promise}
     ###
     initialize: () ->
-        parameters = [
-            '--initialize',
-            '--database=' + @getIndexDatabasePath()
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
 
-        return @performRequest(parameters, null, null)
+        return @performRequest('initialize', parameters, null, null)
 
     ###*
      * Vacuums a project, cleaning up the index database (e.g. pruning files that no longer exist).
@@ -713,12 +680,11 @@ class Proxy
      * @return {Promise}
     ###
     vacuum: () ->
-        parameters = [
-            '--vacuum',
-            '--database=' + @getIndexDatabasePath()
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
 
-        return @performRequest(parameters, null, null)
+        return @performRequest('vacuum', parameters, null, null)
 
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
@@ -749,13 +715,12 @@ class Proxy
 
         progressStreamCallbackWrapper = null
 
-        parameters = [
-            '--reindex',
-            '--database=' + @getIndexDatabasePath()
-        ]
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
 
         if progressStreamCallback?
-            parameters.push('--stream-progress')
+            parameters.streamProgress = true
 
             progressStreamCallbackWrapper = (output) =>
                 # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
@@ -765,23 +730,11 @@ class Proxy
                 for percentage in percentages
                     progressStreamCallback(percentage)
 
-        for pathToIndex in pathsToIndex
-            parameters.push('--source=' + pathToIndex)
+        parameters.source = pathsToIndex
+        parameters.exclude = excludedPaths
+        parameters.extension = fileExtensionsToIndex
 
-        if source?
-            parameters.push('--stdin')
-
-        for excludedPath in excludedPaths
-            parameters.push('--exclude=' + excludedPath)
-
-        for fileExtensionToIndex in fileExtensionsToIndex
-            parameters.push('--extension=' + fileExtensionToIndex)
-
-        return @performRequest(
-            parameters,
-            progressStreamCallbackWrapper,
-            source
-        )
+        return @performRequest('reindex', parameters, progressStreamCallbackWrapper, source)
 
     ###*
      * Sets the name (without path or extension) of the database file to use.
