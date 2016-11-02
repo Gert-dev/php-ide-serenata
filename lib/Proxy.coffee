@@ -154,7 +154,7 @@ class Proxy
                 if jsonRpcResponse?
                     request = @requestQueue[jsonRpcResponse.id]
 
-                    if not jsonRpcResponse or jsonRpcResponse.error?
+                    if jsonRpcResponse.error?
                         request.promise.reject({
                             request  : request
                             response : jsonRpcResponse
@@ -186,12 +186,15 @@ class Proxy
         jsonRpcResponseString = dataBuffer.toString()
 
         try
-            return @getJsonRpcResponseFromResponseContent(jsonRpcResponseString)
+            jsonRpcResponse = @getJsonRpcResponseFromResponseContent(jsonRpcResponseString)
 
         catch error
+            jsonRpcResponse = null
+
+        if not jsonRpcResponse?
             @showUnexpectedSocketResponseError(jsonRpcResponseString)
 
-        return null # Never reached
+        return jsonRpcResponse
 
     ###*
      * @param {String} content
