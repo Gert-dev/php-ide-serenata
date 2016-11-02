@@ -128,7 +128,19 @@ class Proxy
      *
     ###
     onConnectionClosed: () ->
-        # TODO
+        detail =
+            "The socket connection to the PHP server was unexpectedly closed. Either something caused the process to " +
+            "stop, the socket to close, or the PHP process may have crashed. If you're sure it's the last one, feel " +
+            "free to report a bug.\n \n" +
+
+            'An attempt will be made to restart the server and reestablish the connection.'
+
+        atom.notifications.addError('PHP Integrator - Oops, something went wrong!', {
+            dismissable : true
+            detail      : detail
+        })
+
+        @client = null
 
     ###*
      * @param {Buffer} dataBuffer
