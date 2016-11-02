@@ -149,13 +149,7 @@ class Proxy
             @response.bytesRead += bytesRead
 
             if @response.bytesRead == @response.length
-                jsonRpcResponse = null
-
-                try
-                    jsonRpcResponse = @getJsonRpcResponseFromResponseBuffer(@response.content)
-
-                catch error
-                    @showUnexpectedSocketResponseError(response.content.toString())
+                jsonRpcResponse = @getJsonRpcResponseFromResponseBuffer(@response.content)
 
                 if jsonRpcResponse?
                     request = @requestQueue[jsonRpcResponse.id]
@@ -191,7 +185,13 @@ class Proxy
     getJsonRpcResponseFromResponseBuffer: (dataBuffer) ->
         jsonRpcResponseString = dataBuffer.toString()
 
-        return @getJsonRpcResponseFromResponseContent(jsonRpcResponseString)
+        try
+            return @getJsonRpcResponseFromResponseContent(jsonRpcResponseString)
+
+        catch error
+            @showUnexpectedSocketResponseError(jsonRpcResponseString)
+
+        return null # Never reached
 
     ###*
      * @param {String} content
