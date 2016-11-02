@@ -31,6 +31,7 @@ class Proxy
     ###
     constructor: (@config) ->
         @requestQueue = {}
+        @resetResponseState()
 
     ###*
      * Prepares parameters for execution.
@@ -124,14 +125,6 @@ class Proxy
     processDataBuffer: (dataBuffer) ->
         console.log('Processing buffer')
 
-        if not @response
-            console.log('creating new response')
-            @response =
-                length: null
-                wasBoundaryFound: false
-                bytesRead: 0
-                content: new Buffer([])
-
         if not @response.length?
             console.log('expecting length')
             end = dataBuffer.indexOf("\r\n")
@@ -204,14 +197,22 @@ class Proxy
 
                 delete @requestQueue[jsonRpcResponse.id]
 
-                @response = null
+                @resetResponseState()
 
         if dataBuffer.length > 0
             console.log('more data to read...')
             @processDataBuffer(dataBuffer)
 
 
-
+    ###*
+     * Resets the current response's state.
+    ###
+    resetResponseState: () ->
+        @response =
+            length           : null
+            wasBoundaryFound : false
+            bytesRead        : 0
+            content          : new Buffer([])
 
     ###*
      * Performs an asynchronous request to the PHP side.
