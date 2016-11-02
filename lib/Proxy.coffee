@@ -25,6 +25,26 @@ class Proxy
     projectName: null
 
     ###*
+     * @var {Object}
+    ###
+    client: null
+
+    ###*
+     * @var {Object}
+    ###
+    requestQueue: null
+
+    ###*
+     * @var {Number}
+    ###
+    nextRequestId: 1
+
+    ###*
+     * @var {Object}
+    ###
+    response: null
+
+    ###*
      * @var {String}
     ###
     HEADER_DELIMITER: "\r\n"
@@ -75,21 +95,9 @@ class Proxy
     getCorePackagePath: () ->
         return atom.packages.resolvePackagePath("php-integrator-core")
 
-
-
-
-
-
-
-
-    client: null
-    requestQueue: null
-    nextRequestId: 1
-
-
-    response: null
-
-
+    ###*
+     * @return {Object}
+    ###
     getSocketConnection: () ->
         return new Promise (resolve, reject) =>
             if not @client?
@@ -105,20 +113,31 @@ class Proxy
 
             resolve(@client)
 
-
+    ###*
+     * @param {String} data
+    ###
     onDataReceived: (data) ->
         dataBuffer = new Buffer(data)
 
         @processDataBuffer(data)
 
-    onConnectionClosed: (data) ->
+    ###*
+     *
+    ###
+    onConnectionClosed: () ->
         # TODO: Argh, the connection dropped.
         debugger
 
-    onConnectionEnded: (data) ->
+    ###*
+     *
+    ###
+    onConnectionEnded: () ->
         # TODO
         debugger
 
+    ###*
+     * @param {Buffer} dataBuffer
+    ###
     processDataBuffer: (dataBuffer) ->
         if not @response.length?
             contentLengthHeader = @readRawHeader(dataBuffer)
