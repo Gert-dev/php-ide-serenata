@@ -152,23 +152,7 @@ class Proxy
                 jsonRpcResponse = @getJsonRpcResponseFromResponseBuffer(@response.content)
 
                 if jsonRpcResponse?
-                    request = @requestQueue[jsonRpcResponse.id]
-
-                    if jsonRpcResponse.error?
-                        request.promise.reject({
-                            request  : request
-                            response : jsonRpcResponse
-                            error    : jsonRpcResponse.error
-                        })
-
-                        # Server error
-                        if jsonRpcResponse.error.code == -32000
-                            @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
-
-                    else
-                        request.promise.resolve(jsonRpcResponse.result)
-
-                    delete @requestQueue[jsonRpcResponse.id]
+                    @processJsonRpcResponse(jsonRpcResponse)
 
                 @resetResponseState()
 
@@ -176,6 +160,28 @@ class Proxy
 
         if dataBuffer.length > 0
             @processDataBuffer(dataBuffer)
+
+    ###*
+     * @param {Object} jsonRpcResponse
+    ###
+    processJsonRpcResponse: (jsonRpcResponse) ->
+        request = @requestQueue[jsonRpcResponse.id]
+
+        if jsonRpcResponse.error?
+            request.promise.reject({
+                request  : request
+                response : jsonRpcResponse
+                error    : jsonRpcResponse.error
+            })
+
+            # Server error
+            if jsonRpcResponse.error.code == -32000
+                @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
+
+        else
+            request.promise.resolve(jsonRpcResponse.result)
+
+        delete @requestQueue[jsonRpcResponse.id]
 
     ###*
      * @param {Buffer} dataBuffer
