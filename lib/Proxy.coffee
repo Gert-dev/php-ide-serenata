@@ -127,12 +127,8 @@ class Proxy
 
         if not @response.length?
             console.log('expecting length')
-            end = dataBuffer.indexOf("\r\n")
 
-            if end == -1
-              throw new Error('Expected length header');
-
-            contentLengthHeader = dataBuffer.slice(0, end).toString()
+            contentLengthHeader = @readRawHeader(dataBuffer)
 
             parts = contentLengthHeader.split(':')
 
@@ -150,9 +146,10 @@ class Proxy
 
         else if not @response.wasBoundaryFound
             console.log('expecting boundary')
-            end = dataBuffer.indexOf("\r\n")
-
-            if end == 0
+            
+            haeder = @readRawHeader(dataBuffer)
+            
+            if haeder.length == 0
                 console.log('got boundary')
                 @response.wasBoundaryFound = true
 
@@ -203,6 +200,21 @@ class Proxy
             console.log('more data to read...')
             @processDataBuffer(dataBuffer)
 
+
+    ###*
+     * @param {Buffer} dataBuffer
+     *
+     * @throws {Error}
+     *
+     * @return {String}
+    ###
+    readRawHeader: (dataBuffer) ->
+        end = dataBuffer.indexOf("\r\n")
+
+        if end == -1
+          throw new Error('Header delimiter not found');
+
+        return dataBuffer.slice(0, end).toString()
 
     ###*
      * Resets the current response's state.
