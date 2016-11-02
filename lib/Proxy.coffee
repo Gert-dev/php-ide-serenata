@@ -321,6 +321,7 @@ class Proxy
                 }
             }
 
+            # TODO: Pass the port to the socket server and select another one if it is already in use.
             # TODO: The socket process is spawned twice on startup.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
             # side) responses for this.
