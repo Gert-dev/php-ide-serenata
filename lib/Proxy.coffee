@@ -147,6 +147,9 @@ class Proxy
                 return
 
             @response.length = contentLength
+
+            bytesRead = contentLengthHeader.length + @HEADER_DELIMITER.length
+
             console.log('got length ' + contentLength)
 
         else if not @response.wasBoundaryFound
@@ -158,16 +161,14 @@ class Proxy
                 console.log('got boundary')
                 @response.wasBoundaryFound = true
 
-            dataBuffer = dataBuffer.slice(header.length + @HEADER_DELIMITER.length)
+            bytesRead = header.length + @HEADER_DELIMITER.length
 
         else
             console.log('reading data')
-            bytesToRead = Math.min(dataBuffer.length, @response.length - @response.bytesRead)
+            bytesRead = Math.min(dataBuffer.length, @response.length - @response.bytesRead)
 
-            @response.content = Buffer.concat([@response.content, dataBuffer.slice(0, bytesToRead)])
-            @response.bytesRead += bytesToRead
-
-            dataBuffer = dataBuffer.slice(bytesToRead)
+            @response.content = Buffer.concat([@response.content, dataBuffer.slice(0, bytesRead)])
+            @response.bytesRead += bytesRead
 
             if @response.bytesRead == @response.length
                 console.log('all bytes read for response, decoding')
@@ -200,6 +201,8 @@ class Proxy
                 delete @requestQueue[jsonRpcResponse.id]
 
                 @resetResponseState()
+
+        dataBuffer = dataBuffer.slice(bytesRead)
 
         if dataBuffer.length > 0
             console.log('more data to read...')
