@@ -149,29 +149,32 @@ class Proxy
             @response.bytesRead += bytesRead
 
             if @response.bytesRead == @response.length
+                jsonRpcResponse = null
+                
                 try
                     jsonRpcResponse = @getJsonRpcResponseFromResponseContent(@response.content)
 
                 catch error
                     @showUnexpectedSocketResponseError(jsonRpcResponseString)
+                
+                if jsonRpcResponse?
+                    request = @requestQueue[jsonRpcResponse.id]
 
-                request = @requestQueue[jsonRpcResponse.id]
+                    if not jsonRpcResponse or jsonRpcResponse.error?
+                        request.promise.reject({
+                            request  : request
+                            response : jsonRpcResponse
+                            error    : jsonRpcResponse.error
+                        })
 
-                if not jsonRpcResponse or jsonRpcResponse.error?
-                    request.promise.reject({
-                        request  : request
-                        response : jsonRpcResponse
-                        error    : jsonRpcResponse.error
-                    })
+                        # Server error
+                        if jsonRpcResponse.error.code == -32000
+                            @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
 
-                    # Server error
-                    if jsonRpcResponse.error.code == -32000
-                        @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
+                    else
+                        request.promise.resolve(jsonRpcResponse.result)
 
-                else
-                    request.promise.resolve(jsonRpcResponse.result)
-
-                delete @requestQueue[jsonRpcResponse.id]
+                    delete @requestQueue[jsonRpcResponse.id]
 
                 @resetResponseState()
 
