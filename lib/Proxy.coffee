@@ -150,7 +150,7 @@ class Proxy
 
             if @response.bytesRead == @response.length
                 jsonRpcResponse = null
-                
+
                 try
                     jsonRpcResponse = @getJsonRpcResponseFromResponseContent(@response.content)
 
