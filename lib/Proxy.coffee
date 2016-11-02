@@ -152,13 +152,13 @@ class Proxy
         else if not @response.wasBoundaryFound
             console.log('expecting boundary')
 
-            haeder = @readRawHeader(dataBuffer)
+            header = @readRawHeader(dataBuffer)
 
-            if haeder.length == 0
+            if header.length == 0
                 console.log('got boundary')
                 @response.wasBoundaryFound = true
 
-            dataBuffer = dataBuffer.slice(end + @HEADER_DELIMITER.length)
+            dataBuffer = dataBuffer.slice(header.length + @HEADER_DELIMITER.length)
 
         else
             console.log('reading data')
