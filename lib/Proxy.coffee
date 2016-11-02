@@ -242,10 +242,6 @@ class Proxy
                 }
             }
 
-            console.log('Sending request ID ' + id)
-
-
-
             # TODO: Nothing seems to be persisted anymore.
             # TODO: At startup, the reindex command is sent and everything else is waiting for it to finish.
 
@@ -260,6 +256,8 @@ class Proxy
             # if streamCallback
             #     proc.stderr.on 'data', (data) =>
             #         streamCallback(data)
+
+            console.log("Sending request ", JsonRpcRequest)
 
             content = @getContentForJsonRpcRequest(JsonRpcRequest)
 
