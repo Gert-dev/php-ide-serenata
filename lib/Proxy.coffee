@@ -152,7 +152,7 @@ class Proxy
                 jsonRpcResponse = null
 
                 try
-                    jsonRpcResponse = @getJsonRpcResponseFromResponseContent(@response.content)
+                    jsonRpcResponse = @getJsonRpcResponseFromResponseBuffer(@response.content)
 
                 catch error
                     @showUnexpectedSocketResponseError(response.content.toString())
@@ -188,10 +188,18 @@ class Proxy
      *
      * @return {Object}
     ###
-    getJsonRpcResponseFromResponseContent: (dataBuffer) ->
+    getJsonRpcResponseFromResponseBuffer: (dataBuffer) ->
         jsonRpcResponseString = dataBuffer.toString()
 
-        return JSON.parse(jsonRpcResponseString)
+        return @getJsonRpcResponseFromResponseContent(jsonRpcResponseString)
+
+    ###*
+     * @param {String} content
+     *
+     * @return {Object}
+    ###
+    getJsonRpcResponseFromResponseContent: (content) ->
+        return JSON.parse(content)
 
     ###*
      * @param {Buffer} dataBuffer
