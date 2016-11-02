@@ -113,7 +113,6 @@ class Proxy
                 @client.setNoDelay(true)
                 @client.on('data', @onDataReceived.bind(this))
                 @client.on('close', @onConnectionClosed.bind(this))
-                @client.on('end', @onConnectionEnded.bind(this))
 
             resolve(@client)
 
@@ -129,15 +128,7 @@ class Proxy
      *
     ###
     onConnectionClosed: () ->
-        # TODO: Argh, the connection dropped.
-        debugger
-
-    ###*
-     *
-    ###
-    onConnectionEnded: () ->
         # TODO
-        debugger
 
     ###*
      * @param {Buffer} dataBuffer
