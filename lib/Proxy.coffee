@@ -11,16 +11,20 @@ module.exports =
 class Proxy
     ###*
      * The config to use.
+     *
+     * @var {Object}
     ###
     config: null
 
     ###*
      * The name (without path or extension) of the database file to use.
+     *
+     * @var {Object}
     ###
     indexDatabaseName: null
 
     ###*
-     * The name of the project.
+     * @var {String}
     ###
     projectName: null
 
