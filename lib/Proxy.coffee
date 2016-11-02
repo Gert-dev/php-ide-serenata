@@ -128,18 +128,13 @@ class Proxy
 
 
     processDataBuffer: (dataBuffer) ->
-        console.log('Processing buffer')
-
         if not @response.length?
-            console.log('expecting length')
-
             contentLengthHeader = @readRawHeader(dataBuffer)
 
             parts = contentLengthHeader.split(':')
 
             if parts.length != 2
                 throw new Error('Nope')
-
 
             contentLength = parseInt(parts[1])
 
@@ -150,28 +145,21 @@ class Proxy
 
             bytesRead = contentLengthHeader.length + @HEADER_DELIMITER.length
 
-            console.log('got length ' + contentLength)
-
         else if not @response.wasBoundaryFound
-            console.log('expecting boundary')
-
             header = @readRawHeader(dataBuffer)
 
             if header.length == 0
-                console.log('got boundary')
                 @response.wasBoundaryFound = true
 
             bytesRead = header.length + @HEADER_DELIMITER.length
 
         else
-            console.log('reading data')
             bytesRead = Math.min(dataBuffer.length, @response.length - @response.bytesRead)
 
             @response.content = Buffer.concat([@response.content, dataBuffer.slice(0, bytesRead)])
             @response.bytesRead += bytesRead
 
             if @response.bytesRead == @response.length
-                console.log('all bytes read for response, decoding')
                 jsonRpcResponseString = @response.content.toString()
 
                 try
@@ -183,7 +171,6 @@ class Proxy
                 request = @requestQueue[jsonRpcResponse.id]
 
                 if not jsonRpcResponse or jsonRpcResponse.error?
-                    console.log('unsuccessful response')
                     request.promise.reject({
                         request  : request
                         response : jsonRpcResponse
@@ -195,7 +182,6 @@ class Proxy
                         @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
 
                 else
-                    console.log('resolving promise with response')
                     request.promise.resolve(jsonRpcResponse.result)
 
                 delete @requestQueue[jsonRpcResponse.id]
@@ -205,9 +191,7 @@ class Proxy
         dataBuffer = dataBuffer.slice(bytesRead)
 
         if dataBuffer.length > 0
-            console.log('more data to read...')
             @processDataBuffer(dataBuffer)
-
 
     ###*
      * @param {Buffer} dataBuffer
