@@ -25,6 +25,11 @@ class Proxy
     projectName: null
 
     ###*
+     * @var {String}
+    ###
+    HEADER_DELIMITER: "\r\n"
+
+    ###*
      * Constructor.
      *
      * @param {Config} config
@@ -146,14 +151,14 @@ class Proxy
 
         else if not @response.wasBoundaryFound
             console.log('expecting boundary')
-            
+
             haeder = @readRawHeader(dataBuffer)
-            
+
             if haeder.length == 0
                 console.log('got boundary')
                 @response.wasBoundaryFound = true
 
-            dataBuffer = dataBuffer.slice(end + "\r\n".length)
+            dataBuffer = dataBuffer.slice(end + @HEADER_DELIMITER.length)
 
         else
             console.log('reading data')
@@ -209,7 +214,7 @@ class Proxy
      * @return {String}
     ###
     readRawHeader: (dataBuffer) ->
-        end = dataBuffer.indexOf("\r\n")
+        end = dataBuffer.indexOf(@HEADER_DELIMITER)
 
         if end == -1
           throw new Error('Header delimiter not found');
@@ -293,8 +298,8 @@ class Proxy
         @getSocketConnection().then (connection) =>
             lengthInBytes = (new TextEncoder('utf-8').encode(content)).length
 
-            connection.write("Content-Length: " + lengthInBytes + "\r\n")
-            connection.write("\r\n");
+            connection.write("Content-Length: " + lengthInBytes + @HEADER_DELIMITER)
+            connection.write(@HEADER_DELIMITER);
             connection.write(content)
 
     ###*
