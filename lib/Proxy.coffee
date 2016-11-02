@@ -99,7 +99,7 @@ class Proxy
                     resolve(@client)
 
                 @client.setNoDelay(true)
-                @client.on('data', @processData.bind(this))
+                @client.on('data', @onDataReceived.bind(this))
                 @client.on('close', @onConnectionClosed.bind(this))
                 @client.on('end', @onConnectionEnded.bind(this))
 
@@ -107,7 +107,9 @@ class Proxy
 
 
     onDataReceived: (data) ->
-        @processData(data)
+        dataBuffer = new Buffer(data)
+
+        @processDataBuffer(data)
 
     onConnectionClosed: (data) ->
         # TODO: Argh, the connection dropped.
@@ -116,16 +118,6 @@ class Proxy
     onConnectionEnded: (data) ->
         # TODO
         debugger
-
-
-
-
-    processData: (data) ->
-        dataBuffer = new Buffer(data)
-
-        @processDataBuffer(dataBuffer)
-
-
 
     processDataBuffer: (dataBuffer) ->
         if not @response.length?
