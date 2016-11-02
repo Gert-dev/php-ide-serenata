@@ -31,6 +31,11 @@ class Proxy
     ###*
      * @var {Object}
     ###
+    phpServer: null
+
+    ###*
+     * @var {Object}
+    ###
     client: null
 
     ###*
@@ -63,35 +68,42 @@ class Proxy
         @resetResponseState()
 
     ###*
-     * Prepares parameters for execution.
+     * Spawns the PHP socket server process.
+     *
+     * @param {Number} port
+     *
+     * @return {Object}
+    ###
+    spawnPhpServer: (port) ->
+        php = @config.get('phpCommand')
+
+        parameters = [
+             '-d memory_limit=-1',
+             @getCorePackagePath() + "/src/SocketMain.php"
+        ]
+
+        process = child_process.spawn(php, parameters)
+
+        process.stdout.on 'data', (data) =>
+            console.debug('The PHP server has something to say:', data.toString())
+
+        process.stderr.on 'data', (data) =>
+            console.debug('The PHP server has errors to report:', data.toString())
+
+        return process
+
+    ###*
+     * Spawns the PHP socket server process.
      *
      * @param {Array} parameters
      *
      * @return {Array}
     ###
-    # prepareParameters: (args) ->
-    #     parameters = [
-    #         # '-d memory_limit=-1',
-    #         # @getCorePackagePath() + "/src/Main.php"
-    #     ]
-    #
-    #     for a in args
-    #         parameters.push(a)
-    #
-    #     return parameters
+    spawnPhpServerIfNecessary: (port) ->
+        if not @phpServer
+            @phpServer = @spawnPhpServer(port)
 
-    # performRequest: (method, params, streamCallback = null, stdinData = null) ->
-    #     php = @config.get('phpCommand')
-    #
-    #     params.unshift(@projectName)
-    #
-    #     parameters = @prepareParameters(params)
-    #
-    #     if not @projectName
-    #         return new Promise (resolve, reject) ->
-    #             reject('Request aborted as there is no project active (yet)')
-    #
-    #     return @performRequestAsync(php, parameters, streamCallback, stdinData)
+        return @phpServer
 
     ###*
      * @return {String}
@@ -104,6 +116,8 @@ class Proxy
     ###
     getSocketConnection: () ->
         return new Promise (resolve, reject) =>
+            @spawnPhpServerIfNecessary()
+
             if not @client?
                 @client = net.createConnection {port: 9999}, () =>
                     resolve(@client)
@@ -307,9 +321,7 @@ class Proxy
                 }
             }
 
-
-            # TODO: Spawn the server socket process ourselves. Check if it automatically closes if Atom closes.
-            # TODO: The server process may be showing errors, but we can catch those from the server's STDOUT/STDERR when we spawn it ourselves later.
+            # TODO: The socket process is spawned twice on startup.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
             # side) responses for this.
 
