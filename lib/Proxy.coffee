@@ -155,8 +155,8 @@ class Proxy
                     jsonRpcResponse = @getJsonRpcResponseFromResponseContent(@response.content)
 
                 catch error
-                    @showUnexpectedSocketResponseError(jsonRpcResponseString)
-                
+                    @showUnexpectedSocketResponseError(response.content.toString())
+
                 if jsonRpcResponse?
                     request = @requestQueue[jsonRpcResponse.id]
 
