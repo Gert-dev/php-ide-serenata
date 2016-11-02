@@ -242,9 +242,6 @@ class Proxy
                 }
             }
 
-            # TODO: Nothing seems to be persisted anymore.
-            # TODO: At startup, the reindex command is sent and everything else is waiting for it to finish.
-
             # TODO: Refactor.
             # TODO: See if we can also used named pipes instead of TCP, the former should be faster. This should
             # however also work on Windows transparantly. Does React support this?
