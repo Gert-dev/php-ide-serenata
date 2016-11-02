@@ -307,7 +307,6 @@ class Proxy
                 }
             }
 
-            # TODO: Refactor.
             # TODO: See if we can also used named pipes instead of TCP, the former should be faster. This should
             # however also work on Windows transparantly. Does React support this?
             # TODO: Spawn the server socket process ourselves. Check if it automatically closes if Atom closes.
