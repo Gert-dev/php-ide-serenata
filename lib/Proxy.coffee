@@ -227,8 +227,8 @@ class Proxy
         return new Promise (resolve, reject) =>
             JsonRpcRequest =
                 jsonrpc : 2.0
-                id      : id,
-                method  : method,
+                id      : id
+                method  : method
                 params  : parameters
 
             @requestQueue[id] = {
