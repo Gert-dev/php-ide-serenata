@@ -130,18 +130,7 @@ class Proxy
     processDataBuffer: (dataBuffer) ->
         if not @response.length?
             contentLengthHeader = @readRawHeader(dataBuffer)
-
-            parts = contentLengthHeader.split(':')
-
-            if parts.length != 2
-                throw new Error('Nope')
-
-            contentLength = parseInt(parts[1])
-
-            if not contentLength? or contentLength == 0
-                return
-
-            @response.length = contentLength
+            @response.length = @getLengthFromContentLengthHeader(contentLengthHeader)
 
             bytesRead = contentLengthHeader.length + @HEADER_DELIMITER.length
 
@@ -207,6 +196,26 @@ class Proxy
           throw new Error('Header delimiter not found');
 
         return dataBuffer.slice(0, end).toString()
+
+    ###*
+     * @param {String} rawHeader
+     *
+     * @throws {Error}
+     *
+     * @return {Number}
+    ###
+    getLengthFromContentLengthHeader: (rawHeader) ->
+        parts = rawHeader.split(':')
+
+        if parts.length != 2
+            throw new Error('Unexpected amount of header parts found')
+
+        contentLength = parseInt(parts[1])
+
+        if not contentLength?
+            throw new Error('Content length header does not have an integer as value')
+
+        return contentLength
 
     ###*
      * Resets the current response's state.
