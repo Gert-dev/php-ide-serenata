@@ -79,7 +79,9 @@ class Proxy
 
         parameters = [
              '-d memory_limit=-1',
-             @getCorePackagePath() + "/src/SocketMain.php"
+             @getCorePackagePath() + "/src/Main.php",
+             '--server',
+             '-p ' + port
         ]
 
         process = child_process.spawn(php, parameters)
@@ -116,10 +118,12 @@ class Proxy
     ###
     getSocketConnection: () ->
         return new Promise (resolve, reject) =>
-            @spawnPhpServerIfNecessary()
+            port = 9999
+
+            @spawnPhpServerIfNecessary(port)
 
             if not @client?
-                @client = net.createConnection {port: 9999}, () =>
+                @client = net.createConnection {port: port}, () =>
                     resolve(@client)
 
                 @client.setNoDelay(true)
@@ -321,7 +325,7 @@ class Proxy
                 }
             }
 
-            # TODO: Pass the port to the socket server and select another one if it is already in use.
+            # TODO: Select another port if the port is already in use. There might be multiple Atom windows open.
             # TODO: The socket process is spawned twice on startup.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
             # side) responses for this.
