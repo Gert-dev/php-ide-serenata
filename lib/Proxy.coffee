@@ -105,8 +105,6 @@ class Proxy
     getSocketConnection: () ->
         return new Promise (resolve, reject) =>
             if not @client?
-                # TODO: Catch ECONNREFUSED if server hasn't started yet.
-
                 @client = net.createConnection {port: 9999}, () =>
                     resolve(@client)
 
@@ -125,15 +123,22 @@ class Proxy
         @processDataBuffer(data)
 
     ###*
-     *
+     * @param {Boolean} hadError
     ###
-    onConnectionClosed: () ->
-        detail =
-            "The socket connection to the PHP server was unexpectedly closed. Either something caused the process to " +
-            "stop, the socket to close, or the PHP process may have crashed. If you're sure it's the last one, feel " +
-            "free to report a bug.\n \n" +
+    onConnectionClosed: (hadError) ->
+        if hadError
+            detail =
+                "The socket connection with the PHP server could not be established. This means the PHP server could " +
+                "not be spawned. This is most likely an issue with your setup, such as your PHP binary not being " +
+                "found, an extension missing on your system, ..."
 
-            'An attempt will be made to restart the server and reestablish the connection.'
+        else
+            detail =
+                "The socket connection to the PHP server was unexpectedly closed. Either something caused the process to " +
+                "stop, the socket to close, or the PHP process may have crashed. If you're sure it's the last one, feel " +
+                "free to report a bug.\n \n" +
+
+                'An attempt will be made to restart the server and reestablish the connection.'
 
         atom.notifications.addError('PHP Integrator - Oops, something went wrong!', {
             dismissable : true
