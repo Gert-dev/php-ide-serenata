@@ -149,10 +149,8 @@ class Proxy
             @response.bytesRead += bytesRead
 
             if @response.bytesRead == @response.length
-                jsonRpcResponseString = @response.content.toString()
-
                 try
-                    jsonRpcResponse = JSON.parse(jsonRpcResponseString)
+                    jsonRpcResponse = @getJsonRpcResponseFromResponseContent(@response.content)
 
                 catch error
                     @showUnexpectedSocketResponseError(jsonRpcResponseString)
@@ -181,6 +179,16 @@ class Proxy
 
         if dataBuffer.length > 0
             @processDataBuffer(dataBuffer)
+
+    ###*
+     * @param {Buffer} dataBuffer
+     *
+     * @return {Object}
+    ###
+    getJsonRpcResponseFromResponseContent: (dataBuffer) ->
+        jsonRpcResponseString = dataBuffer.toString()
+
+        return JSON.parse(jsonRpcResponseString)
 
     ###*
      * @param {Buffer} dataBuffer
