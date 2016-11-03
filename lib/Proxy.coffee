@@ -108,6 +108,22 @@ class Proxy
         return @phpServer
 
     ###*
+     * Sends the kill signal to the socket server.
+     *
+     * Note that this is a signal, the process may ignore it (but it usually will not, unless it's really persistent in
+     * continuing whatever it's doing).
+     *
+     * @param {Array} parameters
+     *
+     * @return {Array}
+    ###
+    stopPhpServer: (port) ->
+        return if not @phpServer
+
+        @phpServer.kill()
+        @phpServer = null
+
+    ###*
      * @return {String}
     ###
     getCorePackagePath: () ->

@@ -420,6 +420,8 @@ module.exports =
             @disposables.dispose()
             @disposables = null
 
+        @getCachingProxy().stopPhpServer()
+
     ###*
      * Sets the status bar service, which is consumed by this package.
      *
