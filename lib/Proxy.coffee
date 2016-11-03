@@ -92,14 +92,30 @@ class Proxy
         process.stderr.on 'data', (data) =>
             console.debug('The PHP server has errors to report:', data.toString())
 
+        process.on 'close', (code) =>
+            if code == 2
+                console.debug('Port ' + port + ' is already taken')
+                return
+
+            console.debug('PHP socket server exited by itself, a fatal error must have occurred.')
+
         return process
+
+    ###*
+     * @return {Number}
+    ###
+    getRandomServerPort: () ->
+        minPort = 10000
+        maxPort = 40000
+
+        return Math.floor(Math.random() * (maxPort - minPort) + minPort)
 
     ###*
      * Spawns the PHP socket server process.
      *
-     * @param {Array} parameters
+     * @param {Number} port
      *
-     * @return {Array}
+     * @return {Object}
     ###
     spawnPhpServerIfNecessary: (port) ->
         if not @phpServer
@@ -134,12 +150,12 @@ class Proxy
     ###
     getSocketConnection: () ->
         return new Promise (resolve, reject) =>
-            port = 9999
+            @port = @getRandomServerPort()
 
-            @spawnPhpServerIfNecessary(port)
+            @spawnPhpServerIfNecessary(@port)
 
             if not @client?
-                @client = net.createConnection {port: port}, () =>
+                @client = net.createConnection {port: @port}, () =>
                     resolve(@client)
 
                 @client.setNoDelay(true)
@@ -347,7 +363,6 @@ class Proxy
                 }
             }
 
-            # TODO: Select another port if the port is already in use. There might be multiple Atom windows open.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
             # side) responses for this.
 
