@@ -127,7 +127,7 @@ class ProjectManager
         @activeProject = project
 
         @proxy.setProjectName(project.getProps().title)
-        @proxy.setIndexDatabaseName(project.getProps().title)
+        @proxy.setIndexDatabaseName(@getIndexDatabaseName(project))
 
         successHandler = (repository) =>
             return if not repository?
@@ -146,6 +146,14 @@ class ProjectManager
             projectDirectoryObject = new Directory(projectDirectory)
 
             atom.project.repositoryForDirectory(projectDirectoryObject).then(successHandler, failureHandler)
+
+    ###*
+     * @param {Object}
+     *
+     * @return {String}
+    ###
+    getIndexDatabaseName: (project) ->
+        return project.getProps().title
 
     ###*
      * Validates a project by validating its settings.
