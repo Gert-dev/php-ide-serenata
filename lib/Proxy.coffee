@@ -363,8 +363,6 @@ class Proxy
                 }
             }
 
-            # TODO: Autocompletion doesn't work because the TypeDeducer is not ready to maintain state. It previously
-            # always assumed that it was invoked once in the PHP process (bug).
             # TODO: Force indexing won't work because the client side removes the database. This works, but a database
             # connection may still be active and intializing the project afterwards fails.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
@@ -746,7 +744,7 @@ class Proxy
             parameters.file = file
 
         if ignoreLastElement
-            parameters.ignoreLastElement = true
+            parameters['ignore-last-element'] = true
 
         if parts?
             parameters.part = parts
