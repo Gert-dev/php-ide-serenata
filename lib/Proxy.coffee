@@ -340,8 +340,6 @@ class Proxy
             #     proc.stderr.on 'data', (data) =>
             #         streamCallback(data)
 
-            console.log("Sending request ", JsonRpcRequest)
-
             content = @getContentForJsonRpcRequest(JsonRpcRequest)
 
             @writeRawRequest(content)
