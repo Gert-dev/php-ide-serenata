@@ -654,8 +654,23 @@ class Proxy
             stdin    : true
         }
 
-        for key, value of options
-            parameters[key] = value
+        if options.noUnknownClasses == true
+            parameters['no-unknown-classes'] = true
+
+        if options.noUnknownMembers == true
+            parameters['no-unknown-members'] = true
+
+        if options.noUnknownGlobalFunctions == true
+            parameters['no-unknown-global-functions'] = true
+
+        if options.noUnknownGlobalConstants == true
+            parameters['no-unknown-global-constants'] = true
+
+        if options.noDocblockCorrectness == true
+            parameters['no-docblock-correctness'] = true
+
+        if options.noUnusedUseStatements == true
+            parameters['no-unused-use-statements'] = true
 
         return @performRequest('semanticLint', parameters, null, source)
 
