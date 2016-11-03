@@ -363,6 +363,8 @@ class Proxy
                 }
             }
 
+            # TODO: Force indexing won't work because the client side removes the database, which is still in use
+            # by the socket server.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
             # side) responses for this.
 
