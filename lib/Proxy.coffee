@@ -348,7 +348,6 @@ class Proxy
             }
 
             # TODO: Select another port if the port is already in use. There might be multiple Atom windows open.
-            # TODO: The socket process is spawned twice on startup.
             # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
             # side) responses for this.
 
