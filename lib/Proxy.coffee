@@ -138,7 +138,13 @@ class Proxy
     onDataReceived: (data) ->
         dataBuffer = new Buffer(data)
 
-        @processDataBuffer(data)
+        try
+            @processDataBuffer(data)
+
+        catch error
+            console.debug('Encountered some invalid data from the socket server, resetting state')
+
+            @resetResponseState()
 
     ###*
      * @param {Boolean} hadError
