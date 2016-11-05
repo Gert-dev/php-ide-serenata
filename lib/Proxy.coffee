@@ -57,6 +57,11 @@ class Proxy
      * @var {String}
     ###
     HEADER_DELIMITER: "\r\n"
+    
+    ###*
+     * @var {Number}
+    ###
+    FATAL_SERVER_ERROR: -32000
 
     ###*
      * Constructor.
@@ -253,8 +258,7 @@ class Proxy
                 error    : jsonRpcResponse.error
             })
 
-            # Server error
-            if jsonRpcResponse.error.code == -32000
+            if jsonRpcResponse.error.code == @FATAL_SERVER_ERROR
                 @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
 
         else
