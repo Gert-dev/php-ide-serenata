@@ -57,7 +57,7 @@ class Proxy
      * @var {String}
     ###
     HEADER_DELIMITER: "\r\n"
-    
+
     ###*
      * @var {Number}
     ###
@@ -815,6 +815,18 @@ class Proxy
         }
 
         return @performRequest('vacuum', parameters, null, null)
+
+    ###*
+     * Tests a project, to see if it is in a properly usable state.
+     *
+     * @return {Promise}
+    ###
+    test: () ->
+        parameters = {
+            database : @getIndexDatabasePath()
+        }
+
+        return @performRequest('test', parameters, null, null)
 
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.

@@ -458,8 +458,19 @@ module.exports =
 
             return if not projectManager.hasActiveProject()
 
-            # NOTE: If the index is manually deleted and the project is started, built-in items will *not* be indexed.
-            projectManager.attemptCurrentProjectIndex()
+            successHandler = (isProjectInGoodShape) =>
+                # NOTE: If the index is manually deleted, testing will return false so the project is reinitialized.
+                # This is needed to index built-in items as they are not automatically indexed by indexing the project.
+                if not isProjectInGoodShape
+                    return @performInitialFullIndexForCurrentProject()
+
+                else
+                    return @projectManager.attemptCurrentProjectIndex()
+
+            failureHandler = () ->
+                # Ignore
+
+            @proxy.test().then(successHandler, failureHandler)
 
     ###*
      * Retrieves the base package service that can be used by other packages.
