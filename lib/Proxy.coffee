@@ -83,7 +83,7 @@ class Proxy
         php = @config.get('phpCommand')
 
         parameters = [
-             '-d memory_limit=-1',
+             '-d memory_limit=512M',
              @getCorePackagePath() + "/src/Main.php",
              '--server',
              '-p ' + port
