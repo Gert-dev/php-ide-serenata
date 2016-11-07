@@ -8,6 +8,8 @@ Starting with version **1.3.0**, this repository only contains the CoffeeScript 
 * It is now possible to specify an additional indexing delay via the settings screen.
   * It's currently set to `200 ms` by default. As Atom's default delay before invoking an event after an editor stopped changing is about `300 ms`, this results in indexing happening after `500 ms` by default. Increasing this will reduce the load of constant reindexing happening, but will also make results from autocompletion and linting less current.
 * Error messages will now be shown if setting up the current project fails because there is no active project or the project manager service is not available.
+* Caching has been improved, improving performance and responsiveness.
+  * Previously, similar queries to the PHP side that were happening closely in succession did not hit the cache because the promise of the similar query had not resolved yet. In this case, two promises were resolved, fetching the same information.
 
 ### Bugs fixed
 * Popovers will no longer go beyond the left or top part of the screen. They will move respectively right or down in that case.
@@ -168,7 +170,7 @@ $c = some_condition() ? $a : $b;
 * The strictness on `instanceof` has been lifted. The variable type deducer is now able to parse somewhat more complex if statements:
 
 ```php
-if ((1 ^ 0) && true && $b instanceof B && ($test || false && true)) {    
+if ((1 ^ 0) && true && $b instanceof B && ($test || false && true)) {
     // $b will now be recognized as an instance of B.
 }
 ```
@@ -176,7 +178,7 @@ if ((1 ^ 0) && true && $b instanceof B && ($test || false && true)) {
 * If-statements containing variable handling functions such as `is_string`, `is_bool` will now influence type deduction:
 
 ```php
-if (is_string($b) || is_array($b)) {    
+if (is_string($b) || is_array($b)) {
     // $b is now of type string|array.
 }
 ```

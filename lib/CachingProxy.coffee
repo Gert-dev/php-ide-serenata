@@ -9,9 +9,14 @@ module.exports =
 ##
 class CachingProxy extends Proxy
     ###*
-     * The cache.
+     * @var {Object}
     ###
     cache: null
+
+    ###*
+     * @var {Object}
+    ###
+    pendingPromises: null
 
     ###*
      * @inherited
@@ -20,12 +25,14 @@ class CachingProxy extends Proxy
         super(@config)
 
         @cache = {}
+        @pendingPromises = {}
 
     ###*
      * Clears the cache.
     ###
     clearCache: () ->
         @cache = {}
+        @pendingPromises = {}
 
     ###*
      * Internal convenience method that wraps a call to a parent method.
@@ -41,11 +48,22 @@ class CachingProxy extends Proxy
             return new Promise (resolve, reject) =>
                 resolve(@cache[cacheKey])
 
+        else if cacheKey of @pendingPromises
+            # If a query with the same parameters (promise) is still running, don't start another one but just await
+            # the results of the existing promise.
+            return @pendingPromises[cacheKey]
+
         else
-            return (CachingProxy.__super__[parentMethodName].apply(this, parameters)).then (output) =>
+            successHandler = (output) =>
+                delete @pendingPromises[cacheKey]
+
                 @cache[cacheKey] = output
 
                 return output
+
+            @pendingPromises[cacheKey] = CachingProxy.__super__[parentMethodName].apply(this, parameters).then(successHandler)
+
+            return @pendingPromises[cacheKey]
 
     ###*
      * @inherited
