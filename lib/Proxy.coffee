@@ -101,14 +101,14 @@ class Proxy
                 resolve(process)
 
             process.stderr.on 'data', (data) =>
-                console.warning('The PHP server has errors to report:', data.toString())
+                console.warn('The PHP server has errors to report:', data.toString())
 
             process.on 'close', (code) =>
                 if code == 2
                     console.error('Port ' + port + ' is already taken')
                     return
 
-                console.warning('PHP socket server exited by itself, a fatal error must have occurred.')
+                console.warn('PHP socket server exited by itself, a fatal error must have occurred.')
 
     ###*
      * @return {Number}
@@ -187,7 +187,7 @@ class Proxy
             @processDataBuffer(data)
 
         catch error
-            console.warning('Encountered some invalid data from the socket server, resetting state')
+            console.warn('Encountered some invalid data from the socket server, resetting state')
 
             @resetResponseState()
 
@@ -291,18 +291,18 @@ class Proxy
     ###
     processNotificationJsonRpcResponse: (jsonRpcResponse) ->
         if not jsonRpcResponse.result?
-            console.warning('Received a server notification without a result', jsonRpcResponse)
+            console.warn('Received a server notification without a result', jsonRpcResponse)
             return
 
         if jsonRpcResponse.result.type == 'reindexProgressInformation'
             if not jsonRpcResponse.result.requestId?
-                console.warning('Received progress information without a request ID to go with it', jsonRpcResponse)
+                console.warn('Received progress information without a request ID to go with it', jsonRpcResponse)
                 return
 
             relatedJsonRpcRequest = @requestQueue[jsonRpcResponse.result.requestId]
 
             if not relatedJsonRpcRequest.streamCallback?
-                console.warning('Received progress information for a request that isn\'t interested in it')
+                console.warn('Received progress information for a request that isn\'t interested in it')
                 return
 
             # TODO: Fix progress stream callback piling up in the buffer and not really "streaming". This is most likely
@@ -315,7 +315,7 @@ class Proxy
             # relatedJsonRpcRequest.streamCallback(jsonRpcResponse.result.progress)
 
         else
-            console.warning('Received a server notification with an unknown type', jsonRpcResponse)
+            console.warn('Received a server notification with an unknown type', jsonRpcResponse)
 
     ###*
      * @param {Buffer} dataBuffer
