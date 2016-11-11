@@ -147,6 +147,9 @@ class Proxy
      * @return {Array}
     ###
     stopPhpServer: (port) ->
+        if @client
+            @client.destroy()
+
         return if not @phpServer
 
         @phpServer.kill()
