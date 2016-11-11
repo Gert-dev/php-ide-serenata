@@ -159,17 +159,15 @@ class Proxy
 
             @spawnPhpServerIfNecessary(@port)
 
-            if not @client?
-                @client = net.createConnection {port: @port}, () =>
-                    resolve(@client)
+            if @client?
+                resolve(@client)
 
-                @client.setNoDelay(true)
-                @client.on('data', @onDataReceived.bind(this))
-                @client.on('close', @onConnectionClosed.bind(this))
+            @client = net.createConnection {port: @port}, () =>
+                resolve(@client)
 
-                return
-
-            resolve(@client)
+            @client.setNoDelay(true)
+            @client.on('data', @onDataReceived.bind(this))
+            @client.on('close', @onConnectionClosed.bind(this))
 
     ###*
      * @param {String} data
