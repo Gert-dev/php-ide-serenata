@@ -413,28 +413,34 @@ module.exports =
 
         # NOTE: This method is actually called whenever the project changes as well.
         service.getProject (project) =>
-            @activeProject = project
+            @onProjectChanged(project)
 
-            return if not project?
+    ###*
+     * @param {Object} project
+    ###
+    onProjectChanged: (project) ->
+        @activeProject = project
 
-            projectManager = @getProjectManager()
-            projectManager.load(project)
+        return if not project?
 
-            return if not projectManager.hasActiveProject()
+        projectManager = @getProjectManager()
+        projectManager.load(project)
 
-            successHandler = (isProjectInGoodShape) =>
-                # NOTE: If the index is manually deleted, testing will return false so the project is reinitialized.
-                # This is needed to index built-in items as they are not automatically indexed by indexing the project.
-                if not isProjectInGoodShape
-                    return @performInitialFullIndexForCurrentProject()
+        return if not projectManager.hasActiveProject()
 
-                else
-                    return @projectManager.attemptCurrentProjectIndex()
+        successHandler = (isProjectInGoodShape) =>
+            # NOTE: If the index is manually deleted, testing will return false so the project is reinitialized.
+            # This is needed to index built-in items as they are not automatically indexed by indexing the project.
+            if not isProjectInGoodShape
+                return @performInitialFullIndexForCurrentProject()
 
-            failureHandler = () ->
-                # Ignore
+            else
+                return @projectManager.attemptCurrentProjectIndex()
 
-            @proxy.test().then(successHandler, failureHandler)
+        failureHandler = () ->
+            # Ignore
+
+        @proxy.test().then(successHandler, failureHandler)
 
     ###*
      * Retrieves the base package service that can be used by other packages.
