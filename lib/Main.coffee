@@ -10,17 +10,6 @@ module.exports =
             default     : 'php'
             order       : 1
 
-        additionalIndexingDelay:
-            title       : 'Additional delay before reindexing'
-            description : 'File reindexing occurs as soon as its editor\'s contents stop changing. This is after a
-                          fixed time (about 300 ms at the time of writing) and is managed by Atom itself. If this is
-                          too fast for you, you can add an additional delay with this option. Fewer indexes means less
-                          load as tasks such as linting are invoked less often. It also means that it will take longer
-                          for changes to be reflected in various components, such as autocompletion.'
-            type        : 'integer'
-            default     : 200
-            order       : 2
-
         insertNewlinesForUseStatements:
             title       : 'Insert newlines for use statements'
             description : 'When enabled, additional newlines are inserted before or after an automatically added
@@ -28,7 +17,7 @@ module.exports =
                            more cleanly separated use statements but will create additional vertical whitespace.'
             type        : 'boolean'
             default     : false
-            order       : 3
+            order       : 2
 
     ###*
      * The name of the package.
@@ -100,11 +89,6 @@ module.exports =
      * @var {Object|null}
     ###
     projectManagerService: null
-
-    ###*
-     * @var {Object|null}
-    ###
-    editorTimeoutMap: null
 
     ###*
      * Tests the user's configuration.
@@ -359,9 +343,6 @@ module.exports =
                 @registerCommands()
                 @registerConfigListeners()
                 @registerStatusBarListeners()
-
-                @editorTimeoutMap = {}
-
                 @registerAtomListeners()
 
     ###*
@@ -379,21 +360,7 @@ module.exports =
         # also impact other packages), we install our own timeout on top of the existing one. This is useful for users
         # that don't type particularly fast or are on slower machines and will prevent constant indexing from happening.
         @getDisposables().add editor.onDidStopChanging () =>
-            path = editor.getPath()
-
-            additionalIndexingDelay = @getConfiguration().get('additionalIndexingDelay')
-
-            @editorTimeoutMap[path] = setTimeout ( =>
-                @onEditorDidStopChanging(editor)
-                @editorTimeoutMap[path] = null
-            ), additionalIndexingDelay
-
-        @getDisposables().add editor.onDidChange () =>
-            path = editor.getPath()
-
-            if @editorTimeoutMap[path]?
-                clearTimeout(@editorTimeoutMap[path])
-                @editorTimeoutMap[path] = null
+            @onEditorDidStopChanging(editor)
 
     ###*
      * Invoked when an editor stops changing.
