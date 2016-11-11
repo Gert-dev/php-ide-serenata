@@ -167,6 +167,8 @@ class Proxy
                 @client.on('data', @onDataReceived.bind(this))
                 @client.on('close', @onConnectionClosed.bind(this))
 
+                return
+
             resolve(@client)
 
     ###*
