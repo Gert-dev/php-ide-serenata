@@ -423,6 +423,8 @@ module.exports =
 
         return if not project?
 
+        @proxy.clearCache()
+
         projectManager = @getProjectManager()
         projectManager.load(project)
 
