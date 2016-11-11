@@ -70,6 +70,8 @@ class Proxy
     ###
     constructor: (@config) ->
         @requestQueue = {}
+        @port = @getRandomServerPort()
+
         @resetResponseState()
 
     ###*
@@ -77,7 +79,7 @@ class Proxy
      *
      * @param {Number} port
      *
-     * @return {Object}
+     * @return {Promise}
     ###
     spawnPhpServer: (port) ->
         php = @config.get('phpCommand')
@@ -91,20 +93,22 @@ class Proxy
 
         process = child_process.spawn(php, parameters)
 
-        process.stdout.on 'data', (data) =>
-            console.debug('The PHP server has something to say:', data.toString())
+        return new Promise (resolve, reject) =>
+            process.stdout.on 'data', (data) =>
+                console.debug('The PHP server has something to say:', data.toString())
 
-        process.stderr.on 'data', (data) =>
-            console.debug('The PHP server has errors to report:', data.toString())
+                # Assume the server has successfully spawned the moment it says its first words.
+                resolve(process)
 
-        process.on 'close', (code) =>
-            if code == 2
-                console.debug('Port ' + port + ' is already taken')
-                return
+            process.stderr.on 'data', (data) =>
+                console.debug('The PHP server has errors to report:', data.toString())
 
-            console.debug('PHP socket server exited by itself, a fatal error must have occurred.')
+            process.on 'close', (code) =>
+                if code == 2
+                    console.debug('Port ' + port + ' is already taken')
+                    return
 
-        return process
+                console.debug('PHP socket server exited by itself, a fatal error must have occurred.')
 
     ###*
      * @return {Number}
@@ -120,13 +124,17 @@ class Proxy
      *
      * @param {Number} port
      *
-     * @return {Object}
+     * @return {Promise}
     ###
     spawnPhpServerIfNecessary: (port) ->
-        if not @phpServer
-            @phpServer = @spawnPhpServer(port)
+        if @phpServer
+            return new Promise (resolve, reject) =>
+                resolve(@phpServer)
 
-        return @phpServer
+        return @spawnPhpServer(port).then (phpServer) =>
+            @phpServer = phpServer
+
+            return phpServer
 
     ###*
      * Sends the kill signal to the socket server.
@@ -155,19 +163,16 @@ class Proxy
     ###
     getSocketConnection: () ->
         return new Promise (resolve, reject) =>
-            @port = @getRandomServerPort()
+            @spawnPhpServerIfNecessary(@port).then () =>
+                if @client?
+                    resolve(@client)
 
-            @spawnPhpServerIfNecessary(@port)
+                @client = net.createConnection {port: @port}, () =>
+                    resolve(@client)
 
-            if @client?
-                resolve(@client)
-
-            @client = net.createConnection {port: @port}, () =>
-                resolve(@client)
-
-            @client.setNoDelay(true)
-            @client.on('data', @onDataReceived.bind(this))
-            @client.on('close', @onConnectionClosed.bind(this))
+                @client.setNoDelay(true)
+                @client.on('data', @onDataReceived.bind(this))
+                @client.on('close', @onConnectionClosed.bind(this))
 
     ###*
      * @param {String} data
