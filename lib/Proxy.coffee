@@ -249,11 +249,24 @@ class Proxy
      * @param {Object} jsonRpcResponse
     ###
     processJsonRpcResponse: (jsonRpcResponse) ->
-        request = @requestQueue[jsonRpcResponse.id]
+        if jsonRpcResponse.id?
+            jsonRpcRequest = @requestQueue[jsonRpcResponse.id]
 
+            @processJsonRpcResponseForRequest(jsonRpcResponse, jsonRpcRequest)
+
+            delete @requestQueue[jsonRpcResponse.id]
+
+        else
+            @processNotificationJsonRpcResponse(jsonRpcResponse)
+
+    ###*
+     * @param {Object} jsonRpcResponse
+     * @param {Object} jsonRpcRequest
+    ###
+    processJsonRpcResponseForRequest: (jsonRpcResponse, jsonRpcRequest) ->
         if jsonRpcResponse.error?
-            request.promise.reject({
-                request  : request
+            jsonRpcRequest.promise.reject({
+                request  : jsonRpcRequest
                 response : jsonRpcResponse
                 error    : jsonRpcResponse.error
             })
@@ -262,9 +275,32 @@ class Proxy
                 @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
 
         else
-            request.promise.resolve(jsonRpcResponse.result)
+            jsonRpcRequest.promise.resolve(jsonRpcResponse.result)
 
-        delete @requestQueue[jsonRpcResponse.id]
+    ###*
+     * @param {Object} jsonRpcResponse
+     * @param {Object} jsonRpcRequest
+    ###
+    processNotificationJsonRpcResponse: (jsonRpcResponse) ->
+        if not jsonRpcResponse.result?
+            console.warning('Received a server notification without a result', jsonRpcResponse)
+            return
+
+        if jsonRpcResponse.result.type == 'reindexProgressInformation'
+            if not jsonRpcResponse.result.requestId?
+                console.warning('Received progress information without a request ID to go with it', jsonRpcResponse)
+                return
+
+            relatedJsonRpcRequest = @requestQueue[jsonRpcResponse.result.requestId]
+
+            if not relatedJsonRpcRequest.streamCallback?
+                console.warning('Received progress information for a request that isn\'t interested in it')
+                return
+
+            relatedJsonRpcRequest.streamCallback(jsonRpcResponse.result.progress)
+
+        else
+            console.warning('Received a server notification with an unknown type', jsonRpcResponse)
 
     ###*
      * @param {Buffer} dataBuffer
@@ -366,13 +402,6 @@ class Proxy
                     reject  : reject
                 }
             }
-
-            # TODO: Find another way to implement streamCallback, will probably need additional (pushed by server
-            # side) responses for this.
-
-            # if streamCallback
-            #     proc.stderr.on 'data', (data) =>
-            #         streamCallback(data)
 
             content = @getContentForJsonRpcRequest(JsonRpcRequest)
 
@@ -860,15 +889,9 @@ class Proxy
         }
 
         if progressStreamCallback?
-            parameters.streamProgress = true
+            parameters['stream-progress'] = true
 
-            progressStreamCallbackWrapper = (output) =>
-                # Sometimes we receive multiple lines in bulk, so we must ensure it remains split correctly.
-                percentages = output.toString('ascii').split("\n")
-                percentages.pop() # Ditch the empty value.
-
-                for percentage in percentages
-                    progressStreamCallback(percentage)
+            progressStreamCallbackWrapper = progressStreamCallback
 
         parameters.source = pathsToIndex
         parameters.exclude = excludedPaths
