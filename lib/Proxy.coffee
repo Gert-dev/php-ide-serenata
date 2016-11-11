@@ -101,14 +101,14 @@ class Proxy
                 resolve(process)
 
             process.stderr.on 'data', (data) =>
-                console.debug('The PHP server has errors to report:', data.toString())
+                console.warning('The PHP server has errors to report:', data.toString())
 
             process.on 'close', (code) =>
                 if code == 2
-                    console.debug('Port ' + port + ' is already taken')
+                    console.error('Port ' + port + ' is already taken')
                     return
 
-                console.debug('PHP socket server exited by itself, a fatal error must have occurred.')
+                console.warning('PHP socket server exited by itself, a fatal error must have occurred.')
 
     ###*
      * @return {Number}
@@ -187,7 +187,7 @@ class Proxy
             @processDataBuffer(data)
 
         catch error
-            console.debug('Encountered some invalid data from the socket server, resetting state')
+            console.warning('Encountered some invalid data from the socket server, resetting state')
 
             @resetResponseState()
 
