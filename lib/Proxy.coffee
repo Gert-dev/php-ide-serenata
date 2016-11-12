@@ -195,7 +195,7 @@ class Proxy
             @processDataBuffer(data)
 
         catch error
-            console.warn('Encountered some invalid data from the socket server, resetting state')
+            console.warn('Encountered some invalid data, resetting state. Error: ', error)
 
             @resetResponseState()
 
@@ -251,8 +251,7 @@ class Proxy
             if @response.bytesRead == @response.length
                 jsonRpcResponse = @getJsonRpcResponseFromResponseBuffer(@response.content)
 
-                if jsonRpcResponse?
-                    @processJsonRpcResponse(jsonRpcResponse)
+                @processJsonRpcResponse(jsonRpcResponse)
 
                 @resetResponseState()
 
@@ -333,16 +332,7 @@ class Proxy
     getJsonRpcResponseFromResponseBuffer: (dataBuffer) ->
         jsonRpcResponseString = dataBuffer.toString()
 
-        try
-            jsonRpcResponse = @getJsonRpcResponseFromResponseContent(jsonRpcResponseString)
-
-        catch error
-            jsonRpcResponse = null
-
-        if not jsonRpcResponse?
-            @showUnexpectedSocketResponseError(jsonRpcResponseString)
-
-        return jsonRpcResponse
+        return @getJsonRpcResponseFromResponseContent(jsonRpcResponseString)
 
     ###*
      * @param {String} content
