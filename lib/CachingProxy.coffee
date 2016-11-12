@@ -171,15 +171,6 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    truncate: () ->
-        return super().then (output) =>
-            @clearCache()
-
-            return output
-
-    ###*
-     * @inherited
-    ###
     initialize: () ->
         return super().then (output) =>
             @clearCache()

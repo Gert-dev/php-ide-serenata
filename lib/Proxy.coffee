@@ -821,18 +821,6 @@ class Proxy
         return @performRequest('invocationInfo', parameters, null, source)
 
     ###*
-     * Truncates the database.
-     *
-     * @return {Promise}
-    ###
-    truncate: () ->
-        parameters = {
-            database : @getIndexDatabasePath()
-        }
-
-        return @performRequest('truncate', parameters, null, null)
-
-    ###*
      * Initializes a project.
      *
      * @return {Promise}

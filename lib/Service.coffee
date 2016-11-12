@@ -264,14 +264,6 @@ class Service
         return @indexingMediator.reindex(path, source, excludedPaths, fileExtensionsToIndex)
 
     ###*
-     * Truncates the database.
-     *
-     * @return {Promise}
-    ###
-    truncate: () ->
-        return @indexingMediator.truncate()
-
-    ###*
      * Initializes a project.
      *
      * @return {Promise}

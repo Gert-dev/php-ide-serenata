@@ -182,13 +182,7 @@ module.exports =
         atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
             return if not @projectManager.hasActiveProject()
 
-            successHandler = () =>
-                @performInitialFullIndexForCurrentProject()
-
-            failureHandler = () =>
-                # Do nothing.
-
-            @projectManager.truncateCurrentProject().then(successHandler, failureHandler)
+            @performInitialFullIndexForCurrentProject()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
             return unless @testConfig()

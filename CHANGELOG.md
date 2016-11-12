@@ -16,6 +16,7 @@ Starting with version **1.3.0**, this repository only contains the CoffeeScript 
 * Popovers will no longer go beyond the left or top part of the screen. They will move respectively right or down in that case.
 
 ### Changes for developers
+* The `truncate` call was removed as you can now simply call `initialize` again to reinitialize a project.
 * The `reindex` call no longer automatically indexes built-in structural elements, nor will it automatically prune removed files from the database.
   * A new call, `vacuum`, can be used to vacuum a project and prune removed files from its index.
   * A new call, `initialize`, can be used to initialize a project and index built-in structural elements.

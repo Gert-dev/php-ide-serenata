@@ -283,14 +283,6 @@ class ProjectManager
         return @attemptIndex(@getActiveProject())
 
     ###*
-     * Truncates the project, removing the existing indexing database.
-     *
-     * @return {Promise|null}
-    ###
-    truncateCurrentProject: () ->
-        return @indexingMediator.truncate()
-
-    ###*
      * Initializes the project.
      *
      * @return {Promise|null}

@@ -77,14 +77,6 @@ class IndexingMediator
             ).then(successHandler, failureHandler)
 
     ###*
-     * Truncates the database.
-     *
-     * @return {Promise}
-    ###
-    truncate: () ->
-        return @proxy.truncate()
-
-    ###*
      * Initializes the project.
      *
      * @return {Promise}
