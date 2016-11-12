@@ -191,8 +191,6 @@ class Proxy
      * @param {String} data
     ###
     onDataReceived: (data) ->
-        dataBuffer = new Buffer(data)
-
         try
             @processDataBuffer(data)
 
