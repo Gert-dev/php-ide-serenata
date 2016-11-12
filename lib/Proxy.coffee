@@ -34,6 +34,11 @@ class Proxy
     phpServer: null
 
     ###*
+     * @var {Promise}
+    ###
+    phpServerPromise: null
+
+    ###*
      * @var {Object}
     ###
     client: null
@@ -131,10 +136,15 @@ class Proxy
             return new Promise (resolve, reject) =>
                 resolve(@phpServer)
 
-        return @spawnPhpServer(port).then (phpServer) =>
+        else if @phpServerPromise
+            return @phpServerPromise
+
+        @phpServerPromise = @spawnPhpServer(port).then (phpServer) =>
             @phpServer = phpServer
 
             return phpServer
+
+        return @phpServerPromise
 
     ###*
      * Sends the kill signal to the socket server.
