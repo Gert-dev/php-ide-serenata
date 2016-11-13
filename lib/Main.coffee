@@ -21,6 +21,17 @@ module.exports =
             default     : 0
             order       : 2
 
+        memoryLimit:
+            title       : 'Memory limit (in MB)'
+            description : 'The memory limit to set to the PHP process. The PHP process uses the available memory for
+                           in-memory caching as well, so it should not be too low. On the other hand, it should\'t be
+                           growing very large, so setting it to -1 is probably a bad idea as an infinite loop bug
+                           might take down your system. The default is probably a good value, unless there is a
+                           specific reason you want to change it.'
+            type        : 'integer'
+            default     : 512
+            order       : 3
+
         insertNewlinesForUseStatements:
             title       : 'Insert newlines for use statements'
             description : 'When enabled, additional newlines are inserted before or after an automatically added
@@ -28,7 +39,7 @@ module.exports =
                            more cleanly separated use statements but will create additional vertical whitespace.'
             type        : 'boolean'
             default     : false
-            order       : 3
+            order       : 4
 
     ###*
      * The name of the package.

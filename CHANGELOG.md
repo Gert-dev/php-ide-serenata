@@ -12,6 +12,7 @@ Starting with version **1.3.0**, this repository only contains the CoffeeScript 
 * Error messages will now be shown if setting up the current project fails because there is no active project or the project manager service is not available.
 * Caching has been improved, improving performance and responsiveness.
   * Previously, similar queries to the PHP side that were happening closely in succession did not hit the cache because the promise of the similar query had not resolved yet. In this case, two promises were resolved, fetching the same information.
+* A memory limit for the PHP process is now configurable in the package settings.
 
 ### Bugs fixed
 * The status bar was not showing progress when a project index happened through a repository status change.

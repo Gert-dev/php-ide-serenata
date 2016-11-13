@@ -26,6 +26,7 @@ class Config
             phpCommand                     : null
             packagePath                    : null
             additionalIndexingDelay        : 200
+            memoryLimit                    : 512
             insertNewlinesForUseStatements : false
 
             # See also http://www.phpdoc.org/docs/latest/index.html .

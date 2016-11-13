@@ -88,9 +88,10 @@ class Proxy
     ###
     spawnPhpServer: (port) ->
         php = @config.get('phpCommand')
+        memoryLimit = @config.get('memoryLimit')
 
         parameters = [
-             '-d memory_limit=512M',
+             '-d memory_limit=' + memoryLimit + 'M',
              @getCorePackagePath() + "/src/Main.php",
              '--server',
              '-p ' + port
