@@ -18,7 +18,7 @@ module.exports =
                           load as tasks such as linting are invoked less often. It also means that it will take longer
                           for changes to be reflected in various components, such as autocompletion.'
             type        : 'integer'
-            default     : 200
+            default     : 0
             order       : 2
 
         insertNewlinesForUseStatements:
