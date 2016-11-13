@@ -14,6 +14,7 @@ Starting with version **1.3.0**, this repository only contains the CoffeeScript 
   * Previously, similar queries to the PHP side that were happening closely in succession did not hit the cache because the promise of the similar query had not resolved yet. In this case, two promises were resolved, fetching the same information.
 
 ### Bugs fixed
+* The status bar was not showing progress when a project index happened through a repository status change.
 * Popovers will no longer go beyond the left or top part of the screen. They will move respectively right or down in that case.
 
 ### Changes for developers
