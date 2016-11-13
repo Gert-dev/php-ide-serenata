@@ -350,6 +350,9 @@ module.exports =
      * @param {TextEditor} editor
     ###
     registerTextEditorListeners: (editor) ->
+        # The default onDidStopChanging timeout is 300 milliseconds. As this is notcurrently configurable (and would
+        # also impact other packages), we install our own timeout on top of the existing one. This is useful for users
+        # that don't type particularly fast or are on slower machines and will prevent constant indexing from happening.
         @getDisposables().add editor.onDidStopChanging () =>
             @onEditorDidStopChanging(editor)
 
