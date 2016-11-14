@@ -93,7 +93,6 @@ class Proxy
         parameters = [
              '-d memory_limit=' + memoryLimit + 'M',
              @getCorePackagePath() + "/src/Main.php",
-             '--server',
              '-p ' + port
         ]
 
