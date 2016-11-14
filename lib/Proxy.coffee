@@ -179,6 +179,7 @@ class Proxy
             @spawnPhpServerIfNecessary(@port).then () =>
                 if @client?
                     resolve(@client)
+                    return
 
                 @client = net.createConnection {port: @port}, () =>
                     resolve(@client)
