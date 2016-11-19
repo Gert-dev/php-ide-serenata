@@ -93,7 +93,7 @@ class Proxy
         parameters = [
              '-d memory_limit=' + memoryLimit + 'M',
              @getCorePackagePath() + "/src/Main.php",
-             '-p' + port
+             '--port=' + port
         ]
 
         process = child_process.spawn(php, parameters)
