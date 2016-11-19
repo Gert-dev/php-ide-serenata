@@ -313,14 +313,7 @@ class Proxy
                 console.warn('Received progress information for a request that isn\'t interested in it')
                 return
 
-            # TODO: Fix progress stream callback piling up in the buffer and not really "streaming". This is most likely
-            # because the original "reindex" request is still being handled and not drained from the socket yet, causing
-            # the stream data to pile up inside the socket's buffer until the entire operation completes, after which
-            # the buffered stream data is pushed in one large operation to the client.
-            #
-            # In short: even though the server is streaming them, we receive all of these responses after the operation
-            # completes in bulk. We'd need a separate socket or another way to send these over.
-            # relatedJsonRpcRequest.streamCallback(jsonRpcResponse.result.progress)
+            relatedJsonRpcRequest.streamCallback(jsonRpcResponse.result.progress)
 
         else
             console.warn('Received a server notification with an unknown type', jsonRpcResponse)
