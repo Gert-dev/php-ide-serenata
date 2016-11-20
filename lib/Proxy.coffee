@@ -483,6 +483,10 @@ class Proxy
      * @return {Promise}
     ###
     getClassList: () ->
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
         }
@@ -501,6 +505,10 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
 
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
             file     : file
@@ -514,6 +522,10 @@ class Proxy
      * @return {Promise}
     ###
     getNamespaceList: () ->
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
         }
@@ -532,6 +544,10 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
 
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
             file     : file
@@ -545,6 +561,10 @@ class Proxy
      * @return {Promise}
     ###
     getGlobalConstants: () ->
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
         }
@@ -557,6 +577,10 @@ class Proxy
      * @return {Promise}
     ###
     getGlobalFunctions: () ->
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
         }
@@ -574,6 +598,10 @@ class Proxy
         if not className
             return new Promise (resolve, reject) ->
                 reject('No class name passed!')
+
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
 
         parameters = {
             database : @getIndexDatabasePath()
@@ -608,6 +636,10 @@ class Proxy
         if not kind
             return new Promise (resolve, reject) ->
                 reject('No kind passed!')
+
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
 
         parameters = {
             database : @getIndexDatabasePath()
@@ -647,6 +679,10 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('No kind passed!')
 
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
             file     : file
@@ -672,6 +708,10 @@ class Proxy
         if not file
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
+
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
 
         parameters = {
             database : @getIndexDatabasePath()
@@ -712,6 +752,10 @@ class Proxy
         if not file? and not source?
             return new Promise (resolve, reject) ->
                 reject('Either a path to a file or source code must be passed!')
+
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
 
         parameters = {
             database   : @getIndexDatabasePath()
@@ -761,6 +805,10 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('A path to a file must be passed!')
 
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database   : @getIndexDatabasePath()
             offset     : offset
@@ -792,6 +840,10 @@ class Proxy
             return new Promise (resolve, reject) ->
                 reject('Either a path to a file or source code must be passed!')
 
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database   : @getIndexDatabasePath()
             offset     : offset
@@ -809,6 +861,10 @@ class Proxy
      * @return {Promise}
     ###
     initialize: () ->
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
         }
@@ -821,6 +877,10 @@ class Proxy
      * @return {Promise}
     ###
     vacuum: () ->
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
         }
@@ -833,6 +893,10 @@ class Proxy
      * @return {Promise}
     ###
     test: () ->
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
         parameters = {
             database : @getIndexDatabasePath()
         }
@@ -865,6 +929,10 @@ class Proxy
         if path.length == 0
             return new Promise (resolve, reject) ->
                 reject('No filename passed!')
+
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
 
         progressStreamCallbackWrapper = null
 
