@@ -24,11 +24,6 @@ class Proxy
     indexDatabaseName: null
 
     ###*
-     * @var {String}
-    ###
-    projectName: null
-
-    ###*
      * @var {Object}
     ###
     phpServer: null
@@ -474,12 +469,6 @@ class Proxy
                 ''')
                 return
 
-        if not @projectName?
-            return new Promise (resolve, reject) ->
-                reject('Request aborted as there is no project active (yet)')
-
-        parameters.projectName = @projectName
-
         if stdinData?
             parameters.stdin = true
             parameters.stdinData = stdinData
@@ -901,14 +890,6 @@ class Proxy
     ###
     setIndexDatabaseName: (name) ->
         @indexDatabaseName = name
-
-    ###*
-     * Sets the project name to pass.
-     *
-     * @param {String} name
-    ###
-    setProjectName: (name) ->
-        @projectName = name
 
     ###*
      * Retrieves the full path to the database file to use.

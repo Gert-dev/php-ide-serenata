@@ -126,7 +126,6 @@ class ProjectManager
 
         @activeProject = project
 
-        @proxy.setProjectName(project.getProps().title)
         @proxy.setIndexDatabaseName(@getIndexDatabaseName(project))
 
         successHandler = (repository) =>
