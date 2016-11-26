@@ -184,21 +184,6 @@ class Service
         return @proxy.getAvailableVariables(file, source, offset)
 
     ###*
-     * Fetches the types of the specified variable at the specified location.
-     *
-     * @deprecated Use deduceTypes instead.
-     *
-     * @param {String}      name   The variable to fetch, including its leading dollar sign.
-     * @param {String}      file   The path to the file to examine.
-     * @param {String|null} source The source code to search. May be null if a file is passed instead.
-     * @param {Number}      offset The character offset into the file to examine.
-     *
-     * @return {Promise}
-    ###
-    getVariableTypesByOffset: (name, file, source, offset) ->
-        return @proxy.getVariableTypes(name, file, source, offset)
-
-    ###*
      * Deduces the resulting types of an expression.
      *
      * @param {String|null} expression        The expression to deduce the type of, e.g. '$this->foo()'. If null, the
@@ -403,25 +388,6 @@ class Service
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
         return @getAvailableVariablesByOffset(editor.getPath(), editor.getBuffer().getText(), offset)
-
-    ###*
-     * Retrieves the types of a variable, relative to the context at the specified buffer location. Class names will
-     * be returned in their full form (full class name, with a leading slash).
-     *
-     * @deprecated Use deduceTypesAt instead.
-     *
-     * @param {TextEditor} editor
-     * @param {Range}      bufferPosition
-     * @param {String}     name
-     *
-     * @return {Promise}
-    ###
-    getVariableTypes: (editor, bufferPosition, name) ->
-        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
-
-        bufferText = editor.getBuffer().getText()
-
-        return @getVariableTypesByOffset(name, editor.getPath(), bufferText, offset)
 
     ###*
      * Retrieves the types that are being used (called) at the specified location in the buffer. Note that this does not

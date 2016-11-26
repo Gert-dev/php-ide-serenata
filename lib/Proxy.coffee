@@ -769,21 +769,6 @@ class Proxy
         return @performRequest('availableVariables', parameters, null, source)
 
     ###*
-     * Fetches the types of the specified variable at the specified location.
-     *
-     * @deprecated Use deduceTypes instead.
-     *
-     * @param {String}      name   The variable to fetch, including its leading dollar sign.
-     * @param {String}      file   The path to the file to examine.
-     * @param {String|null} source The source code to search. May be null if a file is passed instead.
-     * @param {Number}      offset The character offset into the file to examine.
-     *
-     * @return {Promise}
-    ###
-    getVariableTypes: (name, file, source, offset) ->
-        return @deduceTypes(name, file, source, offset)
-
-    ###*
      * Deduces the resulting types of an expression.
      *
      * @param {String|null} expression        The expression to deduce the type of, e.g. '$this->foo()'. If null, the
