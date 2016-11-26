@@ -18,8 +18,10 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * The status bar was not showing progress when a project index happened through a repository status change.
 * Popovers will no longer go beyond the left or top part of the screen. They will move respectively right or down in that case.
 
-### Changes for developers
+### Changes for developers (see also the core)
+* `getVariableTypes` has been removed as it was deprecated and just an alias for `deduceTypes`.
 * The `truncate` call was removed as you can now simply call `initialize` again to reinitialize a project.
+* The `deduceTypes` call now expects the (optional) entire expression to be passed rather than just its parts.
 * The `reindex` call no longer automatically indexes built-in structural elements, nor will it automatically prune removed files from the database.
   * A new call, `vacuum`, can be used to vacuum a project and prune removed files from its index.
   * A new call, `initialize`, can be used to initialize a project and index built-in structural elements.
