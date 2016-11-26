@@ -781,14 +781,13 @@ class Proxy
      * @return {Promise}
     ###
     getVariableTypes: (name, file, source, offset) ->
-        return @deduceTypes([name], file, source, offset)
+        return @deduceTypes(name, file, source, offset)
 
     ###*
-     * Deduces the resulting types of an expression based on its parts.
+     * Deduces the resulting types of an expression.
      *
-     * @param {Array|null}  parts             One or more strings that are part of the expression, e.g.
-     *                                        ['$this', 'foo()']. If null, the expression will automatically be deduced
-     *                                        based on the offset.
+     * @param {String|null} expression        The expression to deduce the type of, e.g. '$this->foo()'. If null, the
+     *                                        expression just before the specified offset will be used.
      * @param {String}      file              The path to the file to examine.
      * @param {String|null} source            The source code to search. May be null if a file is passed instead.
      * @param {Number}      offset            The character offset into the file to examine.
@@ -800,7 +799,7 @@ class Proxy
      *
      * @return {Promise}
     ###
-    deduceTypes: (parts, file, source, offset, ignoreLastElement) ->
+    deduceTypes: (expression, file, source, offset, ignoreLastElement) ->
         if not file?
             return new Promise (resolve, reject) ->
                 reject('A path to a file must be passed!')
@@ -821,8 +820,8 @@ class Proxy
         if ignoreLastElement
             parameters['ignore-last-element'] = true
 
-        if parts?
-            parameters.part = parts
+        if expression?
+            parameters.expression = expression
 
         return @performRequest('deduceTypes', parameters, null, source)
 

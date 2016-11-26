@@ -199,11 +199,10 @@ class Service
         return @proxy.getVariableTypes(name, file, source, offset)
 
     ###*
-     * Deduces the resulting types of an expression based on its parts.
+     * Deduces the resulting types of an expression.
      *
-     * @param {Array|null}  parts             One or more strings that are part of the expression, e.g.
-     *                                        ['$this', 'foo()']. If null, the expression will automatically be deduced
-     *                                        based on the offset.
+     * @param {String|null} expression        The expression to deduce the type of, e.g. '$this->foo()'. If null, the
+     *                                        expression just before the specified offset will be used.
      * @param {String}      file              The path to the file to examine.
      * @param {String|null} source            The source code to search. May be null if a file is passed instead.
      * @param {Number}      offset            The character offset into the file to examine.
@@ -215,8 +214,8 @@ class Service
      *
      * @return {Promise}
     ###
-    deduceTypes: (parts, file, source, offset, ignoreLastElement) ->
-        return @proxy.deduceTypes(parts, file, source, offset, ignoreLastElement)
+    deduceTypes: (expression, file, source, offset, ignoreLastElement) ->
+        return @proxy.deduceTypes(expression, file, source, offset, ignoreLastElement)
 
     ###*
      * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
@@ -235,18 +234,18 @@ class Service
     ###*
      * Convenience alias for {@see deduceTypes}.
      *
+     * @param {String}     expression
      * @param {TextEditor} editor
      * @param {Range}      bufferPosition
-     * @param {String}     name
      *
      * @return {Promise}
     ###
-    deduceTypesAt: (parts, editor, bufferPosition) ->
+    deduceTypesAt: (expression, editor, bufferPosition) ->
         offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
 
         bufferText = editor.getBuffer().getText()
 
-        return @deduceTypes(parts, editor.getPath(), bufferText, offset)
+        return @deduceTypes(expression, editor.getPath(), bufferText, offset)
 
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
@@ -383,13 +382,14 @@ class Service
      * @param {TextEditor} editor         The editor.
      * @param {Point}      bufferPosition The location of the type.
      * @param {String}     type           The (local) type to resolve.
+     * @param {String}  kind The kind of element. Either 'classlike', 'constant' or 'function'.
      *
      * @return {Promise}
      *
      * @example In a file with namespace A\B, determining C could lead to A\B\C.
     ###
-    resolveTypeAt: (editor, bufferPosition, type) ->
-        return @resolveType(editor.getPath(), bufferPosition.row + 1, type)
+    resolveTypeAt: (editor, bufferPosition, type, kind) ->
+        return @resolveType(editor.getPath(), bufferPosition.row + 1, type, kind)
 
     ###*
      * Retrieves all variables that are available at the specified buffer position.
