@@ -1,7 +1,7 @@
 ### Note
-Starting with version **1.3.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting chnages are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
+Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting chnages are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
-## 1.3.0
+## 2.0.0
 ### Features and enhancements
 * The PHP side is no longer part of the base package. Instead, it has been separated into the [php-integrator/core](https://github.com/php-integrator/core) repository so it can be more easily installed via Composer for use in other projects.
   * This change should not impact users as they upgrade, as this package will be automatically installed and upgraded along with this one if necessary (a notification will be shown whenever that happens).
