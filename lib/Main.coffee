@@ -5,7 +5,9 @@ module.exports =
     config:
         phpCommand:
             title       : 'PHP command'
-            description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...).'
+            description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...). Requires a restart. If you update
+                           to a new minor or major version, you may want to force reindex your project to index the new
+                           built-in structural elements.'
             type        : 'string'
             default     : 'php'
             order       : 1
