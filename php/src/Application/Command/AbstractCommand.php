@@ -19,63 +19,63 @@ use PhpIntegrator\Indexing\IndexDatabase;
 use PhpParser\Parser;
 
 /**
- * Base class for commands.
- */
+* Base class for commands.
+*/
 abstract class AbstractCommand implements CommandInterface
 {
     /**
-     * The version of the database we're currently at. When there are large changes to the layout of the database, this
-     * number is bumped and all databases with older versions will be dumped and replaced with a new index database.
-     *
-     * @var int
-     */
+    * The version of the database we're currently at. When there are large changes to the layout of the database, this
+    * number is bumped and all databases with older versions will be dumped and replaced with a new index database.
+    *
+    * @var int
+    */
     const DATABASE_VERSION = 25;
 
     /**
-     * @var IndexDatabase
-     */
+    * @var IndexDatabase
+    */
     protected $indexDatabase;
 
     /**
-     * @var IndexDataAdapter
-     */
+    * @var IndexDataAdapter
+    */
     protected $indexDataAdapter;
 
     /**
-     * @var string
-     */
+    * @var string
+    */
     protected $databaseFile;
 
     /**
-     * @var Parser
-     */
+    * @var Parser
+    */
     protected $parser;
 
     /**
-     * @var CacheIdPrefixDecorator|null
-     */
+    * @var CacheIdPrefixDecorator|null
+    */
     protected $cache;
 
     /**
-     * @var CachingParserProxy|null
-     */
+    * @var CachingParserProxy|null
+    */
     protected $cachingParserProxy;
 
     /**
-     * @var IndexDataAdapter\ProviderCachingProxy
-     */
+    * @var IndexDataAdapter\ProviderCachingProxy
+    */
     protected $indexDataAdapterProvider;
 
     /**
-     * @var SourceCodeHelper
-     */
+    * @var SourceCodeHelper
+    */
     protected $sourceCodeHelper;
 
     /**
-     * @param Parser             $parser
-     * @param Cache|null         $cache
-     * @param IndexDatabase|null $indexDatabase
-     */
+    * @param Parser             $parser
+    * @param Cache|null         $cache
+    * @param IndexDatabase|null $indexDatabase
+    */
     public function __construct(Parser $parser, Cache $cache = null, IndexDatabase $indexDatabase = null)
     {
         $this->parser = $parser;
@@ -84,8 +84,8 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @inheritDoc
-     */
+    * @inheritDoc
+    */
     public function execute(array $arguments)
     {
         $optionCollection = new OptionCollection();
@@ -121,8 +121,8 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @return IndexDatabase
-     */
+    * @return IndexDatabase
+    */
     protected function getIndexDatabase()
     {
         if (!$this->indexDatabase) {
@@ -133,39 +133,39 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * Sets up command line arguments expected by the command.
-     *
-     * Operates as a(n optional) template method.
-     *
-     * @param OptionCollection $optionCollection
-     */
+    * Sets up command line arguments expected by the command.
+    *
+    * Operates as a(n optional) template method.
+    *
+    * @param OptionCollection $optionCollection
+    */
     protected function attachOptions(OptionCollection $optionCollection)
     {
 
     }
 
     /**
-     * Executes the actual command and processes the specified arguments.
-     *
-     * Operates as a template method.
-     *
-     * @param ArrayAccess $arguments
-     *
-     * @return string Output to pass back.
-     */
+    * Executes the actual command and processes the specified arguments.
+    *
+    * Operates as a template method.
+    *
+    * @param ArrayAccess $arguments
+    *
+    * @return string Output to pass back.
+    */
     abstract protected function process(ArrayAccess $arguments);
 
     /**
-     * @return string
-     */
+    * @return string
+    */
     protected function getCachePrefix()
     {
         return '';
     }
 
     /**
-     * @return IndexDataAdapter
-     */
+    * @return IndexDataAdapter
+    */
     protected function getIndexDataAdapter()
     {
         if (!$this->indexDataAdapter) {
@@ -176,8 +176,8 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @return SourceCodeHelper
-     */
+    * @return SourceCodeHelper
+    */
     protected function getSourceCodeHelper()
     {
         if (!$this->sourceCodeHelper) {
@@ -188,8 +188,8 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @return IndexDataAdapter\ProviderInterface
-     */
+    * @return IndexDataAdapter\ProviderInterface
+    */
     protected function getIndexDataAdapterProvider()
     {
         if (!$this->indexDataAdapterProvider) {
@@ -206,19 +206,56 @@ abstract class AbstractCommand implements CommandInterface
         return $this->indexDataAdapterProvider;
     }
 
+    private function safe_json_encode($value){
+        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            $encoded = json_encode($value, JSON_PRETTY_PRINT);
+        } else {
+            $encoded = json_encode($value);
+        }
+        switch (json_last_error()) {
+            case JSON_ERROR_NONE:
+            return $encoded;
+            case JSON_ERROR_DEPTH:
+            return 'Maximum stack depth exceeded'; // or trigger_error() or throw new Exception()
+            case JSON_ERROR_STATE_MISMATCH:
+            return 'Underflow or the modes mismatch'; // or trigger_error() or throw new Exception()
+            case JSON_ERROR_CTRL_CHAR:
+            return 'Unexpected control character found';
+            case JSON_ERROR_SYNTAX:
+            return 'Syntax error, malformed JSON'; // or trigger_error() or throw new Exception()
+            case JSON_ERROR_UTF8:
+            $clean = $this->utf8ize($value);
+            return $this->safe_json_encode($clean);
+            default:
+            return 'Unknown error'; // or trigger_error() or throw new Exception()
+
+        }
+    }
+
+    private function utf8ize($mixed) {
+        if (is_array($mixed)) {
+            foreach ($mixed as $key => $value) {
+                $mixed[$key] = $this->utf8ize($value);
+            }
+        } else if (is_string ($mixed)) {
+            return utf8_encode($mixed);
+        }
+        return $mixed;
+    }
+
     /**
-     * Outputs JSON.
-     *
-     * @param bool  $success
-     * @param mixed $data
-     *
-     * @throws RuntimeException When the encoding fails, which should never happen.
-     *
-     * @return string
-     */
+    * Outputs JSON.
+    *
+    * @param bool  $success
+    * @param mixed $data
+    *
+    * @throws RuntimeException When the encoding fails, which should never happen.
+    *
+    * @return string
+    */
     protected function outputJson($success, $data)
     {
-        $output = json_encode([
+        $output = $this->safe_json_encode([
             'success' => $success,
             'result'  => $data
         ]);
@@ -238,8 +275,8 @@ abstract class AbstractCommand implements CommandInterface
     }
 
     /**
-     * @return Parser
-     */
+    * @return Parser
+    */
     public function getParser()
     {
         return $this->parser;
