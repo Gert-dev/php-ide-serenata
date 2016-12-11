@@ -13,6 +13,11 @@ if (!function_exists('mb_substr')) {
 // Show us pretty much everything so we can properly debug what is going wrong.
 error_reporting(E_ALL & ~E_DEPRECATED);
 
+// If not timezone is set, default to `UTC` to prevent warnings in PHP 5.3+
+if (! ini_get('date.timezone')) {
+    date_default_timezone_set('UTC');
+}
+
 // This limit can pose a problem for NameResolver built-in to php-parser (it can go over a nesting level of 300 in e.g.
 // a Symfony2 code base). Also, -1 as a value doesn't work in some setups, see also:
 // https://github.com/Gert-dev/php-integrator-base/issues/91
