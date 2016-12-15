@@ -1,6 +1,9 @@
 ### Note
 Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting chnages are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
+## 2.0.2
+* Update to core 2.0.2.
+
 ## 2.0.1
 * Update to core 2.0.1.
 
