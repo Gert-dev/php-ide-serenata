@@ -32,11 +32,9 @@
     "jquery": "~3.1.0",
     "md5": "~2.0.0",
     "rimraf": "~2.5.4",
-    "atom-package-deps": "^4.3.1"
+    "semver": "~5.3.0",
+    "download": "~5.0.2"
   },
-  "package-deps": [
-    "php-integrator-core#php-integrator/core"
-  ],
   "keywords": [
     "php",
     "service",

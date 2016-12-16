@@ -44,6 +44,13 @@ module.exports =
             order       : 4
 
     ###*
+     * The version of the core to download (version specification string).
+     *
+     * @var {String}
+    ###
+    coreVersionSpecification: "2.0.2"
+
+    ###*
      * The name of the package.
      *
      * @var {String}
@@ -330,46 +337,40 @@ module.exports =
             @statusBarManager = null
 
     ###*
-     * Uninstalls the core package (which contains the PHP payload) if it is outdated. It can then be installed in an
-     * up-to-date version again.
-     *
      * @return {Promise}
     ###
-    uninstallCorePackageIfOutdated: () ->
-        fs = require 'fs'
-        path = require 'path'
+    updateCoreIfOutdated: () ->
+        if @getCoreManager().isInstalled() and not @getCoreManager().isOutdated()
+            return new Promise (resolve, reject) ->
+                resolve()
 
-        corePackagePath = atom.packages.resolvePackagePath("php-integrator-core")
+        message =
+            "The core isn't installed yet or is outdated. A new version is in the process of being downloaded."
 
-        if corePackagePath?
-            coreVersion = JSON.parse(fs.readFileSync(path.join(corePackagePath, 'package.json')))?.version
-            baseVersion = JSON.parse(fs.readFileSync(path.join(atom.packages.resolvePackagePath(@packageName), 'package.json')))?.version
+        atom.notifications.addInfo('PHP Integrator - Downloading Core', {'detail': message})
 
-            if coreVersion? and coreVersion < baseVersion
-                return new Promise (resolve, reject) =>
-                    rmdirRecursive = require('rimraf');
+        successHandler = () ->
+            atom.notifications.addSuccess('Core installation successful')
 
-                    rmdirRecursive corePackagePath, (error) =>
-                        resolve()
+        failureHandler = () ->
+            atom.notifications.addError('Core installation failed')
 
-        return new Promise (resolve, reject) ->
-            resolve()
+        return @getCoreManager().install().then(successHandler, failureHandler)
 
     ###*
      * Activates the package.
     ###
     activate: ->
-        @uninstallCorePackageIfOutdated().then () =>
-            require('atom-package-deps').install(@packageName).then () =>
-                @testConfig(false)
+        @testConfig(false)
 
-                @registerCommands()
-                @registerConfigListeners()
-                @registerStatusBarListeners()
+        @updateCoreIfOutdated().then () =>
+            @registerCommands()
+            @registerConfigListeners()
+            @registerStatusBarListeners()
 
-                @editorTimeoutMap = {}
+            @editorTimeoutMap = {}
 
-                @registerAtomListeners()
+            @registerAtomListeners()
 
     ###*
      * Registers listeners for events from Atom's API.
@@ -555,6 +556,35 @@ module.exports =
             @emitter = new Emitter()
 
         return @emitter
+
+    ###*
+     * @return {ComposerService}
+    ###
+    getComposerService: () ->
+        if not @composerService?
+            ComposerService = require './ComposerService';
+
+            @composerService = new ComposerService(
+                @getConfiguration().get('phpCommand'),
+                @getConfiguration().get('packagePath') + '/core/'
+            )
+
+        return @composerService
+
+    ###*
+     * @return {CoreManager}
+    ###
+    getCoreManager: () ->
+        if not @coreManager?
+            CoreManager = require './CoreManager';
+
+            @coreManager = new CoreManager(
+                @getComposerService(),
+                @coreVersionSpecification,
+                @getConfiguration().get('packagePath') + '/core/'
+            )
+
+        return @coreManager
 
     ###*
      * @return {UseStatementHelper}

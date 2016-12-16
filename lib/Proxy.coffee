@@ -87,7 +87,7 @@ class Proxy
 
         parameters = [
              '-d memory_limit=' + memoryLimit + 'M',
-             @getCorePackagePath() + "/src/Main.php",
+             @getCorePath() + "/src/Main.php",
              '--port=' + port
         ]
 
@@ -159,12 +159,6 @@ class Proxy
 
         @phpServer.kill()
         @phpServer = null
-
-    ###*
-     * @return {String}
-    ###
-    getCorePackagePath: () ->
-        return atom.packages.resolvePackagePath("php-integrator-core")
 
     ###*
      * @return {Object}
@@ -461,14 +455,6 @@ class Proxy
      * @return {Promise}
     ###
     performRequest: (method, parameters, streamCallback = null, stdinData = null) ->
-        if not @getCorePackagePath()?
-            return new Promise (resolve, reject) ->
-                reject('''
-                    The core package was not found, it is currently being installed. This only needs to happen once at
-                    initialization, but the service is not available yet in the meantime.
-                ''')
-                return
-
         if stdinData?
             parameters.stdin = true
             parameters.stdinData = stdinData
@@ -950,3 +936,9 @@ class Proxy
     ###
     getIndexDatabasePath: () ->
         return @config.get('packagePath') + '/indexes/' + @indexDatabaseName + '.sqlite'
+
+    ###*
+     * @return {String}
+    ###
+    getCorePath: () ->
+        return @config.get('packagePath') + '/core/vendor/php-integrator/core/'
