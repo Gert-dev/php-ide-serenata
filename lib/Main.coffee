@@ -31,7 +31,7 @@ module.exports =
                            might take down your system. The default is probably a good value, unless there is a
                            specific reason you want to change it.'
             type        : 'integer'
-            default     : 512
+            default     : 1024
             order       : 3
 
         insertNewlinesForUseStatements:
