@@ -372,6 +372,8 @@ module.exports =
 
             @registerAtomListeners()
 
+            @getCachingProxy().setIsActive(true)
+
     ###*
      * Registers listeners for events from Atom's API.
     ###

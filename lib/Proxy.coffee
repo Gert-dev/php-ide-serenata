@@ -24,6 +24,11 @@ class Proxy
     indexDatabaseName: null
 
     ###*
+     * @var {Boolean}
+    ###
+    isActive: false
+
+    ###*
      * @var {String}
     ###
     corePath: null
@@ -400,6 +405,10 @@ class Proxy
     ###
     performJsonRpcRequest: (id, method, parameters, streamCallback = null) ->
         return new Promise (resolve, reject) =>
+            if not @getIsActive()
+                reject('The proxy is not yet active, the core may be in the process of being downloaded')
+                return
+
             JsonRpcRequest =
                 jsonrpc : 2.0
                 id      : id
@@ -960,3 +969,15 @@ class Proxy
     ###
     setCorePath: (corePath) ->
         @corePath = corePath
+
+    ###*
+     * @return {Boolean}
+    ###
+    getIsActive: (isActive) ->
+        return @isActive
+
+    ###*
+     * @param {Boolean} isActive
+    ###
+    setIsActive: (isActive) ->
+        @isActive = isActive
