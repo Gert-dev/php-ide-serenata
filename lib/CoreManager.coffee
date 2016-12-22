@@ -103,7 +103,7 @@ class CoreManager
             if packageData.name == packageName
                 return packageData
 
-        throw new Error('Package with name ' + packageName + 'not found')
+        throw new Error('Package with name ' + packageName + ' not found')
 
     ###*
      * @return {String}
