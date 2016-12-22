@@ -98,8 +98,6 @@ class Proxy
 
         process = child_process.spawn(php, parameters)
 
-        console.log("Spawn")
-
         return new Promise (resolve, reject) =>
             process.stdout.on 'data', (data) =>
                 message = data.toString()
