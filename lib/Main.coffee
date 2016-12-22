@@ -340,7 +340,7 @@ module.exports =
      * @return {Promise}
     ###
     updateCoreIfOutdated: () ->
-        if @getCoreManager().isInstalled() and not @getCoreManager().isOutdated()
+        if @getCoreManager().isInstalled()
             return new Promise (resolve, reject) ->
                 resolve()
 
@@ -543,6 +543,7 @@ module.exports =
             CachingProxy = require './CachingProxy'
 
             @proxy = new CachingProxy(@getConfiguration())
+            @proxy.setCorePath(@getCoreManager().getCoreSourcePath())
 
         return @proxy
 

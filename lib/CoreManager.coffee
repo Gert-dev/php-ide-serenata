@@ -1,6 +1,5 @@
 fs = require 'fs'
 path = require 'path'
-semver = require 'semver'
 
 module.exports =
 
@@ -50,20 +49,14 @@ class CoreManager
      * @return {Promise}
     ###
     install: () ->
-        requirePromise = @composerService.run([
-            'require',
+        return @composerService.run([
+            'create-project',
             @COMPOSER_PACKAGE_NAME,
+            @getCoreSourcePath(),
             @versionSpecification,
-            '--no-update'
+            '--prefer-dist',
+            '--no-dev'
         ], @folder)
-
-        return requirePromise.then () =>
-            # Don't install development dependencies.
-            return @composerService.run([
-                'update',
-                '--prefer-dist',
-                '--no-dev'
-            ], @folder)
 
     ###*
      * @return {Boolean}
@@ -72,41 +65,13 @@ class CoreManager
         return fs.existsSync(@getComposerLockFilePath())
 
     ###*
-     * @return {Boolean}
+     * @return {String}
     ###
-    isOutdated: () ->
-        data = @getInstalledComposerPackageData(@COMPOSER_PACKAGE_NAME)
-
-        return false if semver.satisfies(data.version, @versionSpecification)
-        return true
-
-    ###*
-     * @return {Object}
-    ###
-    getInstalledComposerPackagesData: () ->
-        lockFileData = JSON.parse(fs.readFileSync(@getComposerLockFilePath()))
-
-        if not lockFileData.packages?
-            throw new Error('Not a valid active Composer project')
-
-        return lockFileData.packages
-
-    ###*
-     * @param {String} packageName
-     *
-     * @return {Object}
-    ###
-    getInstalledComposerPackageData: (packageName) ->
-        packagesData = @getInstalledComposerPackagesData()
-
-        for packageData in packagesData
-            if packageData.name == packageName
-                return packageData
-
-        throw new Error('Package with name ' + packageName + ' not found')
+    getComposerLockFilePath: () ->
+        return path.join(@getCoreSourcePath(), 'composer.lock')
 
     ###*
      * @return {String}
     ###
-    getComposerLockFilePath: () ->
-        return path.join(@folder, 'composer.lock')
+    getCoreSourcePath: () ->
+        return path.join(@folder, @versionSpecification)

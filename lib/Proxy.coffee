@@ -24,6 +24,11 @@ class Proxy
     indexDatabaseName: null
 
     ###*
+     * @var {String}
+    ###
+    corePath: null
+
+    ###*
      * @var {Object}
     ###
     phpServer: null
@@ -87,7 +92,7 @@ class Proxy
 
         parameters = [
              '-d memory_limit=' + memoryLimit + 'M',
-             @getCorePath() + "/src/Main.php",
+             @corePath + "/src/Main.php",
              '--port=' + port
         ]
 
@@ -938,7 +943,7 @@ class Proxy
         return @config.get('packagePath') + '/indexes/' + @indexDatabaseName + '.sqlite'
 
     ###*
-     * @return {String}
+     * @param {String} corePath
     ###
-    getCorePath: () ->
-        return @config.get('packagePath') + '/core/vendor/php-integrator/core/'
+    setCorePath: (corePath) ->
+        @corePath = corePath
