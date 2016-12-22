@@ -55,7 +55,9 @@ class CoreManager
             @getCoreSourcePath(),
             @versionSpecification,
             '--prefer-dist',
-            '--no-dev'
+            '--no-dev',
+            '--no-progress',
+            '--quiet'
         ], @folder)
 
     ###*
