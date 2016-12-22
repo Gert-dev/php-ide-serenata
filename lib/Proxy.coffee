@@ -108,6 +108,10 @@ class Proxy
             process.stderr.on 'data', (data) =>
                 console.warn('The PHP server has errors to report:', data.toString())
 
+            process.on 'error', (error) =>
+                console.error('An error ocurred whilst invoking PHP', error)
+                reject()
+
             process.on 'close', (code) =>
                 if code == 2
                     console.error('Port ' + port + ' is already taken')
