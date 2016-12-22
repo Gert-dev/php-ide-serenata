@@ -98,12 +98,17 @@ class Proxy
 
         process = child_process.spawn(php, parameters)
 
+        console.log("Spawn")
+
         return new Promise (resolve, reject) =>
             process.stdout.on 'data', (data) =>
-                console.debug('The PHP server has something to say:', data.toString())
+                message = data.toString()
 
-                # Assume the server has successfully spawned the moment it says its first words.
-                resolve(process)
+                console.debug('The PHP server has something to say:', message)
+
+                if message.startsWith('Starting socket server')
+                    # Assume the server has successfully spawned the moment it says its first words.
+                    resolve(process)
 
             process.stderr.on 'data', (data) =>
                 console.warn('The PHP server has errors to report:', data.toString())
@@ -117,7 +122,8 @@ class Proxy
                     console.error('Port ' + port + ' is already taken')
                     return
 
-                console.warn('PHP socket server exited by itself, a fatal error must have occurred.')
+                console.error('PHP socket server exited by itself, a fatal error must have occurred.')
+                reject()
 
     ###*
      * @return {Number}
@@ -143,10 +149,15 @@ class Proxy
         else if @phpServerPromise
             return @phpServerPromise
 
-        @phpServerPromise = @spawnPhpServer(port).then (phpServer) =>
+        successHandler = (phpServer) =>
             @phpServer = phpServer
 
             return phpServer
+
+        failureHandler = () =>
+            @phpServerPromise = null
+
+        @phpServerPromise = @spawnPhpServer(port).then(successHandler, failureHandler)
 
         return @phpServerPromise
 
