@@ -177,6 +177,7 @@ class Proxy
     stopPhpServer: (port) ->
         if @client
             @client.destroy()
+            @client = null
 
         return if not @phpServer
 
