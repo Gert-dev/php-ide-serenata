@@ -126,6 +126,10 @@ class Proxy
                     return
 
                 console.error('PHP socket server exited by itself, a fatal error must have occurred.')
+
+                @closeServerConnection()
+
+                @phpServer = null
                 reject()
 
     ###*
@@ -146,6 +150,8 @@ class Proxy
     ###
     spawnPhpServerIfNecessary: (port) ->
         if @phpServer
+            @phpServerPromise = null
+
             return new Promise (resolve, reject) =>
                 resolve(@phpServer)
 
@@ -175,14 +181,21 @@ class Proxy
      * @return {Array}
     ###
     stopPhpServer: (port) ->
-        if @client
-            @client.destroy()
-            @client = null
+        @closeConnection()
 
         return if not @phpServer
 
         @phpServer.kill()
         @phpServer = null
+
+    ###*
+     * Closes the socket connection to the server.
+    ###
+    closeServerConnection: (port) ->
+        return if not @client
+
+        @client.destroy()
+        @client = null
 
     ###*
      * @return {Object}
