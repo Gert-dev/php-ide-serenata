@@ -243,11 +243,11 @@ class Proxy
 
         else
             detail =
-                "The socket connection to the PHP server was unexpectedly closed. Either something caused the process to " +
-                "stop, the socket to close, or the PHP process may have crashed. If you're sure it's the last one, feel " +
-                "free to report a bug.\n \n" +
-
-                'An attempt will be made to restart the server and reestablish the connection.'
+                "The socket connection to the PHP server was unexpectedly closed. Either something caused the " +
+                "process to stop, it crashed, or the socket closed. In case of the first two, you should see " +
+                "additional output indicating this is the case and you can report a bug. If there is no additional " +
+                "output, the socket connection should automatically be reestablished and everything should continue " +
+                "working."
 
             console.warn(detail)
 
