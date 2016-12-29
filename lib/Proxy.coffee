@@ -249,7 +249,7 @@ class Proxy
             detail      : detail
         })
 
-        @client = null
+        @closeServerConnection()
 
     ###*
      * @param {Buffer} dataBuffer
