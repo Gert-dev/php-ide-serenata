@@ -236,6 +236,11 @@ class Proxy
                 "not be spawned. This is most likely an issue with your setup, such as your PHP binary not being " +
                 "found, an extension missing on your system, ..."
 
+            atom.notifications.addError('PHP Integrator - Oops, something went wrong!', {
+                dismissable : true
+                detail      : detail
+            })
+
         else
             detail =
                 "The socket connection to the PHP server was unexpectedly closed. Either something caused the process to " +
@@ -244,10 +249,7 @@ class Proxy
 
                 'An attempt will be made to restart the server and reestablish the connection.'
 
-        atom.notifications.addError('PHP Integrator - Oops, something went wrong!', {
-            dismissable : true
-            detail      : detail
-        })
+            console.warn(detail)
 
         @closeServerConnection()
 
