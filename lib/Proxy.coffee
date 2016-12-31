@@ -191,7 +191,7 @@ class Proxy
     ###*
      * Closes the socket connection to the server.
     ###
-    closeServerConnection: (port) ->
+    closeServerConnection: () ->
         @rejectAllOpenRequests()
 
         return if not @client
