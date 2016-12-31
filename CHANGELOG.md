@@ -1,6 +1,9 @@
 ### Note
 Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
+## 2.1.3
+* Fix incorrect method call that only occurred on shutdown or when deactivating the package.
+
 ## 2.1.2
 * Sockets closing without an error code will now warn instead of throw an error.
   * Socket connections that _do_ have an error code will still show an error message.

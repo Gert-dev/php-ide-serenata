@@ -181,7 +181,7 @@ class Proxy
      * @return {Array}
     ###
     stopPhpServer: (port) ->
-        @closeConnection()
+        @closeServerConnection()
 
         return if not @phpServer
 
