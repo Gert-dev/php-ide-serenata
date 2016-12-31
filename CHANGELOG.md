@@ -3,6 +3,9 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 
 ## 2.1.3
 * Fix incorrect method call that only occurred on shutdown or when deactivating the package.
+* All open requests will now be rejected whenever the socket is unexpectedly closed.
+  * This fixes the issue where some requests would hang up because the promise they received was never resolved or rejected.
+    * This should fix the issue where indexing gets stuck (and blocks further indexing events) whenever the socket reconnects.
 
 ## 2.1.2
 * Sockets closing without an error code will now warn instead of throw an error.
