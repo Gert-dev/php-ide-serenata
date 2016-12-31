@@ -222,6 +222,7 @@ class Proxy
                     resolve(@client)
 
                 @client.setNoDelay(true)
+                @client.on('error', @onSocketError.bind(this))
                 @client.on('data', @onDataReceived.bind(this))
                 @client.on('close', @onConnectionClosed.bind(this))
 
@@ -236,6 +237,14 @@ class Proxy
             console.warn('Encountered some invalid data, resetting state. Error: ', error)
 
             @resetResponseState()
+
+    ###*
+     * @param {Object} error
+    ###
+    onSocketError: (error) ->
+        # Do nothing here, this should silence socket errors such as ECONNRESET. After this is called, the socket will
+        # be closed and all handling is performed there.
+        console.warn('The socket connection notified us of an error', error)
 
     ###*
      * @param {Boolean} hadError
