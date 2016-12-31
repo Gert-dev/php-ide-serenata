@@ -192,10 +192,21 @@ class Proxy
      * Closes the socket connection to the server.
     ###
     closeServerConnection: (port) ->
+        @rejectAllOpenRequests()
+
         return if not @client
 
         @client.destroy()
         @client = null
+
+    ###*
+     * Rejects all currently open requests.
+    ###
+    rejectAllOpenRequests: () ->
+        for id,request of @requestQueue
+            request.promise.reject('The socket connection was closed and had to reconnect')
+
+        @requestQueue = {}
 
     ###*
      * @return {Object}
