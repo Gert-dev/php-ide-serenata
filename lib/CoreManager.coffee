@@ -56,8 +56,7 @@ class CoreManager
             @versionSpecification,
             '--prefer-dist',
             '--no-dev',
-            '--no-progress',
-            '--quiet'
+            '--no-progress'
         ], @folder)
 
     ###*
