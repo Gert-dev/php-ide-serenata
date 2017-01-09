@@ -1,6 +1,10 @@
 ### Note
 Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
+## 2.1.5
+* When the socket connection closes and a reconnect happens, the state of response reading is now reset.
+  * Previously, the base package kept accumulating response data in a buffer, never seeing the end of the one that was interrupted.
+
 ## 2.1.4
 * Update to core 2.1.1.
 * Composer output will no longer be silenced when installing the core.

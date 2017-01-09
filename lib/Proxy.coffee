@@ -199,6 +199,8 @@ class Proxy
         @client.destroy()
         @client = null
 
+        @resetResponseState()
+
     ###*
      * Rejects all currently open requests.
     ###
