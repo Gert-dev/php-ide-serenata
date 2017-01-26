@@ -252,26 +252,17 @@ class Proxy
      * @param {Boolean} hadError
     ###
     onConnectionClosed: (hadError) ->
+        detail =
+            "The socket connection to the PHP server was unexpectedly closed. Either something caused the " +
+            "process to stop, it crashed, or the socket closed. In case of the first two, you should see " +
+            "additional output indicating this is the case and you can report a bug. If there is no additional " +
+            "output, the socket connection should automatically be reestablished and everything should continue " +
+            "working."
+
         if hadError
-            detail =
-                "The socket connection with the PHP server could not be established. This means the PHP server could " +
-                "not be spawned. This is most likely an issue with your setup, such as your PHP binary not being " +
-                "found, an extension missing on your system, ..."
+            detail += ' It was also reported that an error was involved'
 
-            atom.notifications.addError('PHP Integrator - Oops, something went wrong!', {
-                dismissable : true
-                detail      : detail
-            })
-
-        else
-            detail =
-                "The socket connection to the PHP server was unexpectedly closed. Either something caused the " +
-                "process to stop, it crashed, or the socket closed. In case of the first two, you should see " +
-                "additional output indicating this is the case and you can report a bug. If there is no additional " +
-                "output, the socket connection should automatically be reestablished and everything should continue " +
-                "working."
-
-            console.warn(detail)
+        console.warn(detail)
 
         @closeServerConnection()
 
