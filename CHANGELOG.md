@@ -1,6 +1,9 @@
 ### Note
 Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
+## 2.1.6
+* Socket closes and reconnections will no longer display errors to the user. See also 46fc09f9b072a601dd6f6b02ee753a9785bfa397.
+
 ## 2.1.5
 * When the socket connection closes and a reconnect happens, the state of response reading is now reset.
   * Previously, the base package kept accumulating response data in a buffer, never seeing the end of the one that was interrupted.
