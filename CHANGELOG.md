@@ -10,7 +10,7 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
   * Previously, the base package kept accumulating response data in a buffer, never seeing the end of the one that was interrupted.
 
 ## 2.1.4
-* Update to core [2.1.1](https://github.com/php-integrator/core/releases/tag/2.1.2).
+* Update to core [2.1.1](https://github.com/php-integrator/core/releases/tag/2.1.1).
 * Composer output will no longer be silenced when installing the core.
 
 ## 2.1.3
