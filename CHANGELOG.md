@@ -10,7 +10,7 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
   * Previously, the base package kept accumulating response data in a buffer, never seeing the end of the one that was interrupted.
 
 ## 2.1.4
-* Update to core 2.1.1.
+* Update to core [2.1.1](https://github.com/php-integrator/core/releases/tag/2.1.2).
 * Composer output will no longer be silenced when installing the core.
 
 ## 2.1.3
@@ -30,15 +30,15 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * Explicitly close open socket connections when the server dies as a safety measure (as the port is reused when the server is spawned again).
 
 ## 2.1.0
-* Update to core 2.1.0.
+* Update to core [2.1.0](https://github.com/php-integrator/core/releases/tag/2.1.0).
 * The server wasn't always being restarted automatically when it died or the connection failed. This should be fixed now.
 * The core is now downloaded using Composer instead of apm, which is more robust and allows properly selecting the right version to download.
 
 ## 2.0.2
-* Update to core 2.0.2.
+* Update to core [2.0.2](https://github.com/php-integrator/core/releases/tag/2.0.2).
 
 ## 2.0.1
-* Update to core 2.0.1.
+* Update to core [2.0.1](https://github.com/php-integrator/core/releases/tag/2.0.1).
 
 ## 2.0.0
 ### Features and enhancements
