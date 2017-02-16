@@ -159,7 +159,7 @@ class TooltipProvider
             marked = require 'marked'
 
             @attachedPopover = @service.createAttachedPopover(showOverElement)
-            @attachedPopover.setText('<div class="php-integrator-tooltips-popover">' + marked(tooltip.contents) + '</div>')
+            @attachedPopover.setText('<div class="php-integrator-tooltip-popover">' + marked(tooltip.contents) + '</div>')
             @attachedPopover.showAfter(0, 100)
 
         failureHandler = () =>
