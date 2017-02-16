@@ -136,7 +136,7 @@ class TooltipProvider
 
         # Needs to be bound outside of the callback, event.currentTarget may no longer be the same value once the
         # callback is run.
-        target = event.currentTarget
+        target = event.target
 
         @timeoutHandle = setTimeout ( =>
             cursorPosition = editorViewComponent.screenPositionForMouseEvent(event)
