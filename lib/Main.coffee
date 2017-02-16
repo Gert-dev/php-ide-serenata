@@ -127,6 +127,11 @@ module.exports =
     editorTimeoutMap: null
 
     ###*
+     * @var {Object|null}
+    ###
+    tooltipProvider: null
+
+    ###*
      * Tests the user's configuration.
      *
      * @param {bool} testServices
@@ -371,6 +376,7 @@ module.exports =
             @editorTimeoutMap = {}
 
             @registerAtomListeners()
+            @activateTooltips()
 
             @getCachingProxy().setIsActive(true)
 
@@ -380,6 +386,12 @@ module.exports =
     registerAtomListeners: () ->
         @getDisposables().add atom.workspace.observeTextEditors (editor) =>
             @registerTextEditorListeners(editor)
+
+    ###*
+     * Activates the tooltip provider.
+    ###
+    activateTooltips: () ->
+        @getTooltipProvider().activate(@getService())
 
     ###*
      * @param {TextEditor} editor
@@ -621,3 +633,14 @@ module.exports =
             @projectManager = new ProjectManager(@getCachingProxy(), @getIndexingMediator())
 
         return @projectManager
+
+    ###*
+     * @return {TooltipProvider}
+    ###
+    getTooltipProvider: () ->
+        if not @tooltipProvider?
+            TooltipProvider = require './TooltipProvider'
+
+            @tooltipProvider = new TooltipProvider()
+
+        return @tooltipProvider

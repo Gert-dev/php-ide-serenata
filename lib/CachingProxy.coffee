@@ -149,6 +149,14 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    tooltip: (file, source, offset) ->
+        sourceKey = if source? then md5(source) else null
+
+        return @wrapCachedRequestToParent("tooltip-#{file}-#{sourceKey}-#{offset}", 'tooltip', arguments)
+
+    ###*
+     * @inherited
+    ###
     getInvocationInfo: (file, source, offset) ->
         sourceKey = if source? then md5(source) else null
 

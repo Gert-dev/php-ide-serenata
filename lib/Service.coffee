@@ -203,6 +203,18 @@ class Service
         return @proxy.deduceTypes(expression, file, source, offset, ignoreLastElement)
 
     ###*
+     * Fetches the contents of the tooltip to display at the specified offset.
+     *
+     * @param {String|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
+     *
+     * @return {Promise}
+    ###
+    tooltip: (file, source, offset) ->
+        return @proxy.tooltip(file, source, offset)
+
+    ###*
      * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
      * used to fetch information about the function or method call the cursor is in.
      *
@@ -231,6 +243,21 @@ class Service
         bufferText = editor.getBuffer().getText()
 
         return @deduceTypes(expression, editor.getPath(), bufferText, offset)
+
+    ###*
+     * Convenience alias for {@see tooltip}.
+     *
+     * @param {TextEditor} editor
+     * @param {Range}      bufferPosition
+     *
+     * @return {Promise}
+    ###
+    tooltipAt: (editor, bufferPosition) ->
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
+
+        bufferText = editor.getBuffer().getText()
+
+        return @tooltip(editor.getPath(), bufferText, offset)
 
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
