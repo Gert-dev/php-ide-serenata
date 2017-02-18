@@ -820,7 +820,7 @@ class Proxy
      * @return {Promise}
     ###
     tooltip: (file, source, offset) ->
-        if not file? and not source?
+        if not file?
             return new Promise (resolve, reject) ->
                 reject('Either a path to a file or source code must be passed!')
 
@@ -832,10 +832,8 @@ class Proxy
             database   : @getIndexDatabasePath()
             offset     : offset
             charoffset : true
+            file       : file
         }
-
-        if file?
-            parameters.file = file
 
         return @performRequest('tooltip', parameters, null, source)
 
