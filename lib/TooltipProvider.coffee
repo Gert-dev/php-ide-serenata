@@ -138,6 +138,8 @@ class TooltipProvider
         # callback is run.
         target = event.target
 
+        return if 'line' in target.classList # Skip whitespace
+
         @timeoutHandle = setTimeout ( =>
             cursorPosition = editorViewComponent.screenPositionForMouseEvent(event)
 
