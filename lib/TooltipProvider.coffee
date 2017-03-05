@@ -1,3 +1,5 @@
+{Disposable, CompositeDisposable} = require 'atom'
+
 module.exports =
 
 ##*
@@ -24,6 +26,11 @@ class TooltipProvider
     timeoutHandle: null
 
     ###*
+     * @var {CompositeDisposable}
+    ###
+    disposables: null
+
+    ###*
      * Initializes this provider.
      *
      * @param {mixed} service
@@ -31,17 +38,19 @@ class TooltipProvider
     activate: (@service) ->
         dependentPackage = 'language-php'
 
+        @disposables = new CompositeDisposable()
+
         # It could be that the dependent package is already active, in that case we can continue immediately. If not,
         # we'll need to wait for the listener to be invoked
         if atom.packages.isPackageActive(dependentPackage)
             @doActualInitialization()
 
-        atom.packages.onDidActivatePackage (packageData) =>
+        @disposables.add atom.packages.onDidActivatePackage (packageData) =>
             return if packageData.name != dependentPackage
 
             @doActualInitialization()
 
-        atom.packages.onDidDeactivatePackage (packageData) =>
+        @disposables.add atom.packages.onDidDeactivatePackage (packageData) =>
             return if packageData.name != dependentPackage
 
             @deactivate()
@@ -50,26 +59,26 @@ class TooltipProvider
      * Does the actual initialization.
     ###
     doActualInitialization: () ->
-        atom.workspace.observeTextEditors (editor) =>
+        @disposables.add atom.workspace.observeTextEditors (editor) =>
             if /text.html.php$/.test(editor.getGrammar().scopeName)
                 @registerEvents(editor)
 
         # When you go back to only have one pane the events are lost, so need to re-register.
-        atom.workspace.onDidDestroyPane (pane) =>
+        @disposables.add atom.workspace.onDidDestroyPane (pane) =>
             panes = atom.workspace.getPanes()
 
             if panes.length == 1
                 @registerEventsForPane(panes[0])
 
         # Having to re-register events as when a new pane is created the old panes lose the events.
-        atom.workspace.onDidAddPane (observedPane) =>
+        @disposables.add atom.workspace.onDidAddPane (observedPane) =>
             panes = atom.workspace.getPanes()
 
             for pane in panes
                 if pane != observedPane
                     @registerEventsForPane(pane)
 
-        atom.workspace.onDidStopChangingActivePaneItem (item) =>
+        @disposables.add atom.workspace.onDidStopChangingActivePaneItem (item) =>
             @removeTooltip()
 
     ###*
@@ -87,6 +96,8 @@ class TooltipProvider
      * Deactives the provider.
     ###
     deactivate: () ->
+        @disposables.dispose()
+
         @removeTooltip()
 
     ###*
@@ -98,25 +109,39 @@ class TooltipProvider
         textEditorElement = atom.views.getView(editor)
         scrollViewElement = textEditorElement.querySelector('.scroll-view')
 
+        removeTooltipListener = @removeTooltip.bind(this)
+
         if scrollViewElement?
-            scrollViewElement.addEventListener('mouseover', @onMouseOver.bind(this, editor))
-            scrollViewElement.addEventListener('mouseout',  @removeTooltip.bind(this))
+            mouseOverListener = @onMouseOver.bind(this, editor)
+
+            scrollViewElement.addEventListener('mouseover', mouseOverListener)
+            scrollViewElement.addEventListener('mouseout',  removeTooltipListener)
+
+            @disposables.add new Disposable () =>
+                scrollViewElement.removeEventListener('mouseover', mouseOverListener)
+                scrollViewElement.removeEventListener('mouseout', removeTooltipListener)
 
         horizontalScrollbar = textEditorElement.querySelector('.horizontal-scrollbar')
 
         if horizontalScrollbar?
-            horizontalScrollbar.addEventListener('scroll',  @removeTooltip.bind(this))
+            horizontalScrollbar.addEventListener('scroll',  removeTooltipListener)
+
+            @disposables.add new Disposable () =>
+                horizontalScrollbar.removeEventListener('scroll', removeTooltipListener)
 
         verticalScrollbar = textEditorElement.querySelector('.vertical-scrollbar')
 
         if verticalScrollbar?
-            verticalScrollbar.addEventListener('scroll',  @removeTooltip.bind(this))
+            verticalScrollbar.addEventListener('scroll',  removeTooltipListener)
+
+            @disposables.add new Disposable () =>
+                verticalScrollbar.removeEventListener('scroll', removeTooltipListener)
 
         # Ticket #107 - Mouseout isn't generated until the mouse moves, even when scrolling (with the keyboard or
         # mouse). If the element goes out of the view in the meantime, its HTML element disappears, never removing
         # it.
-        editor.onDidDestroy(@removeTooltip.bind(this))
-        editor.onDidStopChanging(@removeTooltip.bind(this))
+        @disposables.add editor.onDidDestroy(@removeTooltip.bind(this))
+        @disposables.add editor.onDidStopChanging(@removeTooltip.bind(this))
 
     ###*
      * @param {TextEditor} editor

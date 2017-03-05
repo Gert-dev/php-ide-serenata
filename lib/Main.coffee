@@ -416,9 +416,6 @@ module.exports =
     deactivateTooltips: () ->
         @getTooltipProvider().deactivate()
 
-        delete @tooltipProvider
-        @tooltipProvider = null
-
     ###*
      * @param {TextEditor} editor
     ###
