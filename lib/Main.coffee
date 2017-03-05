@@ -43,6 +43,14 @@ module.exports =
             default     : false
             order       : 4
 
+        enableTooltips:
+            title       : 'Enable tooltips'
+            description : 'When enabled, tooltips will be displayed for various structural elements when the mouse is
+                           hovered over them.'
+            type        : 'boolean'
+            default     : true
+            order       : 5
+
     ###*
      * The version of the core to download (version specification string).
      *
@@ -266,6 +274,13 @@ module.exports =
         config.onDidChange 'insertNewlinesForUseStatements', (value) =>
             @getUseStatementHelper().setAllowAdditionalNewlines(value)
 
+        config.onDidChange 'enableTooltips', (value) =>
+            if value
+                @activateTooltips()
+
+            else
+                @deactivateTooltips()
+
     ###*
      * Registers status bar listeners.
     ###
@@ -376,7 +391,9 @@ module.exports =
             @editorTimeoutMap = {}
 
             @registerAtomListeners()
-            @activateTooltips()
+
+            if @getConfiguration().get('enableTooltips')
+                @activateTooltips()
 
             @getCachingProxy().setIsActive(true)
 
@@ -392,6 +409,15 @@ module.exports =
     ###
     activateTooltips: () ->
         @getTooltipProvider().activate(@getService())
+
+    ###*
+     * Deactivates the tooltip provider.
+    ###
+    deactivateTooltips: () ->
+        @getTooltipProvider().deactivate()
+
+        delete @tooltipProvider
+        @tooltipProvider = null
 
     ###*
      * @param {TextEditor} editor

@@ -27,6 +27,7 @@ class AtomConfig extends Config
         @set('additionalIndexingDelay', atom.config.get("#{@packageName}.additionalIndexingDelay"))
         @set('memoryLimit', atom.config.get("#{@packageName}.memoryLimit"))
         @set('insertNewlinesForUseStatements', atom.config.get("#{@packageName}.insertNewlinesForUseStatements"))
+        @set('enableTooltips', atom.config.get("#{@packageName}.enableTooltips"))
         @set('packagePath', atom.packages.resolvePackagePath("#{@packageName}"))
 
     ###*
@@ -44,3 +45,6 @@ class AtomConfig extends Config
 
         atom.config.onDidChange "#{@packageName}.insertNewlinesForUseStatements", () =>
             @set('insertNewlinesForUseStatements', atom.config.get("#{@packageName}.insertNewlinesForUseStatements"))
+
+        atom.config.onDidChange "#{@packageName}.enableTooltips", () =>
+            @set('enableTooltips', atom.config.get("#{@packageName}.enableTooltips"))

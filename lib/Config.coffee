@@ -28,6 +28,7 @@ class Config
             additionalIndexingDelay        : 200
             memoryLimit                    : 512
             insertNewlinesForUseStatements : false
+            enableTooltips                 : true
 
             # See also http://www.phpdoc.org/docs/latest/index.html .
             phpdoc_base_url : {
