@@ -1,20 +1,20 @@
 ### Note
-Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://github.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://github.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
+Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://gitlab.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://gitlab.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
 ## 2.1.10
-* Update to core [2.1.5](https://github.com/php-integrator/core/releases/tag/2.1.5).
+* Update to core [2.1.5](https://gitlab.com/php-integrator/core/tags/2.1.5).
 
 ## 2.1.9
 * Nothing changed, `apm` just failed to publish 2.1.8 and decided to bump the version, even though I explicitly asked it to try and publish 2.1.8 again.
 
 ## 2.1.8
-* Update to core [2.1.4](https://github.com/php-integrator/core/releases/tag/2.1.4).
+* Update to core [2.1.4](https://gitlab.com/php-integrator/core/tags/2.1.4).
 
 ## 2.1.7
-* Update to core [2.1.3](https://github.com/php-integrator/core/releases/tag/2.1.3).
+* Update to core [2.1.3](https://gitlab.com/php-integrator/core/tags/2.1.3).
 
 ## 2.1.6
-* Update to core [2.1.2](https://github.com/php-integrator/core/releases/tag/2.1.2).
+* Update to core [2.1.2](https://gitlab.com/php-integrator/core/tags/2.1.2).
 * Socket closes and reconnections will no longer display errors to the user. See also 46fc09f9b072a601dd6f6b02ee753a9785bfa397.
 
 ## 2.1.5
@@ -22,7 +22,7 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
   * Previously, the base package kept accumulating response data in a buffer, never seeing the end of the one that was interrupted.
 
 ## 2.1.4
-* Update to core [2.1.1](https://github.com/php-integrator/core/releases/tag/2.1.1).
+* Update to core [2.1.1](https://gitlab.com/php-integrator/core/tags/2.1.1).
 * Composer output will no longer be silenced when installing the core.
 
 ## 2.1.3
@@ -42,19 +42,19 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * Explicitly close open socket connections when the server dies as a safety measure (as the port is reused when the server is spawned again).
 
 ## 2.1.0
-* Update to core [2.1.0](https://github.com/php-integrator/core/releases/tag/2.1.0).
+* Update to core [2.1.0](https://gitlab.com/php-integrator/core/tags/2.1.0).
 * The server wasn't always being restarted automatically when it died or the connection failed. This should be fixed now.
 * The core is now downloaded using Composer instead of apm, which is more robust and allows properly selecting the right version to download.
 
 ## 2.0.2
-* Update to core [2.0.2](https://github.com/php-integrator/core/releases/tag/2.0.2).
+* Update to core [2.0.2](https://gitlab.com/php-integrator/core/tags/2.0.2).
 
 ## 2.0.1
-* Update to core [2.0.1](https://github.com/php-integrator/core/releases/tag/2.0.1).
+* Update to core [2.0.1](https://gitlab.com/php-integrator/core/tags/2.0.1).
 
 ## 2.0.0
 ### Features and enhancements
-* The PHP side is no longer part of the base package. Instead, it has been separated into the [php-integrator/core](https://github.com/php-integrator/core) repository so it can be more easily installed via Composer for use in other projects.
+* The PHP side is no longer part of the base package. Instead, it has been separated into the [php-integrator/core](https://gitlab.com/php-integrator/core) repository so it can be more easily installed via Composer for use in other projects.
   * This change should not impact users as they upgrade, as this package will be automatically installed and upgraded along with this one if necessary (a notification will be shown whenever that happens).
 * Communication with the core now happens via sockets. This means only a single process is spawned on startup and kept active throughout the lifetime of Atom.
   * This should reduce latency across the board as process spawning is rather expensive in comparison. It will also ensure there is never more than one process active when multiple requests are fired simultaneously (they will simply be queued and handled one by one, which will not freeze up Atom as communication is completely asynchronous).
