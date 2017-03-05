@@ -1,14 +1,14 @@
 ### Note
 Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://gitlab.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://gitlab.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
-## 2.1.11
-* Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.6).
-
 ## 3.0.0
 * Update to core [3.0.0](https://github.com/php-integrator/core/releases/tag/3.0.0).
 * Tooltips are now provided by the core. The size of the CoffeeScript side has, as a consequence, shrunk considerably and is part of this package.
 ** Markdown in docblocks is now properly supported when displaying tooltips.
 ** You no longer need the php-integrator-tooltips package installed, as it will no longer be updated to the new service version, it should disable automatically.
+
+## 2.1.11
+* Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.6).
 
 ## 2.1.10
 * Update to core [2.1.5](https://gitlab.com/php-integrator/core/tags/2.1.5).
