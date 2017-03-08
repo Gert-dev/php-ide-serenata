@@ -1,5 +1,7 @@
 {Disposable, CompositeDisposable} = require 'atom'
 
+marked = require 'marked'
+
 module.exports =
 
 ##*
@@ -182,8 +184,6 @@ class TooltipProvider
             return if not tooltip?
 
             @removeTooltip()
-
-            marked = require 'marked'
 
             @attachedPopover = @service.createAttachedPopover(showOverElement)
             @attachedPopover.setText('<div class="php-integrator-tooltip-popover">' + marked(tooltip.contents) + '</div>')
