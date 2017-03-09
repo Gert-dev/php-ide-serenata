@@ -736,7 +736,7 @@ class Proxy
         return @performRequest('localizeType', parameters)
 
     ###*
-     * Performs a semantic lint of the specified file.
+     * Lints the specified file.
      *
      * @param {String}      file
      * @param {String|null} source  The source code of the file to index. May be null if a directory is passed instead.
@@ -746,7 +746,7 @@ class Proxy
      *
      * @return {Promise}
     ###
-    semanticLint: (file, source, options = {}) ->
+    lint: (file, source, options = {}) ->
         if not file
             return new Promise (resolve, reject) ->
                 reject('No file passed!')
@@ -779,7 +779,7 @@ class Proxy
         if options.noUnusedUseStatements == true
             parameters['no-unused-use-statements'] = true
 
-        return @performRequest('semanticLint', parameters, null, source)
+        return @performRequest('lint', parameters, null, source)
 
     ###*
      * Fetches all available variables at a specific location.

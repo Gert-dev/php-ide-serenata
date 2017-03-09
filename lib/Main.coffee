@@ -51,6 +51,83 @@ module.exports =
             default     : true
             order       : 5
 
+        enableLinting:
+            title       : 'Enable linting'
+            description : 'When enabled, linting will show problems with your code.'
+            type        : 'boolean'
+            default     : true
+            order       : 6
+
+        showUnknownClasses:
+            title       : 'Show unknown classes'
+            description : '''
+                Highlights class names that could not be found. This will also work for docblocks. Requires linting to
+                be enabled.
+            '''
+            type        : 'boolean'
+            default     : true
+            order       : 7
+
+        showUnknownGlobalFunctions:
+            title       : 'Show unknown global functions'
+            description : '''
+                Highlights global functions that could not be found. Requires linting to be enabled.
+            '''
+            type        : 'boolean'
+            default     : true
+            order       : 8
+
+        showUnknownGlobalConstants:
+            title       : 'Show unknown global constants'
+            description : '''
+                Highlights global constants that could not be found. Requires linting to be enabled.
+            '''
+            type        : 'boolean'
+            default     : true
+            order       : 9
+
+        showUnusedUseStatements:
+            title       : 'Show unused use statements'
+            description : '''
+                Highlights use statements that don't seem to be used anywhere. This will also look inside docblocks.
+                Requires linting to be enabled.
+            '''
+            type        : 'boolean'
+            default     : true
+            order       : 10
+
+        showMissingDocs:
+            title       : 'Show missing documentation'
+            description : '''
+                Warns about any structural element that is currently missing documentation. Requires linting to be
+                enabled.
+            '''
+            type        : 'boolean'
+            default     : true
+            order       : 11
+
+        validateDocblockCorrectness:
+            title       : 'Validate docblock correctness'
+            description : '''
+                Analyzes the correctness of docblocks of structural elements such as classes, methods and properties.
+                This will show various problems with docblocks such as missing parameters, incorrect parameter types
+                and missing documentation. Requires linting to be enabled.
+            '''
+            type        : 'boolean'
+            default     : true
+            order       : 12
+
+        showUnknownMembers:
+            title       : 'Show unknown members (experimental)'
+            description : '''
+                Highlights class members that could not be found. Note that this can be a large strain on performance.
+                It is also experimental and might show false positives (especially inside conditionals). Requires
+                linting to be enabled.
+            '''
+            type        : 'boolean'
+            default     : false
+            order       : 13
+
     ###*
      * The version of the core to download (version specification string).
      *
@@ -138,6 +215,11 @@ module.exports =
      * @var {Object|null}
     ###
     tooltipProvider: null
+
+    ###*
+     * @var {Object|null}
+    ###
+    linterProvider: null
 
     ###*
      * Tests the user's configuration.
@@ -281,6 +363,13 @@ module.exports =
             else
                 @deactivateTooltips()
 
+        config.onDidChange 'enableLinting', (value) =>
+            if value
+                @activateLinting()
+
+            else
+                @deactivateLinting()
+
     ###*
      * Registers status bar listeners.
     ###
@@ -395,6 +484,9 @@ module.exports =
             if @getConfiguration().get('enableTooltips')
                 @activateTooltips()
 
+            if @getConfiguration().get('enableLinting')
+                @activateLinting()
+
             @getCachingProxy().setIsActive(true)
 
     ###*
@@ -415,6 +507,18 @@ module.exports =
     ###
     deactivateTooltips: () ->
         @getTooltipProvider().deactivate()
+
+    ###*
+     * Activates linting.
+    ###
+    activateLinting: () ->
+        @getLinterProvider().activate(@getService())
+
+    ###*
+     * Deactivates linting.
+    ###
+    deactivateLinting: () ->
+        @getLinterProvider().deactivate()
 
     ###*
      * @param {TextEditor} editor
@@ -483,6 +587,21 @@ module.exports =
         {Disposable} = require 'atom'
 
         return new Disposable => @detachStatusBarItems()
+
+    ###*
+     * Sets the linter indie service.
+     *
+     * @param {mixed} service
+     *
+     * @return {Disposable}
+    ###
+    setLinterIndieService: (service) ->
+        indieLinter = null
+
+        if service
+            indieLinter = service.register({name : @packageName, scope: 'file', grammarScopes: ['source.php']})
+
+        @getLinterProvider().setIndieLinter(indieLinter)
 
     ###*
      * Sets the project manager service.
@@ -667,3 +786,14 @@ module.exports =
             @tooltipProvider = new TooltipProvider()
 
         return @tooltipProvider
+
+    ###*
+     * @return {LinterProvider}
+    ###
+    getLinterProvider: () ->
+        if not @linterProvider?
+            LinterProvider = require './LinterProvider'
+
+            @linterProvider = new LinterProvider(@getConfiguration())
+
+        return @linterProvider

@@ -158,7 +158,7 @@ class Service
         return @proxy.localizeType(file, line, type, kind)
 
     ###*
-     * Performs a semantic lint of the specified file.
+     * Lints the specified file.
      *
      * @param {String}      file
      * @param {String|null} source  The source code of the file to index. May be null if a directory is passed instead.
@@ -168,8 +168,8 @@ class Service
      *
      * @return {Promise}
     ###
-    semanticLint: (file, source, options = {}) ->
-        return @proxy.semanticLint(file, source, options)
+    lint: (file, source, options = {}) ->
+        return @proxy.lint(file, source, options)
 
     ###*
      * Fetches all available variables at a specific location.

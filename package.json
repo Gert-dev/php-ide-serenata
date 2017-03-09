@@ -25,6 +25,11 @@
       "versions": {
         "^3.1.0": "setProjectManagerService"
       }
+    },
+    "linter-indie": {
+      "versions": {
+        "1.0.0": "setLinterIndieService"
+      }
     }
   },
   "dependencies": {

@@ -29,6 +29,14 @@ class Config
             memoryLimit                    : 512
             insertNewlinesForUseStatements : false
             enableTooltips                 : true
+            enableLinting                  : true
+            showUnknownClasses             : true
+            showUnknownMembers             : true
+            showUnknownGlobalFunctions     : true
+            showUnknownGlobalConstants     : true
+            showUnusedUseStatements        : true
+            showMissingDocs                : true
+            validateDocblockCorrectness    : true
 
             # See also http://www.phpdoc.org/docs/latest/index.html .
             phpdoc_base_url : {
