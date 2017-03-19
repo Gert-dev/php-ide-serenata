@@ -29,6 +29,7 @@ class AtomConfig extends Config
         @set('memoryLimit', atom.config.get("#{@packageName}.memoryLimit"))
         @set('insertNewlinesForUseStatements', atom.config.get("#{@packageName}.insertNewlinesForUseStatements"))
         @set('enableTooltips', atom.config.get("#{@packageName}.enableTooltips"))
+        @set('enableSignatureHelp', atom.config.get("#{@packageName}.enableSignatureHelp"))
         @set('enableLinting', atom.config.get("#{@packageName}.enableLinting"))
         @set('showUnknownClasses', atom.config.get("#{@packageName}.showUnknownClasses"))
         @set('showUnknownMembers', atom.config.get("#{@packageName}.showUnknownMembers"))
@@ -53,6 +54,9 @@ class AtomConfig extends Config
 
         atom.config.onDidChange "#{@packageName}.insertNewlinesForUseStatements", () =>
             @set('insertNewlinesForUseStatements', atom.config.get("#{@packageName}.insertNewlinesForUseStatements"))
+
+        atom.config.onDidChange "#{@packageName}.enableSignatureHelp", () =>
+            @set('enableSignatureHelp', atom.config.get("#{@packageName}.enableSignatureHelp"))
 
         atom.config.onDidChange "#{@packageName}.enableTooltips", () =>
             @set('enableTooltips', atom.config.get("#{@packageName}.enableTooltips"))

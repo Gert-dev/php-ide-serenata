@@ -838,6 +838,33 @@ class Proxy
         return @performRequest('tooltip', parameters, null, source)
 
     ###*
+     * Fetches signature help for a method or function call.
+     *
+     * @param {String}      file   The path to the file to examine.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
+     *
+     * @return {Promise}
+    ###
+    signatureHelp: (file, source, offset) ->
+        if not file?
+            return new Promise (resolve, reject) ->
+                reject('Either a path to a file or source code must be passed!')
+
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
+        parameters = {
+            database   : @getIndexDatabasePath()
+            offset     : offset
+            charoffset : true
+            file       : file
+        }
+
+        return @performRequest('signatureHelp', parameters, null, source)
+
+    ###*
      * Deduces the resulting types of an expression.
      *
      * @param {String|null} expression        The expression to deduce the type of, e.g. '$this->foo()'. If null, the
@@ -878,35 +905,6 @@ class Proxy
             parameters.expression = expression
 
         return @performRequest('deduceTypes', parameters, null, source)
-
-    ###*
-     * Fetches invocation information of a method or function call.
-     *
-     * @param {String|null} file   The path to the file to examine. May be null if the source parameter is passed.
-     * @param {String|null} source The source code to search. May be null if a file is passed instead.
-     * @param {Number}      offset The character offset into the file to examine.
-     *
-     * @return {Promise}
-    ###
-    getInvocationInfo: (file, source, offset) ->
-        if not file? and not source?
-            return new Promise (resolve, reject) ->
-                reject('Either a path to a file or source code must be passed!')
-
-        if not @getIndexDatabasePath()?
-            return new Promise (resolve, reject) ->
-                reject('Request aborted as there is no project active (yet)')
-
-        parameters = {
-            database   : @getIndexDatabasePath()
-            offset     : offset
-            charoffset : true
-        }
-
-        if file?
-            parameters.file = file
-
-        return @performRequest('invocationInfo', parameters, null, source)
 
     ###*
      * Initializes a project.

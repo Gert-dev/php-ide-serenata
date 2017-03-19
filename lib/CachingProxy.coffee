@@ -157,10 +157,10 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
-    getInvocationInfo: (file, source, offset) ->
+    signatureHelp: (file, source, offset) ->
         sourceKey = if source? then md5(source) else null
 
-        return @wrapCachedRequestToParent("getInvocationInfo-#{file}-#{sourceKey}-#{offset}", 'getInvocationInfo', arguments)
+        return @wrapCachedRequestToParent("signatureHelp-#{file}-#{sourceKey}-#{offset}", 'signatureHelp', arguments)
 
     ###*
      * @inherited

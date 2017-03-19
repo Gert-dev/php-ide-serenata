@@ -29,6 +29,7 @@ class Config
             memoryLimit                    : 512
             insertNewlinesForUseStatements : false
             enableTooltips                 : true
+            enableSignatureHelp             : true
             enableLinting                  : true
             showUnknownClasses             : true
             showUnknownMembers             : true

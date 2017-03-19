@@ -51,12 +51,20 @@ module.exports =
             default     : true
             order       : 5
 
+        enableSignatureHelp:
+            title       : 'Enable signature help'
+            description : 'When enabled, signature help will be displayed when the keyboard cursor is inside a
+                           function, method or constructor call.'
+            type        : 'boolean'
+            default     : true
+            order       : 6
+
         enableLinting:
             title       : 'Enable linting'
             description : 'When enabled, linting will show problems with your code.'
             type        : 'boolean'
             default     : true
-            order       : 6
+            order       : 7
 
         showUnknownClasses:
             title       : 'Show unknown classes'
@@ -66,7 +74,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 7
+            order       : 8
 
         showUnknownGlobalFunctions:
             title       : 'Show unknown global functions'
@@ -75,7 +83,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 8
+            order       : 9
 
         showUnknownGlobalConstants:
             title       : 'Show unknown global constants'
@@ -84,7 +92,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 9
+            order       : 10
 
         showUnusedUseStatements:
             title       : 'Show unused use statements'
@@ -94,7 +102,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 10
+            order       : 11
 
         showMissingDocs:
             title       : 'Show missing documentation'
@@ -104,7 +112,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 11
+            order       : 12
 
         validateDocblockCorrectness:
             title       : 'Validate docblock correctness'
@@ -115,7 +123,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 12
+            order       : 13
 
         showUnknownMembers:
             title       : 'Show unknown members (experimental)'
@@ -126,7 +134,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : false
-            order       : 13
+            order       : 14
 
     ###*
      * The version of the core to download (version specification string).
@@ -215,6 +223,11 @@ module.exports =
      * @var {Object|null}
     ###
     tooltipProvider: null
+
+    ###*
+     * @var {Object|null}
+    ###
+    signatureHelpProvider: null
 
     ###*
      * @var {Object|null}
@@ -363,6 +376,13 @@ module.exports =
             else
                 @deactivateTooltips()
 
+        config.onDidChange 'enableSignatureHelp', (value) =>
+            if value
+                @activateSignatureHelp()
+
+            else
+                @deactivateSignatureHelp()
+
         config.onDidChange 'enableLinting', (value) =>
             if value
                 @activateLinting()
@@ -484,6 +504,9 @@ module.exports =
             if @getConfiguration().get('enableTooltips')
                 @activateTooltips()
 
+            if @getConfiguration().get('enableSignatureHelp')
+                @activateSignatureHelp()
+
             if @getConfiguration().get('enableLinting')
                 @activateLinting()
 
@@ -507,6 +530,18 @@ module.exports =
     ###
     deactivateTooltips: () ->
         @getTooltipProvider().deactivate()
+
+    ###*
+     * Activates the signature help provider.
+    ###
+    activateSignatureHelp: () ->
+        @getSignatureHelpProvider().activate(@getService())
+
+    ###*
+     * Deactivates the signature help provider.
+    ###
+    deactivateSignatureHelp: () ->
+        @getSignatureHelpProvider().deactivate()
 
     ###*
      * Activates linting.
@@ -786,6 +821,17 @@ module.exports =
             @tooltipProvider = new TooltipProvider()
 
         return @tooltipProvider
+
+    ###*
+     * @return {SignatureHelpProvider}
+    ###
+    getSignatureHelpProvider: () ->
+        if not @signatureHelpProvider?
+            SignatureHelpProvider = require './SignatureHelpProvider'
+
+            @signatureHelpProvider = new SignatureHelpProvider()
+
+        return @signatureHelpProvider
 
     ###*
      * @return {LinterProvider}

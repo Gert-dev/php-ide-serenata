@@ -215,18 +215,16 @@ class Service
         return @proxy.tooltip(file, source, offset)
 
     ###*
-     * Retrieves the call stack of the function or method that is being invoked at the specified position. This can be
-     * used to fetch information about the function or method call the cursor is in.
+     * Fetches signature help for a method or function call.
      *
-     * @param {String|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {String}      file   The path to the file to examine.
      * @param {String|null} source The source code to search. May be null if a file is passed instead.
      * @param {Number}      offset The character offset into the file to examine.
      *
-     * @return {Promise} With elements 'callStack' (array) as well as 'argumentIndex' which denotes the argument in the
-     *                   parameter list the position is located at. Returns 'null' if not in a method or function call.
+     * @return {Promise}
     ###
-    getInvocationInfo: (file, source, offset) ->
-        return @proxy.getInvocationInfo(file, source, offset)
+    signatureHelp: (file, source, offset) ->
+        return @proxy.signatureHelp(file, source, offset)
 
     ###*
      * Convenience alias for {@see deduceTypes}.
@@ -258,6 +256,21 @@ class Service
         bufferText = editor.getBuffer().getText()
 
         return @tooltip(editor.getPath(), bufferText, offset)
+
+    ###*
+     * Convenience alias for {@see signatureHelp}.
+     *
+     * @param {TextEditor} editor
+     * @param {Range}      bufferPosition
+     *
+     * @return {Promise}
+    ###
+    signatureHelpAt: (editor, bufferPosition) ->
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
+
+        bufferText = editor.getBuffer().getText()
+
+        return @signatureHelp(editor.getPath(), bufferText, offset)
 
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.
