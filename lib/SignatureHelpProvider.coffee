@@ -212,7 +212,7 @@ class SignatureHelpProvider
      * @return {String}
     ###
     prettifyDefaultValue: (text) ->
-        return text.replace(/ = (.+)/, '&nbsp;=<span class="keystroke php-integrator-signature-help-default-value">$1</span>')
+        return text.replace(/ = (.+)/, '&nbsp;=&nbsp;<span class="keystroke php-integrator-signature-help-default-value">$1</span>')
 
     ###*
      * Shows the call tip at the specified location and editor with the specified text.
