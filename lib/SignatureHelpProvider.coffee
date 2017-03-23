@@ -187,7 +187,6 @@ class SignatureHelpProvider
 
         @showCallTip(editor, bufferPosition, text)
 
-
     ###*
      * @param {String} text
      *
