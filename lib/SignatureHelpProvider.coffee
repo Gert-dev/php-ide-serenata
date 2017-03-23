@@ -182,7 +182,7 @@ class SignatureHelpProvider
 
         text += '(' + parameterItems.join(', ') + ')'
 
-        if signature.parameters[signatureHelp.activeParameter].documentation?
+        if signature.parameters.length > 0 and signature.parameters[signatureHelp.activeParameter].documentation?
             text += '<br><br><p>' + signature.parameters[signatureHelp.activeParameter].documentation + '</p>'
 
         @showCallTip(editor, bufferPosition, text)
