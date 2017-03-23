@@ -175,7 +175,7 @@ class SignatureHelpProvider
             else
                 parameterText += '<span class="php-integrator-signature-help-inactive-argument">'
 
-            parameterText += @prettifyDefaultValue(parameter.label)
+            parameterText += @prettifyLabel(parameter.label)
             parameterText += '</span>'
 
             parameterItems.push(parameterText)
@@ -193,12 +193,27 @@ class SignatureHelpProvider
      *
      * @return {String}
     ###
-    prettifyDefaultValue: (text) ->
-        if text.indexOf(' = ') != -1
-            return text.replace(/ = (.+)/, '&nbsp;=<span class="keystroke php-integrator-call-tip-default-value">$1</span>')
+    prettifyLabel: (text) ->
+        text = @prettifyType(text)
+        text = @prettifyDefaultValue(text)
 
         return text
 
+    ###*
+     * @param {String} text
+     *
+     * @return {String}
+    ###
+    prettifyType: (text) ->
+        return text.replace(/(.+?)( .+(?: = .+)?)/, '<span class="php-integrator-call-tip-type">$1</span>$2')
+
+    ###*
+     * @param {String} text
+     *
+     * @return {String}
+    ###
+    prettifyDefaultValue: (text) ->
+        return text.replace(/ = (.+)/, '&nbsp;=<span class="keystroke php-integrator-call-tip-default-value">$1</span>')
 
     ###*
      * Shows the call tip at the specified location and editor with the specified text.
