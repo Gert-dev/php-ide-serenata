@@ -204,7 +204,7 @@ class SignatureHelpProvider
      * @return {String}
     ###
     prettifyType: (text) ->
-        return text.replace(/(.+?)( .+(?: = .+)?)/, '<span class="php-integrator-call-tip-type">$1</span>$2')
+        return text.replace(/(.+?)( .+(?: = .+)?)/, '<span class="php-integrator-signature-help-type">$1</span>$2')
 
     ###*
      * @param {String} text
@@ -212,7 +212,7 @@ class SignatureHelpProvider
      * @return {String}
     ###
     prettifyDefaultValue: (text) ->
-        return text.replace(/ = (.+)/, '&nbsp;=<span class="keystroke php-integrator-call-tip-default-value">$1</span>')
+        return text.replace(/ = (.+)/, '&nbsp;=<span class="keystroke php-integrator-signature-help-default-value">$1</span>')
 
     ###*
      * Shows the call tip at the specified location and editor with the specified text.
