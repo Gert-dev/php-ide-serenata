@@ -33,6 +33,7 @@
     }
   },
   "dependencies": {
+    "atom-package-deps": "~4.5.0",
     "event-kit": "~2.0.0",
     "jquery": "~3.1.0",
     "md5": "~2.0.0",
@@ -40,6 +41,10 @@
     "download": "~5.0.2",
     "marked": "~0.3.6"
   },
+  "package-deps": [
+    "project-manager",
+    "linter"
+  ],
   "keywords": [
     "php",
     "service",

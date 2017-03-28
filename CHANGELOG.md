@@ -11,6 +11,7 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 ** Markdown in docblocks is now properly supported when displaying tooltips.
 ** You no longer need the php-integrator-tooltips package installed. As it will no longer be updated to the new service version, it should disable automatically.
 * `semanticLint` has been renamed to just `lint` as it also lints syntax errors.
+* You will now be prompted to install the dependencies of this package (project-manager, linter, ...). If you proceed, they will be installed for you (so you don't need to look them up manually).
 
 ## 2.1.11
 * Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.6).

@@ -490,27 +490,28 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
-        @testConfig(false)
+        require('atom-package-deps').install(@packageName, true).then () =>
+            @testConfig(false)
 
-        @updateCoreIfOutdated().then () =>
-            @registerCommands()
-            @registerConfigListeners()
-            @registerStatusBarListeners()
+            @updateCoreIfOutdated().then () =>
+                @registerCommands()
+                @registerConfigListeners()
+                @registerStatusBarListeners()
 
-            @editorTimeoutMap = {}
+                @editorTimeoutMap = {}
 
-            @registerAtomListeners()
+                @registerAtomListeners()
 
-            if @getConfiguration().get('enableTooltips')
-                @activateTooltips()
+                if @getConfiguration().get('enableTooltips')
+                    @activateTooltips()
 
-            if @getConfiguration().get('enableSignatureHelp')
-                @activateSignatureHelp()
+                if @getConfiguration().get('enableSignatureHelp')
+                    @activateSignatureHelp()
 
-            if @getConfiguration().get('enableLinting')
-                @activateLinting()
+                if @getConfiguration().get('enableLinting')
+                    @activateLinting()
 
-            @getCachingProxy().setIsActive(true)
+                @getCachingProxy().setIsActive(true)
 
     ###*
      * Registers listeners for events from Atom's API.
