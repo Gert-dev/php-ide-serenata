@@ -42,10 +42,8 @@ class AttachedPopover extends Popover
 
     ###*
      * Shows the popover with the specified text.
-     *
-     * @param {Number} fadeInTime The amount of time to take to fade in the tooltip.
     ###
-    show: (fadeInTime = 100) ->
+    show: () ->
         coordinates = @elementToAttachTo.getBoundingClientRect();
 
         centerOffset = ((coordinates.right - coordinates.left) / 2)
@@ -56,16 +54,15 @@ class AttachedPopover extends Popover
         x = 0 if x < 0
         y = 0 if y < 0
 
-        super(x, y, fadeInTime)
+        super(x, y)
 
     ###*
      * Shows the popover with the specified text after the specified delay (in miliiseconds). Calling this method
      * multiple times will cancel previous show requests and restart.
      *
-     * @param {Number} delay      The delay before the tooltip shows up (in milliseconds).
-     * @param {Number} fadeInTime The amount of time to take to fade in the tooltip.
+     * @param {Number} delay The delay before the tooltip shows up (in milliseconds).
     ###
-    showAfter: (delay, fadeInTime = 100) ->
+    showAfter: (delay) ->
         @timeoutId = setTimeout(() =>
-            @show(fadeInTime)
+            @show()
         , delay)
