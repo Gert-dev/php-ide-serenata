@@ -187,7 +187,7 @@ class TooltipProvider
 
             @attachedPopover = @service.createAttachedPopover(showOverElement)
             @attachedPopover.setText('<div class="php-integrator-tooltip-popover">' + marked(tooltip.contents) + '</div>')
-            @attachedPopover.showAfter(0, 100)
+            @attachedPopover.show(100)
 
         failureHandler = () =>
             @removeTooltip()
