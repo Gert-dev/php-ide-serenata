@@ -167,9 +167,9 @@ class TooltipProvider
 
         return if 'line' in target.classList # Skip whitespace
 
-        @timeoutHandle = setTimeout ( =>
-            cursorPosition = editorViewComponent.screenPositionForMouseEvent(event)
+        cursorPosition = editorViewComponent.screenPositionForMouseEvent(event)
 
+        @timeoutHandle = setTimeout ( =>
             @showTooltipAt(editor, cursorPosition, target)
             @timeoutHandle = null
         ), 500
