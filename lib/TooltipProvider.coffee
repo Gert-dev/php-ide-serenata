@@ -2,6 +2,8 @@
 
 marked = require 'marked'
 
+CancelablePromise = require './CancelablePromise'
+
 module.exports =
 
 ##*
@@ -18,9 +20,9 @@ class TooltipProvider
     ###*
      * Keeps track of the currently pending promise.
      *
-     * @var {Promise|null}
+     * @var {CancelablePromise|null}
     ###
-    pendingPromise: null
+    pendingCancelablePromise: null
 
     ###*
      * @var {Number|null}
@@ -161,6 +163,11 @@ class TooltipProvider
             clearTimeout(@timeoutHandle)
             @timeoutHandle = null
 
+        if @pendingCancelablePromise?
+            console.log("Force rejecting")
+            @pendingCancelablePromise.cancel()
+            @pendingCancelablePromise = null
+
         # Needs to be bound outside of the callback, event.currentTarget may no longer be the same value once the
         # callback is run.
         target = event.target
@@ -178,9 +185,13 @@ class TooltipProvider
      * @param {TextEditor} editor
      * @param {Point}      cursorPosition
      * @param {Object}     showOverElement
+     *
+     * @return {Promise}
     ###
     showTooltipAt: (editor, cursorPosition, showOverElement) ->
         successHandler = (tooltip) =>
+            @pendingCancelablePromise = null
+
             return if not tooltip?
 
             @removeTooltip()
@@ -190,17 +201,23 @@ class TooltipProvider
             @attachedPopover.show()
 
         failureHandler = () =>
+            @pendingCancelablePromise = null
+
             @removeTooltip()
 
-        return @service.tooltipAt(editor, cursorPosition).then(successHandler, failureHandler)
+        promise = @service.tooltipAt(editor, cursorPosition)
+
+        @pendingCancelablePromise = new CancelablePromise(promise)
+
+        return @pendingCancelablePromise.then(successHandler, failureHandler)
 
     ###*
      * Removes the popover, if it is displayed.
     ###
     removeTooltip: () ->
-        if @pendingPromise?
-            @pendingPromise.reject()
-            @pendingPromise = null
+        if @pendingCancelablePromise?
+            @pendingCancelablePromise.cancel()
+            @pendingCancelablePromise = null
 
         if @attachedPopover
             @attachedPopover.dispose()
