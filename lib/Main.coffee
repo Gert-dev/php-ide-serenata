@@ -252,7 +252,9 @@ module.exports =
             errorMessage =
                 "PHP is not correctly set up and as a result PHP integrator will not work. Please visit the settings
                  screen to correct this error. If you are not specifying an absolute path for PHP or Composer, make
-                 sure they are in your PATH."
+                 sure they are in your PATH.
+
+                 Please restart Atom after correcting the path."
 
             atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
 
@@ -491,7 +493,7 @@ module.exports =
     ###
     activate: ->
         require('atom-package-deps').install(@packageName, true).then () =>
-            @testConfig(false)
+            return if not @testConfig(false)
 
             @updateCoreIfOutdated().then () =>
                 @registerCommands()
