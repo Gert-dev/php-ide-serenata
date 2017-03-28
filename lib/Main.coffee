@@ -7,7 +7,7 @@ module.exports =
             title       : 'PHP command'
             description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...). Requires a restart. If you update
                            to a new minor or major version, you may want to force reindex your project to index the new
-                           built-in structural elements.'
+                           built-in structural elements. Requires a restart after changing.'
             type        : 'string'
             default     : 'php'
             order       : 1
