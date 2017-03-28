@@ -694,7 +694,7 @@ module.exports =
      * @return {Service}
     ###
     getService: () ->
-        if not @disposables?
+        if not @service?
             Service = require './Service'
 
             @service = new Service(
