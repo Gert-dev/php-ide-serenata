@@ -741,8 +741,8 @@ class Proxy
      * @param {String}      file
      * @param {String|null} source  The source code of the file to index. May be null if a directory is passed instead.
      * @param {Object}      options Additional options to set. Boolean properties noUnknownClasses, noUnknownMembers,
-     *                              noUnknownGlobalFunctions, noUnknownGlobalConstants, noDocblockCorrectness and
-     *                              noUnusedUseStatements are supported.
+     *                              noUnknownGlobalFunctions, noUnknownGlobalConstants, noDocblockCorrectness,
+     *                              noUnusedUseStatements and noMissingDocumentation are supported.
      *
      * @return {Promise}
     ###
@@ -778,6 +778,9 @@ class Proxy
 
         if options.noUnusedUseStatements == true
             parameters['no-unused-use-statements'] = true
+
+        if options.noMissingDocumentation == true
+            parameters['no-missing-documentation'] = true
 
         return @performRequest('lint', parameters, null, source)
 

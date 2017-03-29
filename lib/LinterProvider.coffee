@@ -159,6 +159,7 @@ class LinterProvider
             noUnknownGlobalConstants : not @config.get('showUnknownGlobalConstants')
             noUnusedUseStatements    : not @config.get('showUnusedUseStatements')
             noDocblockCorrectness    : not @config.get('validateDocblockCorrectness')
+            noMissingDocumentation   : not @config.get('showMissingDocs')
         }
 
         return @service.lint(path, source, options)
