@@ -627,19 +627,12 @@ module.exports =
         return new Disposable => @detachStatusBarItems()
 
     ###*
-     * Sets the linter indie service.
-     *
      * @param {mixed} service
      *
      * @return {Disposable}
     ###
-    setLinterIndieService: (service) ->
-        indieLinter = null
-
-        if service
-            indieLinter = service.register({name : @packageName, scope: 'file', grammarScopes: ['source.php']})
-
-        @getLinterProvider().setIndieLinter(indieLinter)
+    setLinterService: (service) ->
+        return @getLinterProvider()
 
     ###*
      * Sets the project manager service.
