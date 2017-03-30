@@ -56,8 +56,6 @@ class LinterProvider
     activate: (@service) ->
         @disposables = new CompositeDisposable()
 
-        # @attachListeners(@service)
-
     ###*
      * Deactives the provider.
     ###
