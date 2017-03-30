@@ -4,14 +4,14 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 ## 3.0.0
 * Update to core [3.0.0](https://github.com/php-integrator/core/releases/tag/3.0.0).
 * Linting has been moved to this package. Due to refactoring in the core, the amount of CoffeeScript boilerplate has considerably reduced.
-** You no longer need the php-integrator-linter package installed. As it will no longer be updated to the new service version, it should disable automatically.
-** Linting has been updated to the new v2 API.
-** Disabling linting while typing is now supported (https://github.com/php-integrator/atom-linter/issues/49).
+  * You no longer need the php-integrator-linter package installed. As it will no longer be updated to the new service version, it should disable automatically.
+  * Linting has been updated to the new v2 API.
+  * Disabling linting while typing is now supported (https://github.com/php-integrator/atom-linter/issues/49).
 * Call tips (or "signature help") has been moved to this package. Due to refactoring in the core, the amount of CoffeeScript boilerplate has considerably reduced.
-** You no longer need the php-integrator-call-tips package installed. As it will no longer be updated to the new service version, it should disable automatically.
+  * You no longer need the php-integrator-call-tips package installed. As it will no longer be updated to the new service version, it should disable automatically.
 * Tooltips are now provided by the core. The size of the CoffeeScript side has, as a consequence, shrunk considerably and is part of this package.
-** Markdown in docblocks is now properly supported when displaying tooltips.
-** You no longer need the php-integrator-tooltips package installed. As it will no longer be updated to the new service version, it should disable automatically.
+  * Markdown in docblocks is now properly supported when displaying tooltips.
+  * You no longer need the php-integrator-tooltips package installed. As it will no longer be updated to the new service version, it should disable automatically.
 * `semanticLint` has been renamed to just `lint` as it also lints syntax errors.
 * You will now be prompted to install the dependencies of this package (project-manager, linter, ...). If you proceed, they will be installed for you (so you don't need to look them up manually).
 * You can now disable linting missing documentation separately from linting docblock correctness.
