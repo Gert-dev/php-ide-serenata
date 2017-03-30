@@ -210,7 +210,7 @@ class TooltipProvider
 
         @pendingCancelablePromise = new CancelablePromise(promise)
 
-        return @pendingCancelablePromise.then(successHandler, failureHandler)
+        return @pendingCancelablePromise.then(successHandler, failureHandler).catch(failureHandler)
 
     ###*
      * Removes the popover, if it is displayed.
