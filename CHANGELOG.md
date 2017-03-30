@@ -15,7 +15,7 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * `semanticLint` has been renamed to just `lint` as it also lints syntax errors.
 * You will now be prompted to install the dependencies of this package (project-manager, linter, ...). If you proceed, they will be installed for you (so you don't need to look them up manually).
 * You can now disable linting missing documentation separately from linting docblock correctness.
-* In some cases the PHP server was still starting in non-PHP projects (e.g. when opening a PHP file there). This should now be fixed (https://github.com/php-integrator/atom-base/issues/272).
+* Fixed the PHP server still starting for non-PHP projects in some cases, e.g. when opening a PHP file there (https://github.com/php-integrator/atom-base/issues/272).
 * Fix databases called `null.sqlite` sometimes being created.
 
 ## 2.1.11
