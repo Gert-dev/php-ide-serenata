@@ -1,7 +1,5 @@
 {CompositeDisposable} = require 'atom'
 
-marked = require 'marked'
-
 module.exports =
 
 ##*
@@ -9,40 +7,34 @@ module.exports =
 ##
 class LinterProvider
     ###*
+     * @var {String}
+    ###
+    name: 'PHP Integrator'
+
+    ###*
+     * @var {String}
+    ###
+    scope: 'file'
+
+    ###*
+     * @var {Boolean}
+    ###
+    lintsOnChange: true
+
+    ###*
+     * @var {Array}
+    ###
+    grammarScopes: ['source.php']
+
+    ###*
      * @var {Object}
     ###
     service: null
 
     ###*
-     * @var {Object|null}
-    ###
-    indieLinter: null
-
-    ###*
      * @var {Object}
     ###
     config: null
-
-    ###*
-     * Keeps track of whether a linting operation is currently running.
-     *
-     * @var {Boolean}
-    ###
-    isLintingInProgress: false
-
-    ###*
-     * Whether to ignore the next linting result.
-     *
-     * @var {Boolean}
-    ###
-    ignoreLintingResult: false
-
-    ###*
-     * The next editor to start a linting task for.
-     *
-     * @var {Object|null}
-    ###
-    nextEditor: null
 
     ###*
      * @var {CompositeDisposable}
@@ -64,7 +56,7 @@ class LinterProvider
     activate: (@service) ->
         @disposables = new CompositeDisposable()
 
-        @attachListeners(@service)
+        # @attachListeners(@service)
 
     ###*
      * Deactives the provider.
@@ -73,72 +65,17 @@ class LinterProvider
         @disposables.dispose()
 
     ###*
-     * Sets the indie linter to use.
-     *
-     * @param {mixed} indieLinter
-    ###
-    setIndieLinter: (@indieLinter) ->
-        @messages = []
-
-    ###*
-     * Attaches listeners for the specified base service.
-     *
-     * @param {Object} service
-    ###
-    attachListeners: (service) ->
-        @disposables.add service.onDidFinishIndexing (response) =>
-            editor = @findTextEditorByPath(response.path)
-
-            return if not editor?
-            return if not @indieLinter?
-
-            @lint(editor)
-
-        @disposables.add service.onDidFailIndexing (response) =>
-            editor = @findTextEditorByPath(response.path)
-
-            return if not editor?
-            return if not @indieLinter?
-
-            @lint(editor)
-
-    ###*
      * @param {TextEditor} editor
      *
      * @return {Promise}
     ###
     lint: (editor) ->
-        if @isLintingInProgress
-            # This file is already being linted, but by the time it finishes, the results will be out of date and we
-            # will then need to perform a new lint (we don't do it now to avoid spawning an excessive amount of
-            # linting processes).
-            @ignoreLintingResult = true
-            @nextEditor = editor
-            return
-
-        @isLintingInProgress = true
-
-        doneHandler = () =>
-            ignoreResult = @ignoreLintingResult
-
-            @isLintingInProgress = false
-            @ignoreLintingResult = false
-
-            if ignoreResult
-                # The result was ignored because there is more recent data, run again.
-                @lint(@nextEditor)
-
-            return ignoreResult
-
         successHandler = (response) =>
-            return if doneHandler()
-
-            @processSuccess(editor, response)
+            return @processSuccess(editor, response)
 
         failureHandler = (response) =>
-            return if doneHandler()
+            return @processFailure()
 
-            @processFailure()
 
         return @invokeLint(editor.getPath(), editor.getBuffer().getText()).then(
             successHandler,
@@ -164,13 +101,13 @@ class LinterProvider
 
         return @service.lint(path, source, options)
 
-    ###*base/chang
+    ###*
      * @param {TextEditor} editor
      * @param {Object}     response
+     *
+     * @return {Array}
     ###
     processSuccess: (editor, response) ->
-        return if not @indieLinter
-
         messages = []
 
         for item in response.errors
@@ -179,15 +116,13 @@ class LinterProvider
         for item in response.warnings
             messages.push @createLinterWarningMessageForOutputItem(editor, item)
 
-        @indieLinter.setMessages(messages)
+        return messages
 
     ###*
-     *
+     * @return {Array}
     ###
     processFailure: () ->
-        return if not @indieLinter
-
-        @indieLinter.setMessages([])
+        return []
 
     ###*
      * @param {TextEditor} editor
@@ -196,7 +131,7 @@ class LinterProvider
      * @return {Object}
     ###
     createLinterErrorMessageForOutputItem: (editor, item) ->
-        return @createLinterMessageForOutputItem(editor, item, 'Error')
+        return @createLinterMessageForOutputItem(editor, item, 'error')
 
     ###*
      * @param {TextEditor} editor
@@ -205,16 +140,16 @@ class LinterProvider
      * @return {Object}
     ###
     createLinterWarningMessageForOutputItem: (editor, item) ->
-        return @createLinterMessageForOutputItem(editor, item, 'Warning')
+        return @createLinterMessageForOutputItem(editor, item, 'warning')
 
     ###*
      * @param {TextEditor} editor
      * @param {Object}     item
-     * @param {String}     type
+     * @param {String}     severity
      *
      * @return {Object}
     ###
-    createLinterMessageForOutputItem: (editor, item, type) ->
+    createLinterMessageForOutputItem: (editor, item, severity) ->
         text =  editor.getBuffer().getText()
 
         startCharacterOffset = @service.getCharacterOffsetFromByteOffset(item.start, text)
@@ -223,17 +158,13 @@ class LinterProvider
         startPoint = editor.getBuffer().positionForCharacterIndex(startCharacterOffset)
         endPoint   = editor.getBuffer().positionForCharacterIndex(endCharacterOffset)
 
-        html = marked(item.message)
-
-        if html?
-            # Strip wrapping paragraph, linter doesn't seem to like it.
-            html = html.substring('<p>'.length, html.length - '</p>'.length - 1)
-
         return {
-            type     : type
-            html     : html
-            range    : [startPoint, endPoint]
-            filePath : editor.getPath()
+            excerpt  : item.message
+            severity : severity
+
+            location:
+                file     : editor.getPath()
+                position : [startPoint, endPoint]
         }
 
     ###*

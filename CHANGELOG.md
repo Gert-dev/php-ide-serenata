@@ -5,6 +5,8 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * Update to core [3.0.0](https://github.com/php-integrator/core/releases/tag/3.0.0).
 * Linting has been moved to this package. Due to refactoring in the core, the amount of CoffeeScript boilerplate has considerably reduced.
 ** You no longer need the php-integrator-linter package installed. As it will no longer be updated to the new service version, it should disable automatically.
+** Linting has been updated to the new v2 API.
+** Disabling linting while typing is now supported (https://github.com/php-integrator/atom-linter/issues/49).
 * Call tips (or "signature help") has been moved to this package. Due to refactoring in the core, the amount of CoffeeScript boilerplate has considerably reduced.
 ** You no longer need the php-integrator-call-tips package installed. As it will no longer be updated to the new service version, it should disable automatically.
 * Tooltips are now provided by the core. The size of the CoffeeScript side has, as a consequence, shrunk considerably and is part of this package.
