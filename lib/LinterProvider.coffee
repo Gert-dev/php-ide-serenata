@@ -74,7 +74,6 @@ class LinterProvider
         failureHandler = (response) =>
             return @processFailure()
 
-
         return @invokeLint(editor.getPath(), editor.getBuffer().getText()).then(
             successHandler,
             failureHandler
