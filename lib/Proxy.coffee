@@ -1016,9 +1016,12 @@ class Proxy
     ###*
      * Retrieves the full path to the database file to use.
      *
-     * @return {String}
+     * @return {String|null}
     ###
     getIndexDatabasePath: () ->
+        if not @indexDatabaseName?
+            return null
+
         return @config.get('packagePath') + '/indexes/' + @indexDatabaseName + '.sqlite'
 
     ###*
