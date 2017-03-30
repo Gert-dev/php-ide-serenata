@@ -1,7 +1,5 @@
 {CompositeDisposable} = require 'atom'
 
-marked = require 'marked'
-
 module.exports =
 
 ##*
@@ -158,13 +156,6 @@ class LinterProvider
 
         startPoint = editor.getBuffer().positionForCharacterIndex(startCharacterOffset)
         endPoint   = editor.getBuffer().positionForCharacterIndex(endCharacterOffset)
-
-        # FIXME: Markdown/HTML support for excerpt, see also https://github.com/steelbrain/linter/issues/1407
-        # html = marked(item.message)
-
-        # if html?
-            # Strip wrapping paragraph, linter doesn't seem to like it.
-            # html = html.substring('<p>'.length, html.length - '</p>'.length - 1)
 
         return {
             excerpt  : item.message
