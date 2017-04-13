@@ -178,6 +178,8 @@ class TooltipProvider
         cursorPosition = editorViewComponent.screenPositionForMouseEvent(event)
 
         @timeoutHandle = setTimeout ( =>
+            console.debug("Showing tooltip ", cursorPosition, target)
+
             @showTooltipAt(editor, cursorPosition, target)
             @timeoutHandle = null
         ), 500
