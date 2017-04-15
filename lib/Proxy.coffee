@@ -1011,7 +1011,9 @@ class Proxy
      * @param {String} name
     ###
     setIndexDatabaseName: (name) ->
-        @indexDatabaseName = name
+        sanitize = require 'sanitize-filename'
+
+        @indexDatabaseName = sanitize(name)
 
     ###*
      * Retrieves the full path to the database file to use.

@@ -17,6 +17,7 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * You can now disable linting missing documentation separately from linting docblock correctness.
 * Fixed the PHP server still starting for non-PHP projects in some cases, e.g. when opening a PHP file there (https://github.com/php-integrator/atom-base/issues/272).
 * Fix databases called `null.sqlite` sometimes being created.
+* Fix project names containing characters that can't be used in file paths generating errors (such as forward slashes, asterisks, ...).
 
 ## 2.1.11
 * Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.6).
