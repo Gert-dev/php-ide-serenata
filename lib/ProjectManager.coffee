@@ -46,7 +46,7 @@ class ProjectManager
         enabled: true
         php_integrator:
             enabled: true
-            phpVersion: 5.6
+            phpVersion: 7.1
             excludedPaths: []
             fileExtensions: ['php']
 
