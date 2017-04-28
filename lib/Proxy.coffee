@@ -96,6 +96,11 @@ class Proxy
         memoryLimit = @config.get('memoryLimit')
 
         parameters = [
+             # Enable these to profile (requires xdebug be installed).
+             #'-d zend_extension=/usr/lib/php/modules/xdebug.so'
+             #'-d xdebug.profiler_enable=On',
+             #'-d xdebug.profiler_output_dir=/tmp',
+
              '-d memory_limit=' + memoryLimit + 'M',
              @corePath + "/src/Main.php",
              '--port=' + port
