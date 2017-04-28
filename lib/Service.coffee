@@ -390,7 +390,7 @@ class Service
 
             successHandler = (namespacesInFile) =>
                 for namespace in namespacesInFile
-                    if bufferPosition.row >= namespace.startLine and (bufferPosition.row <= namespace.endLine
+                    if bufferPosition.row >= namespace.startLine and bufferPosition.row <= namespace.endLine
                         resolve(namespace.name)
 
                 resolve(null)
