@@ -443,7 +443,7 @@ class Proxy
                 reject('The proxy is not yet active, the core may be in the process of being downloaded')
                 return
 
-            JsonRpcRequest =
+            jsonRpcRequest =
                 jsonrpc : 2.0
                 id      : id
                 method  : method
@@ -452,7 +452,7 @@ class Proxy
             @requestQueue[id] = {
                 id             : id
                 streamCallback : streamCallback
-                request        : JsonRpcRequest
+                request        : jsonRpcRequest
 
                 promise: {
                     resolve : resolve
@@ -460,7 +460,7 @@ class Proxy
                 }
             }
 
-            content = @getContentForJsonRpcRequest(JsonRpcRequest)
+            content = @getContentForJsonRpcRequest(jsonRpcRequest)
 
             @writeRawRequest(content)
 
