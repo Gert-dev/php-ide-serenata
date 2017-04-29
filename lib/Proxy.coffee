@@ -334,7 +334,7 @@ class Proxy
             })
 
             if jsonRpcResponse.error.code == @FATAL_SERVER_ERROR
-                @showUnexpectedSocketResponseError(jsonRpcResponse.error.message)
+                @showFatalServerError(jsonRpcResponse.error)
 
         else
             jsonRpcRequest.promise.resolve(jsonRpcResponse.result)
@@ -489,20 +489,21 @@ class Proxy
             connection.write(content)
 
     ###*
-     * @param {String}     rawOutput
-     * @param {Array|null} parameters
+     * @param {Object} error
     ###
-    showUnexpectedSocketResponseError: (rawOutput, parameters = null) ->
+    showFatalServerError: (error) ->
         detail =
-            "The socket server sent back something unexpected. This could be a bug, but it could also be a problem " +
-            "with your setup. If you're sure it is a bug, feel free to report it on the bug tracker."
+            "Don't worry, the server will restart by itself. However, this is likely a bug, so feel free to report " +
+            "it on the bug tracker. Included below is additional debugging information you should include if you do."
 
         if parameters?
             detail += "\n \nCommand\n  → " + parameters.join(' ')
 
-        detail += "\n \nOutput\n  → " + rawOutput
+        detail += "\n \n→ Message\n" + error.message
+        detail += "\n \n→ Location\n" + error.data.file + ':' + error.data.line
+        detail += "\n \n→ Backtrace\n" + error.data.backtrace
 
-        atom.notifications.addError('PHP Integrator - Oops, something went wrong!', {
+        atom.notifications.addError('PHP Integrator - Darn, we\'ve crashed!', {
             dismissable : true
             detail      : detail
         })
