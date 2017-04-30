@@ -9,11 +9,6 @@ class LinterProvider
     ###*
      * @var {String}
     ###
-    name: 'PHP Integrator'
-
-    ###*
-     * @var {String}
-    ###
     scope: 'file'
 
     ###*
@@ -42,11 +37,22 @@ class LinterProvider
     disposables: null
 
     ###*
+     * @var {Object}
+    ###
+    indieLinter: null
+
+    ###*
      * Constructor.
      *
      * @param {Config} config
     ###
     constructor: (@config) ->
+
+    ###*
+     * @param {Object} indieLinter
+    ###
+    setIndieLinter: (@indieLinter) ->
+        @messages = []
 
     ###*
      * Initializes this provider.
@@ -56,11 +62,33 @@ class LinterProvider
     activate: (@service) ->
         @disposables = new CompositeDisposable()
 
+        @attachListeners(@service)
+
     ###*
      * Deactives the provider.
     ###
     deactivate: () ->
         @disposables.dispose()
+
+    ###*
+     * @param {Object} service
+    ###
+    attachListeners: (service) ->
+        @disposables.add service.onDidFinishIndexing (response) =>
+            editor = @findTextEditorByPath(response.path)
+
+            return if not editor?
+            return if not @indieLinter?
+
+            @lint(editor)
+
+        @disposables.add service.onDidFailIndexing (response) =>
+            editor = @findTextEditorByPath(response.path)
+
+            return if not editor?
+            return if not @indieLinter?
+
+            @lint(editor)
 
     ###*
      * @param {TextEditor} editor
@@ -113,13 +141,15 @@ class LinterProvider
         for item in response.warnings
             messages.push @createLinterWarningMessageForOutputItem(editor, item)
 
-        return messages
+        @indieLinter.setMessages(editor.getPath(), messages)
 
     ###*
+     * @param {TextEditor} editor
+     *
      * @return {Array}
     ###
-    processFailure: () ->
-        return []
+    processFailure: (editor) ->
+        @indieLinter.setMessages(editor.getPath(), [])
 
     ###*
      * @param {TextEditor} editor

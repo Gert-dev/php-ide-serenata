@@ -13,14 +13,14 @@
       "versions": {
         "3.0.0": "getServiceInstance"
       }
-    },
-    "linter": {
-      "versions": {
-        "2.0.0": "setLinterService"
-      }
     }
   },
   "consumedServices": {
+    "linter-indie": {
+      "versions": {
+        "2.0.0": "setLinterIndieService"
+      }
+    },
     "status-bar": {
       "versions": {
         "^1.0.0": "setStatusBarService"

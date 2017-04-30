@@ -12,6 +12,16 @@ module.exports =
             default     : 'php'
             order       : 1
 
+        indexContinuously:
+            title       : 'Index continously'
+            description : 'If enabled, indexing will happen continuously and automatically whenever the editor is
+                           modified. If disabled, indexing will only happen on save. This also influences linting, which
+                           happens automatically after indexing completes. In other words, if you would like linting to
+                           happen on save, you should disable this option.'
+            type        : 'boolean'
+            default     : true
+            order       : 2
+
         additionalIndexingDelay:
             title       : 'Additional delay before reindexing'
             description : 'File reindexing occurs as soon as its editor\'s contents stop changing. This is after a
@@ -21,7 +31,7 @@ module.exports =
                           for changes to be reflected in various components, such as autocompletion.'
             type        : 'integer'
             default     : 0
-            order       : 2
+            order       : 3
 
         memoryLimit:
             title       : 'Memory limit (in MB)'
@@ -32,7 +42,7 @@ module.exports =
                            specific reason you want to change it.'
             type        : 'integer'
             default     : 1024
-            order       : 3
+            order       : 4
 
         insertNewlinesForUseStatements:
             title       : 'Insert newlines for use statements'
@@ -41,7 +51,7 @@ module.exports =
                            more cleanly separated use statements but will create additional vertical whitespace.'
             type        : 'boolean'
             default     : false
-            order       : 4
+            order       : 5
 
         enableTooltips:
             title       : 'Enable tooltips'
@@ -49,7 +59,7 @@ module.exports =
                            hovered over them.'
             type        : 'boolean'
             default     : true
-            order       : 5
+            order       : 6
 
         enableSignatureHelp:
             title       : 'Enable signature help'
@@ -57,14 +67,14 @@ module.exports =
                            function, method or constructor call.'
             type        : 'boolean'
             default     : true
-            order       : 6
+            order       : 7
 
         enableLinting:
             title       : 'Enable linting'
             description : 'When enabled, linting will show problems with your code.'
             type        : 'boolean'
             default     : true
-            order       : 7
+            order       : 8
 
         showUnknownClasses:
             title       : 'Show unknown classes'
@@ -74,7 +84,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 8
+            order       : 9
 
         showUnknownGlobalFunctions:
             title       : 'Show unknown global functions'
@@ -83,7 +93,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 9
+            order       : 10
 
         showUnknownGlobalConstants:
             title       : 'Show unknown global constants'
@@ -92,7 +102,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 10
+            order       : 11
 
         showUnusedUseStatements:
             title       : 'Show unused use statements'
@@ -102,7 +112,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 11
+            order       : 12
 
         showMissingDocs:
             title       : 'Show missing documentation'
@@ -112,7 +122,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 12
+            order       : 13
 
         validateDocblockCorrectness:
             title       : 'Validate docblock correctness'
@@ -123,7 +133,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : true
-            order       : 13
+            order       : 14
 
         showUnknownMembers:
             title       : 'Show unknown members (experimental)'
@@ -134,7 +144,7 @@ module.exports =
             '''
             type        : 'boolean'
             default     : false
-            order       : 14
+            order       : 15
 
     ###*
      * The version of the core to download (version specification string).
@@ -562,25 +572,29 @@ module.exports =
      * @param {TextEditor} editor
     ###
     registerTextEditorListeners: (editor) ->
-        # The default onDidStopChanging timeout is 300 milliseconds. As this is notcurrently configurable (and would
-        # also impact other packages), we install our own timeout on top of the existing one. This is useful for users
-        # that don't type particularly fast or are on slower machines and will prevent constant indexing from happening.
-        @getDisposables().add editor.onDidStopChanging () =>
-            path = editor.getPath()
+        if @getConfiguration().get('indexContinuously') == true
+            # The default onDidStopChanging timeout is 300 milliseconds. As this is notcurrently configurable (and would
+            # also impact other packages), we install our own timeout on top of the existing one. This is useful for users
+            # that don't type particularly fast or are on slower machines and will prevent constant indexing from happening.
+            @getDisposables().add editor.onDidStopChanging () =>
+                path = editor.getPath()
 
-            additionalIndexingDelay = @getConfiguration().get('additionalIndexingDelay')
+                additionalIndexingDelay = @getConfiguration().get('additionalIndexingDelay')
 
-            @editorTimeoutMap[path] = setTimeout ( =>
-                @onEditorDidStopChanging(editor)
-                @editorTimeoutMap[path] = null
-            ), additionalIndexingDelay
+                @editorTimeoutMap[path] = setTimeout ( =>
+                    @onEditorDidStopChanging(editor)
+                    @editorTimeoutMap[path] = null
+                ), additionalIndexingDelay
 
-        @getDisposables().add editor.onDidChange () =>
-            path = editor.getPath()
+            @getDisposables().add editor.onDidChange () =>
+                path = editor.getPath()
 
-            if @editorTimeoutMap[path]?
-                clearTimeout(@editorTimeoutMap[path])
-                @editorTimeoutMap[path] = null
+                if @editorTimeoutMap[path]?
+                    clearTimeout(@editorTimeoutMap[path])
+                    @editorTimeoutMap[path] = null
+
+        else
+            @getDisposables().add editor.onDidSave(@onEditorDidStopChanging.bind(this, editor))
 
     ###*
      * Invoked when an editor stops changing.
@@ -631,8 +645,14 @@ module.exports =
      *
      * @return {Disposable}
     ###
-    setLinterService: (service) ->
-        return @getLinterProvider()
+    setLinterIndieService: (service) ->
+        linter = service({
+            name: 'PHP Integrator'
+        })
+
+        @getDisposables().add(linter)
+
+        @getLinterProvider().setIndieLinter(linter)
 
     ###*
      * Sets the project manager service.

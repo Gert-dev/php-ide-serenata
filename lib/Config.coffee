@@ -25,6 +25,7 @@ class Config
         @data =
             phpCommand                     : null
             packagePath                    : null
+            indexContinuously              : true
             additionalIndexingDelay        : 200
             memoryLimit                    : 512
             insertNewlinesForUseStatements : false

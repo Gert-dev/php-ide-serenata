@@ -22,6 +22,7 @@ class AtomConfig extends Config
     constructor: (@packageName) ->
         @configurableProperties = [
             'phpCommand'
+            'indexContinuously'
             'additionalIndexingDelay'
             'memoryLimit'
             'insertNewlinesForUseStatements'
