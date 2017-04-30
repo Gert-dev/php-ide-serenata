@@ -203,7 +203,7 @@ class LinterProvider
     ###
     findTextEditorByPath: (path) ->
         for textEditor in atom.workspace.getTextEditors()
-            if textEditor.getPath() == path
+            if textEditor and textEditor.getPath() == path
                 return textEditor
 
         return null
