@@ -173,7 +173,7 @@ class TooltipProvider
         target = event.target
 
         return if not target?
-        return if 'line' in target.classList # Skip whitespace
+        return if 'syntax--php' not in target.classList # Skip whitespace and other noise
 
         cursorPosition = editorViewComponent.screenPositionForMouseEvent(event)
 
