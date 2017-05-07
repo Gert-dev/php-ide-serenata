@@ -211,7 +211,7 @@ class Proxy
     ###
     rejectAllOpenRequests: () ->
         for id,request of @requestQueue
-            request.promise.reject('The socket connection was closed and had to reconnect')
+            request.promise.reject('Socket connection encountered invalid state or was closed, please resend request')
 
         @requestQueue = {}
 
