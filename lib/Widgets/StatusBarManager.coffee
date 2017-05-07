@@ -1,5 +1,3 @@
-$ = require 'jquery'
-
 module.exports =
 
 ##*
@@ -91,21 +89,21 @@ class StatusBarManager
      * Shows the element.
     ###
     show: ->
-        $(@element).show()
-        $(@progressBar).show()
+        @element.style.display = 'inline-block'
+        @progressBar.style.display = 'inline-block'
 
     ###*
      * Hides the element.
     ###
     hide: ->
-        $(@element).hide()
+        @element.style.display = 'none'
 
     ###*
      * Shows only the label.
     ###
     showLabelOnly: ->
-        $(@element).show()
-        $(@progressBar).hide()
+        @element.style.display = 'inline-block'
+        @progressBar.style.display = 'none'
 
     ###*
      * Shows the specified message in the status area.
