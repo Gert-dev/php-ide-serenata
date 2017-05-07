@@ -58,7 +58,6 @@ class Popover extends Disposable
         @$(@element).css('top', y + 'px')
 
         @$(@element).addClass('in')
-        @$(@element).css('opacity', 100)
         @$(@element).css('display', 'block')
 
     ###*
@@ -66,5 +65,4 @@ class Popover extends Disposable
     ###
     hide: () ->
         @$(@element).removeClass('in')
-        @$(@element).css('opacity', 0)
         @$(@element).css('display', 'none')
