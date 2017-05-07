@@ -47,14 +47,16 @@ class IndexingMediator
                 @indexingEventEmitter.emit('php-integrator-base:indexing-finished', {
                     output : output
                     path   : path
+                    source : source
                 })
 
                 resolve(output)
 
             failureHandler = (error) =>
                 @indexingEventEmitter.emit('php-integrator-base:indexing-failed', {
-                    error : error
-                    path  : path
+                    error  : error
+                    path   : path
+                    source : source
                 })
 
                 reject(error)

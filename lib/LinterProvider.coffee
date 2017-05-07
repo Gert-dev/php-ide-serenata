@@ -80,7 +80,7 @@ class LinterProvider
             return if not editor?
             return if not @indieLinter?
 
-            @lint(editor)
+            @lint(editor, response.source)
 
         @disposables.add service.onDidFailIndexing (response) =>
             editor = @findTextEditorByPath(response.path)
@@ -88,21 +88,22 @@ class LinterProvider
             return if not editor?
             return if not @indieLinter?
 
-            @lint(editor)
+            @lint(editor, response.source)
 
     ###*
      * @param {TextEditor} editor
+     * @param {String}     source
      *
      * @return {Promise}
     ###
-    lint: (editor) ->
+    lint: (editor, source) ->
         successHandler = (response) =>
-            return @processSuccess(editor, response)
+            return @processSuccess(editor, response, source)
 
         failureHandler = (response) =>
             return @processFailure(editor)
 
-        return @invokeLint(editor.getPath(), editor.getBuffer().getText()).then(
+        return @invokeLint(editor.getPath(), source).then(
             successHandler,
             failureHandler
         )
@@ -129,17 +130,18 @@ class LinterProvider
     ###*
      * @param {TextEditor} editor
      * @param {Object}     response
+     * @param {String}     source
      *
      * @return {Array}
     ###
-    processSuccess: (editor, response) ->
+    processSuccess: (editor, response, source) ->
         messages = []
 
         for item in response.errors
-            messages.push @createLinterErrorMessageForOutputItem(editor, item)
+            messages.push @createLinterErrorMessageForOutputItem(editor, item, source)
 
         for item in response.warnings
-            messages.push @createLinterWarningMessageForOutputItem(editor, item)
+            messages.push @createLinterWarningMessageForOutputItem(editor, item, source)
 
         @indieLinter.setMessages(editor.getPath(), messages)
 
@@ -154,33 +156,34 @@ class LinterProvider
     ###*
      * @param {TextEditor} editor
      * @param {Object}     item
+     * @param {String}     source
      *
      * @return {Object}
     ###
-    createLinterErrorMessageForOutputItem: (editor, item) ->
-        return @createLinterMessageForOutputItem(editor, item, 'error')
+    createLinterErrorMessageForOutputItem: (editor, item, source) ->
+        return @createLinterMessageForOutputItem(editor, item, source, 'error')
 
     ###*
      * @param {TextEditor} editor
      * @param {Object}     item
+     * @param {String}     source
      *
      * @return {Object}
     ###
-    createLinterWarningMessageForOutputItem: (editor, item) ->
-        return @createLinterMessageForOutputItem(editor, item, 'warning')
+    createLinterWarningMessageForOutputItem: (editor, item, source) ->
+        return @createLinterMessageForOutputItem(editor, item, source, 'warning')
 
     ###*
      * @param {TextEditor} editor
      * @param {Object}     item
+     * @param {String}     source
      * @param {String}     severity
      *
      * @return {Object}
     ###
-    createLinterMessageForOutputItem: (editor, item, severity) ->
-        text =  editor.getBuffer().getText()
-
-        startCharacterOffset = @service.getCharacterOffsetFromByteOffset(item.start, text)
-        endCharacterOffset   = @service.getCharacterOffsetFromByteOffset(item.end, text)
+    createLinterMessageForOutputItem: (editor, item, source, severity) ->
+        startCharacterOffset = @service.getCharacterOffsetFromByteOffset(item.start, source)
+        endCharacterOffset   = @service.getCharacterOffsetFromByteOffset(item.end, source)
 
         startPoint = editor.getBuffer().positionForCharacterIndex(startCharacterOffset)
         endPoint   = editor.getBuffer().positionForCharacterIndex(endCharacterOffset)
