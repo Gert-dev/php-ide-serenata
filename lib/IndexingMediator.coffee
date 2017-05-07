@@ -44,20 +44,28 @@ class IndexingMediator
             })
 
             successHandler = (output) =>
+                console.debug("Successfully indexed", path)
+
                 @indexingEventEmitter.emit('php-integrator-base:indexing-finished', {
                     output : output
                     path   : path
                     source : source
                 })
 
+                console.debug("Sent event after successfully indexing", path)
+
                 resolve(output)
 
             failureHandler = (error) =>
+                console.debug("Failed indexing", path)
+
                 @indexingEventEmitter.emit('php-integrator-base:indexing-failed', {
                     error  : error
                     path   : path
                     source : source
                 })
+
+                console.debug("Sent event after failed indexing", path)
 
                 reject(error)
 
@@ -69,6 +77,8 @@ class IndexingMediator
                         path       : path
                         percentage : progress
                     })
+
+            console.debug("Sending index request for", path)
 
             return @proxy.reindex(
                 path,
