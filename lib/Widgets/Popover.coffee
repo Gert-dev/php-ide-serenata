@@ -41,11 +41,8 @@ class Popover extends Disposable
      * @param {String} text
     ###
     setText: (text) ->
-        $ = require 'jquery'
-
-        $('.tooltip-inner', @element).html(
-            '<div class="php-integrator-popover-wrapper">' + text.replace(/\n\n/g, '<br/><br/>') + '</div>'
-        )
+        item = @element.querySelector('.tooltip-inner')
+        item.innerHTML =  '<div class="php-integrator-popover-wrapper">' + text.replace(/\n\n/g, '<br/><br/>') + '</div>'
 
     ###*
      * Shows a popover at the specified location with the specified text and fade in time.
