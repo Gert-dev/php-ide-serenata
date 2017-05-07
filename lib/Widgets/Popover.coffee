@@ -12,8 +12,6 @@ class Popover extends Disposable
      * Constructor.
     ###
     constructor: () ->
-        @$ = require 'jquery'
-
         @element = document.createElement('div')
         @element.className = 'tooltip bottom fade php-integrator-popover'
         @element.innerHTML = "<div class='tooltip-arrow'></div><div class='tooltip-inner'></div>"
@@ -43,7 +41,9 @@ class Popover extends Disposable
      * @param {String} text
     ###
     setText: (text) ->
-        @$('.tooltip-inner', @element).html(
+        $ = require 'jquery'
+
+        $('.tooltip-inner', @element).html(
             '<div class="php-integrator-popover-wrapper">' + text.replace(/\n\n/g, '<br/><br/>') + '</div>'
         )
 
@@ -54,15 +54,15 @@ class Popover extends Disposable
      * @param {Number} y The Y coordinate to show the popover at (top).
     ###
     show: (x, y) ->
-        @$(@element).css('left', x + 'px')
-        @$(@element).css('top', y + 'px')
+        @element.style.left = x + 'px'
+        @element.style.top = y + 'px'
 
-        @$(@element).addClass('in')
-        @$(@element).css('display', 'block')
+        @element.classList.add('in')
+        @element.style.display = 'block'
 
     ###*
      * Hides the tooltip, if it is displayed.
     ###
     hide: () ->
-        @$(@element).removeClass('in')
-        @$(@element).css('display', 'none')
+        @element.classList.remove('in')
+        @element.style.display = 'none'

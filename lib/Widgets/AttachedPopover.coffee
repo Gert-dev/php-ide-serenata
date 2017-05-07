@@ -48,7 +48,9 @@ class AttachedPopover extends Popover
 
         centerOffset = ((coordinates.right - coordinates.left) / 2)
 
-        x = coordinates.left - (@$(@getElement()).width() / 2) + centerOffset
+        $ = require 'jquery'
+
+        x = coordinates.left - ($(@getElement()).width() / 2) + centerOffset
         y = coordinates.bottom
 
         x = 0 if x < 0
