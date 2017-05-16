@@ -22,6 +22,9 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * Fix project names containing characters that can't be used in file paths generating errors (such as forward slashes, asterisks, ...).
 * Removed usage of jQuery and removed it from the list of dependencies.
 
+## 2.1.12
+* Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.7).
+
 ## 2.1.11
 * Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.6).
 
