@@ -70,8 +70,10 @@ class AbstractProvider
      * @return {Promise|Array}
     ###
     getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
-        return [
-            {
-                text: "ThisIsATest"
-            }
-        ]
+        successHandler = (suggestions) =>
+            return suggestions
+
+        failureHandler = (suggestions) =>
+            return [] # Just return no suggestions.
+
+        return @service.autocompleteAt(editor, bufferPosition).then(successHandler, failureHandler)

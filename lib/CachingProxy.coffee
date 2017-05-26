@@ -149,6 +149,14 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    autocomplete: (offset, file, source) ->
+        sourceKey = if source? then md5(source) else null
+
+        return @wrapCachedRequestToParent("autocomplete-#{offset}-#{file}-#{sourceKey}", 'autocomplete', arguments)
+
+    ###*
+     * @inherited
+    ###
     tooltip: (file, source, offset) ->
         sourceKey = if source? then md5(source) else null
 

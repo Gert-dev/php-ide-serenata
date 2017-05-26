@@ -203,6 +203,18 @@ class Service
         return @proxy.deduceTypes(expression, file, source, offset, ignoreLastElement)
 
     ###*
+     * Retrieves autocompletion suggestions for a specific location.
+     *
+     * @param {Number}      offset            The character offset into the file to examine.
+     * @param {String}      file              The path to the file to examine.
+     * @param {String|null} source            The source code to search. May be null if a file is passed instead.
+     *
+     * @return {Promise}
+    ###
+    autocomplete: (offset, file, source) ->
+        return @proxy.autocomplete(offset, file, source)
+
+    ###*
      * Fetches the contents of the tooltip to display at the specified offset.
      *
      * @param {String}     file   The path to the file to examine.
@@ -241,6 +253,21 @@ class Service
         bufferText = editor.getBuffer().getText()
 
         return @deduceTypes(expression, editor.getPath(), bufferText, offset)
+
+    ###*
+     * Convenience alias for {@see autocomplete}.
+     *
+     * @param {TextEditor} editor
+     * @param {Range}      bufferPosition
+     *
+     * @return {Promise}
+    ###
+    autocompleteAt: (editor, bufferPosition) ->
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
+
+        bufferText = editor.getBuffer().getText()
+
+        return @autocomplete(editor.getPath(), bufferText, offset)
 
     ###*
      * Convenience alias for {@see tooltip}.

@@ -916,6 +916,35 @@ class Proxy
         return @performRequest('deduceTypes', parameters, null, source)
 
     ###*
+     * Retrieves autocompletion suggestions for a specific location.
+     *
+     * @param {Number}      offset            The character offset into the file to examine.
+     * @param {String}      file              The path to the file to examine.
+     * @param {String|null} source            The source code to search. May be null if a file is passed instead.
+     *
+     * @return {Promise}
+    ###
+    autocomplete: (offset, file, source) ->
+        if not file?
+            return new Promise (resolve, reject) ->
+                reject('A path to a file must be passed!')
+
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
+        parameters = {
+            database   : @getIndexDatabasePath()
+            offset     : offset
+            charoffset : true
+        }
+
+        if file?
+            parameters.file = file
+
+        return @performRequest('autocomplete', parameters, null, source)
+
+    ###*
      * Initializes a project.
      *
      * @return {Promise}

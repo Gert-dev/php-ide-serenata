@@ -13,6 +13,11 @@
       "versions": {
         "3.0.0": "getServiceInstance"
       }
+    },
+    "autocomplete.provider": {
+      "versions": {
+        "3.0.0": "getAutocompletionProviderServices"
+      }
     }
   },
   "consumedServices": {

@@ -704,6 +704,14 @@ module.exports =
         return @getService()
 
     ###*
+     * Retrieves autocompletion providers for the autocompletion package.
+     *
+     * @return {Array}
+    ###
+    getAutocompletionProviderServices: () ->
+        return [@getAutocompletionProvider()]
+
+    ###*
      * @return {Service}
     ###
     getService: () ->
@@ -859,3 +867,14 @@ module.exports =
             @linterProvider = new LinterProvider(@getConfiguration())
 
         return @linterProvider
+
+    ###*
+     * @return {AutocompletionProvider}
+    ###
+    getAutocompletionProvider: () ->
+        if not @autocompletionProvider?
+            AutocompletionProvider = require './AutocompletionProvider'
+
+            @autocompletionProvider = new AutocompletionProvider(@getConfiguration(), @getService())
+
+        return @autocompletionProvider
