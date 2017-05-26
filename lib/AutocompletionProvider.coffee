@@ -71,9 +71,22 @@ class AbstractProvider
     ###
     getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
         successHandler = (suggestions) =>
-            return suggestions
+            return suggestions.map (suggestion) =>
+                return @getAdaptedSuggestion(suggestion)
 
-        failureHandler = (suggestions) =>
+        failureHandler = () =>
+            debugger
+
             return [] # Just return no suggestions.
 
         return @service.autocompleteAt(editor, bufferPosition).then(successHandler, failureHandler)
+
+    ###*
+     * @param {Object} suggestion
+     *
+     * @return {Array}
+    ###
+    getAdaptedSuggestion: (suggestion) ->
+        return {
+            text : suggestion.filterText
+        }
