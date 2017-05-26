@@ -267,7 +267,7 @@ class Service
 
         bufferText = editor.getBuffer().getText()
 
-        return @autocomplete(editor.getPath(), bufferText, offset)
+        return @autocomplete(offset, editor.getPath(), bufferText)
 
     ###*
      * Convenience alias for {@see tooltip}.
