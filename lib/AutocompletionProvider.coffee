@@ -75,8 +75,6 @@ class AbstractProvider
                 return @getAdaptedSuggestion(suggestion)
 
         failureHandler = () =>
-            debugger
-
             return [] # Just return no suggestions.
 
         return @service.autocompleteAt(editor, bufferPosition).then(successHandler, failureHandler)
