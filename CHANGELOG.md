@@ -2,7 +2,7 @@
 Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://gitlab.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://gitlab.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
 
 ## 3.0.0
-* Update to core [3.0.0](https://github.com/php-integrator/core/releases/tag/3.0.0).
+* Update to core [3.0.0](https://gitlab.com/php-integrator/core/tags/3.0.0).
 * Linting has been moved to this package. Due to refactoring in the core, the amount of CoffeeScript boilerplate has considerably reduced.
   * You no longer need the php-integrator-linter package installed. As it will no longer be updated to the new service version, it should disable automatically.
   * Linting has been updated to the new v2 API.
