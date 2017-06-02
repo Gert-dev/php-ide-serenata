@@ -11,7 +11,7 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * Call tips (or "signature help") has been moved to this package. Due to refactoring in the core, the amount of CoffeeScript boilerplate has considerably reduced.
   * You no longer need the php-integrator-call-tips package installed. As it will no longer be updated to the new service version, it should disable automatically.
 * Tooltips are now provided by the core. The size of the CoffeeScript side has, as a consequence, shrunk considerably and is part of this package.
-  * Markdown in docblocks is now properly supported when displaying tooltips.
+  * HTML and markdown in docblocks is now properly supported when displaying tooltips.
   * Opacity will no longer be forced to 100%. If you have a theme with transparent tooltips, the transparency will now be maintained.
   * You no longer need the php-integrator-tooltips package installed. As it will no longer be updated to the new service version, it should disable automatically.
 * `semanticLint` has been renamed to just `lint` as it also lints syntax errors.
