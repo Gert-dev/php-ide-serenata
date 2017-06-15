@@ -126,7 +126,7 @@ class SignatureHelpProvider
             @timeoutHandle = setTimeout ( =>
                 @timeoutHandle = null
                 @onChangeCursorPosition(editor, event.newBufferPosition)
-            ), 30
+            ), 50
 
 
     ###*
