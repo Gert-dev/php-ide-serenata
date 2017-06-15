@@ -496,9 +496,6 @@ class Proxy
             "Don't worry, the server will restart by itself. However, this is likely a bug, so feel free to report " +
             "it on the bug tracker. Included below is additional debugging information you should include if you do."
 
-        if parameters?
-            detail += "\n \nCommand\n  → " + parameters.join(' ')
-
         detail += "\n \n→ Message\n" + error.message
         detail += "\n \n→ Location\n" + error.data.file + ':' + error.data.line
         detail += "\n \n→ Backtrace\n" + error.data.backtrace
