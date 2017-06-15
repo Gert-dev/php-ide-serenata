@@ -493,12 +493,9 @@ class Proxy
     ###
     showFatalServerError: (error) ->
         detail =
-            "Don't worry, the server will restart by itself. However, this is likely a bug, so feel free to report " +
-            "it on the bug tracker. Included below is additional debugging information you should include if you do."
-
-        detail += "\n \n→ Message\n" + error.message
-        detail += "\n \n→ Location\n" + error.data.file + ':' + error.data.line
-        detail += "\n \n→ Backtrace\n" + error.data.backtrace
+            "You've likely hit a bug. Feel free to report it on the bug tracker. If you do, please include the " +
+            "information printed below.\n \nThe server will attempt to restart itself.\n \n" +
+            error.data.backtrace
 
         atom.notifications.addError('PHP Integrator - Darn, we\'ve crashed!', {
             dismissable : true
