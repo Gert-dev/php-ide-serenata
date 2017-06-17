@@ -3,6 +3,8 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 
 ## 3.0.0
 * Update to core [3.0.0](https://gitlab.com/php-integrator/core/tags/3.0.0).
+* Settings are now grouped into sections and their descriptions have been cleaned up.
+  * It is possible you may need to reconfigure your settings. Due to the way Atom saves them, it is recommended to remove your old settings from your config file first (see `Edit` → `Config...`), to prevent Atom from showing old settings (as if they were still configurable) in the base package settings panel.
 * Linting has been moved to this package. Due to refactoring in the core, the amount of CoffeeScript boilerplate has considerably reduced.
   * You no longer need the php-integrator-linter package installed. As it will no longer be updated to the new service version, it should disable automatically.
   * Linting has been updated to the new v2 API.

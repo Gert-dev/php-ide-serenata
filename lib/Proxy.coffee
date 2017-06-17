@@ -92,8 +92,8 @@ class Proxy
      * @return {Promise}
     ###
     spawnPhpServer: (port) ->
-        php = @config.get('phpCommand')
-        memoryLimit = @config.get('memoryLimit')
+        php = @config.get('core.phpCommand')
+        memoryLimit = @config.get('core.memoryLimit')
 
         parameters = [
              # Enable these to profile (requires xdebug be installed).

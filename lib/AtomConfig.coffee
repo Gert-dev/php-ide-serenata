@@ -21,21 +21,21 @@ class AtomConfig extends Config
     ###
     constructor: (@packageName) ->
         @configurableProperties = [
-            'phpCommand'
-            'indexContinuously'
-            'additionalIndexingDelay'
-            'memoryLimit'
-            'insertNewlinesForUseStatements'
-            'enableTooltips'
-            'enableSignatureHelp'
-            'enableLinting'
-            'showUnknownClasses'
-            'showUnknownMembers'
-            'showUnknownGlobalFunctions'
-            'showUnknownGlobalConstants'
-            'showUnusedUseStatements'
-            'showMissingDocs'
-            'validateDocblockCorrectness'
+            'core.phpCommand'
+            'core.memoryLimit'
+            'general.indexContinuously'
+            'general.additionalIndexingDelay'
+            'general.insertNewlinesForUseStatements'
+            'tooltips.enable'
+            'signatureHelp.enable'
+            'linting.enable'
+            'linting.showUnknownClasses'
+            'linting.showUnknownMembers'
+            'linting.showUnknownGlobalFunctions'
+            'linting.showUnknownGlobalConstants'
+            'linting.showUnusedUseStatements'
+            'linting.showMissingDocs'
+            'linting.validateDocblockCorrectness'
         ]
 
         super()

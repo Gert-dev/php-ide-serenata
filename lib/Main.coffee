@@ -3,148 +3,153 @@ module.exports =
      * Configuration settings.
     ###
     config:
-        phpCommand:
-            title       : 'PHP command'
-            description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...). Requires a restart. If you update
-                           to a new minor or major version, you may want to force reindex your project to index the new
-                           built-in structural elements. Requires a restart after changing.'
-            type        : 'string'
-            default     : 'php'
-            order       : 1
+        core:
+            type: 'object'
+            order: 1
+            properties:
+                phpCommand:
+                    title       : 'PHP command'
+                    description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...).
+                                   Requires a restart after changing.'
+                    type        : 'string'
+                    default     : 'php'
+                    order       : 1
 
-        indexContinuously:
-            title       : 'Index continously'
-            description : 'If enabled, indexing will happen continuously and automatically whenever the editor is
-                           modified. If disabled, indexing will only happen on save. This also influences linting, which
-                           happens automatically after indexing completes. In other words, if you would like linting to
-                           happen on save, you should disable this option.'
-            type        : 'boolean'
-            default     : true
-            order       : 2
+                memoryLimit:
+                    title       : 'Memory limit (in MB)'
+                    description : 'The memory limit to set for the PHP process. The PHP process uses the available
+                                   memory for in-memory caching as well, so it should not be too low. On the other hand,
+                                   it shouldn\'t be growing very large, so setting it to -1 is probably a bad idea as
+                                   an infinite loop bug might take down your system. The default should suit most
+                                   projects, from small to large.'
+                    type        : 'integer'
+                    default     : 1024
+                    order       : 2
 
-        additionalIndexingDelay:
-            title       : 'Additional delay before reindexing'
-            description : 'File reindexing occurs as soon as its editor\'s contents stop changing. This is after a
-                          fixed time (about 300 ms at the time of writing) and is managed by Atom itself. If this is
-                          too fast for you, you can add an additional delay with this option. Fewer indexes means less
-                          load as tasks such as linting are invoked less often. It also means that it will take longer
-                          for changes to be reflected in various components, such as autocompletion.'
-            type        : 'integer'
-            default     : 0
-            order       : 3
+        general:
+            type: 'object'
+            order: 2
+            properties:
+                indexContinuously:
+                    title       : 'Index continuously'
+                    description : 'If enabled, indexing will happen continuously and automatically whenever the editor
+                                   is modified. If disabled, indexing will only happen on save. This also influences
+                                   linting, which happens automatically after indexing completes. In other words, if
+                                   you would like linting to happen on save, you can disable this option.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
 
-        memoryLimit:
-            title       : 'Memory limit (in MB)'
-            description : 'The memory limit to set to the PHP process. The PHP process uses the available memory for
-                           in-memory caching as well, so it should not be too low. On the other hand, it should\'t be
-                           growing very large, so setting it to -1 is probably a bad idea as an infinite loop bug
-                           might take down your system. The default is probably a good value, unless there is a
-                           specific reason you want to change it.'
-            type        : 'integer'
-            default     : 1024
-            order       : 4
+                additionalIndexingDelay:
+                    title       : 'Additional delay before reindexing (in ms)'
+                    description : 'Only applies when indexing continously, which happens after a fixed time (about 300
+                                   ms at the time of writing and managed by Atom). If this is too fast for you, you can
+                                   introduce an additional delay here. Fewer indexes means less load as tasks such as
+                                   linting are invoked less often. However, it also means that it will take longer for
+                                   changes to code to be reflected in, for example, autocompletion.'
+                    type        : 'integer'
+                    default     : 0
+                    order       : 2
 
-        insertNewlinesForUseStatements:
-            title       : 'Insert newlines for use statements'
-            description : 'When enabled, additional newlines are inserted before or after an automatically added
-                           use statement when they can\'t be nicely added to an existing \'group\'. This results in
-                           more cleanly separated use statements but will create additional vertical whitespace.'
-            type        : 'boolean'
-            default     : false
-            order       : 5
+                insertNewlinesForUseStatements:
+                    title       : 'Allow newlines when inserting use statements'
+                    description : 'If enabled, additional newlines may be inserted before or after automatically added
+                                   use statements when they can\'t be nicely added to an existing \'group\'. This
+                                   results in more cleanly separated use statements but will create additional vertical
+                                   whitespace.'
+                    type        : 'boolean'
+                    default     : false
+                    order       : 3
 
-        enableTooltips:
-            title       : 'Enable tooltips'
-            description : 'When enabled, tooltips will be displayed for various structural elements when the mouse is
-                           hovered over them.'
-            type        : 'boolean'
-            default     : true
-            order       : 6
+        tooltips:
+            type: 'object'
+            order: 3
+            properties:
+                enable:
+                    title       : 'Enable'
+                    description : 'When enabled, tooltips will be displayed for various structural elements when the
+                                   mouse is hovered over them.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
 
-        enableSignatureHelp:
-            title       : 'Enable signature help'
-            description : 'When enabled, signature help will be displayed when the keyboard cursor is inside a
-                           function, method or constructor call.'
-            type        : 'boolean'
-            default     : true
-            order       : 7
+        signatureHelp:
+            type: 'object'
+            order: 4
+            properties:
+                enable:
+                    title       : 'Enable'
+                    description : 'When enabled, signature help (call tips) will be displayed when the keyboard cursor
+                                   is inside a function, method or constructor call.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
 
-        enableLinting:
-            title       : 'Enable linting'
-            description : 'When enabled, linting will show problems with your code.'
-            type        : 'boolean'
-            default     : true
-            order       : 8
+        linting:
+            type: 'object'
+            order: 5
+            properties:
+                enable:
+                    title       : 'Enable'
+                    description : 'When enabled, linting will show problems and warnings picked up in your code.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
 
-        showUnknownClasses:
-            title       : 'Show unknown classes'
-            description : '''
-                Highlights class names that could not be found. This will also work for docblocks. Requires linting to
-                be enabled.
-            '''
-            type        : 'boolean'
-            default     : true
-            order       : 9
+                showUnknownClasses:
+                    title       : 'Show unknown classes'
+                    description : 'Highlights class names that could not be found. This will also work for docblocks.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 2
 
-        showUnknownGlobalFunctions:
-            title       : 'Show unknown global functions'
-            description : '''
-                Highlights global functions that could not be found. Requires linting to be enabled.
-            '''
-            type        : 'boolean'
-            default     : true
-            order       : 10
+                showUnknownGlobalFunctions:
+                    title       : 'Show unknown (global) functions'
+                    description : 'Highlights (global) functions that could not be found.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 3
 
-        showUnknownGlobalConstants:
-            title       : 'Show unknown global constants'
-            description : '''
-                Highlights global constants that could not be found. Requires linting to be enabled.
-            '''
-            type        : 'boolean'
-            default     : true
-            order       : 11
+                showUnknownGlobalConstants:
+                    title       : 'Show unknown (global) constants'
+                    description : 'Highlights (global) constants that could not be found.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 4
 
-        showUnusedUseStatements:
-            title       : 'Show unused use statements'
-            description : '''
-                Highlights use statements that don't seem to be used anywhere. This will also look inside docblocks.
-                Requires linting to be enabled.
-            '''
-            type        : 'boolean'
-            default     : true
-            order       : 12
+                showUnusedUseStatements:
+                    title       : 'Show unused use statements'
+                    description : 'Highlights use statements that don\'t seem to be used anywhere.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 5
 
-        showMissingDocs:
-            title       : 'Show missing documentation'
-            description : '''
-                Warns about any structural element that is currently missing documentation. Requires linting to be
-                enabled.
-            '''
-            type        : 'boolean'
-            default     : true
-            order       : 13
+                showMissingDocs:
+                    title       : 'Show missing documentation'
+                    description : 'Warns about structural elements that are missing documentation.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 6
 
-        validateDocblockCorrectness:
-            title       : 'Validate docblock correctness'
-            description : '''
-                Analyzes the correctness of docblocks of structural elements such as classes, methods and properties.
-                This will show various problems with docblocks such as missing parameters, incorrect parameter types
-                and missing documentation. Requires linting to be enabled.
-            '''
-            type        : 'boolean'
-            default     : true
-            order       : 14
+                validateDocblockCorrectness:
+                    title       : 'Validate docblock correctness'
+                    description : '''
+                        Analyzes the correctness of docblocks of various structural elements and will show various
+                        problems such as undocumented parameters, mismatched parameter and deprecated tags.
+                    '''
+                    type        : 'boolean'
+                    default     : true
+                    order       : 7
 
-        showUnknownMembers:
-            title       : 'Show unknown members (experimental)'
-            description : '''
-                Highlights class members that could not be found. Note that this can be a large strain on performance.
-                It is also experimental and might show false positives (especially inside conditionals). Requires
-                linting to be enabled.
-            '''
-            type        : 'boolean'
-            default     : false
-            order       : 15
+                showUnknownMembers:
+                    title       : 'Show unknown members (experimental)'
+                    description : '''
+                        Highlights use of unknown members. Note that this can be a large strain on performance and is
+                        experimental (expect false positives, especially inside conditionals).
+                    '''
+                    type        : 'boolean'
+                    default     : false
+                    order       : 8
 
     ###*
      * The version of the core to download (version specification string).
@@ -378,24 +383,24 @@ module.exports =
     registerConfigListeners: () ->
         config = @getConfiguration()
 
-        config.onDidChange 'insertNewlinesForUseStatements', (value) =>
+        config.onDidChange 'general.insertNewlinesForUseStatements', (value) =>
             @getUseStatementHelper().setAllowAdditionalNewlines(value)
 
-        config.onDidChange 'enableTooltips', (value) =>
+        config.onDidChange 'tooltips.enable', (value) =>
             if value
                 @activateTooltips()
 
             else
                 @deactivateTooltips()
 
-        config.onDidChange 'enableSignatureHelp', (value) =>
+        config.onDidChange 'signatureHelp.enable', (value) =>
             if value
                 @activateSignatureHelp()
 
             else
                 @deactivateSignatureHelp()
 
-        config.onDidChange 'enableLinting', (value) =>
+        config.onDidChange 'linting.enable', (value) =>
             if value
                 @activateLinting()
 
@@ -514,13 +519,13 @@ module.exports =
 
                 @registerAtomListeners()
 
-                if @getConfiguration().get('enableTooltips')
+                if @getConfiguration().get('tooltips.enable')
                     @activateTooltips()
 
-                if @getConfiguration().get('enableSignatureHelp')
+                if @getConfiguration().get('signatureHelp.enable')
                     @activateSignatureHelp()
 
-                if @getConfiguration().get('enableLinting')
+                if @getConfiguration().get('linting.enable')
                     @activateLinting()
 
                 @getCachingProxy().setIsActive(true)
@@ -572,14 +577,14 @@ module.exports =
      * @param {TextEditor} editor
     ###
     registerTextEditorListeners: (editor) ->
-        if @getConfiguration().get('indexContinuously') == true
+        if @getConfiguration().get('general.indexContinuously') == true
             # The default onDidStopChanging timeout is 300 milliseconds. As this is notcurrently configurable (and would
             # also impact other packages), we install our own timeout on top of the existing one. This is useful for users
             # that don't type particularly fast or are on slower machines and will prevent constant indexing from happening.
             @getDisposables().add editor.onDidStopChanging () =>
                 path = editor.getPath()
 
-                additionalIndexingDelay = @getConfiguration().get('additionalIndexingDelay')
+                additionalIndexingDelay = @getConfiguration().get('general.additionalIndexingDelay')
 
                 @editorTimeoutMap[path] = setTimeout ( =>
                     @onEditorDidStopChanging(editor)
@@ -781,7 +786,7 @@ module.exports =
             ComposerService = require './ComposerService';
 
             @composerService = new ComposerService(
-                @getConfiguration().get('phpCommand'),
+                @getConfiguration().get('core.phpCommand'),
                 @getConfiguration().get('packagePath') + '/core/'
             )
 
@@ -809,7 +814,7 @@ module.exports =
         if not @useStatementHelper?
             UseStatementHelper = require './UseStatementHelper';
 
-            @useStatementHelper = new UseStatementHelper(@getConfiguration().get('insertNewlinesForUseStatements'))
+            @useStatementHelper = new UseStatementHelper(@getConfiguration().get('general.insertNewlinesForUseStatements'))
 
         return @useStatementHelper
 

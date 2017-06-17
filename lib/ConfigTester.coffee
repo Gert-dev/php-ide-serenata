@@ -19,7 +19,7 @@ class ConfigTester
      * @return {boolean}
     ###
     test: () ->
-        response = child_process.spawnSync(@config.get('phpCommand'), ["-v"])
+        response = child_process.spawnSync(@config.get('core.phpCommand'), ["-v"])
 
         if response.status = null or response.status != 0
             return false

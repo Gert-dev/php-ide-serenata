@@ -23,22 +23,32 @@ class Config
         @listeners = {}
 
         @data =
-            phpCommand                     : null
-            packagePath                    : null
-            indexContinuously              : true
-            additionalIndexingDelay        : 200
-            memoryLimit                    : 512
-            insertNewlinesForUseStatements : false
-            enableTooltips                 : true
-            enableSignatureHelp             : true
-            enableLinting                  : true
-            showUnknownClasses             : true
-            showUnknownMembers             : true
-            showUnknownGlobalFunctions     : true
-            showUnknownGlobalConstants     : true
-            showUnusedUseStatements        : true
-            showMissingDocs                : true
-            validateDocblockCorrectness    : true
+            core:
+                phpCommand  : null
+                memoryLimit : 512
+
+            general:
+                indexContinuously              : true
+                additionalIndexingDelay        : 200
+                insertNewlinesForUseStatements : false
+
+            tooltips:
+                enable : true
+
+            signatureHelp:
+                enable : true
+
+            linting:
+                enable                      : true
+                showUnknownClasses          : true
+                showUnknownMembers          : true
+                showUnknownGlobalFunctions  : true
+                showUnknownGlobalConstants  : true
+                showUnusedUseStatements     : true
+                showMissingDocs             : true
+                validateDocblockCorrectness : true
+
+            packagePath : null
 
             # See also http://www.phpdoc.org/docs/latest/index.html .
             phpdoc_base_url : {

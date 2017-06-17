@@ -116,13 +116,13 @@ class LinterProvider
     ###
     invokeLint: (path, source) ->
         options = {
-            noUnknownClasses         : not @config.get('showUnknownClasses')
-            noUnknownMembers         : not @config.get('showUnknownMembers')
-            noUnknownGlobalFunctions : not @config.get('showUnknownGlobalFunctions')
-            noUnknownGlobalConstants : not @config.get('showUnknownGlobalConstants')
-            noUnusedUseStatements    : not @config.get('showUnusedUseStatements')
-            noDocblockCorrectness    : not @config.get('validateDocblockCorrectness')
-            noMissingDocumentation   : not @config.get('showMissingDocs')
+            noUnknownClasses         : not @config.get('linting.showUnknownClasses')
+            noUnknownMembers         : not @config.get('linting.showUnknownMembers')
+            noUnknownGlobalFunctions : not @config.get('linting.showUnknownGlobalFunctions')
+            noUnknownGlobalConstants : not @config.get('linting.showUnknownGlobalConstants')
+            noUnusedUseStatements    : not @config.get('linting.showUnusedUseStatements')
+            noDocblockCorrectness    : not @config.get('linting.validateDocblockCorrectness')
+            noMissingDocumentation   : not @config.get('linting.showMissingDocs')
         }
 
         return @service.lint(path, source, options)
