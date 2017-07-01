@@ -626,6 +626,10 @@ module.exports =
             @disposables.dispose()
             @disposables = null
 
+        @getLinterProvider().deactivate()
+        @getTooltipProvider().deactivate()
+        @getSignatureHelpProvider().deactivate()
+
         @getCachingProxy().stopPhpServer()
 
     ###*
