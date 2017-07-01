@@ -47,25 +47,27 @@
     }
 }
 
-.php-integrator-tooltip-popover {
-    padding-right: 1em;
+.php-integrator-documentation-pane {
+    height: 100%;
+    padding: 1em 1em;
+    overflow-y: scroll;
 
-    padding-top: 0.25em;
-    padding-bottom: 0.25em;
+    .php-integrator-documentation-placeholder {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
 
-    overflow-y: auto;
-    max-height: 40em;
+        .icon:before {
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+        }
 
-    .php-integrator-tooltip-parameter-name {
-        font-weight: bold;
-    }
-
-    .php-integrator-tooltip-parameter-type {
-        font-style: italic;
-    }
-
-    .php-integrator-tooltip-return-type {
-        font-style: italic;
+        .php-integrator-documentation-placeholder-note {
+            font-size: 0.8em;
+        }
     }
 
     p {
@@ -78,6 +80,10 @@
         // &:last-child {
         //     margin-bottom: -1.25em;
         // }
+    }
+
+    a {
+        font-weight: bold;
     }
 
     table {

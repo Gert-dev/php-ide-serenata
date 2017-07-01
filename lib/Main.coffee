@@ -67,8 +67,10 @@ module.exports =
             properties:
                 enable:
                     title       : 'Enable'
-                    description : 'When enabled, tooltips will be displayed for various structural elements when the
-                                   mouse is hovered over them.'
+                    description : 'When enabled, documentation for various structural elements can be displayed in a
+                                   dock by activating intentions. (This is called tooltips as the data provided is
+                                   meant to be displayed in tooltips, but a dock offers advantages such as proper
+                                   scrolling and can be permanent.)'
                     type        : 'boolean'
                     default     : true
                     order       : 1
@@ -719,6 +721,14 @@ module.exports =
     ###
     getAutocompletionProviderServices: () ->
         return [@getAutocompletionProvider()]
+
+    ###*
+     * Returns a list of intention providers.
+     *
+     * @return {Array}
+    ###
+    getIntentionProviders: () ->
+        return @getTooltipProvider().getIntentionProviders()
 
     ###*
      * @return {Service}

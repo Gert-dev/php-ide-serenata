@@ -1,9 +1,5 @@
 {Disposable, CompositeDisposable} = require 'atom'
 
-marked = require 'marked'
-
-CancelablePromise = require './CancelablePromise'
-
 module.exports =
 
 ##*
@@ -18,16 +14,14 @@ class TooltipProvider
     service: null
 
     ###*
-     * Keeps track of the currently pending promise.
-     *
-     * @var {CancelablePromise|null}
+     * @var {Object|null}
     ###
-    pendingCancelablePromise: null
+    documentationPane: null
 
     ###*
-     * @var {Number|null}
+     * @var {Promise|null}
     ###
-    timeoutHandle: null
+    pendingDocumentationPanePromise: null
 
     ###*
      * @var {CompositeDisposable}
@@ -63,165 +57,147 @@ class TooltipProvider
      * Does the actual initialization.
     ###
     doActualInitialization: () ->
-        @disposables.add atom.workspace.observeTextEditors (editor) =>
-            if /text.html.php$/.test(editor.getGrammar().scopeName)
-                @registerEvents(editor)
-
-        # When you go back to only have one pane the events are lost, so need to re-register.
-        @disposables.add atom.workspace.onDidDestroyPane (pane) =>
-            panes = atom.workspace.getPanes()
-
-            if panes.length == 1
-                @registerEventsForPane(panes[0])
-
-        # Having to re-register events as when a new pane is created the old panes lose the events.
-        @disposables.add atom.workspace.onDidAddPane (observedPane) =>
-            panes = atom.workspace.getPanes()
-
-            for pane in panes
-                if pane != observedPane
-                    @registerEventsForPane(pane)
-
-        @disposables.add atom.workspace.onDidStopChangingActivePaneItem (item) =>
-            @removeTooltip()
-
-    ###*
-     * Registers the necessary event handlers for the editors in the specified pane.
-     *
-     * @param {Pane} pane
-    ###
-    registerEventsForPane: (pane) ->
-        for paneItem in pane.items
-            if atom.workspace.isTextEditor(paneItem)
-                if /text.html.php$/.test(paneItem.getGrammar().scopeName)
-                    @registerEvents(paneItem)
+        @getDocumentationPane() # Ensure dock is always present.
 
     ###*
      * Deactives the provider.
     ###
     deactivate: () ->
+        @getDocumentationPane().then (documentationPane) =>
+            atom.workspace.paneForItem(documentationPane).destroyItem(documentationPane, true)
+
         @disposables.dispose()
 
-        @removeTooltip()
-
     ###*
-     * Registers the necessary event handlers.
-     *
-     * @param {TextEditor} editor TextEditor to register events to.
+     * @return {Array}
     ###
-    registerEvents: (editor) ->
-        textEditorElement = atom.views.getView(editor)
-        scrollViewElement = textEditorElement.querySelector('.scroll-view')
-
-        removeTooltipListener = @removeTooltip.bind(this)
-
-        if scrollViewElement?
-            mouseOverListener = @onMouseOver.bind(this, editor)
-
-            scrollViewElement.addEventListener('mouseover', mouseOverListener)
-            scrollViewElement.addEventListener('mouseout',  removeTooltipListener)
-
-            @disposables.add new Disposable () =>
-                scrollViewElement.removeEventListener('mouseover', mouseOverListener)
-                scrollViewElement.removeEventListener('mouseout', removeTooltipListener)
-
-        horizontalScrollbar = textEditorElement.querySelector('.horizontal-scrollbar')
-
-        if horizontalScrollbar?
-            horizontalScrollbar.addEventListener('scroll',  removeTooltipListener)
-
-            @disposables.add new Disposable () =>
-                horizontalScrollbar.removeEventListener('scroll', removeTooltipListener)
-
-        verticalScrollbar = textEditorElement.querySelector('.vertical-scrollbar')
-
-        if verticalScrollbar?
-            verticalScrollbar.addEventListener('scroll',  removeTooltipListener)
-
-            @disposables.add new Disposable () =>
-                verticalScrollbar.removeEventListener('scroll', removeTooltipListener)
-
-        # Ticket #107 - Mouseout isn't generated until the mouse moves, even when scrolling (with the keyboard or
-        # mouse). If the element goes out of the view in the meantime, its HTML element disappears, never removing
-        # it.
-        @disposables.add editor.onDidDestroy(@removeTooltip.bind(this))
-        @disposables.add editor.onDidStopChanging(@removeTooltip.bind(this))
+    getIntentionProviders: () ->
+        return [{
+            grammarScopes: ['source.php']
+            getIntentions: ({textEditor, bufferPosition}) =>
+                return @getIntentions(textEditor, bufferPosition)
+        }]
 
     ###*
      * @param {TextEditor} editor
-     * @param {Object}     event
-    ###
-    onMouseOver: (editor, event) ->
-        @removeTooltip()
-
-        editorViewComponent = atom.views.getView(editor).component
-
-        # Ticket #140 - In rare cases the component is null.
-        return if not editorViewComponent?
-
-        if @timeoutHandle?
-            clearTimeout(@timeoutHandle)
-            @timeoutHandle = null
-
-        if @pendingCancelablePromise?
-            console.log("Force rejecting")
-            @pendingCancelablePromise.cancel()
-            @pendingCancelablePromise = null
-
-        # Needs to be bound outside of the callback, event.currentTarget may no longer be the same value once the
-        # callback is run.
-        target = event.target
-
-        return if not target?
-        return if 'syntax--php' not in target.classList # Skip whitespace and other noise
-
-        cursorPosition = editorViewComponent.screenPositionForMouseEvent(event)
-
-        @timeoutHandle = setTimeout ( =>
-            console.debug("Showing tooltip ", cursorPosition, target)
-
-            @showTooltipAt(editor, cursorPosition, target)
-            @timeoutHandle = null
-        ), 500
-
-    ###*
-     * @param {TextEditor} editor
-     * @param {Point}      cursorPosition
-     * @param {Object}     showOverElement
+     * @param {Point}      triggerPosition
      *
      * @return {Promise}
     ###
-    showTooltipAt: (editor, cursorPosition, showOverElement) ->
+    getIntentions: (editor, triggerPosition) ->
+        return [] if not @service.getCurrentProjectSettings()
+
+        scopeChain = editor.scopeDescriptorForBufferPosition(triggerPosition).getScopeChain()
+
+        return [] if scopeChain.length == 0
+
+        # Skip whitespace and other noise
+        return [] if scopeChain == '.text.html.php .meta.embedded.block.php .source.php'
+
         successHandler = (tooltip) =>
-            @pendingCancelablePromise = null
+            return [] if not tooltip?
 
-            return if not tooltip?
+            return [{
+                priority : 150
+                icon     : 'book'
+                title    : 'Show Documentation'
 
-            @removeTooltip()
+                selected : () =>
+                    @setCurrentlyVisibleDocumentationTo(@formatTooltip(tooltip.contents))
+                    @triggerDocumentationPane()
+            }]
 
-            @attachedPopover = @service.createAttachedPopover(showOverElement)
-            @attachedPopover.setText('<div class="php-integrator-tooltip-popover">' + marked(tooltip.contents) + '</div>')
-            @attachedPopover.show()
+        failureHandler = () ->
+            return []
 
-        failureHandler = () =>
-            @pendingCancelablePromise = null
-
-            @removeTooltip()
-
-        promise = @service.tooltipAt(editor, cursorPosition)
-
-        @pendingCancelablePromise = new CancelablePromise(promise)
-
-        return @pendingCancelablePromise.then(successHandler, failureHandler).catch(failureHandler)
+        return @service.tooltipAt(editor, triggerPosition).then(successHandler, failureHandler)
 
     ###*
-     * Removes the popover, if it is displayed.
+     * @param {String} tooltipContents
+     *
+     * @return {String}
     ###
-    removeTooltip: () ->
-        if @pendingCancelablePromise?
-            @pendingCancelablePromise.cancel()
-            @pendingCancelablePromise = null
+    formatTooltip: (tooltipContents) ->
+        marked = require 'marked'
 
-        if @attachedPopover
-            @attachedPopover.dispose()
-            @attachedPopover = null
+        return @formatDocumentationContent(marked(tooltipContents))
+
+    ###*
+     * @param {String} documentationContent
+     *
+     * @return {String}
+    ###
+    formatDocumentationContent: (documentationContent) ->
+        return '<div class="php-integrator-documentation-pane">' + documentationContent + '</div>'
+
+    ###*
+     * @param {String} documentationHtmlString
+    ###
+    setCurrentlyVisibleDocumentationTo: (documentationHtmlString) ->
+        @getDocumentationPane().then (documentationPane) =>
+            documentationPane.element.innerHTML = documentationHtmlString
+
+    ###*
+     *
+    ###
+    triggerDocumentationPane: () ->
+        @getDocumentationPane().then (documentationPane) =>
+            atom.workspace.paneContainerForItem(documentationPane).activate()
+            atom.workspace.paneForItem(documentationPane).activateItem(documentationPane)
+
+    ###*
+     * @return {Promise}
+    ###
+    getDocumentationPane: () ->
+        if @documentationPane?
+            return new Promise (resolve, reject) =>
+                resolve(@documentationPane)
+
+        else if @pendingDocumentationPanePromise?
+            return @pendingDocumentationPanePromise
+
+        paneElement = document.createElement('div')
+        paneElement.innerHTML = @formatDocumentationContent('''
+            <div class="php-integrator-documentation-placeholder">
+                <p><span class="icon icon-book"></span></p>
+
+                <p>Documentation will be displayed here.</p>
+
+                <p>
+                    Activate <a href="https://github.com/steelbrain/intentions">intentions</a> on the desired element
+                    and select the entry <strong>Show Documentation</strong>.
+                </p>
+
+                <p class="php-integrator-documentation-placeholder-note">
+                    By default, intentions can be triggered via <span class="highlight">ctrl-enter</span> on Windows
+                    and Linux and <span class="highlight">alt-enter</span> on macOS.
+                </p>
+            </div>
+        ''')
+
+        @pendingDocumentationPanePromise = atom.workspace.open({
+            element: paneElement
+
+            getTitle: () ->
+                return 'PHP Documentation'
+
+            getIconName: () ->
+                return 'book'
+
+            getURI: () ->
+                return 'atom://php-integrator-base/php-documentation'
+
+            getDefaultLocation: () ->
+                return 'bottom'
+        })
+
+        return @pendingDocumentationPanePromise.then (documentationPane) =>
+            disposable = atom.workspace.paneContainerForItem(documentationPane).onDidDestroyPaneItem (paneItem) =>
+                if paneItem.item == documentationPane
+                    @documentationPane = null
+                    disposable.dispose()
+
+            @pendingDocumentationPanePromise = null
+            @documentationPane = documentationPane
+
+            return @documentationPane

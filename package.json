@@ -6,7 +6,7 @@
   "repository": "php-integrator/atom-base",
   "license": "GPL-3.0",
   "engines": {
-    "atom": ">=1.13.0 <2.0.0"
+    "atom": ">=1.17.0 <2.0.0"
   },
   "providedServices": {
     "php-integrator.service": {
@@ -17,6 +17,11 @@
     "autocomplete.provider": {
       "versions": {
         "3.0.0": "getAutocompletionProviderServices"
+      }
+    },
+    "intentions:list": {
+      "versions": {
+        "1.0.0": "getIntentionProviders"
       }
     }
   },
@@ -48,6 +53,7 @@
   },
   "package-deps": [
     "project-manager",
+    "intentions",
     "linter"
   ],
   "keywords": [
