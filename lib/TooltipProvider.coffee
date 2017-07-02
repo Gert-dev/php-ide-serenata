@@ -142,8 +142,15 @@ class TooltipProvider
     ###
     triggerDocumentationPane: () ->
         @getDocumentationPane().then (documentationPane) =>
+            previouslyFocusedElement = document.activeElement
+
             atom.workspace.paneContainerForItem(documentationPane).activate()
             atom.workspace.paneForItem(documentationPane).activateItem(documentationPane)
+
+            # Atom automatically moves focus to the dock when it is activated. As usually the user will just want
+            # to see rudimentary information and doesn't need to scroll, we cater towards the most-used case and
+            # automatically move focus back to the editor.
+            previouslyFocusedElement.focus()
 
     ###*
      * @return {Promise}
