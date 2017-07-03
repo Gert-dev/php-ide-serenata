@@ -196,6 +196,10 @@ class TooltipProvider
 
             getDefaultLocation: () ->
                 return 'bottom'
+        }, {
+            activatePane: false
+            activateItem: false
+            searchAllPanes: true
         })
 
         return @pendingDocumentationPanePromise.then (documentationPane) =>
