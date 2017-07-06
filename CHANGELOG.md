@@ -1,3 +1,6 @@
+## 2.1.13
+* Add upgrade message.
+
 ## 2.1.12
 * Update to core [2.1.7](https://gitlab.com/php-integrator/core/tags/2.1.7).
 
