@@ -358,10 +358,41 @@ module.exports =
         return @getCoreManager().install().then(successHandler, failureHandler)
 
     ###*
+     *
+    ###
+    show30UpgradeMessage: () ->
+        if atom.config.get('php-integrator-base:confirmed-upgrade-message') == true
+            return
+
+        message =
+            "Hello! A new version of PHP Integrator is going to be released in the near future. This includes " +
+            "core 3.0 and new releases of the Atom packages to go alongside it.\n \n" +
+
+            "Why is this important? Core 3.0 will require PHP 7.1 to run, but a legacy version will be provided " +
+            "in case you can't upgrade.\n \n" +
+
+            "For more information, take a look at https://github.com/php-integrator/atom-base !"
+
+        atom.notifications.addInfo('PHP Integrator - New Version Approaching!', {
+            detail: message,
+            dismissable: true,
+            buttons: [
+                {
+                    className: 'btn btn-info'
+                    text: 'Got it!'
+                    onDidClick: () ->
+                        atom.config.set('php-integrator-base:confirmed-upgrade-message', true)
+                        this.model.dismiss()
+                }
+            ]
+        })
+
+    ###*
      * Activates the package.
     ###
     activate: ->
         @testConfig(false)
+        @show30UpgradeMessage()
 
         @updateCoreIfOutdated().then () =>
             @registerCommands()
