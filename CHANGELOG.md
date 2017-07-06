@@ -123,7 +123,6 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
                 "php"
             ]
   ```
->>>>>>> master
 
 ## 1.2.3
 ### Bugs fixed
