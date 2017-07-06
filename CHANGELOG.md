@@ -1,6 +1,3 @@
-### Note
-Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://gitlab.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://gitlab.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
-
 ## 3.0.0
 * Update to core [3.0.0](https://gitlab.com/php-integrator/core/tags/3.0.0).
 * Settings are now grouped into sections and their descriptions have been cleaned up.
@@ -25,8 +22,11 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * Fix project names containing characters that can't be used in file paths generating errors (such as forward slashes, asterisks, ...).
 * Removed usage of jQuery and removed it from the list of dependencies.
 
+## 2.1.13
+* Add upgrade message.
+
 ## 2.1.12
-* Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.7).
+* Update to core [2.1.7](https://gitlab.com/php-integrator/core/tags/2.1.7).
 
 ## 2.1.11
 * Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.6).
@@ -124,6 +124,9 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
 * Built-in interfaces no longer have `isAbstract` set to true. They _are_ abstract in a certain sense, but this property is meant to indicate if a classlike has been defined using the abstract keyword. It was also not consistent with the behavior for non-built-in interfaces.
 * Proxy methods will no longer throw exceptions if some parameters are missing or invalid. Instead, a promise rejection will occur.
 
+### Note
+Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://gitlab.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://gitlab.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
+
 ## 1.2.6
 ### Bugs fixed
 * Rename the package and repository.
@@ -147,7 +150,6 @@ Starting with version **2.0.0**, this repository only contains the CoffeeScript 
                 "php"
             ]
   ```
->>>>>>> master
 
 ## 1.2.3
 ### Bugs fixed
