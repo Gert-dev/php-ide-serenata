@@ -182,9 +182,6 @@ class SignatureHelpProvider
 
         text += '(' + parameterItems.join(', ') + ')'
 
-        if not signature.parameters[signatureHelp.activeParameter]?
-            console.debug("Got out-of-bounds parameter " + signatureHelp.activeParameter + " for signature help " + signature)
-
         if signature.parameters.length > 0 and signature.parameters[signatureHelp.activeParameter].documentation?
             text += '<br><br><p>' + signature.parameters[signatureHelp.activeParameter].documentation + '</p>'
 
