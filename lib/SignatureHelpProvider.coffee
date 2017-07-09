@@ -16,13 +16,6 @@ class SignatureHelpProvider
     service: null
 
     ###*
-     * Keeps track of the currently pending promise.
-     *
-     * @var {Promise|null}
-    ###
-    pendingPromise: null
-
-    ###*
      * @var {Number|null}
     ###
     timeoutHandle: null
@@ -250,10 +243,6 @@ class SignatureHelpProvider
      * Removes the popover, if it is displayed.
     ###
     removeCallTip: () ->
-        if @pendingPromise?
-            @pendingPromise.reject()
-            @pendingPromise = null
-
         if @callTipMarker
             @callTipMarker.destroy()
             @callTipMarker = null
