@@ -54,7 +54,12 @@ class CoreManager
             @COMPOSER_PACKAGE_NAME,
             @getCoreSourcePath(),
             @versionSpecification,
-            '--prefer-dist',
+            # https://github.com/php-integrator/atom-base/issues/303 - Unfortunately the dist involves using a ZIP on
+            # Windows, which in turn causes temporary files to be created that exceed the maximum path limit. Hence
+            # source installation is preferred.
+            # '--prefer-dist',
+            '--prefer-source',
+            '--no-interaction',
             '--no-dev',
             '--no-progress'
         ], @folder)

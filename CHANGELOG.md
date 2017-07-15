@@ -1,3 +1,6 @@
+## 3.0.1
+* ]Fix core installation issues on Windows because of maximum path limit being exceeded due to Composer generating temporary files during ZIP extraction](https://github.com/php-integrator/atom-base/issues/303)
+
 ## 3.0.0
 * Update to core [3.0.0](https://gitlab.com/php-integrator/core/tags/3.0.0).
 * Settings are now grouped into sections and their descriptions have been cleaned up.
