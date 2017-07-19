@@ -56,7 +56,9 @@ class ComposerService
                     console.debug('Composer has something to say:', data.toString())
 
                 process.stderr.on 'data', (data) =>
-                    console.warn('Composer has errors to report:', data.toString())
+                    # Valid information is also sent via STDERR, see also
+                    # https://github.com/composer/composer/issues/3787#issuecomment-76167739
+                    console.warn('Composer has something to say:', data.toString())
 
                 process.on 'close', (code) =>
                     console.debug('Composer exited with status code:', code)

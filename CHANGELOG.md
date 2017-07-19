@@ -1,3 +1,6 @@
+## 3.0.2
+* [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)
+
 ## 3.0.1
 * [Fix core installation issues on Windows because of maximum path limit being exceeded due to Composer generating temporary files during ZIP extraction](https://github.com/php-integrator/atom-base/issues/303)
 
