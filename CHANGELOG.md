@@ -1,5 +1,6 @@
 ## 3.0.2
 * Vertically align table cells to the top in the documentation pane
+* [Fix project paths containing the tilde `~` symbolizing the home folder not working](https://github.com/php-integrator/atom-base/issues/295)
 * [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)
 
 ## 3.0.1

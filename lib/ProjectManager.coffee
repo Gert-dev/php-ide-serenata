@@ -1,3 +1,5 @@
+process = require 'process'
+
 module.exports =
 
 ##*
@@ -401,10 +403,25 @@ class ProjectManager
         for projectDirectory in @getProjectPaths(project)
             projectDirectoryObject = new Directory(projectDirectory)
 
+            # #295 - Resolve home folders. The core supports this out of the box, but we still need to limit files to
+            # the workspace here. Atom is picky about this: if the project contains a tilde, the contains method below
+            # will only return true if the file path also contains the tilde, which is not the case by default for
+            # editor file paths.
+            if projectDirectory.startsWith('~')
+                fileName = fileName.replace(@getHomeFolderPath(), '~')
+
             if projectDirectoryObject.contains(fileName)
                 return true
 
         return false
+
+    ###*
+     * @return {String}
+    ###
+    getHomeFolderPath: () ->
+        homeFolderVarName = if process.platform == 'win32' then 'USERPROFILE' else 'HOME'
+
+        return process.env[homeFolderVarName];
 
     ###*
      * Indicates if the specified file is part of the current project.
