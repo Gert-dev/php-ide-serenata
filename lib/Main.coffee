@@ -501,7 +501,16 @@ module.exports =
             atom.notifications.addSuccess('Core installation successful')
 
         failureHandler = () ->
-            atom.notifications.addError('Core installation failed')
+            message =
+                "The core failed to install. This can happen for a variety of reasons, such as an outdated PHP " +
+                "version or missing extensions.\n \n" +
+
+                "Logs in the developer tools will likely provide you with more information about what is wrong. You " +
+                "can open it via the menu View → Developer → Toggle Developer Tools.\n \n" +
+
+                "Additionally, the README provides more information about requirements and troubleshooting."
+
+            atom.notifications.addError('Core installation failed', {detail: message, dismissable: true})
 
         return @getCoreManager().install().then(successHandler, failureHandler)
 
