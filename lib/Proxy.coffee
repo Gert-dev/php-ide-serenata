@@ -1031,8 +1031,6 @@ class Proxy
         }
 
         if progressStreamCallback?
-            parameters['stream-progress'] = true
-
             progressStreamCallbackWrapper = progressStreamCallback
 
         parameters.source = pathsToIndex
