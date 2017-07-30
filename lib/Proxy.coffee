@@ -355,8 +355,15 @@ class Proxy
 
             relatedJsonRpcRequest = @requestQueue[jsonRpcResponse.result.requestId]
 
-            if not relatedJsonRpcRequest.streamCallback?
-                console.warn('Received progress information for a request that isn\'t interested in it')
+            if not relatedJsonRpcRequest?
+                console.warn(
+                    'Received progress information for request that doesn\'t exist or was already finished',
+                    jsonRpcResponse
+                )
+                return
+
+            else if not relatedJsonRpcRequest.streamCallback?
+                console.warn('Received progress information for a request that isn\'t interested in it', jsonRpcResponse)
                 return
 
             relatedJsonRpcRequest.streamCallback(jsonRpcResponse.result.progress)
