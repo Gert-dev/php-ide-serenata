@@ -875,6 +875,33 @@ class Proxy
         return @performRequest('signatureHelp', parameters, null, source)
 
     ###*
+     * Fetches definition information for code navigation purposes of the structural element at the specified location.
+     *
+     * @param {String}      file   The path to the file to examine.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
+     *
+     * @return {Promise}
+    ###
+    gotoDefinition: (file, source, offset) ->
+        if not file?
+            return new Promise (resolve, reject) ->
+                reject('Either a path to a file or source code must be passed!')
+
+        if not @getIndexDatabasePath()?
+            return new Promise (resolve, reject) ->
+                reject('Request aborted as there is no project active (yet)')
+
+        parameters = {
+            database   : @getIndexDatabasePath()
+            offset     : offset
+            charoffset : true
+            file       : file
+        }
+
+        return @performRequest('gotoDefinition', parameters, null, source)
+
+    ###*
      * Deduces the resulting types of an expression.
      *
      * @param {String|null} expression        The expression to deduce the type of, e.g. '$this->foo()'. If null, the

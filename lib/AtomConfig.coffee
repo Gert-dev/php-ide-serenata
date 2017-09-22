@@ -28,6 +28,7 @@ class AtomConfig extends Config
             'general.insertNewlinesForUseStatements'
             'tooltips.enable'
             'signatureHelp.enable'
+            'gotoDefinition.enable'
             'linting.enable'
             'linting.showUnknownClasses'
             'linting.showUnknownMembers'

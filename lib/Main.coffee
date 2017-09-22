@@ -87,9 +87,20 @@ module.exports =
                     default     : true
                     order       : 1
 
-        linting:
+        gotoDefinition:
             type: 'object'
             order: 5
+            properties:
+                enable:
+                    title       : 'Enable'
+                    description : 'When enabled, code navigation will be activated via the hyperclick package.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
+
+        linting:
+            type: 'object'
+            order: 6
             properties:
                 enable:
                     title       : 'Enable'
@@ -249,6 +260,11 @@ module.exports =
     ###*
      * @var {Object|null}
     ###
+    gotoDefinitionProvider: null
+
+    ###*
+     * @var {Object|null}
+    ###
     linterProvider: null
 
     ###*
@@ -402,6 +418,13 @@ module.exports =
             else
                 @deactivateSignatureHelp()
 
+        config.onDidChange 'gotoDefintion.enable', (value) =>
+            if value
+                @activateGotoDefinition()
+
+            else
+                @deactivateGotoDefinition()
+
         config.onDidChange 'linting.enable', (value) =>
             if value
                 @activateLinting()
@@ -539,6 +562,9 @@ module.exports =
                 if @getConfiguration().get('linting.enable')
                     @activateLinting()
 
+                if @getConfiguration().get('gotoDefinition.enable')
+                    @activateGotoDefinition()
+
                 @getCachingProxy().setIsActive(true)
 
     ###*
@@ -571,6 +597,18 @@ module.exports =
     ###
     deactivateSignatureHelp: () ->
         @getSignatureHelpProvider().deactivate()
+
+    ###*
+     * Activates the goto definition provider.
+    ###
+    activateGotoDefinition: () ->
+        @getGotoDefinitionProvider().activate(@getService())
+
+    ###*
+     * Deactivates the goto definition provider.
+    ###
+    deactivateGotoDefinition: () ->
+        @getGotoDefinitionProvider().deactivate()
 
     ###*
      * Activates linting.
@@ -741,6 +779,14 @@ module.exports =
         return @getTooltipProvider().getIntentionProviders()
 
     ###*
+     * Returns the hyperclick provider.
+     *
+     * @return {Object}
+    ###
+    getHyperclickProvider: () ->
+        return @getGotoDefinitionProvider()
+
+    ###*
      * @return {Service}
     ###
     getService: () ->
@@ -885,6 +931,17 @@ module.exports =
             @signatureHelpProvider = new SignatureHelpProvider()
 
         return @signatureHelpProvider
+
+    ###*
+     * @return {GotoDefinitionProvider}
+    ###
+    getGotoDefinitionProvider: () ->
+        if not @gotoDefinitionProvider?
+            GotoDefinitionProvider = require './GotoDefinitionProvider'
+
+            @gotoDefinitionProvider = new GotoDefinitionProvider()
+
+        return @gotoDefinitionProvider
 
     ###*
      * @return {LinterProvider}

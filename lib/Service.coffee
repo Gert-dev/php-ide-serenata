@@ -239,6 +239,18 @@ class Service
         return @proxy.signatureHelp(file, source, offset)
 
     ###*
+     * Fetches definition information for code navigation purposes of the structural element at the specified location.
+     *
+     * @param {String}      file   The path to the file to examine.
+     * @param {String|null} source The source code to search. May be null if a file is passed instead.
+     * @param {Number}      offset The character offset into the file to examine.
+     *
+     * @return {Promise}
+    ###
+    gotoDefinition: (file, source, offset) ->
+        return @proxy.gotoDefinition(file, source, offset)
+
+    ###*
      * Convenience alias for {@see deduceTypes}.
      *
      * @param {String}     expression
@@ -298,6 +310,21 @@ class Service
         bufferText = editor.getBuffer().getText()
 
         return @signatureHelp(editor.getPath(), bufferText, offset)
+
+    ###*
+     * Convenience alias for {@see gotoDefinition}.
+     *
+     * @param {TextEditor} editor
+     * @param {Range}      bufferPosition
+     *
+     * @return {Promise}
+    ###
+    gotoDefinitionAt: (editor, bufferPosition) ->
+        offset = editor.getBuffer().characterIndexForPosition(bufferPosition)
+
+        bufferText = editor.getBuffer().getText()
+
+        return @gotoDefinition(editor.getPath(), bufferText, offset)
 
     ###*
      * Refreshes the specified file or folder. This method is asynchronous and will return immediately.

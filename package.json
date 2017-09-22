@@ -23,6 +23,11 @@
       "versions": {
         "1.0.0": "getIntentionProviders"
       }
+    },
+    "hyperclick.provider": {
+      "versions": {
+        "0.0.0": "getHyperclickProvider"
+      }
     }
   },
   "consumedServices": {
@@ -49,12 +54,14 @@
     "sanitize-filename": "~1.6.1",
     "rimraf": "~2.5.4",
     "download": "~5.0.2",
-    "marked": "~0.3.6"
+    "marked": "~0.3.6",
+    "atom-languageclient": "^0.6.4"
   },
   "package-deps": [
     "project-manager",
     "intentions",
-    "linter"
+    "linter",
+    "hyperclick"
   ],
   "keywords": [
     "php",

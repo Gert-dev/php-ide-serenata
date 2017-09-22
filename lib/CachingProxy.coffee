@@ -173,6 +173,14 @@ class CachingProxy extends Proxy
     ###*
      * @inherited
     ###
+    gotoDefinition: (file, source, offset) ->
+        sourceKey = if source? then md5(source) else null
+
+        return @wrapCachedRequestToParent("gotoDefinition-#{file}-#{sourceKey}-#{offset}", 'gotoDefinition', arguments)
+
+    ###*
+     * @inherited
+    ###
     initialize: () ->
         return super().then (output) =>
             @clearCache()
