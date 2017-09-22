@@ -11,7 +11,7 @@
   "providedServices": {
     "php-integrator.service": {
       "versions": {
-        "3.0.0": "getServiceInstance"
+        "3.1.0": "getServiceInstance"
       }
     },
     "autocomplete.provider": {
