@@ -10,7 +10,6 @@ code navigation and tooltips.
 This package already contains some functionality as of 3.0, including tooltips, signature help (call tips) and linting. Over time, all official add-on packages will be made redundant by reimplementation in the core. The following packages currently still need to be installed as add-on if you desire this functionality:
 
   * **[php-integrator-autocomplete-plus](https://github.com/php-integrator/atom-autocompletion)** - Provides intelligent PHP autocompletion in combination with autocomplete-plus.
-  * **[php-integrator-navigation](https://github.com/php-integrator/atom-navigation)** - Provides code navigation and go to functionality.
   * **[php-integrator-annotations](https://github.com/php-integrator/atom-annotations)** - Shows annotations, such as for overridden methods and interface implementations.
   * **[php-integrator-refactoring](https://github.com/php-integrator/atom-refactoring)** - Provides basic refactoring capabilities.
 
