@@ -1,3 +1,7 @@
+## 3.1.0 (Unreleased)
+* Add support for goto definition (code navigation) via the core
+  * You no longer need the php-integrator-navigation package installed. It will continue working, albeit in somewhat a broken fashion since Atom 1.20, as the language-php package changed a lot of CSS class names. It is advised to disable it or simply uninstall it altogether, as it will no longer be maintained.
+
 ## 3.0.2
 * Vertically align table cells to the top in the documentation pane
 * [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
