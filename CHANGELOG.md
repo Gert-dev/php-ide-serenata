@@ -2,6 +2,9 @@
 * Add support for goto definition (code navigation) via the core
   * You no longer need the php-integrator-navigation package installed. It will continue working, albeit in somewhat a broken fashion since Atom 1.20, as the language-php package changed a lot of CSS class names. It is advised to disable it or simply uninstall it altogether, as it will no longer be maintained.
 * Vertically align table cells to the top in the documentation pane
+* Signature help will now wait a bit longer to display
+  * This should fix the nuisance of it popping all over the place when rapidly moving the cursor around and gives you a bit more time to get your bearings before it appears.
+  * This also reduces the load on the server in large files, where multiple requests may be queued because of slower cursor movement, after which signature help then seems to "lag" behind afterwards.
 * [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
 * [Fix project paths containing the tilde `~` symbolizing the home folder not working](https://github.com/php-integrator/atom-base/issues/295)
 * [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)

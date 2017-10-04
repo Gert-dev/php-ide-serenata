@@ -107,19 +107,7 @@ class SignatureHelpProvider
 
             return if event.cursor != cursors[0]
 
-            if @timeoutHandle?
-                # Putting this here will ensure the popover is removed when the user currently has a call tip active and
-                # then starts rapidly moving the cursor around. Otherwise, it will stick around for a while until the
-                # user stops moving the cursor.
-                @removeSignatureHelp()
-
-                clearTimeout(@timeoutHandle)
-                @timeoutHandle = null
-
-            @timeoutHandle = setTimeout ( =>
-                @timeoutHandle = null
-                @onChangeCursorPosition(editor, event.newBufferPosition)
-            ), 50
+            @onChangeCursorPosition(editor, event.newBufferPosition)
 
 
     ###*
@@ -127,7 +115,17 @@ class SignatureHelpProvider
      * @param {Point}      newBufferPosition
     ###
     onChangeCursorPosition: (editor, newBufferPosition) ->
-        @showSignatureHelpAt(editor, newBufferPosition)
+        @removeSignatureHelp()
+
+        if @timeoutHandle?
+            clearTimeout(@timeoutHandle)
+            @timeoutHandle = null
+
+        @timeoutHandle = setTimeout ( =>
+            @timeoutHandle = null
+            @showSignatureHelpAt(editor, newBufferPosition)
+        ), 500
+
 
     ###*
      * @param {TextEditor} editor
