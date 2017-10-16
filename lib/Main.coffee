@@ -516,7 +516,9 @@ module.exports =
                 resolve()
 
         message =
-            "The core isn't installed yet or is outdated. A new version is in the process of being downloaded."
+            "The core isn't installed yet or is outdated. A new version is in the process of being downloaded.\n \n" +
+
+            "Progress is being sent to the developer tools console, in case you'd like to monitor it."
 
         atom.notifications.addInfo('PHP Integrator - Downloading Core', {'detail': message, dismissable: true})
 
