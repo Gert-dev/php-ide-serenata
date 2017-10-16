@@ -1,3 +1,5 @@
+{Buffer} = require 'buffer'
+
 Popover         = require './Widgets/Popover'
 AttachedPopover = require './Widgets/AttachedPopover'
 
@@ -561,8 +563,6 @@ class Service
      * @return {Number}
     ###
     getCharacterOffsetFromByteOffset: (byteOffset, string) ->
-        {Buffer} = require 'buffer'
-
         buffer = new Buffer(string)
 
         return buffer.slice(0, byteOffset).toString().length

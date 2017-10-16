@@ -2,6 +2,7 @@ fs            = require 'fs'
 net           = require 'net'
 stream        = require 'stream'
 child_process = require 'child_process'
+sanitize      = require 'sanitize-filename'
 
 module.exports =
 
@@ -1072,8 +1073,6 @@ class Proxy
      * @param {String} name
     ###
     setIndexDatabaseName: (name) ->
-        sanitize = require 'sanitize-filename'
-
         @indexDatabaseName = sanitize(name)
 
     ###*

@@ -1,3 +1,7 @@
+{Directory} = require 'atom'
+
+path = require 'path'
+
 process = require 'process'
 
 module.exports =
@@ -141,8 +145,6 @@ class ProjectManager
         failureHandler = () =>
             return
 
-        {Directory} = require 'atom'
-
         for projectDirectory in @getProjectPaths(project)
             projectDirectoryObject = new Directory(projectDirectory)
 
@@ -211,8 +213,6 @@ class ProjectManager
 
         if not excludedPaths?
             excludedPaths = []
-
-        path = require 'path'
 
         absoluteExcludedPaths = []
 
@@ -398,8 +398,6 @@ class ProjectManager
      * @return {bool}
     ###
     isFilePartOfProject: (project, fileName) ->
-        {Directory} = require 'atom'
-
         for projectDirectory in @getProjectPaths(project)
             projectDirectoryObject = new Directory(projectDirectory)
 

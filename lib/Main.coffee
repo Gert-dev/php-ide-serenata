@@ -1,3 +1,25 @@
+{Disposable, CompositeDisposable} = require 'atom';
+
+{Emitter} = require 'event-kit';
+
+packageDeps = require('atom-package-deps')
+
+Service =                require './Service'
+AtomConfig =             require './AtomConfig'
+CoreManager =            require './CoreManager';
+CachingProxy =           require './CachingProxy'
+ConfigTester =           require './ConfigTester'
+ProjectManager =         require './ProjectManager'
+LinterProvider =         require './LinterProvider'
+ComposerService =        require './ComposerService';
+TooltipProvider =        require './TooltipProvider'
+StatusBarManager =       require "./Widgets/StatusBarManager"
+IndexingMediator =       require './IndexingMediator'
+UseStatementHelper =     require './UseStatementHelper';
+SignatureHelpProvider =  require './SignatureHelpProvider'
+GotoDefinitionProvider = require './GotoDefinitionProvider'
+AutocompletionProvider = require './AutocompletionProvider'
+
 module.exports =
     ###*
      * Configuration settings.
@@ -275,8 +297,6 @@ module.exports =
      * @return {bool}
     ###
     testConfig: (testServices = true) ->
-        ConfigTester = require './ConfigTester'
-
         configTester = new ConfigTester(@getConfiguration())
 
         result = configTester.test()
@@ -493,8 +513,6 @@ module.exports =
     ###
     attachStatusBarItems: (statusBarService) ->
         if not @statusBarManager
-            StatusBarManager = require "./Widgets/StatusBarManager"
-
             @statusBarManager = new StatusBarManager()
             @statusBarManager.initialize(statusBarService)
             @statusBarManager.setLabel("Indexing...")
@@ -543,7 +561,7 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
-        require('atom-package-deps').install(@packageName, true).then () =>
+        packageDeps.install(@packageName, true).then () =>
             return if not @testConfig(false)
 
             @updateCoreIfOutdated().then () =>
@@ -696,8 +714,6 @@ module.exports =
         if not @getProjectManager().isProjectIndexing()
             @statusBarManager.hide()
 
-        {Disposable} = require 'atom'
-
         return new Disposable => @detachStatusBarItems()
 
     ###*
@@ -793,8 +809,6 @@ module.exports =
     ###
     getService: () ->
         if not @service?
-            Service = require './Service'
-
             @service = new Service(
                 @getConfiguration(),
                 @getCachingProxy(),
@@ -810,8 +824,6 @@ module.exports =
     ###
     getDisposables: () ->
         if not @disposables?
-            {CompositeDisposable} = require 'atom';
-
             @disposables = new CompositeDisposable()
 
         return @disposables
@@ -821,8 +833,6 @@ module.exports =
     ###
     getConfiguration: () ->
         if not @configuration?
-            AtomConfig = require './AtomConfig'
-
             @configuration = new AtomConfig(@packageName)
 
         return @configuration
@@ -832,8 +842,6 @@ module.exports =
     ###
     getCachingProxy: () ->
         if not @proxy?
-            CachingProxy = require './CachingProxy'
-
             @proxy = new CachingProxy(@getConfiguration())
             @proxy.setCorePath(@getCoreManager().getCoreSourcePath())
 
@@ -844,8 +852,6 @@ module.exports =
     ###
     getEmitter: () ->
         if not @emitter?
-            {Emitter} = require 'event-kit';
-
             @emitter = new Emitter()
 
         return @emitter
@@ -855,8 +861,6 @@ module.exports =
     ###
     getComposerService: () ->
         if not @composerService?
-            ComposerService = require './ComposerService';
-
             @composerService = new ComposerService(
                 @getConfiguration().get('core.phpCommand'),
                 @getConfiguration().get('packagePath') + '/core/'
@@ -869,8 +873,6 @@ module.exports =
     ###
     getCoreManager: () ->
         if not @coreManager?
-            CoreManager = require './CoreManager';
-
             @coreManager = new CoreManager(
                 @getComposerService(),
                 @coreVersionSpecification,
@@ -884,8 +886,6 @@ module.exports =
     ###
     getUseStatementHelper: () ->
         if not @useStatementHelper?
-            UseStatementHelper = require './UseStatementHelper';
-
             @useStatementHelper = new UseStatementHelper(@getConfiguration().get('general.insertNewlinesForUseStatements'))
 
         return @useStatementHelper
@@ -895,8 +895,6 @@ module.exports =
     ###
     getIndexingMediator: () ->
         if not @indexingMediator?
-            IndexingMediator = require './IndexingMediator'
-
             @indexingMediator = new IndexingMediator(@getCachingProxy(), @getEmitter())
 
         return @indexingMediator
@@ -906,8 +904,6 @@ module.exports =
     ###
     getProjectManager: () ->
         if not @projectManager?
-            ProjectManager = require './ProjectManager'
-
             @projectManager = new ProjectManager(@getCachingProxy(), @getIndexingMediator())
 
         return @projectManager
@@ -917,8 +913,6 @@ module.exports =
     ###
     getTooltipProvider: () ->
         if not @tooltipProvider?
-            TooltipProvider = require './TooltipProvider'
-
             @tooltipProvider = new TooltipProvider()
 
         return @tooltipProvider
@@ -928,8 +922,6 @@ module.exports =
     ###
     getSignatureHelpProvider: () ->
         if not @signatureHelpProvider?
-            SignatureHelpProvider = require './SignatureHelpProvider'
-
             @signatureHelpProvider = new SignatureHelpProvider()
 
         return @signatureHelpProvider
@@ -939,8 +931,6 @@ module.exports =
     ###
     getGotoDefinitionProvider: () ->
         if not @gotoDefinitionProvider?
-            GotoDefinitionProvider = require './GotoDefinitionProvider'
-
             @gotoDefinitionProvider = new GotoDefinitionProvider()
 
         return @gotoDefinitionProvider
@@ -950,8 +940,6 @@ module.exports =
     ###
     getLinterProvider: () ->
         if not @linterProvider?
-            LinterProvider = require './LinterProvider'
-
             @linterProvider = new LinterProvider(@getConfiguration())
 
         return @linterProvider
@@ -961,8 +949,6 @@ module.exports =
     ###
     getAutocompletionProvider: () ->
         if not @autocompletionProvider?
-            AutocompletionProvider = require './AutocompletionProvider'
-
             @autocompletionProvider = new AutocompletionProvider(@getConfiguration(), @getService())
 
         return @autocompletionProvider

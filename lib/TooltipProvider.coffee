@@ -1,5 +1,7 @@
 {Disposable, CompositeDisposable} = require 'atom'
 
+marked = require 'marked'
+
 module.exports =
 
 ##*
@@ -118,8 +120,6 @@ class TooltipProvider
      * @return {String}
     ###
     formatTooltip: (tooltipContents) ->
-        marked = require 'marked'
-
         return @formatDocumentationContent(marked(tooltipContents))
 
     ###*
