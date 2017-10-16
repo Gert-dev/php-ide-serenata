@@ -558,6 +558,39 @@ module.exports =
         return @getCoreManager().install().then(successHandler, failureHandler)
 
     ###*
+     * Checks if the php-integrator-navigation package is installed and notifies the user it is obsolete if it is.
+    ###
+    notifyAboutRedundantNavigationPackageIfnecessary: () ->
+        atom.packages.onDidActivatePackage (packageData) ->
+            return if packageData.name != 'php-integrator-navigation'
+
+            message =
+                "It seems you still have the php-integrator-navigation package installed and activated. As of this " +
+                "release, it is obsolete and all its functionality is already included in the base package.\n \n" +
+
+                "It is recommended to disable or remove it, shall I disable it for you?"
+
+            notification = atom.notifications.addInfo('PHP Integrator - Navigation', {
+                detail      : message
+                dismissable : true
+
+                buttons: [
+                    {
+                        text: 'Yes, nuke it'
+                        onDidClick: () ->
+                            atom.packages.disablePackage('php-integrator-navigation');
+                            notification.dismiss()
+                    },
+
+                    {
+                        text: 'No, don\'t touch it'
+                        onDidClick: () ->
+                            notification.dismiss()
+                    }
+                ]
+            })
+
+    ###*
      * Activates the package.
     ###
     activate: ->
@@ -565,6 +598,8 @@ module.exports =
             return if not @testConfig(false)
 
             @updateCoreIfOutdated().then () =>
+                @notifyAboutRedundantNavigationPackageIfnecessary()
+
                 @registerCommands()
                 @registerConfigListeners()
                 @registerStatusBarListeners()
