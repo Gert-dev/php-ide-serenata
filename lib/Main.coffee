@@ -518,10 +518,10 @@ module.exports =
         message =
             "The core isn't installed yet or is outdated. A new version is in the process of being downloaded."
 
-        atom.notifications.addInfo('PHP Integrator - Downloading Core', {'detail': message})
+        atom.notifications.addInfo('PHP Integrator - Downloading Core', {'detail': message, dismissable: true})
 
         successHandler = () ->
-            atom.notifications.addSuccess('Core installation successful')
+            atom.notifications.addSuccess('Core installation successful', dismissable: true)
 
         failureHandler = () ->
             message =
