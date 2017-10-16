@@ -1,5 +1,6 @@
 fs = require 'fs'
 path = require 'path'
+rimraf = require 'rimraf'
 
 module.exports =
 
@@ -49,6 +50,8 @@ class CoreManager
      * @return {Promise}
     ###
     install: () ->
+        @removeExistingFolderIfPresent()
+
         return @composerService.run([
             'create-project',
             @COMPOSER_PACKAGE_NAME,
@@ -67,6 +70,13 @@ class CoreManager
     ###*
      * @return {Boolean}
     ###
+    removeExistingFolderIfPresent: () ->
+        if fs.existsSync(@getCoreSourcePath())
+            rimraf.sync(@getCoreSourcePath())
+
+    ###*
+     * @return {Boolean}
+    ###
     isInstalled: () ->
         return fs.existsSync(@getComposerLockFilePath())
 
@@ -80,4 +90,19 @@ class CoreManager
      * @return {String}
     ###
     getCoreSourcePath: () ->
-        return path.join(@folder, @versionSpecification)
+        if @folder == null
+            throw new Error('No folder configured for core installation')
+
+        else if @versionSpecification == null
+            throw new Error('No folder configured for core installation')
+
+        coreSourcePath = path.join(@folder, @versionSpecification)
+
+        if not coreSourcePath? or coreSourcePath.length == 0
+            throw new Error('Failed producing a usable core source folder path')
+
+        if coreSourcePath == '/'
+            # Can never be too careful with dynamic path generation (and recursive deletes).
+            throw new Error('Nope, I\'m not going to use your filesystem root')
+
+        return coreSourcePath
