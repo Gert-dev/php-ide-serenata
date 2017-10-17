@@ -5,6 +5,7 @@
 * Signature help will now wait a bit longer to display
   * This should fix the nuisance of it popping all over the place when rapidly moving the cursor around and gives you a bit more time to get your bearings before it appears.
   * This also reduces the load on the server in large files, where multiple requests may be queued because of slower cursor movement, after which signature help then seems to "lag" behind afterwards.
+* [Fix use statement sorting not being stable](https://github.com/php-integrator/atom-base/issues/280)
 * [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
 * [Fix project paths containing the tilde `~` symbolizing the home folder not working](https://github.com/php-integrator/atom-base/issues/295)
 * [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)

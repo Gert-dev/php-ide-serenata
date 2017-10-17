@@ -167,10 +167,12 @@ class UseStatementHelper
 
         maxLength = Math.min(firstClassNameParts.length, secondClassNameParts.length)
 
+        collator = new Intl.Collator
+
         if maxLength >= 2
             for i in [0 .. maxLength - 2]
                 if firstClassNameParts[i] != secondClassNameParts[i]
-                    return (firstClassNameParts[i].localeCompare(secondClassNameParts[i]))
+                    return collator.compare(firstClassNameParts[i], secondClassNameParts[i])
 
         # At this point, both FQSEN's share a common namespace, e.g. A\B and A\B\C\D, or XMLElement and XMLDocument.
         # The one with the most namespace parts ends up last.
@@ -179,6 +181,9 @@ class UseStatementHelper
 
         else if firstClassNameParts.length < secondClassNameParts.length
             return -1
+
+        if firstClassName.length == secondClassName.length
+            return collator.compare(firstClassName, secondClassName)
 
         # Both items have share the same namespace, sort from shortest to longest last word (class, interface, ...).
         return firstClassName.length > secondClassName.length ? 1 : -1
