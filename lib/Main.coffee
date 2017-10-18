@@ -12,7 +12,7 @@ ConfigTester =           require './ConfigTester'
 ProjectManager =         require './ProjectManager'
 LinterProvider =         require './LinterProvider'
 ComposerService =        require './ComposerService';
-TooltipProvider =        require './TooltipProvider'
+DatatipProvider =        require './DatatipProvider'
 StatusBarManager =       require "./Widgets/StatusBarManager"
 IndexingMediator =       require './IndexingMediator'
 UseStatementHelper =     require './UseStatementHelper';
@@ -83,16 +83,14 @@ module.exports =
                     default     : false
                     order       : 3
 
-        tooltips:
+        datatips:
             type: 'object'
             order: 3
             properties:
                 enable:
                     title       : 'Enable'
                     description : 'When enabled, documentation for various structural elements can be displayed in a
-                                   dock by activating intentions. (This is called tooltips as the data provided is
-                                   meant to be displayed in tooltips, but a dock offers advantages such as proper
-                                   scrolling and can be permanent.)'
+                                  datatip (tooltip).'
                     type        : 'boolean'
                     default     : true
                     order       : 1
@@ -272,7 +270,7 @@ module.exports =
     ###*
      * @var {Object|null}
     ###
-    tooltipProvider: null
+    datatipProvider: null
 
     ###*
      * @var {Object|null}
@@ -424,12 +422,12 @@ module.exports =
         config.onDidChange 'general.insertNewlinesForUseStatements', (value) =>
             @getUseStatementHelper().setAllowAdditionalNewlines(value)
 
-        config.onDidChange 'tooltips.enable', (value) =>
+        config.onDidChange 'datatips.enable', (value) =>
             if value
-                @activateTooltips()
+                @activateDatatips()
 
             else
-                @deactivateTooltips()
+                @deactivateDatatips()
 
         config.onDidChange 'signatureHelp.enable', (value) =>
             if value
@@ -608,8 +606,8 @@ module.exports =
 
                 @registerAtomListeners()
 
-                if @getConfiguration().get('tooltips.enable')
-                    @activateTooltips()
+                if @getConfiguration().get('datatips.enable')
+                    @activateDatatips()
 
                 if @getConfiguration().get('signatureHelp.enable')
                     @activateSignatureHelp()
@@ -630,16 +628,16 @@ module.exports =
             @registerTextEditorListeners(editor)
 
     ###*
-     * Activates the tooltip provider.
+     * Activates the datatip provider.
     ###
-    activateTooltips: () ->
-        @getTooltipProvider().activate(@getService())
+    activateDatatips: () ->
+        @getDatatipProvider().activate(@getService())
 
     ###*
-     * Deactivates the tooltip provider.
+     * Deactivates the datatip provider.
     ###
-    deactivateTooltips: () ->
-        @getTooltipProvider().deactivate()
+    deactivateDatatips: () ->
+        @getDatatipProvider().deactivate()
 
     ###*
      * Activates the signature help provider.
@@ -731,7 +729,7 @@ module.exports =
             @disposables = null
 
         @getLinterProvider().deactivate()
-        @getTooltipProvider().deactivate()
+        @getDatatipProvider().deactivate()
         @getSignatureHelpProvider().deactivate()
 
         @getCachingProxy().stopPhpServer()
@@ -824,12 +822,10 @@ module.exports =
         # return [@getAutocompletionProvider()]
 
     ###*
-     * Returns a list of intention providers.
-     *
-     * @return {Array}
+     * @param {Object} datatipService
     ###
-    getIntentionProviders: () ->
-        return @getTooltipProvider().getIntentionProviders()
+    consumeDatatipService: (datatipService) ->
+        datatipService.addProvider(@getDatatipProvider())
 
     ###*
      * Returns the hyperclick provider.
@@ -944,13 +940,13 @@ module.exports =
         return @projectManager
 
     ###*
-     * @return {TooltipProvider}
+     * @return {DatatipProvider}
     ###
-    getTooltipProvider: () ->
-        if not @tooltipProvider?
-            @tooltipProvider = new TooltipProvider()
+    getDatatipProvider: () ->
+        if not @datatipProvider?
+            @datatipProvider = new DatatipProvider()
 
-        return @tooltipProvider
+        return @datatipProvider
 
     ###*
      * @return {SignatureHelpProvider}

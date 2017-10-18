@@ -32,7 +32,7 @@ class Config
                 additionalIndexingDelay        : 200
                 insertNewlinesForUseStatements : false
 
-            tooltips:
+            datatips:
                 enable : true
 
             signatureHelp:

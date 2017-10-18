@@ -26,7 +26,7 @@ class AtomConfig extends Config
             'general.indexContinuously'
             'general.additionalIndexingDelay'
             'general.insertNewlinesForUseStatements'
-            'tooltips.enable'
+            'datatips.enable'
             'signatureHelp.enable'
             'gotoDefinition.enable'
             'linting.enable'
