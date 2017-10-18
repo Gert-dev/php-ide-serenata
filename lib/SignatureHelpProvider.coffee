@@ -1,7 +1,5 @@
 {Disposable, CompositeDisposable} = require 'atom'
 
-marked = require 'marked'
-
 module.exports =
 
 ##*
