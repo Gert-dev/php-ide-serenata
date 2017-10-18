@@ -6,7 +6,7 @@
   "repository": "php-integrator/atom-base",
   "license": "GPL-3.0",
   "engines": {
-    "atom": ">=1.17.0 <2.0.0"
+    "atom": ">=1.21.0 <2.0.0"
   },
   "providedServices": {
     "php-integrator.service": {
@@ -60,8 +60,7 @@
   "package-deps": [
     "project-manager",
     "intentions",
-    "linter",
-    "hyperclick"
+    "atom-ide-ui"
   ],
   "keywords": [
     "php",
