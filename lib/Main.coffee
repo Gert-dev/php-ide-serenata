@@ -824,6 +824,12 @@ module.exports =
         # return [@getAutocompletionProvider()]
 
     ###*
+     * @param {Object} signatureHelpService
+    ###
+    consumeSignatureHelpService: (signatureHelpService) ->
+        signatureHelpService(@getSignatureHelpProvider())
+
+    ###*
      * Returns a list of intention providers.
      *
      * @return {Array}

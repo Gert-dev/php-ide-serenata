@@ -45,6 +45,11 @@
       "versions": {
         "^3.1.0": "setProjectManagerService"
       }
+    },
+    "signature-help": {
+      "versions": {
+        "0.1.0": "consumeSignatureHelpService"
+      }
     }
   },
   "dependencies": {
