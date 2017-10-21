@@ -783,6 +783,12 @@ module.exports =
      * @param {Object} project
     ###
     onProjectChanged: (project) ->
+        @changeActiveProject(project)
+
+    ###*
+     * @param {Object} project
+    ###
+    changeActiveProject: (project) ->
         @activeProject = project
 
         return if not project?
@@ -807,6 +813,8 @@ module.exports =
             # Ignore
 
         @proxy.test().then(successHandler, failureHandler)
+
+        return
 
     ###*
      * Retrieves the base package service that can be used by other packages.
