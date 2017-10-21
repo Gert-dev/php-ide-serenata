@@ -51,8 +51,6 @@ class SignatureHelpProvider
      * @return {Promise}
     ###
     getSignatureHelp: (editor, point) ->
-        console.log("Trigger")
-
         successHandler = (signatureHelp) =>
             return signatureHelp
 
