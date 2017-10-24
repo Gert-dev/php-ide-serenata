@@ -176,7 +176,7 @@ class Service
     ###*
      * Fetches all available variables at a specific location.
      *
-     * @param {String|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {String}      file   The path to the file to examine. May be null if the source parameter is passed.
      * @param {String|null} source The source code to search. May be null if a file is passed instead.
      * @param {Number}      offset The character offset into the file to examine.
      *

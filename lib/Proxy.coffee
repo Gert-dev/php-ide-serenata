@@ -795,16 +795,16 @@ class Proxy
     ###*
      * Fetches all available variables at a specific location.
      *
-     * @param {String|null} file   The path to the file to examine. May be null if the source parameter is passed.
+     * @param {String}      file   The path to the file to examine. May be null if the source parameter is passed.
      * @param {String|null} source The source code to search. May be null if a file is passed instead.
      * @param {Number}      offset The character offset into the file to examine.
      *
      * @return {Promise}
     ###
     getAvailableVariables: (file, source, offset) ->
-        if not file? and not source?
+        if not file
             return new Promise (resolve, reject) ->
-                reject('Either a path to a file or source code must be passed!')
+                reject('No file passed!')
 
         if not @getIndexDatabasePath()?
             return new Promise (resolve, reject) ->
@@ -814,10 +814,8 @@ class Proxy
             database   : @getIndexDatabasePath()
             offset     : offset
             charoffset : true
+            file       : file
         }
-
-        if file?
-            parameters.file = file
 
         return @performRequest('availableVariables', parameters, null, source)
 

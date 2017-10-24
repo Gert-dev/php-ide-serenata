@@ -14,6 +14,7 @@
   * Strictly spoken, this package shouldn't depend directly on other packages, but only on services. The problem with that is that newcomers can get confused more easily or simply not be aware of additional functionality. (One can argue whether that is an audience we should cater to, though.)
   * For your information, the linter contained in atom-ide-ui works just fine with the linting in this package, so you now basically have the choice of which linter you want to use. The same applies to hyperclick: the package is no longer explicitly required since the same service is contained in atom-ide-ui.
   * IDE packages all seem to converge around atom-ide-ui and we're moving slowly towards becoming a language server, so the dependency is likely going to stick.
+* Minor backwards compatibility break: fetching available variables now requires a file path as part of [a core fix](https://gitlab.com/php-integrator/core/issues/126)
 
 ## 3.0.1
 * [Fix core installation issues on Windows because of maximum path limit being exceeded due to Composer generating temporary files during ZIP extraction](https://github.com/php-integrator/atom-base/issues/303)
