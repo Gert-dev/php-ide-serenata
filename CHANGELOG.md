@@ -8,6 +8,7 @@
 * [Fix use statement sorting not being stable](https://github.com/php-integrator/atom-base/issues/280)
 * [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
 * [Fix project paths containing the tilde `~` symbolizing the home folder not working](https://github.com/php-integrator/atom-base/issues/295)
+* Fix project not always automatically reindexing after core install because project manager service was already loaded
 * [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)
 * [Fix Composer complaining about core directory not being empty](https://github.com/php-integrator/atom-base/issues/331)
 * Replace dependency on linter and hyperclick with dependency on atom-ide-ui

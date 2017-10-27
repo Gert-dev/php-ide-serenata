@@ -624,6 +624,13 @@ module.exports =
 
                 @getCachingProxy().setIsActive(true)
 
+                # This fixes the corner case where the core is still installing, the project manager service has already
+                # loaded and the project is already active. At that point, the index that resulted from it silently
+                # failed because the proxy (and core) weren't active yet. This in turn causes the project to not
+                # automatically start indexing, which is especially relevant if a core update requires a reindex.
+                if @activeProject?
+                    @changeActiveProject(@activeProject)
+
     ###*
      * Registers listeners for events from Atom's API.
     ###
