@@ -445,7 +445,7 @@ class Service
                 return
 
             successHandler = (namespacesInFile) =>
-                for namespace in namespacesInFile
+                for id,namespace of namespacesInFile
                     if bufferPosition.row >= namespace.startLine and bufferPosition.row <= namespace.endLine
                         resolve(namespace.name)
 
