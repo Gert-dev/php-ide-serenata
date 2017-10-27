@@ -1,21 +1,27 @@
 ## 3.1.0 (Unreleased)
-* Add support for goto definition (code navigation) via the core
-  * You no longer need the php-integrator-navigation package installed. It will continue working, albeit in somewhat a broken fashion since Atom 1.20, as the language-php package changed a lot of CSS class names. It is advised to disable it or simply uninstall it altogether, as it will no longer be maintained.
-* Vertically align table cells to the top in the documentation pane
-* Signature help will now wait a bit longer to display
+### Major Changes
+* Support goto definition (code navigation) via new core command
+  * `php-integrator-navigation` is now obsolete. It will continue to work on older Atom versions, but it was essentially broken since Atom 1.19, as several CSS class names changed in the `language-php` package. It is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-navigation).
+
+### Bugs Fixed
+* [Fix use statement sorting not being stable](https://github.com/php-integrator/atom-base/issues/280)
+* [Fix Composer complaining about core directory not being empty](https://github.com/php-integrator/atom-base/issues/331)
+* [Expand project paths containing the tilde `~` symbolizing the home folder](https://github.com/php-integrator/atom-base/issues/295)
+* Fix project not always automatically reindexing after core install because project manager service and project was loaded before installation finished
+
+### Various Minor Changes
+* [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
+* [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)
+* Table cells in the documentation pane are now aligned vertically to the top
+* Minor backwards compatibility break: fetching available variables now requires a file path as part of [a core fix](https://gitlab.com/php-integrator/core/issues/126)
+* Wait a bit longer before displaying signature help
   * This should fix the nuisance of it popping all over the place when rapidly moving the cursor around and gives you a bit more time to get your bearings before it appears.
   * This also reduces the load on the server in large files, where multiple requests may be queued because of slower cursor movement, after which signature help then seems to "lag" behind afterwards.
-* [Fix use statement sorting not being stable](https://github.com/php-integrator/atom-base/issues/280)
-* [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
-* [Fix project paths containing the tilde `~` symbolizing the home folder not working](https://github.com/php-integrator/atom-base/issues/295)
-* Fix project not always automatically reindexing after core install because project manager service was already loaded
-* [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)
-* [Fix Composer complaining about core directory not being empty](https://github.com/php-integrator/atom-base/issues/331)
-* Replace dependency on linter and hyperclick with dependency on atom-ide-ui
-  * Strictly spoken, this package shouldn't depend directly on other packages, but only on services. The problem with that is that newcomers can get confused more easily or simply not be aware of additional functionality. (One can argue whether that is an audience we should cater to, though.)
-  * For your information, the linter contained in atom-ide-ui works just fine with the linting in this package, so you now basically have the choice of which linter you want to use. The same applies to hyperclick: the package is no longer explicitly required since the same service is contained in atom-ide-ui.
-  * IDE packages all seem to converge around atom-ide-ui and we're moving slowly towards becoming a language server, so the dependency is likely going to stick.
-* Minor backwards compatibility break: fetching available variables now requires a file path as part of [a core fix](https://gitlab.com/php-integrator/core/issues/126)
+* Replace dependency on `linter` and `hyperclick` with dependency on `atom-ide-ui`
+  * IDE packages all seem to converge around `atom-ide-ui` and we're moving slowly towards becoming a language server, so the dependency is likely going to stick anyway.
+  * `hyperclick` is no longer explicitly required since the same functionality and service is contained in `atom-ide-ui`.
+  * Strictly speaking, we shouldn't depend directly on packages, but rather on services. The problem with that is that newcomers can get confused more easily or may simply not be aware of additional available functionality. _(One can argue whether that is an audience we should cater to, though.)_
+  * For your information, the linter contained in `atom-ide-ui` is compatible with the linting in this package, so can choose which linter you want to use.
 
 ## 3.0.1
 * [Fix core installation issues on Windows because of maximum path limit being exceeded due to Composer generating temporary files during ZIP extraction](https://github.com/php-integrator/atom-base/issues/303)
