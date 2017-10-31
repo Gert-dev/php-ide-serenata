@@ -340,7 +340,7 @@ module.exports =
 
             if not @activeProject?
                 errorMessage = '''
-                    No project is currently active. Please set up and activate one before attempting to set it up.
+                    No project is currently active. Please save and activate one before attempting to set it up.
                     Try doing so via the menu Packages → Project Manager → Save Project.
                 '''
 
