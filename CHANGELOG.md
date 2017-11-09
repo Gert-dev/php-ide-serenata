@@ -1,3 +1,6 @@
+## 3.1.1 (Unreleased)
+* [Improved hint shown when no project is currently active and user tries to set up project](https://github.com/php-integrator/atom-base/issues/352) (thanks to [@ADTC](https://github.com/ADTC))
+
 ## 3.1.0
 ### Major Changes
 * Support goto definition (code navigation) via new core command
