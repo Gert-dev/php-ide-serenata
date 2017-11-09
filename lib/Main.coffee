@@ -340,7 +340,8 @@ module.exports =
 
             if not @activeProject?
                 errorMessage = '''
-                    No project is currently active. Please set up and activate one before attempting to set it up.
+                    No project is currently active. Please save and activate one before attempting to set it up.
+                    You can do it via the menu Packages → Project Manager → Save Project.
                 '''
 
                 atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
