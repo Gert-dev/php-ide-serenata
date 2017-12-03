@@ -95,7 +95,7 @@ class AbstractProvider
             snippet            : suggestion.insertText
             type               : suggestion.kind
             displayText        : suggestion.label
-            leftlabelHTML      : @getSuggestionLeftLabel(suggestion)
+            leftLabelHTML      : @getSuggestionLeftLabel(suggestion)
             rightLabelHTML     : @getSuggestionRightLabel(suggestion)
             description        : suggestion.documentation
             descriptionMoreURL : suggestion.extraData.url
@@ -159,7 +159,7 @@ class AbstractProvider
     ###
     getTypeSpecificationFromTypeArray: (typeArray) ->
         typeNames = typeArray.map (type) =>
-            return @getClassShortName(type.type)
+            return @getClassShortName(type)
 
         return typeNames.join('|')
 
