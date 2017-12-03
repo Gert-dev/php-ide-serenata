@@ -871,8 +871,7 @@ module.exports =
      * @return {Array}
     ###
     getAutocompletionProviderServices: () ->
-        return []
-        # return [@getAutocompletionProvider()]
+        return [@getAutocompletionProvider()]
 
     ###*
      * Returns a list of intention providers.
