@@ -19,12 +19,14 @@ class AbstractProvider
     inclusionPriority: 1
 
     ###*
-     * Let base autocomplete-plus handle the actual filtering, that way we don't need to manually filter (e.g. using
-     * fuzzaldrin) ourselves and the user can configure filtering settings on the base package.
+     * Whether to let autocomplete-plus handle the actual filtering, that way we don't need to manually filter (e.g.
+     * using fuzzaldrin) ourselves and the user can configure filtering settings on the base package.
+     *
+     * Set to false as the core does the filtering to avoid sending a large amount of suggestions back over the socket.
      *
      * @var {Boolean}
     ###
-    filterSuggestions: true
+    filterSuggestions: false
 
     ###*
      * The class selectors autocompletion is explicitly disabled for (overrules the {@see scopeSelector}).
