@@ -89,6 +89,89 @@ class AbstractProvider
      * @return {Array}
     ###
     getAdaptedSuggestion: (suggestion) ->
-        return {
-            text : suggestion.filterText
+        adaptedSuggestion = {
+            text               : suggestion.filterText
+            # replacementPrefix  : prefix
+            snippet            : suggestion.insertText
+            type               : suggestion.kind
+            displayText        : suggestion.label
+            leftlabelHTML      : @getSuggestionLeftLabel(suggestion)
+            rightLabelHTML     : @getSuggestionRightLabel(suggestion)
+            description        : suggestion.documentation
+            descriptionMoreURL : suggestion.extraData.url
+            className          : 'php-integrator-autocomplete-plus-suggestion' + if suggestion.isDeprecated then ' php-integrator-autocomplete-plus-strike' else ''
         }
+
+        if suggestion.extraData?.placeCursorBetweenParentheses == true
+            adaptedSuggestion.snippet = adaptedSuggestion.snippet.replace('()', '($0)')
+
+        else
+            adaptedSuggestion.snippet += '$0' # Place cursor after suggestion.
+
+        return adaptedSuggestion
+
+    ###*
+     * Builds the right label for a PHP function or method.
+     *
+     * @param {Object} suggestion Information about the function or method.
+     *
+     * @return {String}
+    ###
+    getSuggestionLeftLabel: (suggestion) ->
+        leftLabel = ''
+
+        if suggestion.extraData?.protectionLevel == 'public'
+           leftLabel += '<span class="icon icon-globe import">&nbsp;</span>'
+
+        else if suggestion.extraData?.protectionLevel == 'protecetd'
+           leftLabel += '<span class="icon icon-shield">&nbsp;</span>'
+
+        else if suggestion.extraData?.protectionLevel == 'private'
+           leftLabel += '<span class="icon icon-lock selector">&nbsp;</span>'
+
+        if suggestion.extraData?.returnTypes?
+            leftLabel += @getTypeSpecificationFromTypeArray(suggestion.extraData.returnTypes.split('|'))
+
+        return leftLabel
+
+    ###*
+     * Builds the right label for a PHP function or method.
+     *
+     * @param {Object} suggestion Information about the function or method.
+     *
+     * @return {String}
+    ###
+    getSuggestionRightLabel: (suggestion) ->
+        return null if not suggestion.extraData?.declaringStructure?
+
+        # Determine the short name of the location where this item is defined.
+        declaringStructureShortName = ''
+
+        if suggestion.extraData.declaringStructure and suggestion.extraData.declaringStructure.name
+            return @getClassShortName(suggestion.extraData.declaringStructure.name)
+
+        return declaringStructureShortName
+
+    ###*
+     * @param {Array} typeArray
+     *
+     * @return {String}
+    ###
+    getTypeSpecificationFromTypeArray: (typeArray) ->
+        typeNames = typeArray.map (type) =>
+            return @getClassShortName(type.type)
+
+        return typeNames.join('|')
+
+    ###*
+     * Retrieves the short name for the specified class name (i.e. the last segment, without the class namespace).
+     *
+     * @param {String} className
+     *
+     * @return {String}
+    ###
+    getClassShortName: (className) ->
+        return null if not className
+
+        parts = className.split('\\')
+        return parts.pop()
