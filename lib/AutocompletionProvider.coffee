@@ -42,7 +42,7 @@ class AbstractProvider
      *
      * @var {Boolean}
     ###
-    excludeLowerPriority: false
+    excludeLowerPriority: true
 
     ###*
      * The service (that can be used to query the source code and contains utility methods).
