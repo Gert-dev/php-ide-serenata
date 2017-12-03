@@ -33,7 +33,7 @@ class AbstractProvider
      *
      * @var {String}
     ###
-    disableForScopeSelector: '.source.php .comment, .source.php .string'
+    disableForScopeSelector: null
 
     ###*
      * The service (that can be used to query the source code and contains utility methods).
