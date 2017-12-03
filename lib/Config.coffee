@@ -38,6 +38,9 @@ class Config
             signatureHelp:
                 enable : true
 
+            gotoDefintion:
+                enable : true
+
             linting:
                 enable                      : true
                 showUnknownClasses          : true
