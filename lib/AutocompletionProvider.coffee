@@ -36,30 +36,20 @@ class AbstractProvider
     disableForScopeSelector: null
 
     ###*
+     * Whether to exclude providers with a lower priority.
+     *
+     * This ensures the default, built-in suggestions from the language-php package do not show up.
+     *
+     * @var {Boolean}
+    ###
+    excludeLowerPriority: false
+
+    ###*
      * The service (that can be used to query the source code and contains utility methods).
      *
      * @var {Object}
     ###
     service: null
-
-    ###*
-     * Contains global package settings.
-     *
-     * @var {Object}
-    ###
-    config: null
-
-    ###*
-     * Constructor.
-     *
-     * @param {Config}  config
-     * @param {Service} service
-    ###
-    constructor: (@config, @service) ->
-        # @excludeLowerPriority = @config.get('disableBuiltinAutocompletion')
-        #
-        # @config.onDidChange 'disableBuiltinAutocompletion', (newValue) =>
-        #     @excludeLowerPriority = newValue
 
     ###*
      * @param {Service} service

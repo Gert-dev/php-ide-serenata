@@ -1034,6 +1034,6 @@ module.exports =
     ###
     getAutocompletionProvider: () ->
         if not @autocompletionProvider?
-            @autocompletionProvider = new AutocompletionProvider(@getConfiguration(), @getService())
+            @autocompletionProvider = new AutocompletionProvider()
 
         return @autocompletionProvider
