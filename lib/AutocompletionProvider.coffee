@@ -60,6 +60,18 @@ class AbstractProvider
         #     @excludeLowerPriority = newValue
 
     ###*
+     * @param {Service} service
+    ###
+    activate: (@service) ->
+        # No op.
+
+    ###*
+     *
+    ###
+    deactivate: () ->
+        # No op.
+
+    ###*
      * Entry point for all requests from autocomplete-plus.
      *
      * @param {TextEditor} editor

@@ -120,9 +120,20 @@ module.exports =
                     default     : true
                     order       : 1
 
-        linting:
+        autocompletion:
             type: 'object'
             order: 6
+            properties:
+                enable:
+                    title       : 'Enable'
+                    description : 'When enabled, autocompletion will be activated via the autocomplete-plus package.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
+
+        linting:
+            type: 'object'
+            order: 7
             properties:
                 enable:
                     title       : 'Enable'
@@ -446,6 +457,13 @@ module.exports =
             else
                 @deactivateGotoDefinition()
 
+        config.onDidChange 'autocompletion.enable', (value) =>
+            if value
+                @activateAutocompletion()
+
+            else
+                @deactivateAutocompletion()
+
         config.onDidChange 'linting.enable', (value) =>
             if value
                 @activateLinting()
@@ -623,6 +641,9 @@ module.exports =
                 if @getConfiguration().get('gotoDefinition.enable')
                     @activateGotoDefinition()
 
+                if @getConfiguration().get('autocompletion.enable')
+                    @activateAutocompletion()
+
                 @getCachingProxy().setIsActive(true)
 
                 # This fixes the corner case where the core is still installing, the project manager service has already
@@ -674,6 +695,18 @@ module.exports =
     ###
     deactivateGotoDefinition: () ->
         @getGotoDefinitionProvider().deactivate()
+
+    ###*
+     * Activates the goto definition provider.
+    ###
+    activateAutocompletion: () ->
+        @getAutocompletionProvider().activate(@getService())
+
+    ###*
+     * Deactivates the goto definition provider.
+    ###
+    deactivateAutocompletion: () ->
+        @getAutocompletionProvider().deactivate()
 
     ###*
      * Activates linting.
