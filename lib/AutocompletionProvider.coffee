@@ -74,6 +74,8 @@ class AbstractProvider
      * @return {Promise|Array}
     ###
     getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
+        return [] if not @service
+
         successHandler = (suggestions) =>
             return suggestions.map (suggestion) =>
                 return @getAdaptedSuggestion(suggestion)
