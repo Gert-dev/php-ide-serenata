@@ -100,7 +100,6 @@ class AbstractProvider
             leftLabelHTML      : @getSuggestionLeftLabel(suggestion)
             rightLabelHTML     : @getSuggestionRightLabel(suggestion)
             description        : suggestion.documentation
-            descriptionMoreURL : suggestion.extraData.url
             className          : 'php-integrator-autocomplete-plus-suggestion' + if suggestion.isDeprecated then ' php-integrator-autocomplete-plus-strike' else ''
         }
 
