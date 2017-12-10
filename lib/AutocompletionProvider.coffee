@@ -149,8 +149,8 @@ class AbstractProvider
         # Determine the short name of the location where this item is defined.
         declaringStructureShortName = ''
 
-        if suggestion.extraData.declaringStructure and suggestion.extraData.declaringStructure.name
-            return @getClassShortName(suggestion.extraData.declaringStructure.name)
+        if suggestion.extraData.declaringStructure and suggestion.extraData.declaringStructure.fqcn
+            return @getClassShortName(suggestion.extraData.declaringStructure.fqcn)
 
         return declaringStructureShortName
 
