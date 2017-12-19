@@ -1,4 +1,5 @@
 ## 3.1.1 (Unreleased)
+* [Fix structural elements disappearing from index sometimes](https://gitlab.com/php-integrator/core/issues/148)
 * [Improved hint shown when no project is currently active and user tries to set up project](https://github.com/php-integrator/atom-base/issues/352) (thanks to [@ADTC](https://github.com/ADTC))
 
 ## 3.1.0

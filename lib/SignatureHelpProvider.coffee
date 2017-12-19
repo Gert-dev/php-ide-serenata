@@ -72,6 +72,11 @@ class SignatureHelpProvider
                     @registerEventsForPane(pane)
 
         @disposables.add atom.workspace.onDidStopChangingActivePaneItem (item) =>
+            @stopPendingRequests()
+            @removeSignatureHelp()
+
+        @disposables.add atom.workspace.onDidChangeActiveTextEditor (item) =>
+            @stopPendingRequests()
             @removeSignatureHelp()
 
     ###*
@@ -114,10 +119,7 @@ class SignatureHelpProvider
     ###
     onChangeCursorPosition: (editor, newBufferPosition) ->
         @removeSignatureHelp()
-
-        if @timeoutHandle?
-            clearTimeout(@timeoutHandle)
-            @timeoutHandle = null
+        @stopPendingRequests()
 
         @timeoutHandle = setTimeout ( =>
             @timeoutHandle = null
@@ -234,6 +236,14 @@ class SignatureHelpProvider
             class: 'php-integrator-signature-help'
             item: rootDiv
         })
+
+    ###*
+     * Stops any pending requests.
+    ###
+    stopPendingRequests: () ->
+        if @timeoutHandle?
+            clearTimeout(@timeoutHandle)
+            @timeoutHandle = null
 
     ###*
      * Removes the popover, if it is displayed.
