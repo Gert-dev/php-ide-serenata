@@ -101,6 +101,9 @@ class AbstractProvider
             rightLabelHTML     : @getSuggestionRightLabel(suggestion)
             description        : suggestion.documentation
             className          : 'php-integrator-autocompletion-suggestion' + if suggestion.isDeprecated then ' php-integrator-autocompletion-strike' else ''
+
+            extraData:
+                additionalTextEdits: suggestion.additionalTextEdits
         }
 
         if suggestion.extraData?.placeCursorBetweenParentheses == true
@@ -176,3 +179,21 @@ class AbstractProvider
 
         parts = className.split('\\')
         return parts.pop()
+
+    ###*
+     * Called when the user confirms an autocompletion suggestion.
+     *
+     * @param {TextEditor} editor
+     * @param {Position}   triggerPosition
+     * @param {Object}     suggestion
+    ###
+    onDidInsertSuggestion: ({editor, triggerPosition, suggestion}) ->
+        return unless suggestion.extraData.additionalTextEdits?.length > 0
+
+        editor.transact () =>
+            for additionalTextEdit in suggestion.extraData.additionalTextEdits
+                editor.setTextInBufferRange([
+                    [additionalTextEdit.range.start.line, additionalTextEdit.range.start.character],
+                    [additionalTextEdit.range.end.line, additionalTextEdit.range.end.character]],
+                    additionalTextEdit.newText
+                )
