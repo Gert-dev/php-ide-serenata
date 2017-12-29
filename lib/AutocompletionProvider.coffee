@@ -94,7 +94,7 @@ class AbstractProvider
         adaptedSuggestion = {
             text               : suggestion.filterText
             # replacementPrefix  : prefix
-            snippet            : suggestion.insertText
+            snippet            : suggestion.insertText.replace('\\', '\\\\')
             type               : suggestion.kind
             displayText        : suggestion.label
             leftLabelHTML      : @getSuggestionLeftLabel(suggestion)
