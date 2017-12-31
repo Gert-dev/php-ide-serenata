@@ -93,7 +93,6 @@ class AbstractProvider
     getAdaptedSuggestion: (suggestion) ->
         adaptedSuggestion = {
             text               : suggestion.filterText
-            # replacementPrefix  : prefix
             snippet            : suggestion.insertText.replace('\\', '\\\\')
             type               : suggestion.kind
             displayText        : suggestion.label
@@ -105,6 +104,11 @@ class AbstractProvider
             extraData:
                 additionalTextEdits: suggestion.additionalTextEdits
         }
+
+        # TODO: Better would be to support the textEdit property sent brck by the core's suggestions via
+        # onDidInsertSuggestion.
+        if suggestion.extraData?.prefix?
+            adaptedSuggestion.replacementPrefix = suggestion.extraData.prefix
 
         if suggestion.extraData?.placeCursorBetweenParentheses == true
             adaptedSuggestion.snippet = adaptedSuggestion.snippet.replace('()', '($0)')
