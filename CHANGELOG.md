@@ -2,6 +2,13 @@
 ### Major Changes
 * Support autocompletion via new core command
   * `php-integrator-autocomplete-plus` is now obsolete. It will continue to work, for the moment, but it is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-autocompletion).
+  * Differences between the implementation of the core and the one supplied by the Atom package:
+    * Core autocompletion is much more context-based and will do a better of job at only showing relevant suggestions at each cursor position
+    * Core autocompletion does fuzzy matching and filtering beforehand, resulting in fewer results being loaded into Atom, which should improve performance considerably and fix the previous jitter and unresponsiveness due to Atom having to load in the large class, function, constant and namespace lists every so often
+    * The snippet provider is not included in the core
+      * It could be included in Atom but it honestly wasn't showing many useful suggestions, [you can always include these in your own snippets.cson](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/SnippetProvider.coffee#L55)
+    * PHPUnit tags are not included in the core as they were a bit too specific
+      * If anyone wants to reimplement them in a separate package, you can [use the code as reference](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/PHPUnitTagProvider.coffee)
 * [Improve responsiveness considerably by cancelling outdated requests already passed to the core](https://github.com/php-integrator/atom-base/issues/347)
 
 ### Bugs Fixed
