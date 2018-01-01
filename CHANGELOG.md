@@ -1,4 +1,10 @@
-## 3.1.1 (Unreleased)
+## 3.2.0 (Unreleased)
+### Major Changes
+* Support autocompletion via new core command
+  * `php-integrator-autocomplete-plus` is now obsolete. It will continue to work, for the moment, but it is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-autocompletion).
+* [Improve responsiveness considerably by cancelling outdated requests already passed to the core](https://github.com/php-integrator/atom-base/issues/347)
+
+### Bugs Fixed
 * [Fix structural elements disappearing from index sometimes](https://gitlab.com/php-integrator/core/issues/148)
 * [Improved hint shown when no project is currently active and user tries to set up project](https://github.com/php-integrator/atom-base/issues/352) (thanks to [@ADTC](https://github.com/ADTC))
 
