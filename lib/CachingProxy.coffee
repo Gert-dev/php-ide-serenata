@@ -119,16 +119,16 @@ class CachingProxy extends Proxy
     localizeType: (file, line, type, kind = 'classlike') ->
         return @wrapCachedRequestToParent("localizeType-#{file}-#{line}-#{type}-#{kind}", 'localizeType', arguments)
 
-    ###*
-     * @inherited
-    ###
-    lint: (file, source, options) ->
-        # md5 may sound expensive, but it's not as expensive as spawning an extra process that parses PHP code.
-        sourceKey = if source? then md5(source) else null
-
-        optionsKey = JSON.stringify(options)
-
-        return @wrapCachedRequestToParent("lint-#{file}-#{sourceKey}-#{optionsKey}", 'lint', arguments)
+    # ###*
+    #  * @inherited
+    # ###
+    # lint: (file, source, options) ->
+    #     # md5 may sound expensive, but it's not as expensive as spawning an extra process that parses PHP code.
+    #     sourceKey = if source? then md5(source) else null
+    #
+    #     optionsKey = JSON.stringify(options)
+    #
+    #     return @wrapCachedRequestToParent("lint-#{file}-#{sourceKey}-#{optionsKey}", 'lint', arguments)
 
     ###*
      * @inherited
@@ -146,37 +146,37 @@ class CachingProxy extends Proxy
 
         return @wrapCachedRequestToParent("deduceTypes-#{expression}-#{file}-#{sourceKey}-#{offset}-#{ignoreLastElement}", 'deduceTypes', arguments)
 
-    ###*
-     * @inherited
-    ###
-    autocomplete: (offset, file, source) ->
-        sourceKey = if source? then md5(source) else null
-
-        return @wrapCachedRequestToParent("autocomplete-#{offset}-#{file}-#{sourceKey}", 'autocomplete', arguments)
-
-    ###*
-     * @inherited
-    ###
-    tooltip: (file, source, offset) ->
-        sourceKey = if source? then md5(source) else null
-
-        return @wrapCachedRequestToParent("tooltip-#{file}-#{sourceKey}-#{offset}", 'tooltip', arguments)
-
-    ###*
-     * @inherited
-    ###
-    signatureHelp: (file, source, offset) ->
-        sourceKey = if source? then md5(source) else null
-
-        return @wrapCachedRequestToParent("signatureHelp-#{file}-#{sourceKey}-#{offset}", 'signatureHelp', arguments)
-
-    ###*
-     * @inherited
-    ###
-    gotoDefinition: (file, source, offset) ->
-        sourceKey = if source? then md5(source) else null
-
-        return @wrapCachedRequestToParent("gotoDefinition-#{file}-#{sourceKey}-#{offset}", 'gotoDefinition', arguments)
+    # ###*
+    #  * @inherited
+    # ###
+    # autocomplete: (offset, file, source) ->
+    #     sourceKey = if source? then md5(source) else null
+    #
+    #     return @wrapCachedRequestToParent("autocomplete-#{offset}-#{file}-#{sourceKey}", 'autocomplete', arguments)
+    #
+    # ###*
+    #  * @inherited
+    # ###
+    # tooltip: (file, source, offset) ->
+    #     sourceKey = if source? then md5(source) else null
+    #
+    #     return @wrapCachedRequestToParent("tooltip-#{file}-#{sourceKey}-#{offset}", 'tooltip', arguments)
+    #
+    # ###*
+    #  * @inherited
+    # ###
+    # signatureHelp: (file, source, offset) ->
+    #     sourceKey = if source? then md5(source) else null
+    #
+    #     return @wrapCachedRequestToParent("signatureHelp-#{file}-#{sourceKey}-#{offset}", 'signatureHelp', arguments)
+    #
+    # ###*
+    #  * @inherited
+    # ###
+    # gotoDefinition: (file, source, offset) ->
+    #     sourceKey = if source? then md5(source) else null
+    #
+    #     return @wrapCachedRequestToParent("gotoDefinition-#{file}-#{sourceKey}-#{offset}", 'gotoDefinition', arguments)
 
     ###*
      * @inherited

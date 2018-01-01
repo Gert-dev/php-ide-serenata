@@ -31,6 +31,11 @@ class TooltipProvider
     disposables: null
 
     ###*
+     * @var {CancellablePromise}
+    ###
+    pendingRequestPromise: null
+
+    ###*
      * Initializes this provider.
      *
      * @param {mixed} service
@@ -87,6 +92,10 @@ class TooltipProvider
      * @return {Promise}
     ###
     getIntentions: (editor, triggerPosition) ->
+        if @pendingRequestPromise
+            @pendingRequestPromise.cancel()
+            @pendingRequestPromise = null
+
         return [] if not @service.getCurrentProjectSettings()
 
         scopeChain = editor.scopeDescriptorForBufferPosition(triggerPosition).getScopeChain()
@@ -112,7 +121,9 @@ class TooltipProvider
         failureHandler = () ->
             return []
 
-        return @service.tooltipAt(editor, triggerPosition).then(successHandler, failureHandler)
+        @pendingRequestPromise = @service.tooltipAt(editor, triggerPosition)
+
+        return @pendingRequestPromise.then(successHandler, failureHandler)
 
     ###*
      * @param {String} tooltipContents

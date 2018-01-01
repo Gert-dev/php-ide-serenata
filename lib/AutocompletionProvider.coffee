@@ -52,6 +52,11 @@ class AbstractProvider
     service: null
 
     ###*
+     * @var {CancellablePromise}
+    ###
+    pendingRequestPromise: null
+
+    ###*
      * @param {Service} service
     ###
     activate: (@service) ->
@@ -74,6 +79,10 @@ class AbstractProvider
      * @return {Promise|Array}
     ###
     getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
+        if @pendingRequestPromise
+            @pendingRequestPromise.cancel()
+            @pendingRequestPromise = null
+
         return [] if not @service
 
         successHandler = (suggestions) =>
@@ -83,7 +92,9 @@ class AbstractProvider
         failureHandler = () =>
             return [] # Just return no suggestions.
 
-        return @service.autocompleteAt(editor, bufferPosition).then(successHandler, failureHandler)
+        @pendingRequestPromise = @service.autocompleteAt(editor, bufferPosition)
+
+        return @pendingRequestPromise.then(successHandler, failureHandler)
 
     ###*
      * @param {Object} suggestion

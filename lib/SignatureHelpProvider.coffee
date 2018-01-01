@@ -24,6 +24,11 @@ class SignatureHelpProvider
     disposables: null
 
     ###*
+     * @var {CancellablePromise}
+    ###
+    pendingRequestPromise: null
+
+    ###*
      * Initializes this provider.
      *
      * @param {mixed} service
@@ -141,7 +146,9 @@ class SignatureHelpProvider
         failureHandler = () =>
             @removeSignatureHelp()
 
-        return @service.signatureHelpAt(editor, bufferPosition).then(successHandler, failureHandler)
+        @pendingRequestPromise = @service.signatureHelpAt(editor, bufferPosition)
+
+        return @pendingRequestPromise.then(successHandler, failureHandler)
 
 
     ###*
@@ -241,6 +248,10 @@ class SignatureHelpProvider
      * Stops any pending requests.
     ###
     stopPendingRequests: () ->
+        if @pendingRequestPromise
+            @pendingRequestPromise.cancel()
+            @pendingRequestPromise = null
+
         if @timeoutHandle?
             clearTimeout(@timeoutHandle)
             @timeoutHandle = null
