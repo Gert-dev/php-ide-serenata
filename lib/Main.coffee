@@ -612,6 +612,40 @@ module.exports =
             })
 
     ###*
+     * Checks if the php-integrator-autocomplete-plus package is installed and notifies the user it is obsolete if it
+     * is.
+    ###
+    notifyAboutRedundantAutocompletionPackageIfnecessary: () ->
+        atom.packages.onDidActivatePackage (packageData) ->
+            return if packageData.name != 'php-integrator-autocomplete-plus'
+
+            message =
+                "It seems you still have the php-integrator-autocomplete-plus package installed and activated. As of " +
+                "this release, it is obsolete and all its functionality is already included in the base package.\n \n" +
+
+                "It is recommended to disable or remove it, shall I disable it for you?"
+
+            notification = atom.notifications.addInfo('PHP Integrator - Autocompletion', {
+                detail      : message
+                dismissable : true
+
+                buttons: [
+                    {
+                        text: 'Yes, nuke it'
+                        onDidClick: () ->
+                            atom.packages.disablePackage('php-integrator-autocomplete-plus');
+                            notification.dismiss()
+                    },
+
+                    {
+                        text: 'No, don\'t touch it'
+                        onDidClick: () ->
+                            notification.dismiss()
+                    }
+                ]
+            })
+
+    ###*
      * Activates the package.
     ###
     activate: ->
@@ -620,6 +654,7 @@ module.exports =
 
             @updateCoreIfOutdated().then () =>
                 @notifyAboutRedundantNavigationPackageIfnecessary()
+                @notifyAboutRedundantAutocompletionPackageIfnecessary()
 
                 @registerCommands()
                 @registerConfigListeners()
