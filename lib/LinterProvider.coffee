@@ -100,7 +100,7 @@ class LinterProvider
      * @param {String}     source
     ###
     lint: (editor, source) ->
-        if @pendingRequestPromise
+        if @pendingRequestPromise?
             @pendingRequestPromise.cancel()
             @pendingRequestPromise = null
 

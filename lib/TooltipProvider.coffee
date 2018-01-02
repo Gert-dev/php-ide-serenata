@@ -92,7 +92,7 @@ class TooltipProvider
      * @return {Promise}
     ###
     getIntentions: (editor, triggerPosition) ->
-        if @pendingRequestPromise
+        if @pendingRequestPromise?
             @pendingRequestPromise.cancel()
             @pendingRequestPromise = null
 

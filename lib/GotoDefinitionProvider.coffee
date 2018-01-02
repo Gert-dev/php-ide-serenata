@@ -27,7 +27,7 @@ class GotoDefinitionProvider
      * @param {Point}      bufferPosition
     ###
     getSuggestion: (editor, bufferPosition) ->
-        if @pendingRequestPromise
+        if @pendingRequestPromise?
             @pendingRequestPromise.cancel()
             @pendingRequestPromise = null
 

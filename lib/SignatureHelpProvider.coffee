@@ -248,7 +248,7 @@ class SignatureHelpProvider
      * Stops any pending requests.
     ###
     stopPendingRequests: () ->
-        if @pendingRequestPromise
+        if @pendingRequestPromise?
             @pendingRequestPromise.cancel()
             @pendingRequestPromise = null
 

@@ -79,7 +79,7 @@ class AbstractProvider
      * @return {Promise|Array}
     ###
     getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
-        if @pendingRequestPromise
+        if @pendingRequestPromise?
             @pendingRequestPromise.cancel()
             @pendingRequestPromise = null
 
