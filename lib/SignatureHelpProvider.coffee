@@ -101,6 +101,7 @@ class SignatureHelpProvider
     deactivate: () ->
         @disposables.dispose()
 
+        @stopPendingRequests()
         @removeSignatureHelp()
 
     ###*
