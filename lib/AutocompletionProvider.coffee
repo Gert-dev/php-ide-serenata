@@ -1,3 +1,5 @@
+{Disposable, CompositeDisposable} = require 'atom'
+
 module.exports =
 
 ##*
@@ -52,21 +54,106 @@ class AbstractProvider
     service: null
 
     ###*
+     * @var {CompositeDisposable}
+    ###
+    disposables: null
+
+    ###*
      * @var {CancellablePromise}
     ###
     pendingRequestPromise: null
 
     ###*
-     * @param {Service} service
+     * Initializes this provider.
+     *
+     * @param {mixed} service
     ###
     activate: (@service) ->
-        # No op.
+        dependentPackage = 'language-php'
+
+        @disposables = new CompositeDisposable()
+
+        # It could be that the dependent package is already active, in that case we can continue immediately. If not,
+        # we'll need to wait for the listener to be invoked
+        if atom.packages.isPackageActive(dependentPackage)
+            @doActualInitialization()
+
+        @disposables.add atom.packages.onDidActivatePackage (packageData) =>
+            return if packageData.name != dependentPackage
+
+            @doActualInitialization()
+
+        @disposables.add atom.packages.onDidDeactivatePackage (packageData) =>
+            return if packageData.name != dependentPackage
+
+            @deactivate()
 
     ###*
+     * Does the actual initialization.
+    ###
+    doActualInitialization: () ->
+        @disposables.add atom.workspace.observeTextEditors (editor) =>
+            if /text.html.php$/.test(editor.getGrammar().scopeName)
+                @registerEvents(editor)
+
+        # When you go back to only have one pane the events are lost, so need to re-register.
+        @disposables.add atom.workspace.onDidDestroyPane (pane) =>
+            panes = atom.workspace.getPanes()
+
+            if panes.length == 1
+                @registerEventsForPane(panes[0])
+
+        # Having to re-register events as when a new pane is created the old panes lose the events.
+        @disposables.add atom.workspace.onDidAddPane (observedPane) =>
+            panes = atom.workspace.getPanes()
+
+            for pane in panes
+                if pane != observedPane
+                    @registerEventsForPane(pane)
+
+        @disposables.add atom.workspace.onDidStopChangingActivePaneItem (item) =>
+            @stopPendingRequests()
+
+        @disposables.add atom.workspace.onDidChangeActiveTextEditor (item) =>
+            @stopPendingRequests()
+
+    ###*
+     * Registers the necessary event handlers for the editors in the specified pane.
      *
+     * @param {Pane} pane
+    ###
+    registerEventsForPane: (pane) ->
+        for paneItem in pane.items
+            if atom.workspace.isTextEditor(paneItem)
+                if /text.html.php$/.test(paneItem.getGrammar().scopeName)
+                    @registerEvents(paneItem)
+
+    ###*
+     * Registers the necessary event handlers.
+     *
+     * @param {TextEditor} editor TextEditor to register events to.
+    ###
+    registerEvents: (editor) ->
+        @disposables.add editor.onDidChangeCursorPosition (event) =>
+            # Don't trigger whilst actually typing, just when moving.
+            return if event.textChanged == true
+
+            @onChangeCursorPosition(editor)
+
+    ###*
+     * @param {TextEditor} editor
+    ###
+    onChangeCursorPosition: (editor) ->
+        console.log("canceling due to move")
+        @stopPendingRequests()
+
+    ###*
+     * Deactives the provider.
     ###
     deactivate: () ->
-        # No op.
+        @disposables.dispose()
+
+        @stopPendingRequests()
 
     ###*
      * Entry point for all requests from autocomplete-plus.
@@ -79,9 +166,7 @@ class AbstractProvider
      * @return {Promise|Array}
     ###
     getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
-        if @pendingRequestPromise?
-            @pendingRequestPromise.cancel()
-            @pendingRequestPromise = null
+        @stopPendingRequests()
 
         return [] if not @service
 
@@ -212,3 +297,11 @@ class AbstractProvider
                     [additionalTextEdit.range.end.line, additionalTextEdit.range.end.character]],
                     additionalTextEdit.newText
                 )
+
+    ###*
+     * Stops any pending requests.
+    ###
+    stopPendingRequests: () ->
+        if @pendingRequestPromise?
+            @pendingRequestPromise.cancel()
+            @pendingRequestPromise = null
