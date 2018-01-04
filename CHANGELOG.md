@@ -1,6 +1,7 @@
 ## 3.2.0 (Unreleased)
 ### Major Changes
 * Update to core [3.2.0](https://gitlab.com/php-integrator/core/tags/3.2.0) (TODO)
+  * As request prioritization is now in the core, most operations such as autocompletion should now already start working whilst the project is still indexing - previously nothing was done whilst the project was indexing.
 * Support autocompletion via new core command
   * `php-integrator-autocomplete-plus` is now obsolete. It will continue to work, for the moment, but it is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-autocompletion).
   * Differences between the implementation of the core and the one supplied by the Atom package:
