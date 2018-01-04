@@ -19,6 +19,7 @@
 
 ## 3.1.0
 ### Major Changes
+* Update to core [3.1.0](https://gitlab.com/php-integrator/core/tags/3.1.0)
 * Support goto definition (code navigation) via new core command
   * `php-integrator-navigation` is now obsolete. It will continue to work on older Atom versions, but it was essentially broken since Atom 1.19, as several CSS class names changed in the `language-php` package. It is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-navigation).
 
