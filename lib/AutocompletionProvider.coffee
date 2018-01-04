@@ -144,7 +144,6 @@ class AbstractProvider
      * @param {TextEditor} editor
     ###
     onChangeCursorPosition: (editor) ->
-        console.log("canceling due to move")
         @stopPendingRequests()
 
     ###*
