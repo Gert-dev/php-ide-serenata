@@ -8,7 +8,7 @@
     * Core autocompletion is much more context-based and will do a better of job at only showing relevant suggestions at each cursor position
     * Core autocompletion does fuzzy matching and filtering beforehand, resulting in fewer results being loaded into Atom, which should improve performance considerably and fix the previous jitter and unresponsiveness due to Atom having to load in the large class, function, constant and namespace lists every so often
     * Core autocompletion does not support disabling automatic use statements
-      * As most PHP core classes are in the root namespace and use statements for non-compound names in anonymous namespaces are illegal in PHP, users still writing code not using namespaces should not be affected, as imports are not needed here
+      * As most PHP core classes are in the root namespace and use statements for non-compound names in anonymous namespaces are illegal in PHP, users still writing code not using namespaces should not be affected, as imports are not needed here.
     * Core autocompletion has rudimentary support for automatically inserting use statements in files with multiple namespaces
     * The snippet provider is not included in the core
       * It could be included in Atom but it honestly wasn't showing many useful suggestions, [you can always include these in your own snippets.cson](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/SnippetProvider.coffee#L55)
