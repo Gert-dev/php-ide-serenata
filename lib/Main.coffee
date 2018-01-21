@@ -118,9 +118,20 @@ module.exports =
                     default     : true
                     order       : 1
 
-        linting:
+        autocompletion:
             type: 'object'
             order: 6
+            properties:
+                enable:
+                    title       : 'Enable'
+                    description : 'When enabled, autocompletion will be activated via the autocomplete-plus package.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
+
+        linting:
+            type: 'object'
+            order: 7
             properties:
                 enable:
                     title       : 'Enable'
@@ -189,7 +200,7 @@ module.exports =
      *
      * @var {String}
     ###
-    coreVersionSpecification: "3.0.0"
+    coreVersionSpecification: "3.1.0"
 
     ###*
      * The name of the package.
@@ -338,7 +349,8 @@ module.exports =
 
             if not @activeProject?
                 errorMessage = '''
-                    No project is currently active. Please set up and activate one before attempting to set it up.
+                    No project is currently active. Please save and activate one before attempting to set it up.
+                    You can do it via the menu Packages → Project Manager → Save Project.
                 '''
 
                 atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
@@ -443,6 +455,13 @@ module.exports =
             else
                 @deactivateGotoDefinition()
 
+        config.onDidChange 'autocompletion.enable', (value) =>
+            if value
+                @activateAutocompletion()
+
+            else
+                @deactivateAutocompletion()
+
         config.onDidChange 'linting.enable', (value) =>
             if value
                 @activateLinting()
@@ -534,7 +553,9 @@ module.exports =
         message =
             "The core isn't installed yet or is outdated. A new version is in the process of being downloaded.\n \n" +
 
-            "Progress is being sent to the developer tools console, in case you'd like to monitor it."
+            "Progress is being sent to the developer tools console, in case you'd like to monitor it.\n \n" +
+
+            "You will be notified once the install finishes (or fails)."
 
         atom.notifications.addInfo('PHP Integrator - Downloading Core', {'detail': message, dismissable: true})
 
@@ -589,6 +610,40 @@ module.exports =
             })
 
     ###*
+     * Checks if the php-integrator-autocomplete-plus package is installed and notifies the user it is obsolete if it
+     * is.
+    ###
+    notifyAboutRedundantAutocompletionPackageIfnecessary: () ->
+        atom.packages.onDidActivatePackage (packageData) ->
+            return if packageData.name != 'php-integrator-autocomplete-plus'
+
+            message =
+                "It seems you still have the php-integrator-autocomplete-plus package installed and activated. As of " +
+                "this release, it is obsolete and all its functionality is already included in the base package.\n \n" +
+
+                "It is recommended to disable or remove it, shall I disable it for you?"
+
+            notification = atom.notifications.addInfo('PHP Integrator - Autocompletion', {
+                detail      : message
+                dismissable : true
+
+                buttons: [
+                    {
+                        text: 'Yes, nuke it'
+                        onDidClick: () ->
+                            atom.packages.disablePackage('php-integrator-autocomplete-plus');
+                            notification.dismiss()
+                    },
+
+                    {
+                        text: 'No, don\'t touch it'
+                        onDidClick: () ->
+                            notification.dismiss()
+                    }
+                ]
+            })
+
+    ###*
      * Activates the package.
     ###
     activate: ->
@@ -597,6 +652,7 @@ module.exports =
 
             @updateCoreIfOutdated().then () =>
                 @notifyAboutRedundantNavigationPackageIfnecessary()
+                @notifyAboutRedundantAutocompletionPackageIfnecessary()
 
                 @registerCommands()
                 @registerConfigListeners()
@@ -618,7 +674,17 @@ module.exports =
                 if @getConfiguration().get('gotoDefinition.enable')
                     @activateGotoDefinition()
 
+                if @getConfiguration().get('autocompletion.enable')
+                    @activateAutocompletion()
+
                 @getCachingProxy().setIsActive(true)
+
+                # This fixes the corner case where the core is still installing, the project manager service has already
+                # loaded and the project is already active. At that point, the index that resulted from it silently
+                # failed because the proxy (and core) weren't active yet. This in turn causes the project to not
+                # automatically start indexing, which is especially relevant if a core update requires a reindex.
+                if @activeProject?
+                    @changeActiveProject(@activeProject)
 
     ###*
      * Registers listeners for events from Atom's API.
@@ -662,6 +728,18 @@ module.exports =
     ###
     deactivateGotoDefinition: () ->
         @getGotoDefinitionProvider().deactivate()
+
+    ###*
+     * Activates the goto definition provider.
+    ###
+    activateAutocompletion: () ->
+        @getAutocompletionProvider().activate(@getService())
+
+    ###*
+     * Deactivates the goto definition provider.
+    ###
+    deactivateAutocompletion: () ->
+        @getAutocompletionProvider().deactivate()
 
     ###*
      * Activates linting.
@@ -779,6 +857,12 @@ module.exports =
      * @param {Object} project
     ###
     onProjectChanged: (project) ->
+        @changeActiveProject(project)
+
+    ###*
+     * @param {Object} project
+    ###
+    changeActiveProject: (project) ->
         @activeProject = project
 
         return if not project?
@@ -804,6 +888,8 @@ module.exports =
 
         @proxy.test().then(successHandler, failureHandler)
 
+        return
+
     ###*
      * Retrieves the base package service that can be used by other packages.
      *
@@ -818,8 +904,7 @@ module.exports =
      * @return {Array}
     ###
     getAutocompletionProviderServices: () ->
-        return []
-        # return [@getAutocompletionProvider()]
+        return [@getAutocompletionProvider()]
 
     ###*
      * @param {Object} datatipService
@@ -980,6 +1065,6 @@ module.exports =
     ###
     getAutocompletionProvider: () ->
         if not @autocompletionProvider?
-            @autocompletionProvider = new AutocompletionProvider(@getConfiguration(), @getService())
+            @autocompletionProvider = new AutocompletionProvider()
 
         return @autocompletionProvider

@@ -24,6 +24,11 @@ class SignatureHelpProvider
     disposables: null
 
     ###*
+     * @var {CancellablePromise}
+    ###
+    pendingRequestPromise: null
+
+    ###*
      * Initializes this provider.
      *
      * @param {mixed} service
@@ -72,6 +77,11 @@ class SignatureHelpProvider
                     @registerEventsForPane(pane)
 
         @disposables.add atom.workspace.onDidStopChangingActivePaneItem (item) =>
+            @stopPendingRequests()
+            @removeSignatureHelp()
+
+        @disposables.add atom.workspace.onDidChangeActiveTextEditor (item) =>
+            @stopPendingRequests()
             @removeSignatureHelp()
 
     ###*
@@ -91,6 +101,7 @@ class SignatureHelpProvider
     deactivate: () ->
         @disposables.dispose()
 
+        @stopPendingRequests()
         @removeSignatureHelp()
 
     ###*
@@ -114,10 +125,7 @@ class SignatureHelpProvider
     ###
     onChangeCursorPosition: (editor, newBufferPosition) ->
         @removeSignatureHelp()
-
-        if @timeoutHandle?
-            clearTimeout(@timeoutHandle)
-            @timeoutHandle = null
+        @stopPendingRequests()
 
         @timeoutHandle = setTimeout ( =>
             @timeoutHandle = null
@@ -139,7 +147,9 @@ class SignatureHelpProvider
         failureHandler = () =>
             @removeSignatureHelp()
 
-        return @service.signatureHelpAt(editor, bufferPosition).then(successHandler, failureHandler)
+        @pendingRequestPromise = @service.signatureHelpAt(editor, bufferPosition)
+
+        return @pendingRequestPromise.then(successHandler, failureHandler)
 
 
     ###*
@@ -234,6 +244,18 @@ class SignatureHelpProvider
             class: 'php-integrator-signature-help'
             item: rootDiv
         })
+
+    ###*
+     * Stops any pending requests.
+    ###
+    stopPendingRequests: () ->
+        if @pendingRequestPromise?
+            @pendingRequestPromise.cancel()
+            @pendingRequestPromise = null
+
+        if @timeoutHandle?
+            clearTimeout(@timeoutHandle)
+            @timeoutHandle = null
 
     ###*
      * Removes the popover, if it is displayed.

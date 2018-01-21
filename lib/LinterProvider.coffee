@@ -42,6 +42,11 @@ class LinterProvider
     indieLinter: null
 
     ###*
+     * @var {CancellablePromise}
+    ###
+    pendingRequestPromise: null
+
+    ###*
      * Constructor.
      *
      * @param {Config} config
@@ -93,26 +98,27 @@ class LinterProvider
     ###*
      * @param {TextEditor} editor
      * @param {String}     source
-     *
-     * @return {Promise}
     ###
     lint: (editor, source) ->
+        if @pendingRequestPromise?
+            @pendingRequestPromise.cancel()
+            @pendingRequestPromise = null
+
         successHandler = (response) =>
             return @processSuccess(editor, response, source)
 
         failureHandler = (response) =>
             return @processFailure(editor)
 
-        return @invokeLint(editor.getPath(), source).then(
-            successHandler,
-            failureHandler
-        )
+        @pendingRequestPromise = @invokeLint(editor.getPath(), source)
+
+        return @pendingRequestPromise.then(successHandler, failureHandler)
 
     ###*
      * @param {String} path
      * @param {String} source
      *
-     * @return {Promise}
+     * @return {CancellablePromise}
     ###
     invokeLint: (path, source) ->
         options = {

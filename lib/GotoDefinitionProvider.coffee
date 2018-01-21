@@ -12,6 +12,11 @@ class GotoDefinitionProvider
     service: null
 
     ###*
+     * @var {CancellablePromise}
+    ###
+    pendingRequestPromise: null
+
+    ###*
      * @param {Object} service
     ###
     activate: (service) ->
@@ -22,6 +27,10 @@ class GotoDefinitionProvider
      * @param {Point}      bufferPosition
     ###
     getSuggestion: (editor, bufferPosition) ->
+        if @pendingRequestPromise?
+            @pendingRequestPromise.cancel()
+            @pendingRequestPromise = null
+
         return null if not @service?
 
         successHandler = (result) =>
@@ -40,4 +49,6 @@ class GotoDefinitionProvider
         failureHandler = () =>
             return null
 
-        return @service.gotoDefinitionAt(editor, bufferPosition).then(successHandler, failureHandler)
+        @pendingRequestPromise = @service.gotoDefinitionAt(editor, bufferPosition)
+
+        return @pendingRequestPromise.then(successHandler, failureHandler)

@@ -1,19 +1,52 @@
-## 3.1.0 (Unreleased)
-* Add support for goto definition (code navigation) via the core
-  * You no longer need the php-integrator-navigation package installed. It will continue working, albeit in somewhat a broken fashion since Atom 1.20, as the language-php package changed a lot of CSS class names. It is advised to disable it or simply uninstall it altogether, as it will no longer be maintained.
-* Vertically align table cells to the top in the documentation pane
-* Signature help will now wait a bit longer to display
+## 3.2.0 (Unreleased)
+### Major Changes
+* Update to core [3.2.0](https://gitlab.com/php-integrator/core/tags/3.2.0) (TODO)
+  * As request prioritization is now in the core, most operations such as autocompletion should now already start working whilst the project is still indexing - previously nothing was done whilst the project was indexing.
+* Support autocompletion via new core command
+  * `php-integrator-autocomplete-plus` is now obsolete. It will continue to work, for the moment, but it is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-autocompletion).
+  * Differences between the implementation of the core and the one supplied by the Atom package:
+    * Core autocompletion is much more context-based and will do a better of job at only showing relevant suggestions at each cursor position
+    * Core autocompletion does fuzzy matching and filtering beforehand, resulting in fewer results being loaded into Atom, which should improve performance considerably and fix the previous jitter and unresponsiveness due to Atom having to load in the large class, function, constant and namespace lists every so often
+    * Core autocompletion does not (yet) support disabling automatic use statements
+      * As most PHP core classes are in the root namespace and use statements for non-compound names in anonymous namespaces are illegal in PHP, users still writing code not using namespaces should not be affected, as imports are not needed here.
+    * Core autocompletion does not (yet) support disabling additional newlines when inserting imports
+      * This will likely have little effect on most users. Colleagues using PhpStorm will likely not complain since PhpStorm usually (?) collapses use statement blocks entirely
+    * Core autocompletion has rudimentary support for automatically inserting use statements in files with multiple namespaces
+    * The snippet provider is not included in the core
+      * It could be included in Atom but it honestly wasn't showing many useful suggestions, [you can always include these in your own snippets.cson](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/SnippetProvider.coffee#L55)
+    * PHPUnit tags are not included in the core as they were a bit too specific
+      * If anyone wants to reimplement them in a separate package, you can [use the code as reference](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/PHPUnitTagProvider.coffee)
+* [Improve responsiveness considerably by cancelling outdated requests already passed to the core](https://github.com/php-integrator/atom-base/issues/347)
+
+### Bugs Fixed
+* [Fix structural elements disappearing from index sometimes](https://gitlab.com/php-integrator/core/issues/148)
+* [Improved hint shown when no project is currently active and user tries to set up project](https://github.com/php-integrator/atom-base/issues/352) (thanks to [@ADTC](https://github.com/ADTC))
+
+## 3.1.0
+### Major Changes
+* Update to core [3.1.0](https://gitlab.com/php-integrator/core/tags/3.1.0)
+* Support goto definition (code navigation) via new core command
+  * `php-integrator-navigation` is now obsolete. It will continue to work on older Atom versions, but it was essentially broken since Atom 1.19, as several CSS class names changed in the `language-php` package. It is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-navigation).
+
+### Bugs Fixed
+* [Fix use statement sorting not being stable](https://github.com/php-integrator/atom-base/issues/280)
+* [Fix Composer complaining about core directory not being empty](https://github.com/php-integrator/atom-base/issues/331)
+* [Expand project paths containing the tilde `~` symbolizing the home folder](https://github.com/php-integrator/atom-base/issues/295)
+* Fix project not always automatically reindexing after core install because project manager service and project was loaded before installation finished
+
+### Various Minor Changes
+* [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
+* [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)
+* Table cells in the documentation pane are now aligned vertically to the top
+* Minor backwards compatibility break: fetching available variables now requires a file path as part of [a core fix](https://gitlab.com/php-integrator/core/issues/126)
+* Wait a bit longer before displaying signature help
   * This should fix the nuisance of it popping all over the place when rapidly moving the cursor around and gives you a bit more time to get your bearings before it appears.
   * This also reduces the load on the server in large files, where multiple requests may be queued because of slower cursor movement, after which signature help then seems to "lag" behind afterwards.
-* [Fix use statement sorting not being stable](https://github.com/php-integrator/atom-base/issues/280)
-* [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
-* [Fix project paths containing the tilde `~` symbolizing the home folder not working](https://github.com/php-integrator/atom-base/issues/295)
-* [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)
-* [Fix Composer complaining about core directory not being empty](https://github.com/php-integrator/atom-base/issues/331)
-* Replace dependency on linter and hyperclick with dependency on atom-ide-ui
-  * Strictly spoken, this package shouldn't depend directly on other packages, but only on services. The problem with that is that newcomers can get confused more easily or simply not be aware of additional functionality. (One can argue whether that is an audience we should cater to, though.)
-  * For your information, the linter contained in atom-ide-ui works just fine with the linting in this package, so you now basically have the choice of which linter you want to use. The same applies to hyperclick: the package is no longer explicitly required since the same service is contained in atom-ide-ui.
-  * IDE packages all seem to converge around atom-ide-ui and we're moving slowly towards becoming a language server, so the dependency is likely going to stick.
+* Replace dependency on `linter` and `hyperclick` with dependency on `atom-ide-ui`
+  * IDE packages all seem to converge around `atom-ide-ui` and we're moving slowly towards becoming a language server, so the dependency is likely going to stick anyway.
+  * `hyperclick` is no longer explicitly required since the same functionality and service is contained in `atom-ide-ui`.
+  * Strictly speaking, we shouldn't depend directly on packages, but rather on services. The problem with that is that newcomers can get confused more easily or may simply not be aware of additional available functionality. _(One can argue whether that is an audience we should cater to, though.)_
+  * For your information, the linter contained in `atom-ide-ui` is compatible with the linting in this package, so can choose which linter you want to use.
 
 ## 3.0.1
 * [Fix core installation issues on Windows because of maximum path limit being exceeded due to Composer generating temporary files during ZIP extraction](https://github.com/php-integrator/atom-base/issues/303)

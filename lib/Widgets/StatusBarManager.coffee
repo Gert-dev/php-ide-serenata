@@ -49,8 +49,7 @@ class StatusBarManager
         atom.tooltips.add(@element, {
             title: '''
                 Your project is being indexed. During this time, functionality such as autocompletion<br/>
-                may not be available. Saved or unsaved changes made to files may also not be indexed<br/>
-                until the next modification is made.
+                or code navigation may not be available or incomplete.
                 '''
         })
 
