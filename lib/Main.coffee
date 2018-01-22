@@ -907,6 +907,12 @@ module.exports =
         return [@getAutocompletionProvider()]
 
     ###*
+     * @param {Object} signatureHelpService
+    ###
+    consumeSignatureHelpService: (signatureHelpService) ->
+        signatureHelpService(@getSignatureHelpProvider())
+
+    ###*
      * @param {Object} datatipService
     ###
     consumeDatatipService: (datatipService) ->
