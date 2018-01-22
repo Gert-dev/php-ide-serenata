@@ -17,6 +17,16 @@
     * PHPUnit tags are not included in the core as they were a bit too specific
       * If anyone wants to reimplement them in a separate package, you can [use the code as reference](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/PHPUnitTagProvider.coffee)
 * [Improve responsiveness considerably by cancelling outdated requests already passed to the core](https://github.com/php-integrator/atom-base/issues/347)
+* Tooltips no longer use docks, but now use atom-ide-ui's tooltips
+  * This makes the user experience consistent with other atom-ide packages
+  * Tooltips are draggable and can be properly scrolled
+* Signature help (call tips) now use atom-ide-ui's datatips
+  * This makes the user experience consistent with other atom-ide packages
+  * [Datatips can be closed with the escape key](https://github.com/php-integrator/atom-base/issues/300)
+  * [Datatips can be moved out of the way with the mouse](https://github.com/php-integrator/atom-base/issues/300)
+  * [Function documentation is automatically displayed as well](https://github.com/php-integrator/atom-base/issues/301)
+  * [Datatips spawn above the function, avoiding overlap with autocompletion suggestions](https://github.com/php-integrator/atom-base/issues/311)
+  * Datatips only trigger on trigger characters such as `(` and no longer pop up constantly
 
 ### Bugs Fixed
 * [Fix structural elements disappearing from index sometimes](https://gitlab.com/php-integrator/core/issues/148)
