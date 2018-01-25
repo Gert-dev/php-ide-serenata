@@ -306,7 +306,7 @@ class ProjectManager
      * @param {String}      fileName The file to index.
      * @param {String|null} source   The source code of the file to index.
      *
-     * @return {Promise}
+     * @return {CancellablePromise}
     ###
     performFileIndex: (project, fileName, source = null) ->
         return @indexingMediator.reindex(
@@ -328,34 +328,15 @@ class ProjectManager
     attemptFileIndex: (project, fileName, source = null) ->
         return null if @isProjectIndexing()
 
-        if fileName not of @indexMap
-            @indexMap[fileName] = {
-                isBeingIndexed  : true
-                nextIndexSource : null
-            }
+        if fileName of @indexMap
+            @indexMap[fileName].cancel()
 
-        else if @indexMap[fileName].isBeingIndexed
-            # This file is already being indexed, so keep track of the most recent changes so we can index any changes
-            # after the current indexing process finishes.
-            @indexMap[fileName].nextIndexSource = source
-            return null
+        @indexMap[fileName] = @performFileIndex(project, fileName, source)
 
-        @indexMap[fileName].isBeingIndexed = true
+        onIndexFinish = () =>
+            delete @indexMap[fileName]
 
-        handler = () =>
-            @indexMap[fileName].isBeingIndexed = false
-
-            if @indexMap[fileName].nextIndexSource?
-                nextIndexSource = @indexMap[fileName].nextIndexSource
-
-                @indexMap[fileName].nextIndexSource = null
-
-                @attemptFileIndex(project, fileName, nextIndexSource)
-
-        successHandler = handler
-        failureHandler = handler
-
-        return @performFileIndex(project, fileName, source).then(successHandler, failureHandler)
+        return @indexMap[fileName].then(onIndexFinish, onIndexFinish)
 
     ###*
      * Indexes the current project asynchronously.

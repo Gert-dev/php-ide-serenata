@@ -1037,7 +1037,7 @@ class Proxy
      * @param {Array}         excludedPaths          A list of paths to exclude from indexing.
      * @param {Array}         fileExtensionsToIndex  A list of file extensions (without leading dot) to index.
      *
-     * @return {Promise}
+     * @return {CancellablePromise}
     ###
     reindex: (path, source, progressStreamCallback, excludedPaths, fileExtensionsToIndex) ->
         if typeof path == "string"

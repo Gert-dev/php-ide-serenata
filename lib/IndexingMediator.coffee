@@ -1,5 +1,7 @@
 Popover = require './Widgets/Popover'
 
+CancellablePromise = require './CancellablePromise'
+
 module.exports =
 
 ##*
@@ -37,7 +39,14 @@ class IndexingMediator
      * @return {Promise}
     ###
     reindex: (path, source, excludedPaths, fileExtensionsToIndex) ->
-        return new Promise (resolve, reject) =>
+        reindexCancellablePromise = null
+
+        cancelHandler = () =>
+            return if not reindexCancellablePromise?
+
+            reindexCancellablePromise.cancel()
+
+        executor = (resolve, reject) =>
             @indexingEventEmitter.emit('php-integrator-base:indexing-started', {
                 path : path
             })
@@ -69,13 +78,17 @@ class IndexingMediator
                         percentage : progress
                     })
 
-            return @proxy.reindex(
+            reindexCancellablePromise = @proxy.reindex(
                 path,
                 source,
                 progressStreamCallback,
                 excludedPaths,
                 fileExtensionsToIndex
-            ).then(successHandler, failureHandler)
+            )
+
+            return reindexCancellablePromise.then(successHandler, failureHandler)
+
+        return new CancellablePromise(executor, cancelHandler)
 
     ###*
      * Initializes the project.
