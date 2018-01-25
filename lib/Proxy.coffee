@@ -475,7 +475,7 @@ class Proxy
             @writeRawRequest(content)
 
         cancelHandler = () =>
-            test = @performRequest('cancelRequest', {id : id})
+            @performRequest('cancelRequest', {id : id})
 
         return new CancellablePromise(executor, cancelHandler)
 
