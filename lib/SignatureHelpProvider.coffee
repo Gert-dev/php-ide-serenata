@@ -35,7 +35,7 @@ class SignatureHelpProvider
      * Constructor.
     ###
     constructor: () ->
-        @triggerCharacters = new Set(['('])
+        @triggerCharacters = new Set(['(', ','])
 
     ###*
      * Initializes this provider.
