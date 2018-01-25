@@ -70,7 +70,7 @@ module.exports =
                                    linting are invoked less often. However, it also means that it will take longer for
                                    changes to code to be reflected in, for example, autocompletion.'
                     type        : 'integer'
-                    default     : 0
+                    default     : 500
                     order       : 2
 
                 insertNewlinesForUseStatements:
