@@ -63,14 +63,6 @@ class Service
         return @projectManager.getCurrentProjectSettings()
 
     ###*
-     * Clears the autocompletion cache. Most fetching operations such as fetching constants, autocompletion, fetching
-     * members, etc. are cached when they are first retrieved. This clears the cache, forcing them to be retrieved
-     # again. Clearing the cache is automatically performed, so this method is usually unnecessary.
-    ###
-    clearCache: () ->
-        @proxy.clearCache()
-
-    ###*
      * Retrieves a list of available classes.
      *
      * @return {Promise}

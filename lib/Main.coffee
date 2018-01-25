@@ -4,10 +4,10 @@
 
 packageDeps = require('atom-package-deps')
 
+Proxy =                  require './Proxy'
 Service =                require './Service'
 AtomConfig =             require './AtomConfig'
 CoreManager =            require './CoreManager';
-CachingProxy =           require './CachingProxy'
 ConfigTester =           require './ConfigTester'
 ProjectManager =         require './ProjectManager'
 LinterProvider =         require './LinterProvider'
@@ -677,7 +677,7 @@ module.exports =
                 if @getConfiguration().get('autocompletion.enable')
                     @activateAutocompletion()
 
-                @getCachingProxy().setIsActive(true)
+                @getProxy().setIsActive(true)
 
                 # This fixes the corner case where the core is still installing, the project manager service has already
                 # loaded and the project is already active. At that point, the index that resulted from it silently
@@ -810,7 +810,7 @@ module.exports =
         @getDatatipProvider().deactivate()
         @getSignatureHelpProvider().deactivate()
 
-        @getCachingProxy().stopPhpServer()
+        @getProxy().stopPhpServer()
 
     ###*
      * Sets the status bar service, which is consumed by this package.
@@ -866,8 +866,6 @@ module.exports =
         @activeProject = project
 
         return if not project?
-
-        @proxy.clearCache()
 
         projectManager = @getProjectManager()
         projectManager.load(project)
@@ -933,7 +931,7 @@ module.exports =
         if not @service?
             @service = new Service(
                 @getConfiguration(),
-                @getCachingProxy(),
+                @getProxy(),
                 @getProjectManager(),
                 @getIndexingMediator(),
                 @getUseStatementHelper()
@@ -960,11 +958,11 @@ module.exports =
         return @configuration
 
     ###*
-     * @return {CachingProxy}
+     * @return {Proxy}
     ###
-    getCachingProxy: () ->
+    getProxy: () ->
         if not @proxy?
-            @proxy = new CachingProxy(@getConfiguration())
+            @proxy = new Proxy(@getConfiguration())
             @proxy.setCorePath(@getCoreManager().getCoreSourcePath())
 
         return @proxy
@@ -1017,7 +1015,7 @@ module.exports =
     ###
     getIndexingMediator: () ->
         if not @indexingMediator?
-            @indexingMediator = new IndexingMediator(@getCachingProxy(), @getEmitter())
+            @indexingMediator = new IndexingMediator(@getProxy(), @getEmitter())
 
         return @indexingMediator
 
@@ -1026,7 +1024,7 @@ module.exports =
     ###
     getProjectManager: () ->
         if not @projectManager?
-            @projectManager = new ProjectManager(@getCachingProxy(), @getIndexingMediator())
+            @projectManager = new ProjectManager(@getProxy(), @getIndexingMediator())
 
         return @projectManager
 
