@@ -317,7 +317,7 @@ class ProjectManager
         )
 
     ###*
-     * Performs a file index, but only if the file is not currently already being indexed (otherwise silently returns).
+     * Performs a file index.
      *
      * @param {Object}      project
      * @param {String}      fileName The file to index.
@@ -326,8 +326,6 @@ class ProjectManager
      * @return {Promise|null}
     ###
     attemptFileIndex: (project, fileName, source = null) ->
-        return null if @isProjectIndexing()
-
         if fileName of @indexMap
             @indexMap[fileName].cancel()
 
