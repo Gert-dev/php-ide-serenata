@@ -5,7 +5,7 @@
   "description": "Indexes PHP code and exposes services to query it (required for other php-integrator-* packages).",
   "repository": "php-integrator/atom-base",
   "homepage": "https://php-integrator.github.io/",
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-or-later",
   "engines": {
     "atom": ">=1.21.0 <2.0.0"
   },
