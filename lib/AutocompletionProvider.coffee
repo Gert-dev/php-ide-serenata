@@ -205,12 +205,6 @@ class AbstractProvider
         if suggestion.extraData?.prefix?
             adaptedSuggestion.replacementPrefix = suggestion.extraData.prefix
 
-        if suggestion.extraData?.placeCursorBetweenParentheses == true
-            adaptedSuggestion.snippet = adaptedSuggestion.snippet.replace('()', '($0)')
-
-        else
-            adaptedSuggestion.snippet += '$0' # Place cursor after suggestion.
-
         return adaptedSuggestion
 
     ###*
