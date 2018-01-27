@@ -976,7 +976,10 @@ class Proxy
      * Shuts the server down entirely.
     ###
     exit: () ->
-        @performRequest('exit', {}, null, null)
+        handler = () =>
+            # Ignore promise rejection.
+
+        @performRequest('exit', {}, null, null).then(handler, handler)
 
     ###*
      * Vacuums a project, cleaning up the index database (e.g. pruning files that no longer exist).
