@@ -750,7 +750,7 @@ module.exports =
      * Deactivates the package.
     ###
     deactivate: ->
-        if @disposables
+        if @disposables?
             @disposables.dispose()
             @disposables = null
 
