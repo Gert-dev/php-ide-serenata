@@ -32,14 +32,14 @@
         "2.0.0": "setLinterIndieService"
       }
     },
-    "status-bar": {
-      "versions": {
-        "^1.0.0": "setStatusBarService"
-      }
-    },
     "project-manager": {
       "versions": {
         "^3.1.0": "setProjectManagerService"
+      }
+    },
+    "atom-ide-busy-signal": {
+      "versions": {
+        "0.1.0": "consumeBusySignalService"
       }
     },
     "datatip": {

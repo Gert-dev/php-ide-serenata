@@ -28,6 +28,7 @@
   * [Datatips spawn above the function, avoiding overlap with autocompletion suggestions](https://github.com/php-integrator/atom-base/issues/311)
   * Datatips only trigger on trigger characters such as `(` and no longer pop up constantly
   * Datatips can be triggered using the keyboard (tip: the command is `signature-help:show`)
+* Replace status bar progress bar with integration with busy signal from atom-ide-ui
 * Fix changes to files performed during a project index not being indexed after the project index completed until the file was changed again
 * The exposed service is now _deprecated_
   * It was useful in a time where most functionality existed on the CoffeeScript or client side, but since then only one unofficial package, [php-integrator-symbol-viewer](https://atom.io/packages/php-integrator-symbol-viewer), has used it and it has become apparant that implementing important functionality in the core is the best way to move forward. It will remain at least until all separate addon packages have been moved to core functionality. There may also be backwards compatibility breaks, although they will likely be minor, if they occur.

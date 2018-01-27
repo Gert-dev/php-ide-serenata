@@ -13,7 +13,6 @@ ProjectManager =         require './ProjectManager'
 LinterProvider =         require './LinterProvider'
 ComposerService =        require './ComposerService';
 DatatipProvider =        require './DatatipProvider'
-StatusBarManager =       require "./Widgets/StatusBarManager"
 IndexingMediator =       require './IndexingMediator'
 UseStatementHelper =     require './UseStatementHelper';
 SignatureHelpProvider =  require './SignatureHelpProvider'
@@ -231,13 +230,6 @@ module.exports =
     service: null
 
     ###*
-     * The status bar manager.
-     *
-     * @var {Object}
-    ###
-    statusBarManager: null
-
-    ###*
      * @var {IndexingMediator}
     ###
     indexingMediator: null
@@ -260,11 +252,6 @@ module.exports =
      * @var {String|null}
     ###
     timerName: null
-
-    ###*
-     * @var {String|null}
-    ###
-    progressBarTimeout: null
 
     ###*
      * The service instance from the project-manager package.
@@ -297,6 +284,11 @@ module.exports =
      * @var {Object|null}
     ###
     linterProvider: null
+
+    ###*
+     * @var {Object|null}
+    ###
+    busySignalService: null
 
     ###*
      * Tests the user's configuration.
@@ -475,72 +467,28 @@ module.exports =
     registerStatusBarListeners: () ->
         service = @getService()
 
-        service.onDidStartIndexing () =>
-            if @progressBarTimeout
-                clearTimeout(@progressBarTimeout)
+        indexBusyMessageMap = new Map()
+        message = "Indexing PHP code - code assistance may be unavailable or incomplete"
 
-            # Indexing could be anything: the entire project or just a file. If indexing anything takes too long, show
-            # the progress bar to indicate we're doing something.
-            @progressBarTimeout = setTimeout ( =>
-                @progressBarTimeout = null
+        service.onDidStartIndexing ({path}) =>
+            indexBusyMessageMap[path] = @busySignalService.reportBusy(message, {
+                waitingFor    : 'computer',
+                revealTooltip : true
+            })
 
-                @timerName = @packageName + " - Indexing"
+        service.onDidFinishIndexing ({path}) =>
+            if path of indexBusyMessageMap
+                indexBusyMessageMap[path].dispose()
+                delete indexBusyMessageMap[path]
 
-                console.time(@timerName);
+        service.onDidFailIndexing ({path}) =>
+            if path of indexBusyMessageMap
+                indexBusyMessageMap[path].dispose()
+                delete indexBusyMessageMap[path]
 
-                if @statusBarManager?
-                    @statusBarManager.setLabel("Indexing...")
-                    @statusBarManager.setProgress(null)
-                    @statusBarManager.show()
-            ), 1000
-
-        service.onDidFinishIndexing () =>
-            if @progressBarTimeout
-                clearTimeout(@progressBarTimeout)
-                @progressBarTimeout = null
-
-            else
-                console.timeEnd(@timerName)
-
-            if @statusBarManager?
-                @statusBarManager.setLabel("Indexing completed!")
-                @statusBarManager.hide()
-
-        service.onDidFailIndexing () =>
-            if @progressBarTimeout
-                clearTimeout(@progressBarTimeout)
-                @progressBarTimeout = null
-
-            else
-                console.timeEnd(@timerName)
-
-            if @statusBarManager?
-                @statusBarManager.showMessage("Indexing failed!", "highlight-error")
-                @statusBarManager.hide()
-
-        service.onDidIndexingProgress (data) =>
-            if @statusBarManager?
-                @statusBarManager.setProgress(data.percentage)
-                @statusBarManager.setLabel("Indexing... (" + data.percentage.toFixed(2) + " %)")
-
-    ###*
-     * Attaches items to the status bar.
-     *
-     * @param {mixed} statusBarService
-    ###
-    attachStatusBarItems: (statusBarService) ->
-        if not @statusBarManager
-            @statusBarManager = new StatusBarManager()
-            @statusBarManager.initialize(statusBarService)
-            @statusBarManager.setLabel("Indexing...")
-
-    ###*
-     * Detaches existing items from the status bar.
-    ###
-    detachStatusBarItems: () ->
-        if @statusBarManager
-            @statusBarManager.destroy()
-            @statusBarManager = null
+        service.onDidIndexingProgress ({path, percentage}) =>
+            if indexBusyMessageMap[path]?
+                indexBusyMessageMap[path].setTitle(message + " (" + percentage.toFixed(2) + " %)")
 
     ###*
      * @return {Promise}
@@ -813,21 +761,6 @@ module.exports =
         @getProxy().stopPhpServer()
 
     ###*
-     * Sets the status bar service, which is consumed by this package.
-     *
-     * @param {Object} service
-    ###
-    setStatusBarService: (service) ->
-        @attachStatusBarItems(service)
-
-        # This method is usually invoked after the indexing has already started, hence we can't unconditionally hide it
-        # here or it will never be made visible again.
-        if not @getProjectManager().isProjectIndexing()
-            @statusBarManager.hide()
-
-        return new Disposable => @detachStatusBarItems()
-
-    ###*
      * @param {mixed} service
      *
      * @return {Disposable}
@@ -909,6 +842,12 @@ module.exports =
     ###
     consumeSignatureHelpService: (signatureHelpService) ->
         signatureHelpService(@getSignatureHelpProvider())
+
+    ###*
+     * @param {Object} busySignalService
+    ###
+    consumeBusySignalService: (busySignalService) ->
+        @busySignalService = busySignalService
 
     ###*
      * @param {Object} datatipService
