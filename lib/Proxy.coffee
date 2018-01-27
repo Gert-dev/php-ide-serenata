@@ -981,6 +981,8 @@ class Proxy
 
         @performRequest('exit', {}, null, null).then(handler, handler)
 
+        return
+
     ###*
      * Vacuums a project, cleaning up the index database (e.g. pruning files that no longer exist).
      *
