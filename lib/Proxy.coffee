@@ -133,7 +133,15 @@ class Proxy
                     console.error('Port ' + port + ' is already taken')
                     return
 
-                console.error('PHP socket server exited by itself, a fatal error must have occurred.')
+                else if code != 0
+                    detail =
+                        "The PHP core socket server was unexpectedly closed. Either something caused the process to " +
+                        "stop, it crashed, or the socket closed. In case of the first two, you should see additional" +
+                        "output indicating this is the case and you can report a bug. If there is no additional " +
+                        "output, the socket connection should automatically be reestablished and everything should " +
+                        "continue working."
+
+                    console.error(detail)
 
                 @closeServerConnection()
 
@@ -177,24 +185,6 @@ class Proxy
         @phpServerPromise = @spawnPhpServer(port).then(successHandler, failureHandler)
 
         return @phpServerPromise
-
-    ###*
-     * Sends the kill signal to the socket server.
-     *
-     * Note that this is a signal, the process may ignore it (but it usually will not, unless it's really persistent in
-     * continuing whatever it's doing).
-     *
-     * @param {Array} parameters
-     *
-     * @return {Array}
-    ###
-    stopPhpServer: (port) ->
-        @closeServerConnection()
-
-        return if not @phpServer
-
-        @phpServer.kill()
-        @phpServer = null
 
     ###*
      * Closes the socket connection to the server.
@@ -260,18 +250,6 @@ class Proxy
      * @param {Boolean} hadError
     ###
     onConnectionClosed: (hadError) ->
-        detail =
-            "The socket connection to the PHP server was unexpectedly closed. Either something caused the " +
-            "process to stop, it crashed, or the socket closed. In case of the first two, you should see " +
-            "additional output indicating this is the case and you can report a bug. If there is no additional " +
-            "output, the socket connection should automatically be reestablished and everything should continue " +
-            "working."
-
-        if hadError
-            detail += ' It was also reported that an error was involved'
-
-        console.warn(detail)
-
         @closeServerConnection()
 
     ###*
@@ -993,6 +971,12 @@ class Proxy
         }
 
         return @performRequest('initialize', parameters, null, null)
+
+    ###*
+     * Shuts the server down entirely.
+    ###
+    exit: () ->
+        @performRequest('exit', {}, null, null)
 
     ###*
      * Vacuums a project, cleaning up the index database (e.g. pruning files that no longer exist).

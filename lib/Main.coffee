@@ -758,7 +758,9 @@ module.exports =
         @getDatatipProvider().deactivate()
         @getSignatureHelpProvider().deactivate()
 
-        @getProxy().stopPhpServer()
+        @getProxy().exit()
+
+        return
 
     ###*
      * @param {mixed} service

@@ -36,6 +36,7 @@
 ### Bugs Fixed
 * [Fix structural elements disappearing from index sometimes](https://gitlab.com/php-integrator/core/issues/148)
 * [Improved hint shown when no project is currently active and user tries to set up project](https://github.com/php-integrator/atom-base/issues/352) (thanks to [@ADTC](https://github.com/ADTC))
+* [The core is now shut down properly instead of killed, which should help mitigate locked and busy errors after upgrades or restarts](https://github.com/php-integrator/atom-base/issues/270)
 
 ## 3.1.0
 ### Major Changes
