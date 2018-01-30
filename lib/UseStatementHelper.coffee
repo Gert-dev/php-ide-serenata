@@ -169,18 +169,21 @@ class UseStatementHelper
 
         collator = new Intl.Collator
 
-        if maxLength >= 2
-            for i in [0 .. maxLength - 2]
-                if firstClassNameParts[i] != secondClassNameParts[i]
-                    return collator.compare(firstClassNameParts[i], secondClassNameParts[i])
-
         # At this point, both FQSEN's share a common namespace, e.g. A\B and A\B\C\D, or XMLElement and XMLDocument.
         # The one with the most namespace parts ends up last.
-        if firstClassNameParts.length > secondClassNameParts.length
+        if firstClassNameParts.length < secondClassNameParts.length
+            return -1
+
+        else if firstClassNameParts.length > secondClassNameParts.length
             return 1
 
-        else if firstClassNameParts.length < secondClassNameParts.length
-            return -1
+        if maxLength >= 2
+            for i in [0 .. maxLength - 1]
+                if firstClassNameParts[i] != secondClassNameParts[i]
+                    if firstClassNameParts[i].length == secondClassNameParts[i].length
+                        return collator.compare(firstClassNameParts[i], secondClassNameParts[i])
+
+                    return firstClassNameParts[i].length > secondClassNameParts[i].length ? 1 : -1
 
         if firstClassName.length == secondClassName.length
             return collator.compare(firstClassName, secondClassName)
