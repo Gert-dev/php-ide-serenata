@@ -295,6 +295,10 @@ class Proxy
         if jsonRpcResponse.id?
             jsonRpcRequest = @requestQueue[jsonRpcResponse.id]
 
+            if not jsonRpcRequest?
+                console.warn('Received response for request that was already removed from the queue', jsonRpcResponse)
+                return
+
             @processJsonRpcResponseForRequest(jsonRpcResponse, jsonRpcRequest)
 
             delete @requestQueue[jsonRpcResponse.id]
