@@ -23,7 +23,7 @@ class UseStatementHelper
      *
      * @var {Boolean}
     ###
-    allowAdditionalNewlines : false
+    allowAdditionalNewlines : true
 
     ###*
      * @param {Boolean} allowAdditionalNewlines
