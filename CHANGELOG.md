@@ -1,37 +1,36 @@
-## 3.2.0 (Unreleased)
+## 3.2.0
 ### Major Changes
-* Update to core [3.2.0](https://gitlab.com/php-integrator/core/tags/3.2.0) (TODO)
-  * As request prioritization is now in the core, most operations such as autocompletion should now already start working whilst the project is still indexing - previously nothing was done whilst the project was indexing.
-* Support autocompletion via new core command
-  * `php-integrator-autocomplete-plus` is now obsolete. It will continue to work, for the moment, but it is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-autocompletion).
-  * Differences between the implementation of the core and the one supplied by the Atom package:
-    * Core autocompletion is much more context-based and will do a better of job at only showing relevant suggestions at each cursor position
-    * Core autocompletion does fuzzy matching and filtering beforehand, resulting in fewer results being loaded into Atom, which should improve performance considerably and fix the previous jitter and unresponsiveness due to Atom having to load in the large class, function, constant and namespace lists every so often
-    * Core autocompletion does not (yet) support disabling automatic use statements
-      * As most PHP core classes are in the root namespace and use statements for non-compound names in anonymous namespaces are illegal in PHP, users still writing code not using namespaces should not be affected, as imports are not needed here.
-    * Core autocompletion does not (yet) support disabling additional newlines when inserting imports
-      * This will likely have little effect on most users. Colleagues using PhpStorm will likely not complain since PhpStorm usually (?) collapses use statement blocks entirely
-    * Core autocompletion has rudimentary support for automatically inserting use statements in files with multiple namespaces
-    * The snippet provider is not included in the core
-      * It could be included in Atom but it honestly wasn't showing many useful suggestions, [you can always include these in your own snippets.cson](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/SnippetProvider.coffee#L55)
-    * PHPUnit tags are not included in the core as they were a bit too specific
-      * If anyone wants to reimplement them in a separate package, you can [use the code as reference](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/PHPUnitTagProvider.coffee)
-* [Improve responsiveness considerably by cancelling outdated requests already passed to the core](https://github.com/php-integrator/atom-base/issues/347)
-* Tooltips no longer use docks, but now use atom-ide-ui's tooltips
-  * This makes the user experience consistent with other atom-ide packages
-  * Tooltips are draggable and can be properly scrolled
-* Signature help (call tips) now use atom-ide-ui's datatips
-  * This makes the user experience consistent with other atom-ide packages
-  * [Datatips can be closed with the escape key](https://github.com/php-integrator/atom-base/issues/300)
-  * [Datatips can be moved out of the way with the mouse](https://github.com/php-integrator/atom-base/issues/300)
-  * [Function documentation is automatically displayed as well](https://github.com/php-integrator/atom-base/issues/301)
-  * [Datatips spawn above the function, avoiding overlap with autocompletion suggestions](https://github.com/php-integrator/atom-base/issues/311)
-  * Datatips only trigger on trigger characters such as `(` and no longer pop up constantly
-  * Datatips can be triggered using the keyboard (tip: the command is `signature-help:show`)
-* Replace status bar progress bar with integration with busy signal from atom-ide-ui
-* Fix changes to files performed during a project index not being indexed after the project index completed until the file was changed again
-* The exposed service is now _deprecated_
-  * It was useful in a time where most functionality existed on the CoffeeScript or client side, but since then only one unofficial package, [php-integrator-symbol-viewer](https://atom.io/packages/php-integrator-symbol-viewer), has used it and it has become apparant that implementing important functionality in the core is the best way to move forward. It will remain at least until all separate addon packages have been moved to core functionality. There may also be backwards compatibility breaks, although they will likely be minor, if they occur.
+* Update to core [3.2.0](https://gitlab.com/php-integrator/core/tags/3.2.0)
+  * Among the changes is request prioritization, causing most operations such as autocompletion to already start working whilst the project is still indexing.
+* [Improve responsiveness considerably by cancelling outdated requests in the core](https://github.com/php-integrator/atom-base/issues/347)
+* Rewrite tooltips to use tooltips from `atom-ide-ui`
+  * You can drag them around and scroll them properly.
+* Rewrite signature help (call tips) to datatips from `atom-ide-ui`
+  * Trigger them by typing `(` or `,` after a function name or via command `signature-help:show` in a function call.
+  * [Close them via the escape key.](https://github.com/php-integrator/atom-base/issues/300)
+  * [View function or method documentation.](https://github.com/php-integrator/atom-base/issues/301)
+  * [Move them out of the way using the mouse.](https://github.com/php-integrator/atom-base/issues/300)
+  * [Avoid overlap with the autocompletion popup.](https://github.com/php-integrator/atom-base/issues/311)
+* Support autocompletion via core
+  * `php-integrator-autocomplete-plus` is now obsolete. It may still work, but it is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-autocompletion).
+  * Autocompletion is now much more context-based and will do a better of job at only showing relevant suggestions at the cursor's location.
+  * Considerably less data is exchanged than with the autocompletion package, which should in turn considerably improve responsiveness of autocompletion and delays after adding new classlikes.
+  * Automatic use statements in files with multiple namespaces is now rudimentarily supported
+  * Snippet autocompletions are no longer included
+    * They could be included in Atom but it honestly wasn't showing many useful suggestions, [you can still include these in your own snippets.cson](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/SnippetProvider.coffee#L55) if you miss them.
+  * PHPUnit tag autocompletion was dropped
+    * It was a bit too specific to a single tool. If anyone wants to reimplement them in a separate package, you can [use this code as reference](https://github.com/php-integrator/atom-autocompletion/blob/master/lib/PHPUnitTagProvider.coffee).
+  * Disabling automatic use statements is no longer possible (the core does not support it)
+    * Most PHP core classes are in the root namespace and use statements for non-compound names in the root namespace aren't added by the core, so users still writing code without namespaces should only minimally be affected.
+  * Disabling additional newlines when inserting imports is no longer possible (the core does not support it)
+    * This will likely have little effect on most users. Colleagues using PhpStorm will likely not complain since PhpStorm usually (?) collapses use statements visually. Tip: you can also sort your current imports using the `php-integrator-base:sort-use-statements` command to make them consistent once.
+
+### Other Improvements
+* Replace progress bar in status bar with integration with busy-signal from `atom-ide-ui`
+* Fix file changes performed during project index not being indexed after it completed (unless the file was changed again afterwards)
+* The exposed Atom service is now _deprecated_
+  * It was useful in a time where most functionality existed in Atom packages. Only one unofficial package ever used it, [php-integrator-symbol-viewer](https://atom.io/packages/php-integrator-symbol-viewer), and it has become apparant that moving all functionality to the core is the best way to move forward.
+  * It will remain at least until all separate addon packages have been moved to the core. There may also be backwards compatibility breaks, although they will likely be minor, if they occur at all.
 
 ### Bugs Fixed
 * [Fix structural elements disappearing from index sometimes](https://gitlab.com/php-integrator/core/issues/148)
