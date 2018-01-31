@@ -28,9 +28,8 @@ class Config
                 memoryLimit : 512
 
             general:
-                indexContinuously              : true
-                additionalIndexingDelay        : 200
-                insertNewlinesForUseStatements : false
+                indexContinuously       : true
+                additionalIndexingDelay : 200
 
             datatips:
                 enable : true

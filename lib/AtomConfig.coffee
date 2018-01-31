@@ -25,7 +25,6 @@ class AtomConfig extends Config
             'core.memoryLimit'
             'general.indexContinuously'
             'general.additionalIndexingDelay'
-            'general.insertNewlinesForUseStatements'
             'datatips.enable'
             'signatureHelp.enable'
             'gotoDefinition.enable'

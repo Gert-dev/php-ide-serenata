@@ -72,16 +72,6 @@ module.exports =
                     default     : 500
                     order       : 2
 
-                insertNewlinesForUseStatements:
-                    title       : 'Allow newlines when inserting use statements'
-                    description : 'If enabled, additional newlines may be inserted before or after automatically added
-                                   use statements when they can\'t be nicely added to an existing \'group\'. This
-                                   results in more cleanly separated use statements but will create additional vertical
-                                   whitespace.'
-                    type        : 'boolean'
-                    default     : false
-                    order       : 3
-
         datatips:
             type: 'object'
             order: 3
@@ -199,7 +189,7 @@ module.exports =
      *
      * @var {String}
     ###
-    coreVersionSpecification: "3.1.0"
+    coreVersionSpecification: "3.2.0"
 
     ###*
      * The name of the package.
@@ -422,9 +412,6 @@ module.exports =
     ###
     registerConfigListeners: () ->
         config = @getConfiguration()
-
-        config.onDidChange 'general.insertNewlinesForUseStatements', (value) =>
-            @getUseStatementHelper().setAllowAdditionalNewlines(value)
 
         config.onDidChange 'datatips.enable', (value) =>
             if value
@@ -947,7 +934,7 @@ module.exports =
     ###
     getUseStatementHelper: () ->
         if not @useStatementHelper?
-            @useStatementHelper = new UseStatementHelper(@getConfiguration().get('general.insertNewlinesForUseStatements'))
+            @useStatementHelper = new UseStatementHelper(true)
 
         return @useStatementHelper
 
