@@ -11,13 +11,13 @@ class CoreManager
     ###*
      * The commit to download from the Composer repository.
      *
-     * Currently set to version 1.2.4.
+     * Currently set to version 1.6.3.
      *
      * @see https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
      *
      * @var {String}
     ###
-    COMPOSER_COMMIT: 'd0310b646229c3dc57b71bfea2f14ed6c560a5bd'
+    COMPOSER_COMMIT: 'c1ad3667731e9c5c1a21e5835c7e6a7eedc2e1fe'
 
     ###*
      * @var {String}
