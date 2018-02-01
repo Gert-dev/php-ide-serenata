@@ -53,12 +53,12 @@ class ComposerService
                 process = child_process.spawn(@phpBinary, [@getPath()].concat(parameters), options)
 
                 process.stdout.on 'data', (data) =>
-                    console.debug('Composer has something to say:', data.toString())
+                    console.info('Composer has something to say:', data.toString())
 
                 process.stderr.on 'data', (data) =>
                     # Valid information is also sent via STDERR, see also
                     # https://github.com/composer/composer/issues/3787#issuecomment-76167739
-                    console.warn('Composer has something to say:', data.toString())
+                    console.info('Composer has something to say:', data.toString())
 
                 process.on 'close', (code) =>
                     console.debug('Composer exited with status code:', code)
