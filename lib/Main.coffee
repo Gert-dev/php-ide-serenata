@@ -4,6 +4,8 @@
 
 packageDeps = require('atom-package-deps')
 
+fs = require 'fs'
+
 Proxy =                  require './Proxy'
 Service =                require './Service'
 AtomConfig =             require './AtomConfig'
@@ -189,7 +191,7 @@ module.exports =
      *
      * @var {String}
     ###
-    coreVersionSpecification: "3.2.0"
+    coreVersionSpecification: "3.2.1"
 
     ###*
      * The name of the package.
@@ -455,10 +457,18 @@ module.exports =
         service = @getService()
 
         indexBusyMessageMap = new Map()
-        message = "Indexing PHP code - code assistance may be unavailable or incomplete"
+
+        getBaseMessageForPath = (path) ->
+            if Array.isArray(path)
+                path = path[0]
+
+            if fs.lstatSync(path).isDirectory()
+                return 'Indexing project - code assistance may be unavailable or incomplete'
+
+            return 'Indexing ' + path
 
         service.onDidStartIndexing ({path}) =>
-            indexBusyMessageMap[path] = @busySignalService.reportBusy(message, {
+            indexBusyMessageMap[path] = @busySignalService.reportBusy(getBaseMessageForPath(path), {
                 waitingFor    : 'computer',
                 revealTooltip : true
             })
@@ -475,7 +485,7 @@ module.exports =
 
         service.onDidIndexingProgress ({path, percentage}) =>
             if indexBusyMessageMap[path]?
-                indexBusyMessageMap[path].setTitle(message + " (" + percentage.toFixed(2) + " %)")
+                indexBusyMessageMap[path].setTitle(getBaseMessageForPath(path) + " (" + percentage.toFixed(2) + " %)")
 
     ###*
      * @return {Promise}
