@@ -468,24 +468,31 @@ module.exports =
             return 'Indexing ' + path
 
         service.onDidStartIndexing ({path}) =>
-            indexBusyMessageMap[path] = @busySignalService.reportBusy(getBaseMessageForPath(path), {
+            if not indexBusyMessageMap.has(path)
+                indexBusyMessageMap.set(path, new Array())
+
+            indexBusyMessageMap.get(path).push(@busySignalService.reportBusy(getBaseMessageForPath(path), {
                 waitingFor    : 'computer',
                 revealTooltip : true
-            })
+            }))
 
         service.onDidFinishIndexing ({path}) =>
-            if path of indexBusyMessageMap
-                indexBusyMessageMap[path].dispose()
-                delete indexBusyMessageMap[path]
+            return if not indexBusyMessageMap.has(path)
+
+            indexBusyMessageMap.get(path).forEach((busyMessage) => busyMessage.dispose())
+            indexBusyMessageMap.delete(path)
 
         service.onDidFailIndexing ({path}) =>
-            if path of indexBusyMessageMap
-                indexBusyMessageMap[path].dispose()
-                delete indexBusyMessageMap[path]
+            return if not indexBusyMessageMap.has(path)
+
+            indexBusyMessageMap.get(path).forEach((busyMessage) => busyMessage.dispose())
+            indexBusyMessageMap.delete(path)
 
         service.onDidIndexingProgress ({path, percentage}) =>
-            if indexBusyMessageMap[path]?
-                indexBusyMessageMap[path].setTitle(getBaseMessageForPath(path) + " (" + percentage.toFixed(2) + " %)")
+            return if not indexBusyMessageMap.has(path)
+
+            indexBusyMessageMap.get(path).forEach (busyMessage) =>
+                busyMessage.setTitle(getBaseMessageForPath(path) + " (" + percentage.toFixed(2) + " %)")
 
     ###*
      * @return {Promise}

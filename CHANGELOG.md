@@ -1,5 +1,6 @@
 ## 3.2.1
 * Update to core [3.2.1](https://gitlab.com/php-integrator/core/tags/3.2.1)
+* [Fix busy messages lingering sometimes](https://github.com/php-integrator/atom-base/issues/372)
 * [Fix indexing busy messages not showing what is actually being indexed](https://github.com/php-integrator/atom-base/issues/372)
 
 ## 3.2.0
