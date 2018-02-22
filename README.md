@@ -1,7 +1,7 @@
 # php-integrator/atom-base
 <p align="right">
 :coffee:
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YKTNLZCRHMRTJ">Send me some coffee beans</a>
+<a href="https://liberapay.com/Gert-dev/donate">Send me some coffee beans</a>
 </p>
 
 This package provides Atom integration for [PHP Integrator](https://gitlab.com/php-integrator/core) and exposes a service that other packages can use to provide additional functionality, such as autocompletion,
