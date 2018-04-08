@@ -1,3 +1,8 @@
+## 3.3.0
+* The PHP configuration will no longer be tested on every startup, just when requested
+* Made first-time installation a little more user-friendly by requesting user to set up PHP correctly before trying to install core
+* Renamed the `php-integrator-base:configuration` command to `php-integrator-base:test-configuration` to better indicate what it does
+
 ## 3.2.1
 * Update to core [3.2.1](https://gitlab.com/php-integrator/core/tags/3.2.1)
 * [Fix busy messages lingering sometimes](https://github.com/php-integrator/atom-base/issues/372)

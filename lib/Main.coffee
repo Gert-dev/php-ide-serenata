@@ -32,8 +32,9 @@ module.exports =
             properties:
                 phpCommand:
                     title       : 'PHP command'
-                    description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...).
-                                   Requires a restart after changing.'
+                    description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...). Requires a restart after
+                                  changing. You can also use the php-integrator-base:test-configuration command to
+                                  test it.'
                     type        : 'string'
                     default     : 'php'
                     order       : 1
@@ -284,38 +285,21 @@ module.exports =
 
     ###*
      * Tests the user's configuration.
-     *
-     * @param {bool} testServices
-     *
-     * @return {bool}
     ###
-    testConfig: (testServices = true) ->
+    testConfig: () ->
         configTester = new ConfigTester(@getConfiguration())
 
-        result = configTester.test()
-
-        if not result
+        if not configTester.test()
             errorMessage =
-                "PHP is not correctly set up and as a result PHP integrator will not work. Please visit the settings
-                 screen to correct this error. If you are not specifying an absolute path for PHP or Composer, make
-                 sure they are in your PATH.
+                "PHP is not configured correctly. Please visit the settings screen to correct this error. If you are
+                using a relative path to PHP, make sure it is in your PATH variable."
 
-                 Please restart Atom after correcting the path."
+            atom.notifications.addError('PHP Integrator - Failure', {dismissable: true, detail: errorMessage})
 
-            atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
-
-            return false
-
-        if testServices and not @projectManagerService?
-            errorMessage =
-                "There is no project manager service available. Install the atom-project-manager package for project
-                support to work in its full extent."
-
-            atom.notifications.addError('Incorrect setup!', {'detail': errorMessage})
-
-            return false
-
-        return true
+        atom.notifications.addSuccess 'PHP Integrator - Success', {
+            dismissable: true,
+            detail: 'Your setup is working correctly.'
+        }
 
     ###*
      * Registers any commands that are available to the user.
@@ -377,12 +361,8 @@ module.exports =
 
             @performInitialFullIndexForCurrentProject()
 
-        atom.commands.add 'atom-workspace', "php-integrator-base:configuration": =>
-            return unless @testConfig()
-
-            atom.notifications.addSuccess 'Success', {
-                'detail' : 'Your PHP integrator configuration is working correctly!'
-            }
+        atom.commands.add 'atom-workspace', "php-integrator-base:test-configuration": =>
+            @testConfig()
 
         atom.commands.add 'atom-workspace', "php-integrator-base:sort-use-statements": =>
             activeTextEditor = atom.workspace.getActiveTextEditor()
@@ -497,26 +477,78 @@ module.exports =
     ###*
      * @return {Promise}
     ###
-    updateCoreIfOutdated: () ->
-        if @getCoreManager().isInstalled()
-            return new Promise (resolve, reject) ->
+    installCoreIfNecessary: () ->
+        return new Promise (resolve, reject) =>
+            if @getCoreManager().isInstalled()
                 resolve()
+                return
 
+            message =
+                "The core isn't installed yet or is outdated. I can install the latest version for you " +
+                "automatically.\n \n" +
+
+                "First time using this package? Please visit the package settings to set up PHP correctly first."
+
+            notification = atom.notifications.addInfo('PHP Integrator - Core Installation', {
+                detail      : message
+                dismissable : true
+
+                buttons: [
+                    {
+                        text: 'Open package settings'
+                        onDidClick: () =>
+                            atom.workspace.open('atom://config/packages/' + @packageName)
+                    },
+
+                    {
+                        text: 'Test my setup'
+                        onDidClick: () =>
+                            @testConfig()
+                    },
+
+                    {
+                        text: 'Ready, install the core'
+                        onDidClick: () =>
+                            notification.dismiss()
+
+                            promise = @installCore()
+
+                            promise.then () =>
+                                resolve()
+
+                            promise.catch () =>
+                                reject(new Error('Core installation failed'))
+                    },
+
+                    {
+                        text: 'No, go away'
+                        onDidClick: () =>
+                            notification.dismiss()
+                            reject()
+                    }
+                ]
+            })
+
+    ###*
+     * @return {Promise}
+    ###
+    installCore: () ->
         message =
-            "The core isn't installed yet or is outdated. A new version is in the process of being downloaded.\n \n" +
+            "The core is being downloaded and installed. To do this, Composer is automatically downloaded and " +
+            "installed into a temporary folder.\n \n" +
 
-            "Progress is being sent to the developer tools console, in case you'd like to monitor it.\n \n" +
+            "Progress and output is sent to the developer tools console, in case you'd like to monitor it.\n \n" +
 
             "You will be notified once the install finishes (or fails)."
 
-        atom.notifications.addInfo('PHP Integrator - Downloading Core', {'detail': message, dismissable: true})
+        atom.notifications.addInfo('PHP Integrator - Installing Core', {'detail': message, dismissable: true})
 
         successHandler = () ->
-            atom.notifications.addSuccess('Core installation successful', dismissable: true)
+            atom.notifications.addSuccess('PHP Integrator - Core Installation Succeeded', dismissable: true)
 
         failureHandler = () ->
             message =
-                "The core failed to install. This can happen for a variety of reasons, such as an outdated PHP " +
+                "Installation of the core failed. This can happen for a variety of reasons, such as an outdated PHP " +
                 "version or missing extensions.\n \n" +
 
                 "Logs in the developer tools will likely provide you with more information about what is wrong. You " +
@@ -524,14 +556,14 @@ module.exports =
 
                 "Additionally, the README provides more information about requirements and troubleshooting."
 
-            atom.notifications.addError('Core installation failed', {detail: message, dismissable: true})
+            atom.notifications.addError('PHP Integrator - Core Installation Failed', {detail: message, dismissable: true})
 
-        return @getCoreManager().install().then(successHandler, failureHandler)
+        @getCoreManager().install().then(successHandler, failureHandler)
 
     ###*
      * Checks if the php-integrator-navigation package is installed and notifies the user it is obsolete if it is.
     ###
-    notifyAboutRedundantNavigationPackageIfnecessary: () ->
+    notifyAboutRedundantNavigationPackageIfNecessary: () ->
         atom.packages.onDidActivatePackage (packageData) ->
             return if packageData.name != 'php-integrator-navigation'
 
@@ -565,7 +597,7 @@ module.exports =
      * Checks if the php-integrator-autocomplete-plus package is installed and notifies the user it is obsolete if it
      * is.
     ###
-    notifyAboutRedundantAutocompletionPackageIfnecessary: () ->
+    notifyAboutRedundantAutocompletionPackageIfNecessary: () ->
         atom.packages.onDidActivatePackage (packageData) ->
             return if packageData.name != 'php-integrator-autocomplete-plus'
 
@@ -599,44 +631,55 @@ module.exports =
      * Activates the package.
     ###
     activate: ->
-        packageDeps.install(@packageName, true).then () =>
-            return if not @testConfig(false)
+        return packageDeps.install(@packageName, true).then () =>
+            promise = @installCoreIfNecessary()
 
-            @updateCoreIfOutdated().then () =>
-                @notifyAboutRedundantNavigationPackageIfnecessary()
-                @notifyAboutRedundantAutocompletionPackageIfnecessary()
+            promise.then () =>
+                @doActivate()
 
-                @registerCommands()
-                @registerConfigListeners()
-                @registerStatusBarListeners()
+            promise.catch () =>
+                return
 
-                @editorTimeoutMap = {}
+            return promise
 
-                @registerAtomListeners()
+    ###*
+     * Does the actual activation.
+    ###
+    doActivate: () ->
+        @notifyAboutRedundantNavigationPackageIfNecessary()
+        @notifyAboutRedundantAutocompletionPackageIfNecessary()
 
-                if @getConfiguration().get('datatips.enable')
-                    @activateDatatips()
+        @registerCommands()
+        @registerConfigListeners()
+        @registerStatusBarListeners()
 
-                if @getConfiguration().get('signatureHelp.enable')
-                    @activateSignatureHelp()
+        @editorTimeoutMap = {}
 
-                if @getConfiguration().get('linting.enable')
-                    @activateLinting()
+        @registerAtomListeners()
 
-                if @getConfiguration().get('gotoDefinition.enable')
-                    @activateGotoDefinition()
+        if @getConfiguration().get('datatips.enable')
+            @activateDatatips()
 
-                if @getConfiguration().get('autocompletion.enable')
-                    @activateAutocompletion()
+        if @getConfiguration().get('signatureHelp.enable')
+            @activateSignatureHelp()
 
-                @getProxy().setIsActive(true)
+        if @getConfiguration().get('linting.enable')
+            @activateLinting()
 
-                # This fixes the corner case where the core is still installing, the project manager service has already
-                # loaded and the project is already active. At that point, the index that resulted from it silently
-                # failed because the proxy (and core) weren't active yet. This in turn causes the project to not
-                # automatically start indexing, which is especially relevant if a core update requires a reindex.
-                if @activeProject?
-                    @changeActiveProject(@activeProject)
+        if @getConfiguration().get('gotoDefinition.enable')
+            @activateGotoDefinition()
+
+        if @getConfiguration().get('autocompletion.enable')
+            @activateAutocompletion()
+
+        @getProxy().setIsActive(true)
+
+        # This fixes the corner case where the core is still installing, the project manager service has already
+        # loaded and the project is already active. At that point, the index that resulted from it silently
+        # failed because the proxy (and core) weren't active yet. This in turn causes the project to not
+        # automatically start indexing, which is especially relevant if a core update requires a reindex.
+        if @activeProject?
+            @changeActiveProject(@activeProject)
 
     ###*
      * Registers listeners for events from Atom's API.
