@@ -88,6 +88,18 @@ module.exports =
                     default     : 1024
                     order       : 3
 
+                additionalDockerVolumes:
+                    title       : 'Additional Docker volumes'
+                    description : 'Additional paths to mount as Docker volumes. Only applies when using Docker to run
+                                   the core. Separate these using comma\'s, where each item follows the format
+                                   "src:dest" as the Docker -v flag uses. \n \n
+                                   Requires a restart after changing.'
+                    type        : 'array'
+                    default     : []
+                    order       : 4
+                    items       :
+                        type : 'string'
+
         general:
             type: 'object'
             order: 2

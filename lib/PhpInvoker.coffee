@@ -52,18 +52,25 @@ class PhpInvoker
     getDockerRunParameters: (additionalDockerRunParameters) ->
         parameters = ['run']
 
-        for path in @getPathsToMountInDockerContainer()
+        for src, dest of @getPathsToMountInDockerContainer()
             parameters.push('-v')
-            parameters.push(path + ':' + path)
+            parameters.push(src + ':' + dest)
 
         return parameters.concat(additionalDockerRunParameters).concat(['php:7.2-cli', 'php'])
 
     ###*
-     * @return {Array}
+     * @return {Object}
     ###
     getPathsToMountInDockerContainer: () ->
-        paths = [
-            @config.get('packagePath')
-        ]
+        paths = {}
+        paths[@config.get('packagePath')] = @config.get('packagePath')
 
-        return paths.concat(atom.project.getPaths())
+        for path in @config.get('core.additionalDockerVolumes')
+            parts = path.split(':')
+
+            paths[parts[0]] = parts[1]
+
+        for path in atom.project.getPaths()
+            paths[path] = path
+
+        return paths

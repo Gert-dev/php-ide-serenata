@@ -24,9 +24,10 @@ class Config
 
         @data =
             core:
-                phpExecutionType : 'host'
-                phpCommand       : null
-                memoryLimit      : 512
+                phpExecutionType        : 'host'
+                phpCommand              : null
+                memoryLimit             : 512
+                additionalDockerVolumes : []
 
             general:
                 indexContinuously       : true
