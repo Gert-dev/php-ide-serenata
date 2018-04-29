@@ -203,7 +203,7 @@ module.exports =
      *
      * @var {String}
     ###
-    coreVersionSpecification: "3.2.1"
+    coreVersionSpecification: "3.3.0"
 
     ###*
      * The name of the package.
