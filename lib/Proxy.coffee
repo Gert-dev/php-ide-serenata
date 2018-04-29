@@ -96,6 +96,7 @@ class Proxy
     ###
     spawnPhpServer: (port) ->
         php = @config.get('core.phpCommand')
+        socketHost = @config.get('core.socketHost')
         memoryLimit = @config.get('core.memoryLimit')
 
         parameters = [
@@ -106,7 +107,7 @@ class Proxy
 
              '-d memory_limit=' + memoryLimit + 'M',
              @corePath + "/src/Main.php",
-             '--port=' + port
+             '--uri=tcp://' + socketHost + ':' + port
         ]
 
         process = child_process.spawn(php, parameters)

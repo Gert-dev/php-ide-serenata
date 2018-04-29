@@ -23,6 +23,7 @@ class AtomConfig extends Config
         @configurableProperties = [
             'core.phpCommand'
             'core.memoryLimit'
+            'core.socketHost'
             'general.indexContinuously'
             'general.additionalIndexingDelay'
             'datatips.enable'

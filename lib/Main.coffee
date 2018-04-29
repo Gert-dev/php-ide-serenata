@@ -32,9 +32,9 @@ module.exports =
             properties:
                 phpCommand:
                     title       : 'PHP command'
-                    description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...). Requires a restart after
-                                  changing. You can also use the php-integrator-base:test-configuration command to
-                                  test it.'
+                    description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...). You can also use the
+                                   php-integrator-base:test-configuration command to test it. Requires a restart after
+                                   changing.'
                     type        : 'string'
                     default     : 'php'
                     order       : 1
@@ -45,9 +45,20 @@ module.exports =
                                    memory for in-memory caching as well, so it should not be too low. On the other hand,
                                    it shouldn\'t be growing very large, so setting it to -1 is probably a bad idea as
                                    an infinite loop bug might take down your system. The default should suit most
-                                   projects, from small to large.'
+                                   projects, from small to large. Requires a restart after changing.'
                     type        : 'integer'
                     default     : 1024
+                    order       : 2
+
+                socketHost:
+                    title       : 'Socket host'
+                    description : 'The host to bind the socket to. The default should usually not be changed, unless
+                                   the server is running on a different machine across the network or containerized,
+                                   in which case you could use 0.0.0.0 to listen on all interfaces. This is not done by
+                                   default as anyone could in theory send requests to the server and harvest information
+                                   unless you have a proper firewall. Requires a restart after changing.'
+                    type        : 'string'
+                    default     : '127.0.0.1'
                     order       : 2
 
         general:

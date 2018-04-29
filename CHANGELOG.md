@@ -1,3 +1,7 @@
+## 3.4.0
+* Allow configuring the host to bind the socket to (`127.0.0.1` by default, as before)
+  * You can use e.g. 0.0.0.0 if you're spawning the server via Docker via a custom script in the `PHP executable` section, previously a containerized server would not accept commands
+
 ## 3.3.0
 * The PHP configuration will no longer be tested on every startup, just when requested
 * Made first-time installation a little more user-friendly by requesting user to set up PHP correctly before trying to install core
