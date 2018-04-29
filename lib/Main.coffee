@@ -88,19 +88,6 @@ module.exports =
                     default     : 1024
                     order       : 3
 
-                socketHost:
-                    title       : 'Socket host'
-                    description : 'The host to bind the socket to. The default should usually not be changed, unless
-                                   the server is running on a different machine across the network or containerized,
-                                   in which case you could use 0.0.0.0 to listen on all interfaces. This is not done by
-                                   default as anyone could in theory send requests to the server and harvest information
-                                   unless you have a proper firewall. \n \n
-
-                                   Requires a restart after changing.'
-                    type        : 'string'
-                    default     : '127.0.0.1'
-                    order       : 4
-
         general:
             type: 'object'
             order: 2

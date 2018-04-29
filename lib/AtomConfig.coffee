@@ -24,7 +24,6 @@ class AtomConfig extends Config
             'core.phpExecutionType'
             'core.phpCommand'
             'core.memoryLimit'
-            'core.socketHost'
             'general.indexContinuously'
             'general.additionalIndexingDelay'
             'datatips.enable'

@@ -27,7 +27,6 @@ class Config
                 phpExecutionType : 'host'
                 phpCommand       : null
                 memoryLimit      : 512
-                socketHost       : '127.0.0.1'
 
             general:
                 indexContinuously       : true

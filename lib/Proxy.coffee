@@ -101,8 +101,8 @@ class Proxy
      * @return {Promise}
     ###
     spawnPhpServer: (port) ->
-        socketHost = @config.get('core.socketHost')
         memoryLimit = @config.get('core.memoryLimit')
+        socketHost = if @config.get('core.phpExecutionType') == 'host' then '127.0.0.1' else '0.0.0.0'
 
         parameters = [
              # Enable these to profile (requires xdebug be installed).
