@@ -9,6 +9,7 @@ fs = require 'fs'
 Proxy =                  require './Proxy'
 Service =                require './Service'
 AtomConfig =             require './AtomConfig'
+PhpInvoker =             require './PhpInvoker'
 CoreManager =            require './CoreManager';
 ConfigTester =           require './ConfigTester'
 ProjectManager =         require './ProjectManager'
@@ -30,14 +31,50 @@ module.exports =
             type: 'object'
             order: 1
             properties:
+                phpExecutionType:
+                    title       : 'PHP execution type'
+                    description : "How to start PHP, which is needed to start the core in turn. \n \n
+
+                                   'Use PHP on the host' uses a PHP binary installed on your local machine. 'Use PHP
+                                   container via Docker' requires Docker and uses a PHP container to start the server
+                                   with. Using PolicyKit allows Linux users that are not part of the Docker group to
+                                   enter their password via an authentication dialog to temporarily escalate privileges
+                                   so the Docker daemon can be invoked once to start the server. \n \n
+
+                                   You can use the php-integrator-base:test-configuration command to test your setup.
+                                   \n \n
+
+                                   Requires a restart after changing. \n \n"
+                    type        : 'string'
+                    default     : 'host'
+                    order       : 1
+                    enum        : [
+                        {
+                            value       : 'host'
+                            description : 'Use PHP on the host'
+                        },
+
+                        {
+                            value       : 'docker'
+                            description : 'Use a PHP container via Docker'
+                        },
+
+                        {
+                            value       : 'docker-polkit'
+                            description : 'Use a PHP container via Docker, using PolicyKit for privilege escalation ' +
+                                          '(Linux only)'
+                        }
+                    ]
+
                 phpCommand:
                     title       : 'PHP command'
-                    description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...). You can also use the
-                                   php-integrator-base:test-configuration command to test it. Requires a restart after
-                                   changing.'
+                    description : 'The path to your PHP binary (e.g. /usr/bin/php, php, ...). Only applies if you\'ve
+                                   selected "Use PHP on the host" above. \n \n
+
+                                   Requires a restart after changing.'
                     type        : 'string'
                     default     : 'php'
-                    order       : 1
+                    order       : 2
 
                 memoryLimit:
                     title       : 'Memory limit (in MB)'
@@ -45,10 +82,11 @@ module.exports =
                                    memory for in-memory caching as well, so it should not be too low. On the other hand,
                                    it shouldn\'t be growing very large, so setting it to -1 is probably a bad idea as
                                    an infinite loop bug might take down your system. The default should suit most
-                                   projects, from small to large. Requires a restart after changing.'
+                                   projects, from small to large. \n \n
+                                   Requires a restart after changing.'
                     type        : 'integer'
                     default     : 1024
-                    order       : 2
+                    order       : 3
 
                 socketHost:
                     title       : 'Socket host'
@@ -56,10 +94,12 @@ module.exports =
                                    the server is running on a different machine across the network or containerized,
                                    in which case you could use 0.0.0.0 to listen on all interfaces. This is not done by
                                    default as anyone could in theory send requests to the server and harvest information
-                                   unless you have a proper firewall. Requires a restart after changing.'
+                                   unless you have a proper firewall. \n \n
+
+                                   Requires a restart after changing.'
                     type        : 'string'
                     default     : '127.0.0.1'
-                    order       : 2
+                    order       : 4
 
         general:
             type: 'object'
@@ -220,6 +260,11 @@ module.exports =
     configuration: null
 
     ###*
+     * @var {Object}
+    ###
+    PhpInvoker: null
+
+    ###*
      * The proxy object.
      *
      * @var {Object}
@@ -298,19 +343,21 @@ module.exports =
      * Tests the user's configuration.
     ###
     testConfig: () ->
-        configTester = new ConfigTester(@getConfiguration())
+        configTester = new ConfigTester(@getPhpInvoker())
 
-        if not configTester.test()
-            errorMessage =
-                "PHP is not configured correctly. Please visit the settings screen to correct this error. If you are
-                using a relative path to PHP, make sure it is in your PATH variable."
+        configTester.test().then (wasSuccessful) =>
+            if not wasSuccessful
+                errorMessage =
+                    "PHP is not configured correctly. Please visit the settings screen to correct this error. If you are
+                    using a relative path to PHP, make sure it is in your PATH variable."
 
-            atom.notifications.addError('PHP Integrator - Failure', {dismissable: true, detail: errorMessage})
+                atom.notifications.addError('PHP Integrator - Failure', {dismissable: true, detail: errorMessage})
 
-        atom.notifications.addSuccess 'PHP Integrator - Success', {
-            dismissable: true,
-            detail: 'Your setup is working correctly.'
-        }
+            else
+                atom.notifications.addSuccess 'PHP Integrator - Success', {
+                    dismissable: true,
+                    detail: 'Your setup is working correctly.'
+                }
 
     ###*
      * Registers any commands that are available to the user.
@@ -957,11 +1004,20 @@ module.exports =
         return @configuration
 
     ###*
+     * @return {Configuration}
+    ###
+    getPhpInvoker: () ->
+        if not @phpInvoker?
+            @phpInvoker = new PhpInvoker(@getConfiguration())
+
+        return @phpInvoker
+
+    ###*
      * @return {Proxy}
     ###
     getProxy: () ->
         if not @proxy?
-            @proxy = new Proxy(@getConfiguration())
+            @proxy = new Proxy(@getConfiguration(), @getPhpInvoker())
             @proxy.setCorePath(@getCoreManager().getCoreSourcePath())
 
         return @proxy

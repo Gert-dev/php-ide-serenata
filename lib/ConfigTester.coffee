@@ -3,25 +3,24 @@ child_process = require "child_process"
 module.exports =
 
 ##*
-# Tests configurations to see if they are properly usable.
+# Tests the user's PHP setup to see if it is properly usable.
 ##
 class ConfigTester
     ###*
      * Constructor.
      *
-     * @param {Config} config
+     * @param {PhpInvoker} phpInvoker
     ###
-    constructor: (@config) ->
+    constructor: (@phpInvoker) ->
 
     ###*
-     * Tests the user's configuration.
-     *
-     * @return {boolean}
+     * @return {Promise}
     ###
     test: () ->
-        response = child_process.spawnSync(@config.get('core.phpCommand'), ["-v"])
+        return new Promise (resolve, reject) =>
+            process = @phpInvoker.invoke(['-v'])
+            process.on 'close', (code) =>
+                if code == 0
+                    resolve(true)
 
-        if response.status = null or response.status != 0
-            return false
-
-        return true
+                resolve(false)

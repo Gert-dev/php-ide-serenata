@@ -21,6 +21,7 @@ class AtomConfig extends Config
     ###
     constructor: (@packageName) ->
         @configurableProperties = [
+            'core.phpExecutionType'
             'core.phpCommand'
             'core.memoryLimit'
             'core.socketHost'
