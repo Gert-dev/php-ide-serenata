@@ -344,6 +344,14 @@ module.exports =
     testConfig: () ->
         configTester = new ConfigTester(@getPhpInvoker())
 
+        atom.notifications.addInfo 'PHP Integrator - Testing Configuration', {
+            dismissable: true,
+            detail: 'Now testing your configuration... \n \n' +
+
+                    'If you\'ve selected Docker, this may take a while the first time
+                     as the Docker image has to be fetched first.'
+        }
+
         configTester.test().then (wasSuccessful) =>
             if not wasSuccessful
                 errorMessage =
