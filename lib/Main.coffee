@@ -1036,7 +1036,7 @@ module.exports =
     getComposerService: () ->
         if not @composerService?
             @composerService = new ComposerService(
-                @getConfiguration().get('core.phpCommand'),
+                @getPhpInvoker(),
                 @getConfiguration().get('packagePath') + '/core/'
             )
 

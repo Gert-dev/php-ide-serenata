@@ -21,9 +21,9 @@ class ComposerService
     COMPOSER_COMMIT: '01a340a59c504c900251e3e189d0cb2008e888c6'
 
     ###*
-     * @var {String}
+     * @var {Object}
     ###
-    phpBinary: null
+    phpInvoker: null
 
     ###*
      * @var {String}
@@ -31,10 +31,10 @@ class ComposerService
     folder: null
 
     ###*
-     * @param {String} phpBinary
+     * @param {Object} phpInvoker
      * @param {String} folder
     ###
-    constructor: (@phpBinary, @folder) ->
+    constructor: (@phpInvoker, @folder) ->
 
     ###*
      * @param {Array}       parameters
@@ -50,7 +50,7 @@ class ComposerService
                 options.cwd = workingDirectory
 
             return new Promise (resolve, reject) =>
-                process = child_process.spawn(@phpBinary, [@getPath()].concat(parameters), options)
+                process = @phpInvoker.invoke([@getPath()].concat(parameters), [], options)
 
                 process.stdout.on 'data', (data) =>
                     console.info('Composer has something to say:', data.toString())
@@ -97,7 +97,7 @@ class ComposerService
              ]
 
              return new Promise (resolve, reject) =>
-                 process = child_process.spawn(@phpBinary, parameters)
+                 process = @phpInvoker.invoke(parameters)
 
                  process.stdout.on 'data', (data) =>
                      console.debug('Composer installer has something to say:', data.toString())
