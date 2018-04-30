@@ -1,8 +1,8 @@
 ## 3.5.0 (Unreleased)
 * Using Docker to run the core is now _experimentally_ supported
   * Please review your settings if you wish to try it out
-  * If you are not on Linux or on Linux and part of the Docker group, select the default Docker option
-  * If you are on Linux and not part of the Docker group - no, you were not ignored ;-) -, you can use the Docker option using [PolicyKit](https://www.freedesktop.org/wiki/Software/polkit/) to enter your credentials when necessary
+      * If you are not on Linux or on Linux and part of the Docker group, select the default Docker option
+      * If you are on Linux and not part of the Docker group - no, you were not ignored ;-) -, you can use the Docker option using [PolicyKit](https://www.freedesktop.org/wiki/Software/polkit/) to enter your credentials when necessary
 * Update Composer used during installation to 1.6.4 (was at 1.2.4)
 * Show feedback when configuration is being tested, as this may take a while the first time when using Docker if the image still needs to be fetched
 
