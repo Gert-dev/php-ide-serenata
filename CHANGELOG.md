@@ -1,4 +1,4 @@
-## 3.5.0 (Unreleased)
+## 3.5.0
 * Using Docker to run the core is now _experimentally_ supported
   * Please review your settings if you wish to try it out
       * If you are not on Linux or on Linux and part of the Docker group, select the default Docker option
