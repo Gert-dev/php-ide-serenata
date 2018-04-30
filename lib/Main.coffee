@@ -56,13 +56,13 @@ module.exports =
 
                         {
                             value       : 'docker'
-                            description : 'Use a PHP container via Docker'
+                            description : 'Use a PHP container via Docker (experimental)'
                         },
 
                         {
                             value       : 'docker-polkit'
                             description : 'Use a PHP container via Docker, using PolicyKit for privilege escalation ' +
-                                          '(Linux only)'
+                                          ' (experimental, Linux only)'
                         }
                     ]
 
