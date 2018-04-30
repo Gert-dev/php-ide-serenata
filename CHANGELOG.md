@@ -1,3 +1,6 @@
+## 3.5.0 (Unreleased)
+* Update Composer used during installation to 1.6.4 (was at 1.2.4)
+
 ## 3.4.0
 * Update to core [3.3.0](https://gitlab.com/php-integrator/core/tags/3.3.0)
 * Allow configuring the host to bind the socket to (`127.0.0.1` by default, as before)
