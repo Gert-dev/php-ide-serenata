@@ -369,7 +369,7 @@ module.exports =
 
         return @busySignalService.reportBusyWhile('Testing your configuration...', callback, {
             waitingFor    : 'computer',
-            revealTooltip : true
+            revealTooltip : false
         });
 
     ###*
