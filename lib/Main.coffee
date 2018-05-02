@@ -352,19 +352,25 @@ module.exports =
                      as the Docker image has to be fetched first.'
         }
 
-        configTester.test().then (wasSuccessful) =>
-            if not wasSuccessful
-                errorMessage =
-                    "PHP is not configured correctly. Please visit the settings screen to correct this error. If you are
-                    using a relative path to PHP, make sure it is in your PATH variable."
+        callback = () =>
+            return configTester.test().then (wasSuccessful) =>
+                if not wasSuccessful
+                    errorMessage =
+                        "PHP is not configured correctly. Please visit the settings screen to correct this error. If you are
+                        using a relative path to PHP, make sure it is in your PATH variable."
 
-                atom.notifications.addError('PHP Integrator - Failure', {dismissable: true, detail: errorMessage})
+                    atom.notifications.addError('PHP Integrator - Failure', {dismissable: true, detail: errorMessage})
 
-            else
-                atom.notifications.addSuccess 'PHP Integrator - Success', {
-                    dismissable: true,
-                    detail: 'Your setup is working correctly.'
-                }
+                else
+                    atom.notifications.addSuccess 'PHP Integrator - Success', {
+                        dismissable: true,
+                        detail: 'Your setup is working correctly.'
+                    }
+
+        return @busySignalService.reportBusyWhile('Testing your configuration...', callback, {
+            waitingFor    : 'computer',
+            revealTooltip : true
+        });
 
     ###*
      * Registers any commands that are available to the user.

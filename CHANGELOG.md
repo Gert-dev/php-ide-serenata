@@ -1,3 +1,6 @@
+## 3.6.0 (Unreleased)
+* Show progress spinner whilst testing configuration
+
 ## 3.5.0
 * Using Docker to run the core is now _experimentally_ supported
   * Please review your settings if you wish to try it out
