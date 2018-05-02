@@ -582,13 +582,19 @@ module.exports =
                         onDidClick: () =>
                             notification.dismiss()
 
-                            promise = @installCore()
+                            callback = () =>
+                                promise = @installCore()
 
-                            promise.then () =>
-                                resolve()
+                                promise.catch () =>
+                                    reject(new Error('Core installation failed'))
 
-                            promise.catch () =>
-                                reject(new Error('Core installation failed'))
+                                return promise.then () =>
+                                    resolve()
+
+                            @busySignalService.reportBusyWhile('Installing the core...', callback, {
+                                waitingFor    : 'computer',
+                                revealTooltip : false
+                            });
                     },
 
                     {

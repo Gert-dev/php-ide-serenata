@@ -1,4 +1,5 @@
 ## 3.6.0 (Unreleased)
+* Show progress spinner whilst installing the core
 * Show progress spinner whilst testing configuration
 
 ## 3.5.0
