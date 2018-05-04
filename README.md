@@ -4,16 +4,9 @@
 <a href="https://liberapay.com/Gert-dev/donate">Send me some coffee beans</a>
 </p>
 
-This package provides Atom integration for [PHP Integrator](https://gitlab.com/php-integrator/core) and exposes a service that other packages can use to provide additional functionality, such as autocompletion,
-code navigation and tooltips.
+Integrates [PHP Integrator](https://gitlab.com/php-integrator/core) into Atom, providing autocompletion, code navigation, refactoring, signature help, linting and annotations.
 
-This package already contains some functionality as of 3.x, including autocompletion, navigation, tooltips, signature help (call tips), linting and annotations.
-
-The following packages currently still need to be installed as add-on if you desire this functionality:
-
-  * **[php-integrator-refactoring](https://github.com/php-integrator/atom-refactoring)** - Provides basic refactoring capabilities.
-
-Over time, all official add-on packages will be made redundant by reimplementation in the base package and, ultimately, the core.
+See also [the website](https://php-integrator.github.io/) for screenshots.
 
 Note that the heavy lifting is performed by the [PHP core](https://gitlab.com/php-integrator/core), which is automatically installed as _payload_ for this package and kept up to date automatically.
 

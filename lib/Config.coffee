@@ -48,6 +48,9 @@ class Config
             annotations:
                 enable : true
 
+            refactoring:
+                enable : true
+
             linting:
                 enable                      : true
                 showUnknownClasses          : true

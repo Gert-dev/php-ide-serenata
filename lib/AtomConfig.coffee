@@ -32,6 +32,7 @@ class AtomConfig extends Config
             'gotoDefinition.enable'
             'autocompletion.enable'
             'annotations.enable'
+            'refactoring.enable'
             'linting.enable'
             'linting.showUnknownClasses'
             'linting.showUnknownMembers'

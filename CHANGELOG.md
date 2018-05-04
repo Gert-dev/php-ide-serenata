@@ -1,11 +1,11 @@
 ## 3.6.0 (Unreleased)
 * Show progress spinner whilst installing the core
 * Show progress spinner whilst testing configuration
-* Integrate annotations from the [annotations](https://github.com/php-integrator/atom-annotations) package
-    * The functionality of this is the same as was in the separate package
-    * Annotations can be disabled via the settings if you don't want them
-    * This is the first step towards integrating it into the core fully in the long term
-    * This will also help discoverability, since I notice a lot of users don't notice other packages are available
+* Integrate annotations and refactoring from the [annotations](https://github.com/php-integrator/atom-annotations) and [refactoring](https://github.com/php-integrator/atom-refactoring) packages
+    * The new functionality is equivalent to that supplied by the separate packages
+    * Both can be disabled via the settings if you don't want them
+    * This is the first step towards integrating this functionality into the core fully in the long term
+    * This will also help discoverability, since I notice a lot of users don't notice other packages are available, and is less of a hassle
 
 ## 3.5.0
 * Using Docker to run the core is now _experimentally_ supported

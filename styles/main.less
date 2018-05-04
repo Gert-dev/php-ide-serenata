@@ -149,3 +149,65 @@ atom-text-editor {
         }
     }
 }
+
+.php-integrator-refactoring-strikethrough {
+    text-decoration: line-through;
+}
+
+.php-integrator-refactoring-multi-selection-view {
+    .list-item {
+
+    }
+
+    .checkbox {
+        font-size: x-small;
+    }
+
+    .text-line {
+        // margin-top: 0.5em;
+    }
+
+    .button-bar {
+        // margin-top: 0.5em;
+
+        .clear-float {
+            clear: both;
+        }
+    }
+}
+
+.php-integrator-refactoring-extract-method {
+    .section-body, .form-control, .control-label, .control-group, .controls {
+        width: 100%;
+    }
+    .preview-area {
+        atom-text-editor .editor-contents--private {
+            max-height: 400px !important;
+        }
+    }
+    // Should change to reflect the padding of the theme instead of hardcoded.
+    .block {
+        margin-top: 4px;
+    }
+    .pull-right {
+        .inline-block {
+            margin-left: 9px;
+        }
+    }
+
+    .checkbox {
+        // Removing any extra margining to the checkboxes (e.g. Atom Material)
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .settings-view .section-body {
+        margin-top: 0px;
+    }
+
+    .button-bar {
+        .clear-float {
+            clear: both;
+        }
+    }
+}

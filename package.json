@@ -24,6 +24,11 @@
       "versions": {
         "0.0.0": "getHyperclickProvider"
       }
+    },
+    "intentions:list": {
+      "versions": {
+        "1.0.0": "provideIntentions"
+      }
     }
   },
   "consumedServices": {
@@ -51,6 +56,11 @@
       "versions": {
         "0.1.0": "consumeSignatureHelpService"
       }
+    },
+    "snippets": {
+      "versions": {
+        "0.1.0": "setSnippetManager"
+      }
     }
   },
   "dependencies": {
@@ -60,17 +70,23 @@
     "sanitize-filename": "~1.6.1",
     "rimraf": "~2.5.4",
     "download": "~5.0.2",
-    "atom-languageclient": "^0.6.4"
+    "atom-languageclient": "^0.6.4",
+    "atom-space-pen-views": "~2.2"
   },
   "package-deps": [
     "project-manager",
-    "atom-ide-ui"
+    "atom-ide-ui",
+    "intentions"
   ],
   "keywords": [
     "php",
-    "service",
+    "ide",
     "integrator",
     "integration",
-    "php-integrator"
+    "php-integrator",
+    "autocompletion",
+    "refactoring",
+    "docblock",
+    "generator"
   ]
 }

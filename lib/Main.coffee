@@ -6,23 +6,39 @@ packageDeps = require('atom-package-deps')
 
 fs = require 'fs'
 
-Proxy =                      require './Proxy'
-Service =                    require './Service'
-AtomConfig =                 require './AtomConfig'
-PhpInvoker =                 require './PhpInvoker'
-CoreManager =                require './CoreManager';
-ConfigTester =               require './ConfigTester'
-ProjectManager =             require './ProjectManager'
-LinterProvider =             require './LinterProvider'
-ComposerService =            require './ComposerService';
-DatatipProvider =            require './DatatipProvider'
-IndexingMediator =           require './IndexingMediator'
-UseStatementHelper =         require './UseStatementHelper';
-SignatureHelpProvider =      require './SignatureHelpProvider'
-GotoDefinitionProvider =     require './GotoDefinitionProvider'
-AutocompletionProvider =     require './AutocompletionProvider'
-MethodAnnotationProvider =   require './Annotations/MethodAnnotationProvider'
+Proxy = require './Proxy'
+Service = require './Service'
+AtomConfig = require './AtomConfig'
+PhpInvoker = require './PhpInvoker'
+CoreManager = require './CoreManager';
+ConfigTester = require './ConfigTester'
+ProjectManager = require './ProjectManager'
+LinterProvider = require './LinterProvider'
+ComposerService = require './ComposerService';
+DatatipProvider = require './DatatipProvider'
+IndexingMediator = require './IndexingMediator'
+UseStatementHelper = require './UseStatementHelper';
+SignatureHelpProvider = require './SignatureHelpProvider'
+GotoDefinitionProvider = require './GotoDefinitionProvider'
+AutocompletionProvider = require './AutocompletionProvider'
+
+MethodAnnotationProvider = require './Annotations/MethodAnnotationProvider'
 PropertyAnnotationProvider = require './Annotations/PropertyAnnotationProvider'
+
+DocblockProvider = require './Refactoring/DocblockProvider'
+GetterSetterProvider = require './Refactoring/GetterSetterProvider'
+ExtractMethodProvider = require './Refactoring/ExtractMethodProvider'
+OverrideMethodProvider = require './Refactoring/OverrideMethodProvider'
+IntroducePropertyProvider = require './Refactoring/IntroducePropertyProvider'
+StubAbstractMethodProvider = require './Refactoring/StubAbstractMethodProvider'
+StubInterfaceMethodProvider = require './Refactoring/StubInterfaceMethodProvider'
+ConstructorGenerationProvider = require './Refactoring/ConstructorGenerationProvider'
+
+Builder = require './Refactoring/ExtractMethodProvider/Builder'
+TypeHelper = require './Refactoring/Utility/TypeHelper'
+DocblockBuilder = require './Refactoring/Utility/DocblockBuilder'
+FunctionBuilder = require './Refactoring/Utility/FunctionBuilder'
+ParameterParser = require './Refactoring/ExtractMethodProvider/ParameterParser'
 
 module.exports =
     ###*
@@ -185,9 +201,20 @@ module.exports =
                     default     : true
                     order       : 1
 
-        linting:
+        refactoring:
             type: 'object'
             order: 8
+            properties:
+                enable:
+                    title       : 'Enable'
+                    description : 'When enabled, refactoring actions will be available via the intentions package.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
+
+        linting:
+            type: 'object'
+            order: 9
             properties:
                 enable:
                     title       : 'Enable'
@@ -316,6 +343,31 @@ module.exports =
     timerName: null
 
     ###*
+     * @var {Object|null}
+    ###
+    typeHelper: null
+
+    ###*
+     * @var {Object|null}
+    ###
+    docblockBuilder: null
+
+    ###*
+     * @var {Object|null}
+    ###
+    functionBuilder: null
+
+    ###*
+     * @var {Object|null}
+    ###
+    parameterParser: null
+
+    ###*
+     * @var {Object|null}
+    ###
+    builder: null
+
+    ###*
      * The service instance from the project-manager package.
      *
      * @var {Object|null}
@@ -346,6 +398,11 @@ module.exports =
      * @var {Array|null}
     ###
     annotationProviders: null
+
+    ###*
+     * @var {Array|null}
+    ###
+    refactoringProviders: null
 
     ###*
      * @var {Object|null}
@@ -519,6 +576,13 @@ module.exports =
 
             else
                 @deactivateAnnotations()
+
+        config.onDidChange 'refactoring.enable', (value) =>
+            if value
+                @activateRefactoring()
+
+            else
+                @deactivateRefactoring()
 
         config.onDidChange 'linting.enable', (value) =>
             if value
@@ -765,6 +829,40 @@ module.exports =
             })
 
     ###*
+     * Checks if the php-integrator-refactoring package is installed and notifies the user it is obsolete if it
+     * is.
+    ###
+    notifyAboutRedundantRefactoringPackageIfNecessary: () ->
+        atom.packages.onDidActivatePackage (packageData) ->
+            return if packageData.name != 'php-integrator-refactoring'
+
+            message =
+                "It seems you still have the php-integrator-refactoring package installed and activated. As of " +
+                "this release, it is obsolete and all its functionality is already included in the base package.\n \n" +
+
+                "It is recommended to disable or remove it, shall I disable it for you?"
+
+            notification = atom.notifications.addInfo('PHP Integrator - Autocompletion', {
+                detail      : message
+                dismissable : true
+
+                buttons: [
+                    {
+                        text: 'Yes, nuke it'
+                        onDidClick: () ->
+                            atom.packages.disablePackage('php-integrator-refactoring');
+                            notification.dismiss()
+                    },
+
+                    {
+                        text: 'No, don\'t touch it'
+                        onDidClick: () ->
+                            notification.dismiss()
+                    }
+                ]
+            })
+
+    ###*
      * Activates the package.
     ###
     activate: ->
@@ -786,6 +884,7 @@ module.exports =
         @notifyAboutRedundantNavigationPackageIfNecessary()
         @notifyAboutRedundantAutocompletionPackageIfNecessary()
         @notifyAboutRedundantAnnotationsPackageIfNecessary()
+        @notifyAboutRedundantRefactoringPackageIfNecessary()
 
         @registerCommands()
         @registerConfigListeners()
@@ -806,6 +905,9 @@ module.exports =
 
         if @getConfiguration().get('linting.enable')
             @activateLinting()
+
+        if @getConfiguration().get('refactoring.enable')
+            @activateRefactoring()
 
         if @getConfiguration().get('gotoDefinition.enable')
             @activateGotoDefinition()
@@ -878,7 +980,7 @@ module.exports =
         @getAutocompletionProvider().deactivate()
 
     ###*
-     * Activates linting.
+     * Activates annotations.
     ###
     activateAnnotations: () ->
         @annotationProviders = []
@@ -889,7 +991,7 @@ module.exports =
             provider.activate(@getService())
 
     ###*
-     * Deactivates linting.
+     * Deactivates annotations.
     ###
     deactivateAnnotations: () ->
         for provider in @annotationProviders
@@ -898,13 +1000,32 @@ module.exports =
         @annotationProviders = []
 
     ###*
-     * Activates annotations.
+     * Activates refactoring.
+    ###
+    activateRefactoring: () ->
+        @getRefactoringBuilder().setService(@getService())
+        @getRefactoringTypeHelper().setService(@getService())
+
+        for provider in @getRefactoringProviders()
+            provider.activate(@getService())
+
+    ###*
+     * Deactivates refactoring.
+    ###
+    deactivateRefactoring: () ->
+        for provider in @getRefactoringProviders()
+            provider.deactivate()
+
+        @refactoringProviders = null
+
+    ###*
+     * Activates linting.
     ###
     activateLinting: () ->
         @getLinterProvider().activate(@getService())
 
     ###*
-     * Deactivates annotations.
+     * Deactivates linting.
     ###
     deactivateLinting: () ->
         @getLinterProvider().deactivate()
@@ -962,10 +1083,11 @@ module.exports =
             @disposables.dispose()
             @disposables = null
 
-        @deactivateAnnotations()
         @deactivateLinting()
         @deactivateDatatips()
         @deactivateSignatureHelp()
+        @deactivateAnnotations()
+        @deactivateRefactoring()
 
         @getProxy().exit()
 
@@ -1073,6 +1195,28 @@ module.exports =
     ###
     getHyperclickProvider: () ->
         return @getGotoDefinitionProvider()
+
+    ###*
+     * Consumes the atom/snippet service.
+     *
+     * @param {Object} snippetManager
+    ###
+    setSnippetManager: (snippetManager) ->
+        for provider in @getRefactoringProviders()
+            provider.setSnippetManager(snippetManager)
+
+    ###*
+     * Returns a list of intention providers.
+     *
+     * @return {Array}
+    ###
+    provideIntentions: () ->
+        intentionProviders = []
+
+        for provider in @getRefactoringProviders()
+            intentionProviders = intentionProviders.concat(provider.getIntentionProviders())
+
+        return intentionProviders
 
     ###*
      * @return {Service}
@@ -1231,3 +1375,71 @@ module.exports =
             @autocompletionProvider = new AutocompletionProvider()
 
         return @autocompletionProvider
+
+    ###*
+     * @return {TypeHelper}
+    ###
+    getRefactoringTypeHelper: () ->
+        if not @typeHelper?
+            @typeHelper = new TypeHelper()
+
+        return @typeHelper
+
+    ###*
+     * @return {DocblockBuilder}
+    ###
+    getRefactoringDocblockBuilder: () ->
+        if not @docblockBuilder?
+            @docblockBuilder = new DocblockBuilder()
+
+        return @docblockBuilder
+
+    ###*
+     * @return {FunctionBuilder}
+    ###
+    getRefactoringFunctionBuilder: () ->
+        if not @functionBuilder?
+            @functionBuilder = new FunctionBuilder()
+
+        return @functionBuilder
+
+    ###*
+     * @return {ParameterParser}
+    ###
+    getRefactoringParameterParser: () ->
+        if not @parameterParser?
+            @parameterParser = new ParameterParser(@getRefactoringTypeHelper())
+
+        return @parameterParser
+
+    ###*
+     * @return {Builder}
+    ###
+    getRefactoringBuilder: () ->
+        if not @builder?
+            @builder = new Builder(
+                @getRefactoringParameterParser(),
+                @getRefactoringDocblockBuilder(),
+                @getRefactoringFunctionBuilder(),
+                @getRefactoringTypeHelper()
+            )
+
+        return @builder
+
+    ###*
+     * @return {Array}
+    ###
+    getRefactoringProviders: () ->
+        if not @refactoringProviders?
+            @refactoringProviders = []
+            @refactoringProviders.push new DocblockProvider(@getRefactoringTypeHelper(), @getRefactoringDocblockBuilder())
+            @refactoringProviders.push new IntroducePropertyProvider(@getRefactoringDocblockBuilder())
+            @refactoringProviders.push new GetterSetterProvider(@getRefactoringTypeHelper(), @getRefactoringFunctionBuilder(), @getRefactoringDocblockBuilder())
+            @refactoringProviders.push new ExtractMethodProvider(@getRefactoringBuilder())
+            @refactoringProviders.push new ConstructorGenerationProvider(@getRefactoringTypeHelper(), @getRefactoringFunctionBuilder(), @getRefactoringDocblockBuilder())
+
+            @refactoringProviders.push new OverrideMethodProvider(@getRefactoringDocblockBuilder(), @getRefactoringFunctionBuilder())
+            @refactoringProviders.push new StubAbstractMethodProvider(@getRefactoringDocblockBuilder(), @getRefactoringFunctionBuilder())
+            @refactoringProviders.push new StubInterfaceMethodProvider(@getRefactoringDocblockBuilder(), @getRefactoringFunctionBuilder())
+
+        return @refactoringProviders
