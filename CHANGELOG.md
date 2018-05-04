@@ -1,4 +1,5 @@
 ## 3.6.0 (Unreleased)
+* Update dependencies
 * Show progress spinner whilst installing the core
 * Show progress spinner whilst testing configuration
 * Integrate annotations and refactoring from the [annotations](https://github.com/php-integrator/atom-annotations) and [refactoring](https://github.com/php-integrator/atom-refactoring) packages

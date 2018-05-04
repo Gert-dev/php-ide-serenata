@@ -64,14 +64,14 @@
     }
   },
   "dependencies": {
-    "atom-package-deps": "~4.5.0",
-    "event-kit": "~2.0.0",
-    "md5": "~2.0.0",
-    "sanitize-filename": "~1.6.1",
-    "rimraf": "~2.5.4",
-    "download": "~5.0.2",
-    "atom-languageclient": "^0.6.4",
-    "atom-space-pen-views": "~2.2"
+    "atom-package-deps": "^4.6",
+    "event-kit": "^2.4",
+    "md5": "^2.2",
+    "sanitize-filename": "^1.6",
+    "rimraf": "^2.6",
+    "download": "^7.0",
+    "atom-languageclient": "^0.8",
+    "atom-space-pen-views": "^2.2"
   },
   "package-deps": [
     "project-manager",
