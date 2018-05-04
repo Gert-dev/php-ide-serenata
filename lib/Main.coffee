@@ -898,13 +898,13 @@ module.exports =
         @annotationProviders = []
 
     ###*
-     * Activates linting.
+     * Activates annotations.
     ###
     activateLinting: () ->
         @getLinterProvider().activate(@getService())
 
     ###*
-     * Deactivates linting.
+     * Deactivates annotations.
     ###
     deactivateLinting: () ->
         @getLinterProvider().deactivate()
