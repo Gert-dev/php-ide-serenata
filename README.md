@@ -1,4 +1,4 @@
-# php-integrator/atom-base
+# PHP Integrator IDE
 <p align="right">
 :coffee:
 <a href="https://liberapay.com/Gert-dev/donate">Send me some coffee beans</a>
