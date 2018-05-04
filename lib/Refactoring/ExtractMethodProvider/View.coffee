@@ -46,7 +46,7 @@ class ExtractMethodView extends View
         @settings = {
             generateDocs: true,
             methodName: '',
-            visibility: 'protected',
+            visibility: 'private',
             tabs: false,
             arraySyntax: 'brackets',
             typeHinting: true,
@@ -69,8 +69,8 @@ class ExtractMethodView extends View
                                     @div class: 'setting-title', 'Access Modifier'
                                     @select outlet: 'accessMethodsInput', class: 'form-control', =>
                                         @option value: 'public', 'Public'
-                                        @option value: 'protected', selected: "selected", 'Protected'
-                                        @option value: 'private', 'Private'
+                                        @option value: 'protected', 'Protected'
+                                        @option value: 'private', selected: "selected", 'Private'
                         @div class: 'control-group', =>
                             @label class: 'control-label', =>
                                 @div class: 'setting-title', 'Documentation'

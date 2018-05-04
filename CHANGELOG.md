@@ -6,6 +6,7 @@
     * Both can be disabled via the settings if you don't want them
     * This is the first step towards integrating this functionality into the core fully in the long term
     * This will also help discoverability, since I notice a lot of users don't notice other packages are available, and is less of a hassle
+* `private` is now the default access modifier when extracting methods
 
 ## 3.5.0
 * Using Docker to run the core is now _experimentally_ supported
