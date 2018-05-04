@@ -1,7 +1,7 @@
 # PHP Integrator IDE
 <p align="right">
 :coffee:
-<a href="https://liberapay.com/Gert-dev/donate">Send me some coffee beans</a>
+<a href="https://liberapay.com/Gert-dev/donate">Feed me some coffee beans to keep it (me) alive</a>
 </p>
 
 Integrates [PHP Integrator](https://gitlab.com/php-integrator/core) into Atom, providing autocompletion, code navigation, refactoring, signature help, linting and annotations.
