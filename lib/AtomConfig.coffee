@@ -31,6 +31,7 @@ class AtomConfig extends Config
             'signatureHelp.enable'
             'gotoDefinition.enable'
             'autocompletion.enable'
+            'annotations.enable'
             'linting.enable'
             'linting.showUnknownClasses'
             'linting.showUnknownMembers'

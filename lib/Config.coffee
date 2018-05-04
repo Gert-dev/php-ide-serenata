@@ -45,6 +45,9 @@ class Config
             autocompletion:
                 enable : true
 
+            annotations:
+                enable : true
+
             linting:
                 enable                      : true
                 showUnknownClasses          : true

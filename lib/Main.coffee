@@ -6,21 +6,23 @@ packageDeps = require('atom-package-deps')
 
 fs = require 'fs'
 
-Proxy =                  require './Proxy'
-Service =                require './Service'
-AtomConfig =             require './AtomConfig'
-PhpInvoker =             require './PhpInvoker'
-CoreManager =            require './CoreManager';
-ConfigTester =           require './ConfigTester'
-ProjectManager =         require './ProjectManager'
-LinterProvider =         require './LinterProvider'
-ComposerService =        require './ComposerService';
-DatatipProvider =        require './DatatipProvider'
-IndexingMediator =       require './IndexingMediator'
-UseStatementHelper =     require './UseStatementHelper';
-SignatureHelpProvider =  require './SignatureHelpProvider'
-GotoDefinitionProvider = require './GotoDefinitionProvider'
-AutocompletionProvider = require './AutocompletionProvider'
+Proxy =                      require './Proxy'
+Service =                    require './Service'
+AtomConfig =                 require './AtomConfig'
+PhpInvoker =                 require './PhpInvoker'
+CoreManager =                require './CoreManager';
+ConfigTester =               require './ConfigTester'
+ProjectManager =             require './ProjectManager'
+LinterProvider =             require './LinterProvider'
+ComposerService =            require './ComposerService';
+DatatipProvider =            require './DatatipProvider'
+IndexingMediator =           require './IndexingMediator'
+UseStatementHelper =         require './UseStatementHelper';
+SignatureHelpProvider =      require './SignatureHelpProvider'
+GotoDefinitionProvider =     require './GotoDefinitionProvider'
+AutocompletionProvider =     require './AutocompletionProvider'
+MethodAnnotationProvider =   require './Annotations/MethodAnnotationProvider'
+PropertyAnnotationProvider = require './Annotations/PropertyAnnotationProvider'
 
 module.exports =
     ###*
@@ -171,9 +173,21 @@ module.exports =
                     default     : true
                     order       : 1
 
-        linting:
+        annotations:
             type: 'object'
             order: 7
+            properties:
+                enable:
+                    title       : 'Enable'
+                    description : 'When enabled, annotations will be shown in the gutter with more information
+                                   regarding member overrides and interface implementations.'
+                    type        : 'boolean'
+                    default     : true
+                    order       : 1
+
+        linting:
+            type: 'object'
+            order: 8
             properties:
                 enable:
                     title       : 'Enable'
@@ -327,6 +341,11 @@ module.exports =
      * @var {Object|null}
     ###
     gotoDefinitionProvider: null
+
+    ###*
+     * @var {Array|null}
+    ###
+    annotationProviders: null
 
     ###*
      * @var {Object|null}
@@ -493,6 +512,13 @@ module.exports =
 
             else
                 @deactivateAutocompletion()
+
+        config.onDidChange 'annotations.enable', (value) =>
+            if value
+                @activateAnnotations()
+
+            else
+                @deactivateAnnotations()
 
         config.onDidChange 'linting.enable', (value) =>
             if value
@@ -705,6 +731,40 @@ module.exports =
             })
 
     ###*
+     * Checks if the php-integrator-annotations package is installed and notifies the user it is obsolete if it
+     * is.
+    ###
+    notifyAboutRedundantAnnotationsPackageIfNecessary: () ->
+        atom.packages.onDidActivatePackage (packageData) ->
+            return if packageData.name != 'php-integrator-annotations'
+
+            message =
+                "It seems you still have the php-integrator-annotations package installed and activated. As of " +
+                "this release, it is obsolete and all its functionality is already included in the base package.\n \n" +
+
+                "It is recommended to disable or remove it, shall I disable it for you?"
+
+            notification = atom.notifications.addInfo('PHP Integrator - Autocompletion', {
+                detail      : message
+                dismissable : true
+
+                buttons: [
+                    {
+                        text: 'Yes, nuke it'
+                        onDidClick: () ->
+                            atom.packages.disablePackage('php-integrator-annotations');
+                            notification.dismiss()
+                    },
+
+                    {
+                        text: 'No, don\'t touch it'
+                        onDidClick: () ->
+                            notification.dismiss()
+                    }
+                ]
+            })
+
+    ###*
      * Activates the package.
     ###
     activate: ->
@@ -725,6 +785,7 @@ module.exports =
     doActivate: () ->
         @notifyAboutRedundantNavigationPackageIfNecessary()
         @notifyAboutRedundantAutocompletionPackageIfNecessary()
+        @notifyAboutRedundantAnnotationsPackageIfNecessary()
 
         @registerCommands()
         @registerConfigListeners()
@@ -739,6 +800,9 @@ module.exports =
 
         if @getConfiguration().get('signatureHelp.enable')
             @activateSignatureHelp()
+
+        if @getConfiguration().get('annotations.enable')
+            @activateAnnotations()
 
         if @getConfiguration().get('linting.enable')
             @activateLinting()
@@ -816,6 +880,26 @@ module.exports =
     ###*
      * Activates linting.
     ###
+    activateAnnotations: () ->
+        @annotationProviders = []
+        @annotationProviders.push new MethodAnnotationProvider()
+        @annotationProviders.push new PropertyAnnotationProvider()
+
+        for provider in @annotationProviders
+            provider.activate(@getService())
+
+    ###*
+     * Deactivates linting.
+    ###
+    deactivateAnnotations: () ->
+        for provider in @annotationProviders
+            provider.deactivate()
+
+        @annotationProviders = []
+
+    ###*
+     * Activates linting.
+    ###
     activateLinting: () ->
         @getLinterProvider().activate(@getService())
 
@@ -878,9 +962,10 @@ module.exports =
             @disposables.dispose()
             @disposables = null
 
-        @getLinterProvider().deactivate()
-        @getDatatipProvider().deactivate()
-        @getSignatureHelpProvider().deactivate()
+        @deactivateAnnotations()
+        @deactivateLinting()
+        @deactivateDatatips()
+        @deactivateSignatureHelp()
 
         @getProxy().exit()
 
