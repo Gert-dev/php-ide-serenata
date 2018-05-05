@@ -13,7 +13,7 @@ class Popover extends Disposable
     ###
     constructor: () ->
         @element = document.createElement('div')
-        @element.className = 'tooltip bottom fade php-integrator-popover'
+        @element.className = 'tooltip bottom fade php-ide-serenata-popover'
         @element.innerHTML = "<div class='tooltip-arrow'></div><div class='tooltip-inner'></div>"
 
         document.body.appendChild(@element)
@@ -42,7 +42,7 @@ class Popover extends Disposable
     ###
     setText: (text) ->
         item = @element.querySelector('.tooltip-inner')
-        item.innerHTML =  '<div class="php-integrator-popover-wrapper">' + text.replace(/\n\n/g, '<br/><br/>') + '</div>'
+        item.innerHTML =  '<div class="php-ide-serenata-popover-wrapper">' + text.replace(/\n\n/g, '<br/><br/>') + '</div>'
 
     ###*
      * Shows a popover at the specified location with the specified text and fade in time.

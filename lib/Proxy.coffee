@@ -504,7 +504,7 @@ class Proxy
             "information printed below.\n \nThe server will attempt to restart itself.\n \n" +
             error.data.backtrace
 
-        atom.notifications.addError('PHP Integrator - Darn, we\'ve crashed!', {
+        atom.notifications.addError('Serenata - Darn, we\'ve crashed!', {
             dismissable : true
             detail      : detail
         })

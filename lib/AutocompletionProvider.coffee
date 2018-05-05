@@ -194,7 +194,7 @@ class AbstractProvider
             leftLabelHTML      : @getSuggestionLeftLabel(suggestion)
             rightLabelHTML     : @getSuggestionRightLabel(suggestion)
             description        : suggestion.documentation
-            className          : 'php-integrator-autocompletion-suggestion' + if suggestion.isDeprecated then ' php-integrator-autocompletion-strike' else ''
+            className          : 'php-ide-serenata-autocompletion-suggestion' + if suggestion.isDeprecated then ' php-ide-serenata-autocompletion-strike' else ''
 
             extraData:
                 additionalTextEdits: suggestion.additionalTextEdits

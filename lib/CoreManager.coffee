@@ -22,7 +22,7 @@ class CoreManager
     ###*
      * @var {String}
     ###
-    COMPOSER_PACKAGE_NAME: 'php-integrator/core'
+    COMPOSER_PACKAGE_NAME: 'Serenata/Serenata'
 
     ###*
      * @var {ComposerService}

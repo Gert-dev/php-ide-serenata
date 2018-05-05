@@ -3,13 +3,13 @@
         'label': 'Packages'
         'submenu': [
             {
-                'label': 'PHP Integrator',
+                'label': 'Serenata',
                 'submenu': [
-                    {'label': 'Set Up Current Project', 'command': 'php-integrator-base:set-up-current-project'},
-                    {'label': '(Re)index Project', 'command': 'php-integrator-base:index-project'},
-                    {'label': 'Forcibly (Re)index Project', 'command': 'php-integrator-base:force-index-project'},
+                    {'label': 'Set Up Current Project', 'command': 'php-ide-serenata:set-up-current-project'},
+                    {'label': '(Re)index Project', 'command': 'php-ide-serenata:index-project'},
+                    {'label': 'Forcibly (Re)index Project', 'command': 'php-ide-serenata:force-index-project'},
                     {'type' : 'separator'},
-                    {'label': 'Sort Use Statements', 'command': 'php-integrator-base:sort-use-statements'},
+                    {'label': 'Sort Use Statements', 'command': 'php-ide-serenata:sort-use-statements'},
                 ]
             }
         ]

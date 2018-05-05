@@ -28,7 +28,7 @@ class Builder
     maxLineLength: null
 
     ###*
-     * The php-integrator-base service.
+     * The php-ide-serenata service.
      *
      * @type {Service}
     ###
@@ -117,7 +117,7 @@ class Builder
         @maxLineLength = maxLineLength
 
     ###*
-     * Set the php-integrator-base service to be used.
+     * Set the php-ide-serenata service to be used.
      *
      * @param {Service} service
     ###

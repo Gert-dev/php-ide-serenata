@@ -4,7 +4,7 @@ module.exports =
 
 class ParameterParser
     ###*
-     * Service object from the php-integrator-base service
+     * Service object from the php-ide-serenata service
      *
      * @type {Service}
     ###

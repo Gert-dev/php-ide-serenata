@@ -47,12 +47,12 @@ class IndexingMediator
             reindexCancellablePromise.cancel()
 
         executor = (resolve, reject) =>
-            @indexingEventEmitter.emit('php-integrator-base:indexing-started', {
+            @indexingEventEmitter.emit('php-ide-serenata:indexing-started', {
                 path : path
             })
 
             successHandler = (output) =>
-                @indexingEventEmitter.emit('php-integrator-base:indexing-finished', {
+                @indexingEventEmitter.emit('php-ide-serenata:indexing-finished', {
                     output : output
                     path   : path
                     source : source
@@ -61,7 +61,7 @@ class IndexingMediator
                 resolve(output)
 
             failureHandler = (error) =>
-                @indexingEventEmitter.emit('php-integrator-base:indexing-failed', {
+                @indexingEventEmitter.emit('php-ide-serenata:indexing-failed', {
                     error  : error
                     path   : path
                     source : source
@@ -73,7 +73,7 @@ class IndexingMediator
                 progress = parseFloat(progress)
 
                 if not isNaN(progress)
-                    @indexingEventEmitter.emit('php-integrator-base:indexing-progress', {
+                    @indexingEventEmitter.emit('php-ide-serenata:indexing-progress', {
                         path       : path
                         percentage : progress
                     })
@@ -114,7 +114,7 @@ class IndexingMediator
      * @return {Disposable}
     ###
     onDidStartIndexing: (callback) ->
-        @indexingEventEmitter.on('php-integrator-base:indexing-started', callback)
+        @indexingEventEmitter.on('php-ide-serenata:indexing-started', callback)
 
     ###*
      * Attaches a callback to indexing progress event. The returned disposable can be used to detach your event handler.
@@ -124,7 +124,7 @@ class IndexingMediator
      * @return {Disposable}
     ###
     onDidIndexingProgress: (callback) ->
-        @indexingEventEmitter.on('php-integrator-base:indexing-progress', callback)
+        @indexingEventEmitter.on('php-ide-serenata:indexing-progress', callback)
 
     ###*
      * Attaches a callback to indexing finished event. The returned disposable can be used to detach your event handler.
@@ -134,7 +134,7 @@ class IndexingMediator
      * @return {Disposable}
     ###
     onDidFinishIndexing: (callback) ->
-        @indexingEventEmitter.on('php-integrator-base:indexing-finished', callback)
+        @indexingEventEmitter.on('php-ide-serenata:indexing-finished', callback)
 
     ###*
      * Attaches a callback to indexing failed event. The returned disposable can be used to detach your event handler.
@@ -144,4 +144,4 @@ class IndexingMediator
      * @return {Disposable}
     ###
     onDidFailIndexing: (callback) ->
-        @indexingEventEmitter.on('php-integrator-base:indexing-failed', callback)
+        @indexingEventEmitter.on('php-ide-serenata:indexing-failed', callback)

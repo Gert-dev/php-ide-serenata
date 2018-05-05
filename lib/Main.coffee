@@ -59,7 +59,7 @@ module.exports =
                                    enter their password via an authentication dialog to temporarily escalate privileges
                                    so the Docker daemon can be invoked once to start the server. \n \n
 
-                                   You can use the php-integrator-base:test-configuration command to test your setup.
+                                   You can use the php-ide-serenata:test-configuration command to test your setup.
                                    \n \n
 
                                    Requires a restart after changing. \n \n"
@@ -283,14 +283,14 @@ module.exports =
      *
      * @var {String}
     ###
-    coreVersionSpecification: "3.3.0"
+    coreVersionSpecification: "4.0.0"
 
     ###*
      * The name of the package.
      *
      * @var {String}
     ###
-    packageName: 'php-integrator-base'
+    packageName: 'php-ide-serenata'
 
     ###*
      * The configuration object.
@@ -420,7 +420,7 @@ module.exports =
     testConfig: () ->
         configTester = new ConfigTester(@getPhpInvoker())
 
-        atom.notifications.addInfo 'PHP Integrator - Testing Configuration', {
+        atom.notifications.addInfo 'Serenata - Testing Configuration', {
             dismissable: true,
             detail: 'Now testing your configuration... \n \n' +
 
@@ -435,10 +435,10 @@ module.exports =
                         "PHP is not configured correctly. Please visit the settings screen to correct this error. If you are
                         using a relative path to PHP, make sure it is in your PATH variable."
 
-                    atom.notifications.addError('PHP Integrator - Failure', {dismissable: true, detail: errorMessage})
+                    atom.notifications.addError('Serenata - Failure', {dismissable: true, detail: errorMessage})
 
                 else
-                    atom.notifications.addSuccess 'PHP Integrator - Success', {
+                    atom.notifications.addSuccess 'Serenata - Success', {
                         dismissable: true,
                         detail: 'Your setup is working correctly.'
                     }
@@ -452,7 +452,7 @@ module.exports =
      * Registers any commands that are available to the user.
     ###
     registerCommands: () ->
-        atom.commands.add 'atom-workspace', "php-integrator-base:set-up-current-project": =>
+        atom.commands.add 'atom-workspace', "php-ide-serenata:set-up-current-project": =>
             if not @projectManagerService?
                 errorMessage = '''
                     The project manager service was not found. Did you perhaps forget to install the project-manager
@@ -498,20 +498,20 @@ module.exports =
 
             @performInitialFullIndexForCurrentProject()
 
-        atom.commands.add 'atom-workspace', "php-integrator-base:index-project": =>
+        atom.commands.add 'atom-workspace', "php-ide-serenata:index-project": =>
             return if not @projectManager.hasActiveProject()
 
             @projectManager.attemptCurrentProjectIndex()
 
-        atom.commands.add 'atom-workspace', "php-integrator-base:force-index-project": =>
+        atom.commands.add 'atom-workspace', "php-ide-serenata:force-index-project": =>
             return if not @projectManager.hasActiveProject()
 
             @performInitialFullIndexForCurrentProject()
 
-        atom.commands.add 'atom-workspace', "php-integrator-base:test-configuration": =>
+        atom.commands.add 'atom-workspace', "php-ide-serenata:test-configuration": =>
             @testConfig()
 
-        atom.commands.add 'atom-workspace', "php-integrator-base:sort-use-statements": =>
+        atom.commands.add 'atom-workspace', "php-ide-serenata:sort-use-statements": =>
             activeTextEditor = atom.workspace.getActiveTextEditor()
 
             return if not activeTextEditor?
@@ -650,7 +650,7 @@ module.exports =
 
                 "First time using this package? Please visit the package settings to set up PHP correctly first."
 
-            notification = atom.notifications.addInfo('PHP Integrator - Core Installation', {
+            notification = atom.notifications.addInfo('Serenata - Core Installation', {
                 detail      : message
                 dismissable : true
 
@@ -708,10 +708,10 @@ module.exports =
 
             "You will be notified once the install finishes (or fails)."
 
-        atom.notifications.addInfo('PHP Integrator - Installing Core', {'detail': message, dismissable: true})
+        atom.notifications.addInfo('Serenata - Installing Core', {'detail': message, dismissable: true})
 
         successHandler = () ->
-            atom.notifications.addSuccess('PHP Integrator - Core Installation Succeeded', dismissable: true)
+            atom.notifications.addSuccess('Serenata - Core Installation Succeeded', dismissable: true)
 
         failureHandler = () ->
             message =
@@ -723,7 +723,7 @@ module.exports =
 
                 "Additionally, the README provides more information about requirements and troubleshooting."
 
-            atom.notifications.addError('PHP Integrator - Core Installation Failed', {detail: message, dismissable: true})
+            atom.notifications.addError('Serenata - Core Installation Failed', {detail: message, dismissable: true})
 
         @getCoreManager().install().then(successHandler, failureHandler)
 
@@ -740,7 +740,7 @@ module.exports =
 
                 "It is recommended to disable or remove it, shall I disable it for you?"
 
-            notification = atom.notifications.addInfo('PHP Integrator - Navigation', {
+            notification = atom.notifications.addInfo('Serenata - Navigation', {
                 detail      : message
                 dismissable : true
 
@@ -774,7 +774,7 @@ module.exports =
 
                 "It is recommended to disable or remove it, shall I disable it for you?"
 
-            notification = atom.notifications.addInfo('PHP Integrator - Autocompletion', {
+            notification = atom.notifications.addInfo('Serenata - Autocompletion', {
                 detail      : message
                 dismissable : true
 
@@ -808,7 +808,7 @@ module.exports =
 
                 "It is recommended to disable or remove it, shall I disable it for you?"
 
-            notification = atom.notifications.addInfo('PHP Integrator - Autocompletion', {
+            notification = atom.notifications.addInfo('Serenata - Autocompletion', {
                 detail      : message
                 dismissable : true
 
@@ -842,7 +842,7 @@ module.exports =
 
                 "It is recommended to disable or remove it, shall I disable it for you?"
 
-            notification = atom.notifications.addInfo('PHP Integrator - Autocompletion', {
+            notification = atom.notifications.addInfo('Serenata - Autocompletion', {
                 detail      : message
                 dismissable : true
 
@@ -1100,7 +1100,7 @@ module.exports =
     ###
     setLinterIndieService: (service) ->
         linter = service({
-            name: 'PHP Integrator'
+            name: 'Serenata'
         })
 
         @getDisposables().add(linter)
@@ -1153,14 +1153,6 @@ module.exports =
         @proxy.test().then(successHandler, failureHandler)
 
         return
-
-    ###*
-     * Retrieves the base package service that can be used by other packages.
-     *
-     * @return {Service}
-    ###
-    getServiceInstance: () ->
-        return @getService()
 
     ###*
      * Retrieves autocompletion providers for the autocompletion package.

@@ -39,13 +39,13 @@ class GetterSetterProvider extends AbstractProvider
     activate: (service) ->
         super(service)
 
-        atom.commands.add 'atom-workspace', "php-integrator-refactoring:generate-getter": =>
+        atom.commands.add 'atom-workspace', "php-ide-serenata-refactoring:generate-getter": =>
             @executeCommand(true, false)
 
-        atom.commands.add 'atom-workspace', "php-integrator-refactoring:generate-setter": =>
+        atom.commands.add 'atom-workspace', "php-ide-serenata-refactoring:generate-setter": =>
             @executeCommand(false, true)
 
-        atom.commands.add 'atom-workspace', "php-integrator-refactoring:generate-getter-setter-pair": =>
+        atom.commands.add 'atom-workspace', "php-ide-serenata-refactoring:generate-getter-setter-pair": =>
             @executeCommand(true, true)
 
     ###*
@@ -154,7 +154,7 @@ class GetterSetterProvider extends AbstractProvider
                     if (enableGetterGeneration and enableSetterGeneration and getterExists and setterExists) or
                        (enableGetterGeneration and getterExists) or
                        (enableSetterGeneration and setterExists)
-                        data.className = 'php-integrator-refactoring-strikethrough'
+                        data.className = 'php-ide-serenata-refactoring-strikethrough'
                         disabledItems.push(data)
 
                     else

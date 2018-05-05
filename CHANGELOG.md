@@ -1,7 +1,9 @@
-## 3.6.0 (Unreleased)
+## 4.0.0
 * Update dependencies
 * Show progress spinner whilst installing the core
 * Show progress spinner whilst testing configuration
+* Make the service unavailable (it was already deprecated)
+* Rename package to `php-ide-serenata` to reflect new name of project
 * Integrate annotations and refactoring from the [annotations](https://github.com/php-integrator/atom-annotations) and [refactoring](https://github.com/php-integrator/atom-refactoring) packages
     * The new functionality is equivalent to that supplied by the separate packages
     * Both can be disabled via the settings if you don't want them

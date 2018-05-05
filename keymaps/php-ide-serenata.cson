@@ -8,4 +8,4 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/behind-atom-keymaps-in-depth
 'atom-text-editor':
-  'alt-m': 'php-integrator-base:extract-method'
+  'alt-m': 'php-ide-serenata:extract-method'

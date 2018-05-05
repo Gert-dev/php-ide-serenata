@@ -57,7 +57,7 @@ class ExtractMethodView extends View
      * Content to be displayed when this view is shown.
     ###
     @content: ->
-        @div class: 'php-integrator-refactoring-extract-method', =>
+        @div class: 'php-ide-serenata-refactoring-extract-method', =>
             @div outlet: 'methodNameForm', =>
                 @subview 'methodNameEditor', new TextEditorView(mini:true, placeholderText: 'Enter a method name')
                 @div class: 'text-error error-message hide error-message--method-name', 'You must enter a method name!'
@@ -129,7 +129,7 @@ class ExtractMethodView extends View
 
         @methodNameEditor.getModel().onDidChange () =>
             @settings.methodName = @methodNameEditor.getText()
-            $('.php-integrator-refactoring-extract-method .error-message--method-name').addClass('hide');
+            $('.php-ide-serenata-refactoring-extract-method .error-message--method-name').addClass('hide');
 
             @refreshPreviewArea()
 
@@ -140,9 +140,9 @@ class ExtractMethodView extends View
         $(@generateDocInput[0]).change (event) =>
             @settings.generateDocs = !@settings.generateDocs
             if @settings.generateDocs == true
-                $('.php-integrator-refactoring-extract-method .generate-docs-control').removeClass('hide')
+                $('.php-ide-serenata-refactoring-extract-method .generate-docs-control').removeClass('hide')
             else
-                $('.php-integrator-refactoring-extract-method .generate-docs-control').addClass('hide')
+                $('.php-ide-serenata-refactoring-extract-method .generate-docs-control').addClass('hide')
 
 
             @refreshPreviewArea()
@@ -201,7 +201,7 @@ class ExtractMethodView extends View
     ###
     confirm: ->
         if @settings.methodName == ''
-            $('.php-integrator-refactoring-extract-method .error-message--method-name').removeClass('hide');
+            $('.php-ide-serenata-refactoring-extract-method .error-message--method-name').removeClass('hide');
             return false
 
         if @onDidConfirm
@@ -228,14 +228,14 @@ class ExtractMethodView extends View
         successHandler = (methodBody) =>
             if @builder.hasReturnValues()
                 if @builder.hasMultipleReturnValues()
-                    $('.php-integrator-refactoring-extract-method .return-multiple-control').removeClass('hide')
+                    $('.php-ide-serenata-refactoring-extract-method .return-multiple-control').removeClass('hide')
                 else
-                    $('.php-integrator-refactoring-extract-method .return-multiple-control').addClass('hide')
+                    $('.php-ide-serenata-refactoring-extract-method .return-multiple-control').addClass('hide')
 
-                $('.php-integrator-refactoring-extract-method .return-control').removeClass('hide')
+                $('.php-ide-serenata-refactoring-extract-method .return-control').removeClass('hide')
             else
-                $('.php-integrator-refactoring-extract-method .return-control').addClass('hide')
-                $('.php-integrator-refactoring-extract-method .return-multiple-control').addClass('hide')
+                $('.php-ide-serenata-refactoring-extract-method .return-control').addClass('hide')
+                $('.php-ide-serenata-refactoring-extract-method .return-multiple-control').addClass('hide')
 
             @previewArea.getModel().getBuffer().setText('<?php' + "\n\n" + methodBody)
 

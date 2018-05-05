@@ -33,7 +33,7 @@ class ExtractMethodProvider extends AbstractProvider
     activate: (service) ->
         super(service)
 
-        atom.commands.add 'atom-text-editor', "php-integrator-base:extract-method": =>
+        atom.commands.add 'atom-text-editor', "php-ide-serenata:extract-method": =>
             @executeCommand()
 
     ###*
@@ -90,7 +90,7 @@ class ExtractMethodProvider extends AbstractProvider
 
         # Checking if a selection has been made
         if selection.start.row == selection.end.row and selection.start.column == selection.end.column
-            atom.notifications.addInfo('php-integrator-refactoring', {
+            atom.notifications.addInfo('Serenata', {
                 detail: 'Please select the code to extract and try again.'
             })
 

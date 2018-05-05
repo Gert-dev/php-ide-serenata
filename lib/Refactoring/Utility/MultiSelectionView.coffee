@@ -48,7 +48,7 @@ class MultiSelectionView extends SelectListView
     initialize: ->
         super()
 
-        @addClass('php-integrator-refactoring-multi-selection-view')
+        @addClass('php-ide-serenata-refactoring-multi-selection-view')
         @list.addClass('mark-active')
 
         @panel ?= atom.workspace.addModalPanel(item: this, visible: false)
