@@ -1,5 +1,5 @@
 {
-  "name": "php-ide-serenata",
+  "name": "php-integrator-base",
   "main": "./lib/Main",
   "version": "4.0.0",
   "description": "Indexes PHP code and exposes services to query it (required for other php-integrator-* packages).",
