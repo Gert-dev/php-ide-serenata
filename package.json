@@ -2,7 +2,7 @@
   "name": "php-ide-serenata",
   "main": "./lib/Main",
   "version": "4.0.1",
-  "description": "Indexes PHP code and exposes services to query it (required for other php-integrator-* packages).",
+  "description": "Atom IDE package that integrates the Serenata server to provide PHP code assistance",
   "repository": "https://github.com/Gert-dev/php-ide-serenata",
   "homepage": "https://php-integrator.github.io/",
   "license": "GPL-3.0-or-later",
