@@ -146,7 +146,7 @@ class Proxy
                 else if code != 0
                     detail =
                         "The PHP core socket server was unexpectedly closed. Either something caused the process to " +
-                        "stop, it crashed, or the socket closed. In case of the first two, you should see additional" +
+                        "stop, it crashed, or the socket closed. In case of the first two, you should see additional " +
                         "output indicating this is the case and you can report a bug. If there is no additional " +
                         "output, the socket connection should automatically be reestablished and everything should " +
                         "continue working."
