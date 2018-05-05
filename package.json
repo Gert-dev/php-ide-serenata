@@ -4,7 +4,7 @@
   "version": "4.0.3",
   "description": "PHP language support for Atom-IDE via the Serenata server",
   "repository": "https://github.com/Gert-dev/php-ide-serenata",
-  "homepage": "https://php-integrator.github.io/",
+  "homepage": "https://serenata.gitlab.io/",
   "license": "GPL-3.0-or-later",
   "engines": {
     "atom": ">=1.26.0 <2.0.0"
