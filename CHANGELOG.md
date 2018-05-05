@@ -1,3 +1,9 @@
+## 4.0.2
+* Update package description
+
+## 4.0.1
+* Fix rename via atom.io
+
 ## 4.0.0
 * Update dependencies
 * Show progress spinner whilst installing the core
