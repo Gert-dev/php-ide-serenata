@@ -103,7 +103,7 @@ module.exports =
                                    projects, from small to large. \n \n
                                    Requires a restart after changing.'
                     type        : 'integer'
-                    default     : 1024
+                    default     : 2048
                     order       : 3
 
                 additionalDockerVolumes:

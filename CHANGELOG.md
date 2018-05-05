@@ -1,3 +1,6 @@
+## 4.1.0 (Unreleased)
+* Up default memory limit to 2048 MB
+
 ## 4.0.3
 * Update package description
 
