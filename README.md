@@ -6,7 +6,7 @@
 
 Integrates [Serenata](https://gitlab.com/Serenata/Serenata) into Atom as PHP IDE, providing autocompletion, code navigation, refactoring, signature help, linting and annotations.
 
-See also [the website](https://php-integrator.github.io/) for [how to set it up](https://php-integrator.github.io/#what-do-i-need) and screenshots.
+See also [the website](https://serenata.gitlab.io/) for [how to set it up](https://serenata.gitlab.io/#what-do-i-need) and screenshots.
 
 There is also [a wiki](https://github.com/Gert-dev/php-ide-serenata/wiki) with more information.
 
