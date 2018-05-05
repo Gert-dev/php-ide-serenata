@@ -1,5 +1,6 @@
 ## 4.1.0 (Unreleased)
 * Up default memory limit to 2048 MB
+* Up default project PHP version from PHP 7.1 to PHP 7.2 (latest)
 
 ## 4.0.3
 * Update package description
