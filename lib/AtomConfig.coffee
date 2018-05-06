@@ -85,7 +85,7 @@ class AtomConfig extends Config
             baseFolder = process.env.APPDATA
 
         else if process.platform == 'darwin'
-            baseFolder = process.env.HOME + 'Library/Preferences'
+            baseFolder = process.env.HOME + '/Library/Preferences'
 
         else
             baseFolder = process.env.HOME + '/.cache'
