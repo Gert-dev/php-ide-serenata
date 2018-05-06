@@ -2,7 +2,7 @@
 * Up default memory limit to 2048 MB
 * Add missing space in core error message
 * Up default project PHP version from PHP 7.1 to PHP 7.2 (latest)
-* The core and indexes are now stored somewhere in a semi-persistent folder
+* The core and indexes are now stored somewhere else, in a semi-persistent folder
   * The core will now no longer be reinstalled every time this package updates if its version remains the same
   * This avoids an [EBUSY error during update on Windows](https://github.com/Gert-dev/php-ide-serenata/issues/413)
   * The base locations used are (concatenated with the package name):
