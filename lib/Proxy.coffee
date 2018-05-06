@@ -1,5 +1,7 @@
 fs            = require 'fs'
 net           = require 'net'
+path          = require 'path'
+mkdirp        = require 'mkdirp'
 stream        = require 'stream'
 child_process = require 'child_process'
 sanitize      = require 'sanitize-filename'
@@ -1091,7 +1093,11 @@ class Proxy
         if not @indexDatabaseName?
             return null
 
-        return @config.get('packagePath') + '/indexes/' + @indexDatabaseName + '.sqlite'
+        folder = @config.get('storagePath') + path.sep + 'indexes'
+
+        mkdirp.sync(folder)
+
+        return folder + path.sep + @indexDatabaseName + '.sqlite'
 
     ###*
      * @param {String} corePath

@@ -1278,7 +1278,7 @@ module.exports =
         if not @composerService?
             @composerService = new ComposerService(
                 @getPhpInvoker(),
-                @getConfiguration().get('packagePath') + '/core/'
+                @getConfiguration().get('storagePath') + '/core/'
             )
 
         return @composerService
@@ -1291,7 +1291,7 @@ module.exports =
             @coreManager = new CoreManager(
                 @getComposerService(),
                 @coreVersionSpecification,
-                @getConfiguration().get('packagePath') + '/core/'
+                @getConfiguration().get('storagePath') + '/core/'
             )
 
         return @coreManager

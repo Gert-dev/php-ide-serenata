@@ -1,6 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 rimraf = require 'rimraf'
+mkdirp = require 'mkdirp'
 
 module.exports =
 
@@ -51,6 +52,8 @@ class CoreManager
     ###
     install: () ->
         @removeExistingFolderIfPresent()
+
+        mkdirp(@getCoreSourcePath())
 
         return @composerService.run([
             'create-project',

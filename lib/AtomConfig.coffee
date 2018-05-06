@@ -1,3 +1,7 @@
+path = require 'path'
+process = require 'process'
+mkdirp = require 'mkdirp'
+
 Config = require './Config'
 
 module.exports =
@@ -51,6 +55,7 @@ class AtomConfig extends Config
      * @inheritdoc
     ###
     load: () ->
+        @set('storagePath', @getPathToStorageFolderInRidiculousWay())
         @set('packagePath', atom.packages.resolvePackagePath("#{@packageName}"))
 
         for property in @configurableProperties
@@ -68,3 +73,26 @@ class AtomConfig extends Config
             ).bind(this, property)
 
             atom.config.onDidChange("#{@packageName}.#{property}", callback)
+
+    ###*
+     * @return {String}
+    ###
+    getPathToStorageFolderInRidiculousWay: () ->
+        # NOTE: Apparently process.env.ATOM_HOME is not always set for whatever reason and this ridiculous workaround
+        # is needed to fetch an OS-compliant location to store application data.
+        baseFolder = null
+
+        if process.env.APPDATA
+            baseFolder = process.env.APPDATA
+
+        else if process.platform == 'darwin'
+            baseFolder = process.env.HOME + 'Library/Preferences'
+
+        else
+            baseFolder = process.env.HOME + '/.cache'
+
+        packageFolder = baseFolder + path.sep + @packageName
+
+        mkdirp.sync(packageFolder)
+
+        return packageFolder

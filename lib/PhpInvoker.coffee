@@ -72,7 +72,7 @@ class PhpInvoker
     ###
     getPathsToMountInDockerContainer: () ->
         paths = {}
-        paths[@config.get('packagePath')] = @config.get('packagePath')
+        paths[@config.get('storagePath')] = @config.get('storagePath')
 
         for path in @config.get('core.additionalDockerVolumes')
             parts = path.split(':')
