@@ -1,4 +1,4 @@
-## 4.1.1 (Unreleased)
+## 4.1.1
 * [Fix incorrect install path](https://github.com/Gert-dev/php-ide-serenata/issues/415) [on macOS](https://github.com/Gert-dev/php-ide-serenata/issues/414)
 * Fix project paths containing `~` to refer to the home folder being ignored due to them not being found
 
