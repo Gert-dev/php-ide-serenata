@@ -56,7 +56,6 @@ class AtomConfig extends Config
     ###
     load: () ->
         @set('storagePath', @getPathToStorageFolderInRidiculousWay())
-        @set('packagePath', atom.packages.resolvePackagePath("#{@packageName}"))
 
         for property in @configurableProperties
             @set(property, atom.config.get("#{@packageName}.#{property}"))

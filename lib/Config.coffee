@@ -61,8 +61,6 @@ class Config
                 showMissingDocs             : true
                 validateDocblockCorrectness : true
 
-            packagePath : null
-
             # See also http://www.phpdoc.org/docs/latest/index.html .
             phpdoc_base_url : {
                 prefix: 'http://www.phpdoc.org/docs/latest/references/phpdoc/tags/'
