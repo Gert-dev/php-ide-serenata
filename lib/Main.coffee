@@ -5,6 +5,7 @@
 packageDeps = require('atom-package-deps')
 
 fs = require 'fs'
+process = require 'process'
 
 Proxy = require './Proxy'
 Service = require './Service'
@@ -602,6 +603,9 @@ module.exports =
         getBaseMessageForPath = (path) ->
             if Array.isArray(path)
                 path = path[0]
+
+            if path.indexOf('~') != false
+                path = path.replace('~', process.env.HOME)
 
             if fs.lstatSync(path).isDirectory()
                 return 'Indexing project - code assistance may be unavailable or incomplete'

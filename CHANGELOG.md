@@ -1,3 +1,6 @@
+## 4.1.1 (Unreleased)
+* Fix project paths containing `~` to refer to the home folder being ignored due to them not being found
+
 ## 4.1.0
 * Up default memory limit to 2048 MB
 * Add missing space in core error message
