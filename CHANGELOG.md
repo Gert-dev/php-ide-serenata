@@ -1,4 +1,4 @@
-## 4.1.0 (Unreleased)
+## 4.1.0
 * Up default memory limit to 2048 MB
 * Add missing space in core error message
 * Up default project PHP version from PHP 7.1 to PHP 7.2 (latest)
