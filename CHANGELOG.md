@@ -1,5 +1,5 @@
 ## 4.1.2
-* Update to Serenata [4.0.1](https://gitlab.com/php-integrator/core/tags/4.0.1)
+* Update to Serenata [4.0.1](https://gitlab.com/Serenata/Serenata/tags/4.0.1)
 
 ## 4.1.1
 * [Fix incorrect install path](https://github.com/Gert-dev/php-ide-serenata/issues/415) [on macOS](https://github.com/Gert-dev/php-ide-serenata/issues/414)
@@ -51,7 +51,7 @@
 * Show feedback when configuration is being tested, as this may take a while the first time when using Docker if the image still needs to be fetched
 
 ## 3.4.0
-* Update to core [3.3.0](https://gitlab.com/php-integrator/core/tags/3.3.0)
+* Update to core [3.3.0](https://gitlab.com/Serenata/Serenata/tags/3.3.0)
 * Allow configuring the host to bind the socket to (`127.0.0.1` by default, as before)
   * You can use e.g. 0.0.0.0 if you're spawning the server via Docker via a custom script in the `PHP executable` section, previously a containerized server would not accept commands
 
@@ -61,13 +61,13 @@
 * Renamed the `php-integrator-base:configuration` command to `php-integrator-base:test-configuration` to better indicate what it does
 
 ## 3.2.1
-* Update to core [3.2.1](https://gitlab.com/php-integrator/core/tags/3.2.1)
+* Update to core [3.2.1](https://gitlab.com/Serenata/Serenata/tags/3.2.1)
 * [Fix busy messages lingering sometimes](https://github.com/php-integrator/atom-base/issues/372)
 * [Fix indexing busy messages not showing what is actually being indexed](https://github.com/php-integrator/atom-base/issues/372)
 
 ## 3.2.0
 ### Major Changes
-* Update to core [3.2.0](https://gitlab.com/php-integrator/core/tags/3.2.0)
+* Update to core [3.2.0](https://gitlab.com/Serenata/Serenata/tags/3.2.0)
   * Among the changes is request prioritization, causing most operations such as autocompletion to already start working whilst the project is still indexing.
 * [Improve responsiveness considerably by cancelling outdated requests in the core](https://github.com/php-integrator/atom-base/issues/347)
 * Rewrite tooltips to use tooltips from `atom-ide-ui`
@@ -100,13 +100,13 @@
   * It will remain at least until all separate addon packages have been moved to the core. There may also be backwards compatibility breaks, although they will likely be minor, if they occur at all.
 
 ### Bugs Fixed
-* [Fix structural elements disappearing from index sometimes](https://gitlab.com/php-integrator/core/issues/148)
+* [Fix structural elements disappearing from index sometimes](https://gitlab.com/Serenata/Serenata/issues/148)
 * [Improved hint shown when no project is currently active and user tries to set up project](https://github.com/php-integrator/atom-base/issues/352) (thanks to [@ADTC](https://github.com/ADTC))
 * [The core is now shut down properly instead of killed, which should help mitigate locked and busy errors after upgrades or restarts](https://github.com/php-integrator/atom-base/issues/270)
 
 ## 3.1.0
 ### Major Changes
-* Update to core [3.1.0](https://gitlab.com/php-integrator/core/tags/3.1.0)
+* Update to core [3.1.0](https://gitlab.com/Serenata/Serenata/tags/3.1.0)
 * Support goto definition (code navigation) via new core command
   * `php-integrator-navigation` is now obsolete. It will continue to work on older Atom versions, but it was essentially broken since Atom 1.19, as several CSS class names changed in the `language-php` package. It is advised to uninstall it, [as it will no longer be maintained](https://github.com/php-integrator/atom-navigation).
 
@@ -120,7 +120,7 @@
 * [Show troubleshooting information when core installation fails](https://github.com/php-integrator/atom-base/issues/84)
 * [Rephrase `Composer has errors to report` during installation](https://github.com/php-integrator/atom-base/issues/307)
 * Table cells in the documentation pane are now aligned vertically to the top
-* Minor backwards compatibility break: fetching available variables now requires a file path as part of [a core fix](https://gitlab.com/php-integrator/core/issues/126)
+* Minor backwards compatibility break: fetching available variables now requires a file path as part of [a core fix](https://gitlab.com/Serenata/Serenata/issues/126)
 * Wait a bit longer before displaying signature help
   * This should fix the nuisance of it popping all over the place when rapidly moving the cursor around and gives you a bit more time to get your bearings before it appears.
   * This also reduces the load on the server in large files, where multiple requests may be queued because of slower cursor movement, after which signature help then seems to "lag" behind afterwards.
@@ -134,7 +134,7 @@
 * [Fix core installation issues on Windows because of maximum path limit being exceeded due to Composer generating temporary files during ZIP extraction](https://github.com/php-integrator/atom-base/issues/303)
 
 ## 3.0.0
-* Update to core [3.0.0](https://gitlab.com/php-integrator/core/tags/3.0.0).
+* Update to core [3.0.0](https://gitlab.com/Serenata/Serenata/tags/3.0.0).
 * Settings are now grouped into sections and their descriptions have been cleaned up.
   * It is possible you may need to reconfigure your settings. Due to the way Atom saves them, it is recommended to remove your old settings from your config file first (see `Edit` → `Config...`), to prevent Atom from showing old settings (as if they were still configurable) in the base package settings panel.
 * Linting has been moved to this package. Due to refactoring in the core, the amount of CoffeeScript boilerplate has considerably reduced.
@@ -161,25 +161,25 @@
 * Add upgrade message.
 
 ## 2.1.12
-* Update to core [2.1.7](https://gitlab.com/php-integrator/core/tags/2.1.7).
+* Update to core [2.1.7](https://gitlab.com/Serenata/Serenata/tags/2.1.7).
 
 ## 2.1.11
-* Update to core [2.1.6](https://gitlab.com/php-integrator/core/tags/2.1.6).
+* Update to core [2.1.6](https://gitlab.com/Serenata/Serenata/tags/2.1.6).
 
 ## 2.1.10
-* Update to core [2.1.5](https://gitlab.com/php-integrator/core/tags/2.1.5).
+* Update to core [2.1.5](https://gitlab.com/Serenata/Serenata/tags/2.1.5).
 
 ## 2.1.9
 * Nothing changed, `apm` just failed to publish 2.1.8 and decided to bump the version, even though I explicitly asked it to try and publish 2.1.8 again.
 
 ## 2.1.8
-* Update to core [2.1.4](https://gitlab.com/php-integrator/core/tags/2.1.4).
+* Update to core [2.1.4](https://gitlab.com/Serenata/Serenata/tags/2.1.4).
 
 ## 2.1.7
-* Update to core [2.1.3](https://gitlab.com/php-integrator/core/tags/2.1.3).
+* Update to core [2.1.3](https://gitlab.com/Serenata/Serenata/tags/2.1.3).
 
 ## 2.1.6
-* Update to core [2.1.2](https://gitlab.com/php-integrator/core/tags/2.1.2).
+* Update to core [2.1.2](https://gitlab.com/Serenata/Serenata/tags/2.1.2).
 * Socket closes and reconnections will no longer display errors to the user. See also 46fc09f9b072a601dd6f6b02ee753a9785bfa397.
 
 ## 2.1.5
@@ -187,7 +187,7 @@
   * Previously, the base package kept accumulating response data in a buffer, never seeing the end of the one that was interrupted.
 
 ## 2.1.4
-* Update to core [2.1.1](https://gitlab.com/php-integrator/core/tags/2.1.1).
+* Update to core [2.1.1](https://gitlab.com/Serenata/Serenata/tags/2.1.1).
 * Composer output will no longer be silenced when installing the core.
 
 ## 2.1.3
@@ -207,19 +207,19 @@
 * Explicitly close open socket connections when the server dies as a safety measure (as the port is reused when the server is spawned again).
 
 ## 2.1.0
-* Update to core [2.1.0](https://gitlab.com/php-integrator/core/tags/2.1.0).
+* Update to core [2.1.0](https://gitlab.com/Serenata/Serenata/tags/2.1.0).
 * The server wasn't always being restarted automatically when it died or the connection failed. This should be fixed now.
 * The core is now downloaded using Composer instead of apm, which is more robust and allows properly selecting the right version to download.
 
 ## 2.0.2
-* Update to core [2.0.2](https://gitlab.com/php-integrator/core/tags/2.0.2).
+* Update to core [2.0.2](https://gitlab.com/Serenata/Serenata/tags/2.0.2).
 
 ## 2.0.1
-* Update to core [2.0.1](https://gitlab.com/php-integrator/core/tags/2.0.1).
+* Update to core [2.0.1](https://gitlab.com/Serenata/Serenata/tags/2.0.1).
 
 ## 2.0.0
 ### Features and enhancements
-* The PHP side is no longer part of the base package. Instead, it has been separated into the [php-integrator/core](https://gitlab.com/php-integrator/core) repository so it can be more easily installed via Composer for use in other projects.
+* The PHP side is no longer part of the base package. Instead, it has been separated into the [php-integrator/core](https://gitlab.com/Serenata/Serenata) repository so it can be more easily installed via Composer for use in other projects.
   * This change should not impact users as they upgrade, as this package will be automatically installed and upgraded along with this one if necessary (a notification will be shown whenever that happens).
 * Communication with the core now happens via sockets. This means only a single process is spawned on startup and kept active throughout the lifetime of Atom.
   * This should reduce latency across the board as process spawning is rather expensive in comparison. It will also ensure there is never more than one process active when multiple requests are fired simultaneously (they will simply be queued and handled one by one, which will not freeze up Atom as communication is completely asynchronous).
@@ -260,7 +260,7 @@
 * Proxy methods will no longer throw exceptions if some parameters are missing or invalid. Instead, a promise rejection will occur.
 
 ### Note
-Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://gitlab.com/php-integrator/core/blob/master/CHANGELOG.md) for the master branch or [here](https://gitlab.com/php-integrator/core/blob/development/CHANGELOG.md) for the development branch.
+Starting with version **2.0.0**, this repository only contains the CoffeeScript or _client_ side (for Atom) of the indexer. Most of the interesting changes are happening on the PHP or _server_ side. You can view its changelog [here](https://gitlab.com/Serenata/Serenata/blob/master/CHANGELOG.md) for the master branch or [here](https://gitlab.com/Serenata/Serenata/blob/development/CHANGELOG.md) for the development branch.
 
 ## 1.2.6
 ### Bugs fixed
