@@ -1,3 +1,6 @@
+## 4.1.3 (Unreleased)
+* Make it easier to report issues when the server crashed and add note that they should not be reported to GitHub
+
 ## 4.1.2
 * Update to Serenata [4.0.1](https://gitlab.com/Serenata/Serenata/tags/4.0.1)
 

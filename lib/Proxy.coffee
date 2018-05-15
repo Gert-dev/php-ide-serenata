@@ -501,13 +501,33 @@ class Proxy
     ###
     showFatalServerError: (error) ->
         detail =
-            "You've likely hit a bug. Feel free to report it on the bug tracker. If you do, please include the " +
-            "information printed below.\n \nThe server will attempt to restart itself.\n \n" +
+            "You've likely hit a snag in the Serenata server. Feel free to report it on its bug tracker. " +
+            "If you do, please include the information printed below.\n \n" +
+
+            "Please do *not* report this to the issue tracker of this package on GitHub as it is not a bug here.\n \n" +
+
+            "The server will attempt to restart itself.\n \n" +
+
             error.data.backtrace
 
-        atom.notifications.addError('Serenata - Darn, we\'ve crashed!', {
+        notification = atom.notifications.addError('Serenata - Darn, we\'ve crashed!', {
             dismissable : true
             detail      : detail
+
+            buttons: [
+                {
+                    text: 'Open issue tracker'
+                    onDidClick: () ->
+                        {shell} = require 'electron'
+                        shell.openExternal('https://gitlab.com/Serenata/Serenata/issues')
+                },
+
+                {
+                    text: 'Dismiss'
+                    onDidClick: () ->
+                        notification.dismiss()
+                }
+            ]
         })
 
     ###*
