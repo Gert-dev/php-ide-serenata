@@ -45,10 +45,10 @@ class PhpInvoker
 
         # NOTE: Uncomment this to test failures
         # process.stdout.on 'data', (data) =>
-        #     console.log('STDOUT', data)
+        #     console.log('STDOUT', data.toString())
         #
         # process.stderr.on 'data', (data) =>
-        #     console.log('STDERR', data)
+        #     console.log('STDERR', data.toString())
 
         return process
 
