@@ -1350,7 +1350,7 @@ module.exports =
     ###
     getGotoDefinitionProvider: () ->
         if not @gotoDefinitionProvider?
-            @gotoDefinitionProvider = new GotoDefinitionProvider()
+            @gotoDefinitionProvider = new GotoDefinitionProvider(@getPhpInvoker())
 
         return @gotoDefinitionProvider
 

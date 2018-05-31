@@ -17,6 +17,16 @@ class GotoDefinitionProvider
     pendingRequestPromise: null
 
     ###*
+     * @var {PhpInvoker}
+    ###
+    phpInvoker: null
+
+    ###*
+     * @param {Object} phpInvoker
+    ###
+    constructor: (@phpInvoker) ->
+
+    ###*
      * @param {Object} service
     ###
     activate: (service) ->
@@ -40,7 +50,7 @@ class GotoDefinitionProvider
                 range : SymbolHelpers.getRangeForSymbolAtPosition(editor, bufferPosition)
 
                 callback : () =>
-                    atom.workspace.open(result.uri, {
+                    atom.workspace.open(@phpInvoker.denormalizePlatformAndRuntimePath(result.uri), {
                         initialLine    : (result.line - 1),
                         searchAllPanes: true
                     })

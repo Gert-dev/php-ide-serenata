@@ -1,4 +1,5 @@
 ## 4.1.3 (Unreleased)
+* Fix experimental Docker support not working on Windows due to Windows ↔ Linux path transitions
 * Make it easier to report issues when the server crashed and add note that they should not be reported to GitHub
 
 ## 4.1.2

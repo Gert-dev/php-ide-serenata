@@ -92,7 +92,7 @@ class ComposerService
         @download().then () =>
              parameters = [
                  @getInstallerFileFilePath(),
-                 '--install-dir=' + @folder + '',
+                 '--install-dir=' + @phpInvoker.normalizePlatformAndRuntimePath(@getInstallerFilePath()),
                  '--filename=' + @getFileName()
              ]
 
@@ -139,13 +139,13 @@ class ComposerService
      * @return {String}
     ###
     getInstallerFileFilePath: () ->
-        return path.join(@getInstallerFilePath(), @getInstallerFileFileName())
+        return @phpInvoker.normalizePlatformAndRuntimePath(path.join(@getInstallerFilePath(), @getInstallerFileFileName()))
 
     ###*
      * @return {String}
     ###
     getPath: () ->
-        return path.join(@folder, @getFileName())
+        return @phpInvoker.normalizePlatformAndRuntimePath(path.join(@getInstallerFilePath(), @getFileName()))
 
     ###*
      * @return {String}

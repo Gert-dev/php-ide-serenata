@@ -58,7 +58,7 @@ class CoreManager
         return @composerService.run([
             'create-project',
             @COMPOSER_PACKAGE_NAME,
-            @getCoreSourcePath(),
+            @composerService.phpInvoker.normalizePlatformAndRuntimePath(@getCoreSourcePath()),
             @versionSpecification,
             # https://github.com/php-integrator/atom-base/issues/303 - Unfortunately the dist involves using a ZIP on
             # Windows, which in turn causes temporary files to be created that exceed the maximum path limit. Hence

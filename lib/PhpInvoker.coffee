@@ -1,3 +1,4 @@
+os = require "os"
 child_process = require "child_process"
 
 module.exports =
@@ -43,17 +44,18 @@ class PhpInvoker
 
         process = child_process.spawn(command, dockerParameters)
 
+        console.log(command, dockerParameters)
+
         # NOTE: Uncomment this to test failures
-        # process.stdout.on 'data', (data) =>
-        #     console.log('STDOUT', data.toString())
-        #
-        # process.stderr.on 'data', (data) =>
-        #     console.log('STDERR', data.toString())
+        process.stdout.on 'data', (data) =>
+            console.debug('STDOUT', data.toString())
+
+        process.stderr.on 'data', (data) =>
+            console.debug('STDERR', data.toString())
 
         return process
 
     ###*
-     * @param {String} dockerImage
      * @param {Array}  additionalDockerRunParameters
      *
      * @return {Array}
@@ -82,4 +84,86 @@ class PhpInvoker
         for path in atom.project.getPaths()
             paths[path] = path
 
-        return paths
+        return @normalizeVolumePaths(paths)
+
+    ###*
+     * @param {Object} pathMap
+     *
+     * @return {Object}
+    ###
+    normalizeVolumePaths: (pathMap) ->
+        newPathMap = {}
+
+        for src, dest of pathMap
+            newPathMap[@normalizeVolumePath(src)] = @normalizeVolumePath(dest)
+
+        return newPathMap
+
+    ###*
+     * @param {String} path
+     *
+     * @return {String}
+    ###
+    normalizeVolumePath: (path) ->
+        if os.platform() != 'win32'
+            return path
+
+        matches = path.match(/^([A-Z]+):(.+)$/)
+
+        # Path already normalized.
+        if matches != null
+            # On Windows, paths for Docker volumes are specified as
+            # /c/Path/To/Item.
+            path = '/' + matches[1].toLowerCase() + matches[2]
+
+        return path.replace(/\\/g, '/')
+
+    ###*
+     * @param {String} path
+     *
+     * @return {String}
+    ###
+    denormalizeVolumePath: (path) ->
+        if os.platform() != 'win32'
+            return path
+
+        matches = path.match(/^\/([a-z]+)\/(.+)$/)
+
+        # Path already denormalized.
+        if matches != null
+            # On Windows, paths for Docker volumes are specified as
+            # /c/Path/To/Item.
+            path = matches[1].toUpperCase() + ':\\' + matches[2]
+
+        return path.replace(/\//g, '\\')
+
+    ###*
+     * Retrieves a path normalized for the current platform *and* runtime.
+     *
+     * On Windows, we still need UNIX paths if we are using Docker as runtime,
+     * but not if we are using the host PHP.
+     *
+     * @param {String} path
+     *
+     * @return {String}
+    ###
+    normalizePlatformAndRuntimePath: (path) ->
+        if @config.get('core.phpExecutionType') == 'host'
+            return path
+
+        return @normalizeVolumePath(path)
+
+    ###*
+     * Retrieves a path denormalized for the current platform *and* runtime.
+     *
+     * On Windows, this converts Docker paths back to Windows paths.
+     *
+     * @param {String} path
+     *
+     * @return {String}
+    ###
+    denormalizePlatformAndRuntimePath: (path) ->
+        if @config.get('core.phpExecutionType') == 'host'
+            return path
+
+        return @denormalizeVolumePath(path)
