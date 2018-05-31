@@ -44,7 +44,7 @@ class PhpInvoker
 
         process = child_process.spawn(command, dockerParameters)
 
-        console.log(command, dockerParameters)
+        console.debug(command, dockerParameters)
 
         # NOTE: Uncomment this to test failures
         process.stdout.on 'data', (data) =>
