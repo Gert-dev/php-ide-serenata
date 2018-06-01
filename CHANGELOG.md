@@ -1,4 +1,4 @@
-## 4.1.3 (Unreleased)
+## 4.1.3
 * [Silence error when busy signal service is not loaded yet](https://github.com/Gert-dev/php-ide-serenata/issues/416)
 * [Pass `--rm=true` to `docker run` when using Docker to clean up containers when they exit](https://github.com/Gert-dev/php-ide-serenata/issues/432)
 * [Use `serenata` as key in project settings instead of old `php_integrator`](https://github.com/Gert-dev/php-ide-serenata/issues/426)
