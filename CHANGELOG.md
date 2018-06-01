@@ -1,5 +1,6 @@
 ## 4.2.0 (Unreleased)
 * [Decaffeinate to switch to ES6 JavaScript from CoffeeScript](https://github.com/Gert-dev/php-ide-serenata/issues/375)
+* [Fix no icon being shown for protected methods during autocompletion](https://github.com/Gert-dev/php-ide-serenata/issues/379)
 
 ## 4.1.3
 * [Silence error when busy signal service is not loaded yet](https://github.com/Gert-dev/php-ide-serenata/issues/416)
