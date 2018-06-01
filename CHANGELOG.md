@@ -1,3 +1,6 @@
+## 4.2.0 (Unreleased)
+* [Decaffeinate to switch to ES6 JavaScript from CoffeeScript](https://github.com/Gert-dev/php-ide-serenata/issues/375)
+
 ## 4.1.3
 * [Silence error when busy signal service is not loaded yet](https://github.com/Gert-dev/php-ide-serenata/issues/416)
 * [Pass `--rm=true` to `docker run` when using Docker to clean up containers when they exit](https://github.com/Gert-dev/php-ide-serenata/issues/432)
