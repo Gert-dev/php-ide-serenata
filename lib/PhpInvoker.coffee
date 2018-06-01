@@ -61,7 +61,7 @@ class PhpInvoker
      * @return {Array}
     ###
     getDockerRunParameters: (dockerImage, additionalDockerRunParameters) ->
-        parameters = ['run']
+        parameters = ['run', '--rm=true']
 
         for src, dest of @getPathsToMountInDockerContainer()
             parameters.push('-v')
