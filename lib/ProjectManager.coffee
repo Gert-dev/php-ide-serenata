@@ -50,7 +50,7 @@ class ProjectManager
     ###
     defaultProjectSettings:
         enabled: true
-        php_integrator:
+        serenata:
             enabled: true
             phpVersion: 7.2
             excludedPaths: []
@@ -99,7 +99,7 @@ class ProjectManager
     setUpProject: (project) ->
         projectPhpSettings = if project.getProps().php? then project.getProps().php else {}
 
-        if projectPhpSettings.php_integrator?
+        if projectPhpSettings.serenata?
             throw new Error('''
                 The currently active project was already initialized. To prevent existing settings from getting lost,
                 the request has been aborted.
@@ -108,8 +108,8 @@ class ProjectManager
         if not projectPhpSettings.enabled
             projectPhpSettings.enabled = true
 
-        if not projectPhpSettings.php_integrator?
-            projectPhpSettings.php_integrator = @defaultProjectSettings.php_integrator
+        if not projectPhpSettings.serenata?
+            projectPhpSettings.serenata = @defaultProjectSettings.serenata
 
         existingProps = project.getProps()
         existingProps.php = projectPhpSettings
@@ -170,14 +170,14 @@ class ProjectManager
 
         if not projectSettings?
             throw new Error(
-                'No project settings were found, a php.php_integrator node must be present in your project settings!'
+                'No project settings were found under a node called "php.serenata" in your project settings'
             )
 
         phpVersion = projectSettings.phpVersion
 
         if isNaN(parseFloat(phpVersion)) or not isFinite(phpVersion)
             throw new Error('''
-                The PHP version that is set in your project settings is not valid! It must be a number, for example: 5.6
+                PHP version in your project settings must be a number such as 7.2
             ''')
 
     ###*
@@ -351,7 +351,11 @@ class ProjectManager
      * @return {Object|null}
     ###
     getProjectSettings: (project) ->
-        if project.getProps().php?.php_integrator?
+        if project.getProps().php?.serenata?
+            return project.getProps().php.serenata
+
+        # Legacy name supported for backwards compatibility.
+        else if project.getProps().php?.php_integrator?
             return project.getProps().php.php_integrator
 
         return null
