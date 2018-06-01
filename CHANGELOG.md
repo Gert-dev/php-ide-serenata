@@ -1,5 +1,5 @@
 ## 4.1.3 (Unreleased)
-* Pass `--rm=true` to `docker run` when using Docker to clean up containers when they exit
+* [Pass `--rm=true` to `docker run` when using Docker to clean up containers when they exit](https://github.com/Gert-dev/php-ide-serenata/issues/432)
 * Fix experimental Docker support not working on Windows due to Windows ↔ Linux path transitions
 * Make it easier to report issues when the server crashed and add note that they should not be reported to GitHub
 
