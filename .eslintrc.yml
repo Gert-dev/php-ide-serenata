@@ -22,3 +22,7 @@ rules:
         - always
     no-console:
         - off
+    max-len:
+        - error
+        -
+            code: 120
