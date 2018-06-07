@@ -1,6 +1,7 @@
 ## 4.2.0 (Unreleased)
 * [Decaffeinate to switch to ES6 JavaScript from CoffeeScript](https://github.com/Gert-dev/php-ide-serenata/issues/375)
 * [Fix no icon being shown for protected methods during autocompletion](https://github.com/Gert-dev/php-ide-serenata/issues/379)
+* Fix no communication with the server initiating when multiple messages were printed simultaneously by the server (such as the Xdebug warning and the "Starting socket server" message)
 
 ## 4.1.3
 * [Silence error when busy signal service is not loaded yet](https://github.com/Gert-dev/php-ide-serenata/issues/416)
