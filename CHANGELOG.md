@@ -1,4 +1,4 @@
-## 4.2.0 (Unreleased)
+## 4.2.0
 * Update to Serenata [4.1.0](https://gitlab.com/Serenata/Serenata/tags/4.1.0)
 * [Decaffeinate to switch to ES6 JavaScript from CoffeeScript](https://github.com/Gert-dev/php-ide-serenata/issues/375)
 * [Fix no icon being shown for protected methods during autocompletion](https://github.com/Gert-dev/php-ide-serenata/issues/379)
