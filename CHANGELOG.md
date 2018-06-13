@@ -1,4 +1,5 @@
 ## 4.2.0 (Unreleased)
+* Update to Serenata [4.1.0](https://gitlab.com/Serenata/Serenata/tags/4.1.0)
 * [Decaffeinate to switch to ES6 JavaScript from CoffeeScript](https://github.com/Gert-dev/php-ide-serenata/issues/375)
 * [Fix no icon being shown for protected methods during autocompletion](https://github.com/Gert-dev/php-ide-serenata/issues/379)
 * Fix no communication with the server initiating when multiple messages were printed simultaneously by the server (such as the Xdebug warning and the "Starting socket server" message)
