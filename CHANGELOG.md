@@ -1,4 +1,5 @@
 ## 4.2.1 (Unreleased)
+* [Add note that index continuously requires a restart](https://github.com/Gert-dev/php-ide-serenata/issues/348)
 * [Fix quickly closing a file still indexing it, but with no contents, removing contained structural elements](https://gitlab.com/Serenata/Serenata/issues/183)
   * This was actually a bug in the client package, not the server.
 
