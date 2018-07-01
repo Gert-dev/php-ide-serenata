@@ -1,3 +1,7 @@
+## 4.2.1 (Unreleased)
+* [Fix quickly closing a file still indexing it, but with no contents, removing contained structural elements](https://gitlab.com/Serenata/Serenata/issues/183)
+  * This was actually a bug in the client package, not the server.
+
 ## 4.2.0
 * Update to Serenata [4.1.0](https://gitlab.com/Serenata/Serenata/tags/4.1.0)
 * [Decaffeinate to switch to ES6 JavaScript from CoffeeScript](https://github.com/Gert-dev/php-ide-serenata/issues/375)
