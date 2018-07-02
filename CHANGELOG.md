@@ -1,4 +1,4 @@
-## 4.2.1 (Unreleased)
+## 4.3.0
 * [Add note that index continuously requires a restart](https://github.com/Gert-dev/php-ide-serenata/issues/348)
 * [Fix newly opened file not being immediately indexed](https://github.com/Gert-dev/php-ide-serenata/issues/366)
 * [Fix quickly closing a file still indexing it, but with no contents, removing contained structural elements](https://gitlab.com/Serenata/Serenata/issues/183)
