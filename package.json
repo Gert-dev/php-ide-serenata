@@ -24,6 +24,11 @@
       "versions": {
         "1.0.0": "provideIntentions"
       }
+    },
+    "outline-view": {
+      "versions": {
+        "0.1.0": "getOutlineProvider"
+      }
     }
   },
   "consumedServices": {
