@@ -1,4 +1,4 @@
-## 4.4.0 (Unreleased)
+## 4.4.0
 * Update to Serenata [4.2.0](https://gitlab.com/Serenata/Serenata/tags/4.2.0)
 * [Integrate support for showing an outline via document symbols](https://github.com/Gert-dev/php-ide-serenata/issues/279)
 
