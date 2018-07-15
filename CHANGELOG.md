@@ -1,5 +1,6 @@
 ## 4.5.0 (Unreleased)
 * [Fix `Cannot read property 'dispose' of null at LinterProvider.deactivate`](https://github.com/Gert-dev/php-ide-serenata/issues/435) (thanks to [@chuhta](https://github.com/chuhta))
+* Fix refactoring actions proposing incorrect class members when inside an anonymous class that was inside another class
 
 ## 4.4.0
 * Update to Serenata [4.2.0](https://gitlab.com/Serenata/Serenata/tags/4.2.0)
