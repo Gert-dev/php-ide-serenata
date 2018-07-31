@@ -1,7 +1,7 @@
 # php-ide-serenata
 <p align="right">
 :coffee:
-<a href="https://liberapay.com/Gert-dev">Feed me some coffee beans to keep it (me) alive</a>
+<a href="https://serenata.gitlab.io/#support">Feed me some coffee beans to keep it (me) alive</a>
 </p>
 
 Integrates [Serenata](https://gitlab.com/Serenata/Serenata) into Atom as PHP IDE, providing autocompletion, code navigation, refactoring, signature help, linting and annotations.
