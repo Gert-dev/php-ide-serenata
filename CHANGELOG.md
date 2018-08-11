@@ -1,6 +1,8 @@
 ## 5.0.0 (Unreleased)
 * (TODO) Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0)
     * Adapt to server changes.
+* Types are now localized during refactoring actions
+    * This will have the effect that if use statements or aliases already exist for a method that is overridden, those aliases will be used instead of copying the original type hint, which might still need to be imported.
 
 ## 4.5.0 (Unreleased)
 * (TODO) Update to Serenata [4.3.0](https://gitlab.com/Serenata/Serenata/tags/4.3.0)
