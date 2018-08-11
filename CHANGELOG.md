@@ -1,3 +1,7 @@
+## 5.0.0 (Unreleased)
+* (TODO) Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0)
+    * Adapt to server changes.
+
 ## 4.5.0 (Unreleased)
 * (TODO) Update to Serenata [4.3.0](https://gitlab.com/Serenata/Serenata/tags/4.3.0)
 * [Fix `Cannot read property 'dispose' of null at LinterProvider.deactivate`](https://github.com/Gert-dev/php-ide-serenata/issues/435) (thanks to [@chuhta](https://github.com/chuhta))
