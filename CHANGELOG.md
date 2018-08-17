@@ -1,4 +1,4 @@
-## 4.5.0 (Unreleased)
+## 4.5.0
 * Update to Serenata [4.3.0](https://gitlab.com/Serenata/Serenata/tags/4.3.0)
 * [Fix `Cannot read property 'dispose' of null at LinterProvider.deactivate`](https://github.com/Gert-dev/php-ide-serenata/issues/435) (thanks to [@chuhta](https://github.com/chuhta))
 * Fix deprecated structural elements no longer having any visible style reflecting it during autocompletion
