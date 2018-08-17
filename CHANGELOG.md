@@ -4,6 +4,7 @@
 * Fix deprecated structural elements no longer having any visible style reflecting it during autocompletion
 * Fix refactoring actions proposing incorrect class members when inside an anonymous class that was inside another class
 * Update use statement sorting logic to match [bugfix in core](https://gitlab.com/Serenata/Serenata/issues/181)
+* Update Composer used for server installation to 1.7.2
 
 ## 4.4.0
 * Update to Serenata [4.2.0](https://gitlab.com/Serenata/Serenata/tags/4.2.0)
