@@ -60,9 +60,6 @@
   },
   "dependencies": {
     "atom-package-deps": "^4.6",
-    "event-kit": "^2.4",
-    "md5": "^2.2",
-    "sanitize-filename": "^1.6",
     "rimraf": "^2.6",
     "mkdirp": "^0.5",
     "download": "^7.0",
@@ -87,176 +84,82 @@
     "eslint": "^4.19.1"
   },
   "configSchema": {
-	"core": {
-		"type": "object",
-		"order": 1,
-		"properties": {
-			"phpExecutionType": {
-				"title": "PHP execution type",
-				"description": "How to start PHP, which is needed to start the server in turn. \n \n 'Use PHP on the host' uses a PHP binary installed on your local machine. 'Use PHP container via Docker' requires Docker and uses a PHP container to start the server with. Using PolicyKit allows Linux users that are not part of the Docker group to enter their password via an authentication dialog to temporarily escalate privileges so the Docker daemon can be invoked once to start the server. \n \n You can use the php-ide-serenata:test-configuration command to test your setup. \n \n Requires a restart after changing. \n \n",
-				"type": "string",
-				"default": "host",
-				"order": 1,
-				"enum": [{
-					"value": "host",
-					"description": "Use PHP on the host"
-				}, {
-					"value": "docker",
-					"description": "Use a PHP container via Docker (experimental)"
-				}, {
-					"value": "docker-polkit",
-					"description": "Use a PHP container via Docker, using PolicyKit for privilege escalation  (experimental, Linux only)"
-				}]
-			},
-			"phpCommand": {
-				"title": "PHP command",
-				"description": "The path to your PHP binary (e.g. /usr/bin/php, php, ...). Only applies if you've selected \"Use PHP on the host\" above. \n \n Requires a restart after changing.",
-				"type": "string",
-				"default": "php",
-				"order": 2
-			},
-			"memoryLimit": {
-				"title": "Memory limit (in MB)",
-				"description": "The memory limit to set for the PHP process. The PHP process uses the available memory for in-memory caching as well, so it should not be too low. On the other hand, it shouldn't be growing very large, so setting it to -1 is probably a bad idea as an infinite loop bug might take down your system. The default should suit most projects, from small to large. \n \n Requires a restart after changing.",
-				"type": "integer",
-				"default": 2048,
-				"order": 3
-			},
-			"additionalDockerVolumes": {
-				"title": "Additional Docker volumes",
-				"description": "Additional paths to mount as Docker volumes. Only applies when using Docker to run the server. Separate these using comma's, where each item follows the format \"src:dest\" as the Docker -v flag uses. \n \n Requires a restart after changing.",
-				"type": "array",
-				"default": [],
-				"order": 4,
-				"items": {
-					"type": "string"
-				}
-			}
-		}
-	},
-	"general": {
-		"type": "object",
-		"order": 2,
-		"properties": {
-			"indexContinuously": {
-				"title": "Index continuously",
-				"description": "If enabled, indexing will happen continuously and automatically whenever the editor is modified. If disabled, indexing will only happen on save. This also influences linting, which happens automatically after indexing completes. In other words, if you would like linting to happen on save, you can disable this option. \n \n Requires a restart after changing.",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			},
-			"additionalIndexingDelay": {
-				"title": "Additional delay before reindexing (in ms)",
-				"description": "Only applies when indexing continously, which happens after a fixed time (about 300 ms at the time of writing and managed by Atom). If this is too fast for you, you can introduce an additional delay here. Fewer indexes means less load as tasks such as linting are invoked less often. However, it also means that it will take longer for changes to code to be reflected in, for example, autocompletion.",
-				"type": "integer",
-				"default": 500,
-				"order": 2
-			}
-		}
-	},
-	"datatips": {
-		"type": "object",
-		"order": 3,
-		"properties": {
-			"enable": {
-				"title": "Enable",
-				"description": "When enabled, documentation for various structural elements can be displayed in a datatip (tooltip).",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			}
-		}
-	},
-	"signatureHelp": {
-		"type": "object",
-		"order": 4,
-		"properties": {
-			"enable": {
-				"title": "Enable",
-				"description": "When enabled, signature help (call tips) will be displayed when the keyboard cursor is inside a function, method or constructor call.",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			}
-		}
-	},
-	"gotoDefinition": {
-		"type": "object",
-		"order": 5,
-		"properties": {
-			"enable": {
-				"title": "Enable",
-				"description": "When enabled, code navigation will be activated via the hyperclick package.",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			}
-		}
-	},
-	"autocompletion": {
-		"type": "object",
-		"order": 6,
-		"properties": {
-			"enable": {
-				"title": "Enable",
-				"description": "When enabled, autocompletion will be activated via the autocomplete-plus package.",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			}
-		}
-	},
-	"annotations": {
-		"type": "object",
-		"order": 7,
-		"properties": {
-			"enable": {
-				"title": "Enable",
-				"description": "When enabled, annotations will be shown in the gutter with more information regarding member overrides and interface implementations.",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			}
-		}
-	},
-	"refactoring": {
-		"type": "object",
-		"order": 8,
-		"properties": {
-			"enable": {
-				"title": "Enable",
-				"description": "When enabled, refactoring actions will be available via the intentions package.",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			}
-		}
-	},
-	"symbols": {
-		"type": "object",
-		"order": 9,
-		"properties": {
-			"enable": {
-				"title": "Enable",
-				"description": "When enabled, symbols will be shown in the outline view.",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			}
-		}
-	},
-	"linting": {
-		"type": "object",
-		"order": 10,
-		"properties": {
-			"enable": {
-				"title": "Enable",
-				"description": "When enabled, linting will show syntax errors in your code. Looking for the old linting options? Serenata 5 has removed them in favor of existing alternatives, which do a much better job at this. See also https://gitlab.com/Serenata/Serenata/wikis/Linting for more information.",
-				"type": "boolean",
-				"default": true,
-				"order": 1
-			}
-		}
-	}
+    "core": {
+      "type": "object",
+      "order": 1,
+      "properties": {
+        "phpExecutionType": {
+          "title": "PHP execution type",
+          "description": "How to start PHP, which is needed to start the server in turn. \n \n 'Use PHP on the host' uses a PHP binary installed on your local machine. 'Use PHP container via Docker' requires Docker and uses a PHP container to start the server with. Using PolicyKit allows Linux users that are not part of the Docker group to enter their password via an authentication dialog to temporarily escalate privileges so the Docker daemon can be invoked once to start the server. \n \n You can use the php-ide-serenata:test-configuration command to test your setup. \n \n Requires a restart after changing. \n \n",
+          "type": "string",
+          "default": "host",
+          "order": 1,
+          "enum": [
+            {
+              "value": "host",
+              "description": "Use PHP on the host"
+            },
+            {
+              "value": "docker",
+              "description": "Use a PHP container via Docker (experimental)"
+            },
+            {
+              "value": "docker-polkit",
+              "description": "Use a PHP container via Docker, using PolicyKit for privilege escalation  (experimental, Linux only)"
+            }
+          ]
+        },
+        "phpCommand": {
+          "title": "PHP command",
+          "description": "The path to your PHP binary (e.g. /usr/bin/php, php, ...). Only applies if you've selected \"Use PHP on the host\" above. \n \n Requires a restart after changing.",
+          "type": "string",
+          "default": "php",
+          "order": 2
+        },
+        "memoryLimit": {
+          "title": "Memory limit (in MB)",
+          "description": "The memory limit to set for the PHP process. The PHP process uses the available memory for in-memory caching as well, so it should not be too low. On the other hand, it shouldn't be growing very large, so setting it to -1 is probably a bad idea as an infinite loop bug might take down your system. The default should suit most projects, from small to large. \n \n Requires a restart after changing.",
+          "type": "integer",
+          "default": 2048,
+          "order": 3
+        },
+        "additionalDockerVolumes": {
+          "title": "Additional Docker volumes",
+          "description": "Additional paths to mount as Docker volumes. Only applies when using Docker to run the server. Separate these using comma's, where each item follows the format \"src:dest\" as the Docker -v flag uses. \n \n Requires a restart after changing.",
+          "type": "array",
+          "default": [],
+          "order": 4,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "order": 2,
+      "properties": {
+        "enable": {
+          "title": "Enable",
+          "description": "When enabled, annotations will be shown in the gutter with more information regarding member overrides and interface implementations.",
+          "type": "boolean",
+          "default": true,
+          "order": 1
+        }
+      }
+    },
+    "refactoring": {
+      "type": "object",
+      "order": 3,
+      "properties": {
+        "enable": {
+          "title": "Enable",
+          "description": "When enabled, refactoring actions will be available via the intentions package.",
+          "type": "boolean",
+          "default": true,
+          "order": 1
+        }
+      }
+    }
   }
 }
