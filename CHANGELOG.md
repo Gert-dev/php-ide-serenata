@@ -1,3 +1,6 @@
+## 4.5.1
+* [Fix `SHA384 is not supported by your openssl extension` on PHP 7.2 setups](https://github.com/Gert-dev/php-ide-serenata/issues/435) (thanks to [@ivanaugustobd](https://github.com/ivanaugustobd))
+
 ## 4.5.0
 * Update to Serenata [4.3.0](https://gitlab.com/Serenata/Serenata/tags/4.3.0)
 * [Fix `Cannot read property 'dispose' of null at LinterProvider.deactivate`](https://github.com/Gert-dev/php-ide-serenata/issues/435) (thanks to [@chuhta](https://github.com/chuhta))
