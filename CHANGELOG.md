@@ -1,6 +1,10 @@
 ## 5.0.0 (Unreleased)
 * (TODO) Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0)
     * Adapt to server changes.
+* Add new experimental execution type to run Serenata using [Podman](https://podman.io/) on Linux
+    * Podman allows for rootless containers that don't require you to add yourself to the Docker group (effectively becoming root) nor escalating privileges using PolicyKit or sudo
+        * Serenata also does not really require anything that requires root, so this should help improve security
+        * Tip: you can also use Podman to run PHPUnit and other things in a container without requiring root
 * Types are now localized during refactoring actions
     * This will have the effect that if use statements or aliases already exist for a method that is overridden, those aliases will be used instead of copying the original type hint, which might still need to be imported.
 
