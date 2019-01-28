@@ -105,7 +105,7 @@
             },
             {
               "value": "docker-polkit",
-              "description": "Use a PHP container via Docker, using PolicyKit for privilege escalation  (experimental, Linux only)"
+              "description": "Use a PHP container via Docker, using PolicyKit for privilege escalation (experimental, Linux only)"
             }
           ]
         },
