@@ -4,8 +4,11 @@
 * Types are now localized during refactoring actions
     * This will have the effect that if use statements or aliases already exist for a method that is overridden, those aliases will be used instead of copying the original type hint, which might still need to be imported.
 
-## 4.5.1
+## 4.5.2
 * Update to Serenata [4.3.1](https://gitlab.com/Serenata/Serenata/tags/4.3.1)
+
+## 4.5.1
+* Fix SHA384 is not supported by your openssl extension on PHP 7.2 setups (thanks to @ivanaugustobd)
 
 ## 4.5.0
 * Update to Serenata [4.3.0](https://gitlab.com/Serenata/Serenata/tags/4.3.0)
