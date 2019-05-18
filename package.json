@@ -59,11 +59,11 @@
     }
   },
   "dependencies": {
-    "atom-package-deps": "^4.6",
+    "atom-package-deps": "^5.0",
     "rimraf": "^2.6",
     "mkdirp": "^0.5",
-    "download": "^7.0",
-    "atom-languageclient": "^0.9.6",
+    "download": "^7.1",
+    "atom-languageclient": "^0.9.9",
     "atom-space-pen-views": "^2.2"
   },
   "package-deps": [
