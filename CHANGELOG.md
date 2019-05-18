@@ -7,6 +7,8 @@
         * Tip: you can also use Podman to run PHPUnit and other things in a container without requiring root
 * Types are now localized during refactoring actions
     * This will have the effect that if use statements or aliases already exist for a method that is overridden, those aliases will be used instead of copying the original type hint, which might still need to be imported.
+* Add new `Restart server` command
+    * Can be used in scenarios where the server is misbehaving, i.e. hanging or consuming too much memory whilst running for a long time. I believe these are issues that should be fixed in the server at some point, but it may be useful nonetheless.
 
 ## 4.5.2
 * Update to Serenata [4.3.1](https://gitlab.com/Serenata/Serenata/tags/4.3.1)
