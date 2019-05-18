@@ -1,6 +1,7 @@
 ## 5.0.0 (Unreleased)
 * (TODO) Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0)
     * Adapt to server changes.
+    * [project-manager](https://atom.io/packages/project-manager) is no longer a hard requirement to run this package. You can still continue using it, if you wish.
 * Add new experimental execution type to run Serenata using [Podman](https://podman.io/) on Linux
     * Podman allows for rootless containers that don't require you to add yourself to the Docker group (effectively becoming root) nor escalating privileges using PolicyKit or sudo
         * Serenata also does not really require anything that requires root, so this should help improve security
