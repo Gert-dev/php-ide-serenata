@@ -12,6 +12,7 @@
     * This will have the effect that if use statements or aliases already exist for a method that is overridden, those aliases will be used instead of copying the original type hint, which might still need to be imported.
 * Add new `Restart server` command
     * Can be used in scenarios where the server is misbehaving, i.e. hanging or consuming too much memory whilst running for a long time. I believe these are issues that should be fixed in the server at some point, but it may be useful nonetheless.
+* Update Composer used for server installation to 1.8.5
 
 ## 4.5.2
 * Update to Serenata [4.3.1](https://gitlab.com/Serenata/Serenata/tags/4.3.1)
