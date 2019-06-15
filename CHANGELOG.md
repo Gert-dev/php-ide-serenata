@@ -12,6 +12,14 @@
     * This will have the effect that if use statements or aliases already exist for a method that is overridden, those aliases will be used instead of copying the original type hint, which might still need to be imported.
 * Add new `Restart server` command
     * Can be used in scenarios where the server is misbehaving, i.e. hanging or consuming too much memory whilst running for a long time. I believe these are issues that should be fixed in the server at some point, but it may be useful nonetheless.
+* Reduce activation time, some very roughly measured numbers:
+    * Before:
+        * PHP project: _200 - 220 ms_
+        * Other project: _170 - 180 ms_
+    * After:
+        * PHP project: _100 - 130 ms_
+        * Other project: _50 - 60 ms_
+    * Note that Serenata isn't even supposed to be starting for other projects, so the code has been restructured to do as little setup as possible here. The remaining overhead is solely induced by loading the `atom-languageclient` package.
 * Update Composer used for server installation to 1.8.5
 
 ## 4.5.2
