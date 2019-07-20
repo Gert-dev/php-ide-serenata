@@ -56,7 +56,12 @@
       "versions": {
         "0.1.0": "consumeSignatureHelp"
       }
-    }
+    },
+    "console": {
+      "versions": {
+        "0.1.0": "consumeConsole"
+      }
+     }
   },
   "dependencies": {
     "atom-package-deps": "^5.0",
