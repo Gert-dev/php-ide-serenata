@@ -4,6 +4,11 @@
     * This package now uses the official [atom-languageclient](https://github.com/atom/atom-languageclient) library and is now a proper language server.
         * Note that we now obey `minimumWordLength` from the `autocomplete-plus` package for autocompletion, **change this to `0` to retain the old behavior.**
     * [project-manager](https://atom.io/packages/project-manager) is no longer a hard requirement to run this package. You can still continue using it, if you wish.
+* Install server as PHAR
+    * Installation should be much faster.
+    * The server is much smaller whilst sitting on disk.
+    * Composer is no longer downloaded to install the server with.
+    * This avoids installation problems with Composer entirely (missing extensions, files missing after installation, ...).
 * Support running for single-file PHP scripts or projects that haven't explicitly been set up
     * By default, the server will only start if you open a PHP file. If you explicitly set up a project before, that configuration will be used (and is the recommended mode of operating). If not, the server will use a fallback configuration and use your system's temp folder to store the index database.
 * Add new experimental execution type to run Serenata using [Podman](https://podman.io/) on Linux
