@@ -5,80 +5,6 @@
 @import "ui-variables";
 @import "octicon-utf-codes";
 
-.php-ide-serenata-popover {
-    max-width: 45%;
-    pointer-events: none;
-
-    .php-ide-serenata-popover-wrapper {
-        margin: 0em 0em 0em 0em;
-        text-align: left;
-
-        div {
-            white-space: normal;
-        }
-
-        .section {
-            > h4 {
-                margin-top: 1em;
-                font-size: larger;
-                font-weight: bold;
-            }
-
-            > div {
-                padding-left: 1em;
-            }
-
-            td {
-                vertical-align: top;
-            }
-
-            td:not(:last-child) {
-                padding-right: 1em;
-            }
-        }
-    }
-}
-
-.php-ide-serenata-signature-help {
-    width: 50%;
-    max-width: 50%;
-
-    .tooltip {
-        pointer-events: none;
-    }
-
-    .php-ide-serenata-signature-help-type {
-        font-style: italic;
-    }
-
-    .php-ide-serenata-signature-help-active-argument {
-        font-weight: bold;
-    }
-
-    .php-ide-serenata-signature-help-inactive-argument {
-        opacity: 0.50;
-    }
-
-    .php-ide-serenata-signature-help-default-value {
-        margin: initial !important;
-    }
-
-    .php-ide-serenata-signature-help-wrapper {
-        margin: 0;
-        padding: 0.25em 0.50em !important;
-        text-align: left;
-        line-height: 1.55em !important;
-
-        div {
-            white-space: normal;
-        }
-
-        p {
-            line-height: 1.25em;
-        }
-    }
-}
-
 .php-ide-serenata-autocompletion-strike, .php-ide-serenata-autocompletion-strike .word {
     text-decoration: line-through;
 }
@@ -102,51 +28,6 @@
 
     .right-label {
         float: right;
-    }
-}
-
-atom-text-editor {
-    .gutter {
-        .line-number {
-            &.override {
-                .icon-right {
-                    opacity: 1.0;
-                    cursor: pointer;
-                    visibility: visible;
-
-                    &:before {
-                        content: @link;
-                        color: @ui-site-color-2;
-                    }
-                }
-            }
-
-            &.abstract-override {
-                .icon-right {
-                    opacity: 1.0;
-                    cursor: pointer;
-                    visibility: visible;
-
-                    &:before {
-                        content: @link;
-                        color: @ui-site-color-5;
-                    }
-                }
-            }
-
-            &.implementations {
-                .icon-right {
-                    opacity: 1.0;
-                    cursor: pointer;
-                    visibility: visible;
-
-                    &:before {
-                        content: @link;
-                        color: @ui-site-color-3;
-                    }
-                }
-            }
-        }
     }
 }
 

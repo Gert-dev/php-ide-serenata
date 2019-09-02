@@ -149,19 +149,6 @@
         }
       }
     },
-    "annotations": {
-      "type": "object",
-      "order": 2,
-      "properties": {
-        "enable": {
-          "title": "Enable",
-          "description": "When enabled, annotations will be shown in the gutter with more information regarding member overrides and interface implementations.",
-          "type": "boolean",
-          "default": true,
-          "order": 1
-        }
-      }
-    },
     "refactoring": {
       "type": "object",
       "order": 3,
