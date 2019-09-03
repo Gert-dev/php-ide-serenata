@@ -66,14 +66,14 @@
       "versions": {
         "0.1.0": "consumeConsole"
       }
-     }
+    }
   },
   "dependencies": {
     "atom-package-deps": "^5.0",
     "rimraf": "^2.6",
     "mkdirp": "^0.5",
     "download": "^7.1",
-    "atom-languageclient": "^0.9.9",
+    "atom-languageclient": "atom/atom-languageclient#3d92c060e0a1b9558a392f5fba674dc707b4528e",
     "atom-space-pen-views": "^2.2"
   },
   "package-deps": [
