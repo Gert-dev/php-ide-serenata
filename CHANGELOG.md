@@ -1,34 +1,35 @@
 ## 5.0.0 (Unreleased)
-* (TODO) Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0)
-    * Adapt to server changes.
-    * This package now uses the official [atom-languageclient](https://github.com/atom/atom-languageclient) library and is now a proper language server.
+* (TODO) Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0) and [become an LSP client](https://github.com/Gert-dev/php-ide-serenata/issues/460)
+    * This package now uses the official [atom-languageclient](https://github.com/atom/atom-languageclient) library.
         * Note that we now obey `minimumWordLength` from the `autocomplete-plus` package for autocompletion, **change this to `0` to retain the old behavior.**
-    * [project-manager](https://atom.io/packages/project-manager) is no longer a hard requirement to run this package. You can still continue using it, if you wish.
+    * Gutter annotations were replaced by inline markers based on code lenses (the language server protocol's equivalent).
+* Make use of [project-manager](https://atom.io/packages/project-manager) optional
 * Install server as PHAR
-    * Installation should be much faster.
-    * The server is much smaller whilst sitting on disk.
-    * Composer is no longer downloaded to install the server with.
-    * This avoids installation problems with Composer entirely (missing extensions, files missing after installation, ...).
-* Support running for single-file PHP scripts or projects that haven't explicitly been set up
-    * By default, the server will only start if you open a PHP file. If you explicitly set up a project before, that configuration will be used (and is the recommended mode of operating). If not, the server will use a fallback configuration and use your system's temp folder to store the index database.
-* Add new experimental execution type to run Serenata using [Podman](https://podman.io/) on Linux
-    * Podman allows for rootless containers that don't require you to add yourself to the Docker group (effectively becoming root) nor escalating privileges using PolicyKit or sudo
-        * Serenata also does not really require anything that requires root, so this should help improve security
-        * Tip: you can also use Podman to run PHPUnit and other things in a container without requiring root
-* Types are now localized during refactoring actions
-    * This will have the effect that if use statements or aliases already exist for a method that is overridden, those aliases will be used instead of copying the original type hint, which might still need to be imported.
-* Gutter annotations have been replaced by inline markers based on code lenses (the language server protocol's equivalent)
+    * Installation is much faster.
+    * The server takes much less disk space.
+    * Composer is no longer downloaded, so fewer extensions are needed and issues with sporadic broken installs are gone.
+* Support single-file PHP scripts and temporary projects
+    * The server will only start if you open a PHP file.
+    * If you explicitly set up a project before, its configuration will be used (this is the recommended mode of operation).
+    * If no explicit project is set up, the server will use a fallback configuration and store the index in memory.
+* Allow experimentally running using [Podman](https://podman.io/) on Linux
+    * Podman allows for rootless containers that don't require adding yourself to the Docker group (effectively becoming root) or escalating privileges using PolicyKit or sudo.
+        * Serenata does not require anything that requires root, so this can help improve security.
+        * Tip: you can also use Podman to run PHPUnit and other things in a container without requiring root.
+* Localize types during refactoring actions
+    * If use statements or aliases already exist for a method that is overridden, these will now be used instead of copying the original type hint, which might not have been imported.
 * Add new `Restart server` command
-    * Can be used in scenarios where the server is misbehaving, i.e. hanging or consuming too much memory whilst running for a long time. I believe these are issues that should be fixed in the server at some point, but it may be useful nonetheless.
-* Reduce activation time, some very roughly measured numbers:
-    * Before:
-        * PHP project: _200 - 220 ms_
-        * Other project: _170 - 180 ms_
-    * After:
-        * PHP project: _100 - 130 ms_
-        * Other project: _50 - 60 ms_
-    * Note that Serenata isn't even supposed to be starting for other projects, so the code has been restructured to do as little setup as possible here. The remaining overhead is solely induced by loading the `atom-languageclient` package.
-* Update Composer used for server installation to 1.8.5
+    * Can be used if the server is misbehaving, i.e. hanging or consuming too much memory whilst running for a long time. These issues should be fixed in the server at some point, but it may be useful in the meantime.
+* Reduce activation time considerably
+    * Some very roughly measured numbers:
+        * Before:
+            * PHP project: _200 - 220 ms_
+            * Other project: _170 - 180 ms_
+        * After:
+            * PHP project: _100 - 130 ms_
+            * Other project: _50 - 60 ms_
+    * Note that, as mentioned above, the server should only start for PHP files, and not everywhere, as before.
+    * The code was restructured to do as little setup as possible. The remaining overhead is primarily loading the `atom-languageclient` package itself.
 
 ## 4.5.2
 * Update to Serenata [4.3.1](https://gitlab.com/Serenata/Serenata/tags/4.3.1)
