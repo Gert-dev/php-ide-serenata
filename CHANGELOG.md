@@ -12,7 +12,7 @@
 * Support single-file PHP scripts and temporary projects
     * The server will only start if you open a PHP file.
     * If you explicitly set up a project before, its configuration will be used (this is the recommended mode of operation).
-    * If no explicit project is set up, the server will use a fallback configuration and store the index in memory.
+    * If no explicit project is set up, the server will use a fallback configuration and store the index in your system's temp folder.
 * Allow experimentally running using [Podman](https://podman.io/) on Linux
     * Podman allows for rootless containers that don't require adding yourself to the Docker group (effectively becoming root) or escalating privileges using PolicyKit or sudo.
         * Serenata does not require anything that requires root, so this can help improve security.
