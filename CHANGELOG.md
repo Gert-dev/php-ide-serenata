@@ -3,6 +3,7 @@
     * This package now uses the official [atom-languageclient](https://github.com/atom/atom-languageclient) library.
         * Note that we now obey `minimumWordLength` from the `autocomplete-plus` package for autocompletion, **change this to `0` to retain the old behavior.**
     * Gutter annotations were replaced by inline markers based on code lenses (the language server protocol's equivalent).
+    * [Files are now automatically watched for changes, so external changes should now properly propagate to the server immediately.](https://github.com/Gert-dev/php-ide-serenata/issues/365)
 * Make use of [project-manager](https://atom.io/packages/project-manager) optional
 * Install server as PHAR
     * Installation is much faster.
