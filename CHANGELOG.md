@@ -1,20 +1,23 @@
-## 5.0.0 (Unreleased)
-* Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0) and [become an LSP client](https://github.com/Gert-dev/php-ide-serenata/issues/460)
-    * This package now uses the official [atom-languageclient](https://github.com/atom/atom-languageclient) library.
-        * Note that we now obey `minimumWordLength` from the `autocomplete-plus` package for autocompletion, **change this to `0` to retain the old behavior.**
-    * Gutter annotations were replaced by inline markers based on code lenses (the language server protocol's equivalent).
-    * [Files are now automatically watched for changes, so external changes should now properly propagate to the server immediately.](https://github.com/Gert-dev/php-ide-serenata/issues/365)
-* Make use of [project-manager](https://atom.io/packages/project-manager) optional
+## 5.0.0
+### Major Changes
+* Update to [Serenata 5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0)
+* [Become an LSP client](https://github.com/Gert-dev/php-ide-serenata/issues/460) and use the official [atom-languageclient](https://github.com/atom/atom-languageclient) library
+* [Watch files for changes to let external changes propagate to the server immediately](https://github.com/Gert-dev/php-ide-serenata/issues/365)
+
+### Improvements
+* Remove dependency on [project-manager](https://atom.io/packages/project-manager)
+* Obey `minimumWordLength` from `autocomplete-plus`, **change it to `0` to retain the old behavior**
+* Replace gutter annotations by inline markers based on code lenses (the language server protocol's equivalent)
 * Install server as PHAR
-    * Installation is much faster.
+    * Installation is now much faster.
     * The server takes much less disk space.
     * Composer is no longer downloaded, so fewer extensions are needed and issues with sporadic broken installs are gone.
 * Support single-file PHP scripts and temporary projects
     * The server will only start if you open a PHP file.
     * If you explicitly set up a project before, its configuration will be used (this is the recommended mode of operation).
     * If no explicit project is set up, the server will use a fallback configuration and store the index in your system's temp folder.
-* Allow experimentally running using [Podman](https://podman.io/) on Linux
-    * Podman allows for rootless containers that don't require adding yourself to the Docker group (effectively becoming root) or escalating privileges using PolicyKit or sudo.
+* Allow experimentally use of [Podman](https://podman.io/) on Linux
+    * Podman allows rootless containers that don't require adding yourself to the Docker group (effectively becoming root) or escalating privileges using PolicyKit or sudo.
         * Serenata does not require anything that requires root, so this can help improve security.
         * Tip: you can also use Podman to run PHPUnit and other things in a container without requiring root.
 * Localize types during refactoring actions
