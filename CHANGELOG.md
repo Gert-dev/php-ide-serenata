@@ -1,5 +1,5 @@
 ## 5.0.0 (Unreleased)
-* (TODO) Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0) and [become an LSP client](https://github.com/Gert-dev/php-ide-serenata/issues/460)
+* Update to Serenata [5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0) and [become an LSP client](https://github.com/Gert-dev/php-ide-serenata/issues/460)
     * This package now uses the official [atom-languageclient](https://github.com/atom/atom-languageclient) library.
         * Note that we now obey `minimumWordLength` from the `autocomplete-plus` package for autocompletion, **change this to `0` to retain the old behavior.**
     * Gutter annotations were replaced by inline markers based on code lenses (the language server protocol's equivalent).
