@@ -1,10 +1,14 @@
+<p align="center">
+<img src="https://serenata.gitlab.io/images/logo.png" alt="Serenata logo"</img>
+</p>
+
 # php-ide-serenata
-Integrates [Serenata](https://gitlab.com/Serenata/Serenata) into Atom as PHP IDE, providing autocompletion, code navigation, refactoring, signature help, linting and annotations.
+Integrates [Serenata](https://serenata.gitlab.io/) into Atom, providing autocompletion, code navigation, refactoring, signature help, linting and code lenses for PHP.
 
-See also [the website](https://serenata.gitlab.io/) for [how to set it up](https://serenata.gitlab.io/#what-do-i-need) and screenshots.
+![T](https://serenata.gitlab.io/images/autocompletion.png)
 
-There is also [a wiki](https://github.com/Gert-dev/php-ide-serenata/wiki) with more information.
+See also [the website](https://serenata.gitlab.io/) on [how to set it up](https://serenata.gitlab.io/#what-do-i-need) and more screenshots.
 
-Note that this package is an alternative to and will conflict with the [ide-php](https://atom.io/packages/ide-php) package by default (you can disable parts of this package via the settings screen if desired).
+_This package is an alternative to and conflicts with the [ide-php](https://atom.io/packages/ide-php) package._
 
 ![GPLv3 Logo](http://gplv3.fsf.org/gplv3-127x51.png)
