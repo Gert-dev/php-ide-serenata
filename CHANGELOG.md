@@ -1,3 +1,7 @@
+## 5.0.1
+* [Fix "Cannot read property 'set' of undefined"](https://github.com/Gert-dev/php-ide-serenata/issues/476) (thanks to @bpedroza)
+* [Fix incorrect paths in generated project configuration on Windows](https://github.com/Gert-dev/php-ide-serenata/pull/479) (thanks to @UziTech)
+
 ## 5.0.0
 ### Major Changes
 * Update to [Serenata 5.0.0](https://gitlab.com/Serenata/Serenata/tags/5.0.0)
