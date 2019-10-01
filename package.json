@@ -1,7 +1,7 @@
 {
   "name": "php-ide-serenata",
   "main": "./lib/Main",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "PHP language support for Atom-IDE via the Serenata server",
   "repository": "https://github.com/Gert-dev/php-ide-serenata",
   "homepage": "https://serenata.gitlab.io/",
