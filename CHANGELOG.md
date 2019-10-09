@@ -1,4 +1,7 @@
 ## 5.0.1
+* [Fix installation on Windows due to `apm` breaking with unstable Git versions](https://github.com/Gert-dev/php-ide-serenata/issues/477)
+    * A fix for this is pending upstream (thanks @UziTech).
+    * This reintroduces [a bug](https://github.com/Gert-dev/php-ide-serenata/issues/487) I fixed by targeting the latest release, but this is not as worse as breaking installation on Windows.
 * [Fix "Cannot read property 'set' of undefined"](https://github.com/Gert-dev/php-ide-serenata/issues/476) (thanks to @bpedroza)
 * [Fix incorrect paths in generated project configuration on Windows](https://github.com/Gert-dev/php-ide-serenata/pull/479) (thanks to @UziTech)
 
