@@ -1,3 +1,6 @@
+## 5.1.0
+* Update to [Serenata 5.1.0](https://gitlab.com/Serenata/Serenata/tags/5.1.0)
+
 ## 5.0.2
 * [Fix installation on Windows due to `apm` breaking with unstable Git versions](https://github.com/Gert-dev/php-ide-serenata/issues/477)
     * A fix for this is pending upstream (thanks @UziTech).
