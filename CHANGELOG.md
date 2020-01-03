@@ -1,3 +1,6 @@
+## 5.2.0
+* Update to [Serenata 5.2.0](https://gitlab.com/Serenata/Serenata/tags/5.2.0)
+
 ## 5.1.0
 * Update to [Serenata 5.1.0](https://gitlab.com/Serenata/Serenata/tags/5.1.0)
 
