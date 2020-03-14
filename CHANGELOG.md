@@ -1,3 +1,7 @@
+## 5.2.1 (Unreleased)
+* Update dependencies
+* [Don't update settings every project open to avoid settings synchronization being triggered](https://github.com/Gert-dev/php-ide-serenata/issues/499)
+
 ## 5.2.0
 * Update to [Serenata 5.2.0](https://gitlab.com/Serenata/Serenata/tags/5.2.0)
 
