@@ -77,7 +77,8 @@
   },
   "package-deps": [
     "atom-ide-ui",
-    "intentions"
+    "intentions",
+    "busy-signal"
   ],
   "keywords": [
     "serenata",
