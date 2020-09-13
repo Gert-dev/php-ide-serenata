@@ -69,11 +69,11 @@
     }
   },
   "dependencies": {
-    "atom-package-deps": "^5.0",
-    "mkdirp": "^0.5",
-    "download": "^7.1",
     "atom-languageclient": "^0.9.9",
-    "atom-space-pen-views": "^2.2"
+    "atom-package-deps": "^5.0",
+    "atom-space-pen-views": "^2.2",
+    "download": "^7.1",
+    "mkdirp": "^0.5.5"
   },
   "package-deps": [
     "atom-ide-ui",
