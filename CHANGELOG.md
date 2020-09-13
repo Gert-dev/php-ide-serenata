@@ -1,3 +1,7 @@
+## 5.4.0
+* Update dependencies
+* Update to [Serenata 5.4.0](https://gitlab.com/Serenata/Serenata/tags/5.4.0)
+
 ## 5.3.0
 * Update dependencies
 * Update to [Serenata 5.3.0](https://gitlab.com/Serenata/Serenata/tags/5.3.0)
