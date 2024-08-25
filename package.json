@@ -1,7 +1,7 @@
 {
   "name": "php-ide-serenata",
   "main": "./lib/Main",
-  "version": "5.4.1",
+  "version": "5.5.0",
   "description": "PHP language support for Pulsar-IDE via the Serenata server",
   "repository": "git@github.com:Gert-dev/php-ide-serenata",
   "homepage": "https://serenata.gitlab.io/",
