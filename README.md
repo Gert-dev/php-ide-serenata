@@ -3,7 +3,8 @@
 </p>
 
 # php-ide-serenata
-Integrates [Serenata](https://serenata.gitlab.io/) into Atom, providing autocompletion, code navigation, refactoring, signature help, linting and code lenses for PHP.
+
+Integrates [Serenata](https://serenata.gitlab.io/) into Pulsar, providing autocompletion, code navigation, refactoring, signature help, linting and code lenses for PHP.
 
 ![T](https://serenata.gitlab.io/images/autocompletion.png)
 

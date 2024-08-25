@@ -2,7 +2,7 @@
   "name": "php-ide-serenata",
   "main": "./lib/Main",
   "version": "5.4.1",
-  "description": "PHP language support for Atom-IDE via the Serenata server",
+  "description": "PHP language support for Pulsar-IDE via the Serenata server",
   "repository": "https://github.com/Gert-dev/php-ide-serenata",
   "homepage": "https://serenata.gitlab.io/",
   "license": "GPL-3.0-or-later",
@@ -99,7 +99,7 @@
       "properties": {
         "phpExecutionType": {
           "title": "PHP execution type",
-          "description": "How to start PHP, which is needed to start the server in turn. \n \n 'Use PHP on the host' uses a PHP binary installed on your local machine. 'Use PHP container via Docker' requires Docker and uses a PHP container to start the server with. Using PolicyKit allows Linux users that are not part of the Docker group to enter their password via an authentication dialog to temporarily escalate privileges so the Docker daemon can be invoked once to start the server. \n \n You can use the php-ide-serenata:test-configuration command to test your setup. \n \n When using containers, project paths open in Atom are automatically mounted into the container at the same path. If you want to specify more exotic paths for Serenata to index in your project file, you have to ensure these are mounted in the container as well. \n \n Requires a restart after changing. \n \n",
+          "description": "How to start PHP, which is needed to start the server in turn. \n \n 'Use PHP on the host' uses a PHP binary installed on your local machine. 'Use PHP container via Docker' requires Docker and uses a PHP container to start the server with. Using PolicyKit allows Linux users that are not part of the Docker group to enter their password via an authentication dialog to temporarily escalate privileges so the Docker daemon can be invoked once to start the server. \n \n You can use the php-ide-serenata:test-configuration command to test your setup. \n \n When using containers, project paths open in Pulsar are automatically mounted into the container at the same path. If you want to specify more exotic paths for Serenata to index in your project file, you have to ensure these are mounted in the container as well. \n \n Requires a restart after changing. \n \n",
           "type": "string",
           "default": "host",
           "order": 1,
