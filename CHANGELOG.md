@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased][]
 
+## [5.5.1][]
+
 ### Changed
 
 * Migrate to Pulsar from Atom. Atom is no longer supported.
@@ -1246,4 +1248,5 @@ foo()-> // Autocompletion for DateTime.
 ## 0.1.0
 * Initial release.
 
-[unreleased]: https://github.com/Gert-dev/php-ide-serenata/compare/v5.4.1...HEAD
+[unreleased]: https://github.com/Gert-dev/php-ide-serenata/compare/v5.5.1...HEAD
+[5.5.1]: https://github.com/Gert-dev/php-ide-serenata/compare/v5.4.1...v5.5.1
