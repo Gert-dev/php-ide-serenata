@@ -1,3 +1,19 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased][]
+
+### Changed
+
+* Migrate to Pulsar from Atom. Atom is no longer supported.
+
+### Fixed
+
+* Fix autocompletion leading to duplicated symbols and tokens ([#527](https://github.com/Gert-dev/php-ide-serenata/issues/527)).
+
 ## 5.4.0
 * Update dependencies
 * Update to [Serenata 5.4.0](https://gitlab.com/Serenata/Serenata/tags/5.4.0)
@@ -1229,3 +1245,5 @@ foo()-> // Autocompletion for DateTime.
 
 ## 0.1.0
 * Initial release.
+
+[unreleased]: https://github.com/Gert-dev/php-ide-serenata/compare/v5.4.1...HEAD
